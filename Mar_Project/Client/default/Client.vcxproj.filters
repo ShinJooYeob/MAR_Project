@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Defualt">
+      <UniqueIdentifier>{e7156619-cad2-4907-b502-1d1c22817347}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Defualt\00.Win32Frame">
+      <UniqueIdentifier>{5c7bab4b-2b9f-4139-aaf5-876563fb76d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Defualt\01.Resource">
+      <UniqueIdentifier>{cc18a8c6-5aae-41d9-9dd0-d61f309badcd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Defualt\02.Etc">
+      <UniqueIdentifier>{52d18270-3c81-43e1-b808-48e60e8ac357}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00.MainApp">
+      <UniqueIdentifier>{0ccab6bc-d019-4f6a-bc24-2e51ddbb49c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject">
+      <UniqueIdentifier>{c8084e21-6e42-4756-bc55-0f79fcd51637}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.Scene">
+      <UniqueIdentifier>{9a2c5b51-8549-45fb-806c-ff4b44a6a156}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.Manager">
+      <UniqueIdentifier>{fd19786c-916a-4a67-94d9-8b6441c018ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="99.Define">
+      <UniqueIdentifier>{1ee0750c-8ecd-4398-bb1b-0d397435881c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="04.Shader">
+      <UniqueIdentifier>{30453a1d-d790-418b-a46d-3d663ffac8a3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Client.h">
+      <Filter>Defualt\00.Win32Frame</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Defualt\01.Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Defualt\02.Etc</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Defualt\02.Etc</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Client.cpp">
+      <Filter>Defualt\00.Win32Frame</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Defualt\02.Etc</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Client.ico">
+      <Filter>Defualt\01.Resource</Filter>
+    </Image>
+    <Image Include="small.ico">
+      <Filter>Defualt\01.Resource</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Client.rc">
+      <Filter>Defualt\01.Resource</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt">
+      <Filter>Defualt\02.Etc</Filter>
+    </Text>
+  </ItemGroup>
+</Project>
