@@ -76,6 +76,9 @@
     <Filter Include="02.Scene\02.Scene_StageSelect">
       <UniqueIdentifier>{145c5e13-96c0-44f7-9b0c-4e9a3c0d8ed2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03.Manager\00.ImguiMgr">
+      <UniqueIdentifier>{29328987-fc74-40a6-9e9f-099c4bed12c8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -117,6 +120,9 @@
     <ClInclude Include="..\public\MainApp.h">
       <Filter>00.MainApp</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\ImguiMgr.h">
+      <Filter>03.Manager\00.ImguiMgr</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -142,6 +148,9 @@
     </ClCompile>
     <ClCompile Include="..\private\MainApp.cpp">
       <Filter>00.MainApp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\ImguiMgr.cpp">
+      <Filter>03.Manager\00.ImguiMgr</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

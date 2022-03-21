@@ -157,6 +157,7 @@
     <ClInclude Include="..\public\Client_Define.h" />
     <ClInclude Include="..\public\Client_Enum.h" />
     <ClInclude Include="..\public\Client_Struct.h" />
+    <ClInclude Include="..\public\ImguiMgr.h" />
     <ClInclude Include="..\public\Loader.h" />
     <ClInclude Include="..\public\MainApp.h" />
     <ClInclude Include="..\public\Scene_Loading.h" />
@@ -169,6 +170,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Camera_Main.cpp" />
+    <ClCompile Include="..\private\ImguiMgr.cpp" />
     <ClCompile Include="..\private\Loader.cpp" />
     <ClCompile Include="..\private\MainApp.cpp" />
     <ClCompile Include="..\private\Scene_Loading.cpp" />
