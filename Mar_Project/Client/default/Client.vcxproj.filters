@@ -31,6 +31,51 @@
     <Filter Include="04.Shader">
       <UniqueIdentifier>{30453a1d-d790-418b-a46d-3d663ffac8a3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.Scene\00.Scene_Loby">
+      <UniqueIdentifier>{7b131272-88f9-4afd-bdd2-382caad94551}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.Scene\01.Scene_Loading">
+      <UniqueIdentifier>{6ad055e1-8e5f-4a43-91a9-26ce892987d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\01.Camera">
+      <UniqueIdentifier>{d09064ee-34a7-42b6-b363-e8d2bf134f17}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\02.GroundObject">
+      <UniqueIdentifier>{4234320f-adb5-41c4-a71e-d2160e5f2c5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\03.Enemy">
+      <UniqueIdentifier>{82b6eeb9-b6bd-402b-aee4-71e95a28309b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\04.NPC">
+      <UniqueIdentifier>{b5844b96-6a34-4bae-8369-2bc7f90fceea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\00.Player">
+      <UniqueIdentifier>{fe57c843-b3ec-44e6-94f4-b3ddf1c4e08d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\97.Effect">
+      <UniqueIdentifier>{83f6410d-f1b9-4c63-8879-97974cc0472b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\98.Particle">
+      <UniqueIdentifier>{cfe067af-132a-4c87-8f94-4ef11e40a36a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\99.UI">
+      <UniqueIdentifier>{a01e9795-e673-41db-821f-03fe4d08e81c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.Scene\03.Scene_Gameplay">
+      <UniqueIdentifier>{6c098263-0780-437e-aab4-7b46404ad0c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.Scene\03.Scene_Gameplay\Scene_Stage1">
+      <UniqueIdentifier>{35e6df60-beb8-4ad4-9ce1-66b4579a3c8f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.Scene\03.Scene_Gameplay\Scene_Stage2">
+      <UniqueIdentifier>{8fb49357-b233-4b49-b7fe-bb5283fd5dbd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.Scene\03.Scene_Gameplay\Scene_Stage3">
+      <UniqueIdentifier>{47af3df8-c050-4cb8-a98f-61ab8b1e0757}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.Scene\02.Scene_StageSelect">
+      <UniqueIdentifier>{145c5e13-96c0-44f7-9b0c-4e9a3c0d8ed2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -45,6 +90,33 @@
     <ClInclude Include="targetver.h">
       <Filter>Defualt\02.Etc</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Client_Define.h">
+      <Filter>99.Define</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Client_Enum.h">
+      <Filter>99.Define</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Client_Struct.h">
+      <Filter>99.Define</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Loader.h">
+      <Filter>02.Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Camera_Main.h">
+      <Filter>01.GameObject\01.Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Scene_Loading.h">
+      <Filter>02.Scene\01.Scene_Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Scene_Loby.h">
+      <Filter>02.Scene\00.Scene_Loby</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Scene_StageSelect.h">
+      <Filter>02.Scene\02.Scene_StageSelect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\MainApp.h">
+      <Filter>00.MainApp</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -52,6 +124,24 @@
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>Defualt\02.Etc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Loader.cpp">
+      <Filter>02.Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Camera_Main.cpp">
+      <Filter>01.GameObject\01.Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Scene_Loading.cpp">
+      <Filter>02.Scene\01.Scene_Loading</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Scene_Loby.cpp">
+      <Filter>02.Scene\00.Scene_Loby</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Scene_StageSelect.cpp">
+      <Filter>02.Scene\02.Scene_StageSelect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\MainApp.cpp">
+      <Filter>00.MainApp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -159,6 +159,7 @@
     <ClInclude Include="..\public\ThreadMgr.h" />
     <ClInclude Include="..\public\TimeMgr.h" />
     <ClInclude Include="..\public\Timer.h" />
+    <ClInclude Include="..\public\Transform.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp" />
@@ -180,6 +181,7 @@
     <ClCompile Include="..\private\ThreadMgr.cpp" />
     <ClCompile Include="..\private\TimeMgr.cpp" />
     <ClCompile Include="..\private\Timer.cpp" />
+    <ClCompile Include="..\private\Transform.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

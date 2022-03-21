@@ -21,12 +21,12 @@ HRESULT CSoundMgr::Initialize_FMOD()
 	}
 
 	ZeroMemory(m_PauseArr, sizeof(_bool)*CHANNEL_MAXCHANNEL);
-	ZeroMemory(m_fPassedTimeArr, sizeof(_float) * 32);
+	ZeroMemory(m_fPassedTimeArr, sizeof(_double) * 32);
 
 	return LoadSoundFile();
 }
 
-HRESULT CSoundMgr::Update_FMOD(_float fTimeDelta)
+HRESULT CSoundMgr::Update_FMOD(_double fTimeDelta)
 {
 	FMOD_System_Update(m_pSystem);
 
@@ -136,7 +136,7 @@ HRESULT CSoundMgr::PlaySound(TCHAR * pSoundKey, CHANNELID eID, _float fLouderMul
 
 	FMOD_BOOL bPlay = FALSE;
 	_uint fOldSoundIndx = -1;
-	_float fOldestTime = -1.f;
+	_double fOldestTime = -1.f;
 
 	for (_uint i = eID * m_iNumOfEachChannel; i < (eID + 1) * m_iNumOfEachChannel; i++)
 	{

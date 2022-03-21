@@ -23,6 +23,9 @@
 #define DIS_DoubleDown		0b00000100
 #define DIS_Press			0b11111111
 
+
+#define NOT_EXIST_VECTOR		_float3(99999.f,99999.f,99999.f)
+
 //// »ö
 //#define COLOR_GRAY		(D3DCOLOR_ARGB(255, 124, 124, 124))
 //#define COLOR_BLUE      (D3DCOLOR_XRGB(0, 0, 255))

@@ -13,7 +13,7 @@ private:
 
 public:
 	HRESULT Initialize_FMOD();
-	HRESULT Update_FMOD(_float fTimeDelta);
+	HRESULT Update_FMOD(_double fTimeDelta);
 
 public:
 	_int  Channel_VolumeUp(CHANNELID eID, _float _vol);
@@ -30,7 +30,7 @@ public:
 	_bool  Get_Channel_IsPaused(CHANNELID eID);
 
 private:
-	_float	m_fPassedTimeArr[32];
+	_double	m_fPassedTimeArr[32];
 	_float	m_VolumeArr[CHANNEL_MAXCHANNEL];
 	_bool	m_PauseArr[CHANNEL_MAXCHANNEL];
 	//FMOD_BOOL m_bool;

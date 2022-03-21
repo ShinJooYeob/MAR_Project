@@ -20,11 +20,18 @@ HRESULT CComponentMgr::Reserve_Container(_uint eMaxSceneNum)
 HRESULT CComponentMgr::Add_Component_Prototype(_uint eSceneIdx, const _tchar * tagComPrototype, CComponent * pComponenet)
 {
 	if (eSceneIdx >= m_iMaxScenenNum || pComponenet == nullptr)
+	{
+		__debugbreak();
 		return E_FAIL;
+	}
 
 
 	if (Find_Component(eSceneIdx, tagComPrototype) != nullptr)
+	{
+
+		__debugbreak();
 		return E_FAIL;
+	}
 
 	m_mapComPrototype[eSceneIdx].emplace(tagComPrototype, pComponenet);
 
@@ -53,7 +60,10 @@ HRESULT CComponentMgr::Clear_Scene_Componenets(_uint eSceneIdx)
 {
 
 	if (eSceneIdx >= m_iMaxScenenNum)
+	{
+		__debugbreak();
 		return E_FAIL;
+	}
 
 	for (auto& pair : m_mapComPrototype[eSceneIdx]) 
 		Safe_Release(pair.second);

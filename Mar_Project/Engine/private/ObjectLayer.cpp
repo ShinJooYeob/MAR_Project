@@ -13,7 +13,7 @@ HRESULT CObjectLayer::Add_GameObject(CGameObject * pGameObject)
 	return S_OK;
 }
 
-_int CObjectLayer::Update(_float fDeltaTime)
+_int CObjectLayer::Update(_double fDeltaTime)
 {
 
 	auto ObjectIter = m_ObjectList.begin();
@@ -37,7 +37,7 @@ _int CObjectLayer::Update(_float fDeltaTime)
 	return _int();
 }
 
-_int CObjectLayer::LateUpdate(_float fDeltaTime)
+_int CObjectLayer::LateUpdate(_double fDeltaTime)
 {
 
 	auto ObjectIter = m_ObjectList.begin();
@@ -95,7 +95,10 @@ HRESULT CObjectLayer::Delete_GameObject_By_LayerIndex(_uint iIndex)
 {
 	// 특정 오브젝트 삭제 / 인덱스번호
 	if (iIndex >= m_ObjectList.size())
+	{
+		__debugbreak();
 		return E_FAIL;
+	}
 
 	int index = 0;
 	for (auto iter = m_ObjectList.begin(); iter!=m_ObjectList.end();iter++)
@@ -108,6 +111,7 @@ HRESULT CObjectLayer::Delete_GameObject_By_LayerIndex(_uint iIndex)
 		index++;
 	}
 
+	__debugbreak();
 	return E_FAIL;
 }
 

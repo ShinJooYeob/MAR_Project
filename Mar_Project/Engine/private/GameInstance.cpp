@@ -37,11 +37,14 @@ CGameInstance::CGameInstance()
 }
 
 
-HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInst, const CGraphic_Device::GRAPHICDESC & GraphicDesc, _uint iMaxSceneNum, ID3D11Device** ppDeviceOut, ID3D11DeviceContext** ppDeviceContextOut, _float fDoubleInterver)
+HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInst, const CGraphic_Device::GRAPHICDESC & GraphicDesc, _uint iMaxSceneNum, ID3D11Device** ppDeviceOut, ID3D11DeviceContext** ppDeviceContextOut, _double fDoubleInterver)
 {
 	if (m_pGraphicDevice == nullptr || m_pObjectMgr == nullptr || m_pComponenetMgr == nullptr ||
-		m_pSceneMgr == nullptr || m_pFrustumMgr == nullptr || m_pSoundMgr == nullptr )
+		m_pSceneMgr == nullptr || m_pFrustumMgr == nullptr || m_pSoundMgr == nullptr)
+	{
+		__debugbreak();
 		return E_FAIL;
+	}
 
 	//if (FAILED(m_pSeverMgr->ConnectSever()))
 	//{
@@ -68,7 +71,7 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInst, const CGraphic_Device:
 }
 
 
-_int CGameInstance::Update_Engine(_float fDeltaTime)
+_int CGameInstance::Update_Engine(_double fDeltaTime)
 {
 	if (m_pSceneMgr == nullptr || m_pObjectMgr == nullptr || m_pSoundMgr == nullptr)
 		return -1;
@@ -79,10 +82,16 @@ _int CGameInstance::Update_Engine(_float fDeltaTime)
 	FAILED_CHECK(m_pSoundMgr->Update_FMOD(fDeltaTime));
 
 	if (m_pSceneMgr->Update(fDeltaTime) < 0)
+	{
+		__debugbreak();
 		return -1;
+	}
 
 	if (m_pObjectMgr->Update(fDeltaTime) < 0)
+	{
+		__debugbreak();
 		return -1;
+	}
 
 	FAILED_CHECK(SetUp_WorldFrustumPlane());
 
@@ -90,12 +99,18 @@ _int CGameInstance::Update_Engine(_float fDeltaTime)
 	return 0;
 }
 
-_int CGameInstance::LateUpdate_Engine(_float fDeltaTime)
+_int CGameInstance::LateUpdate_Engine(_double fDeltaTime)
 {
 	if (m_pObjectMgr->LateUpdate(fDeltaTime) < 0)
+	{
+		__debugbreak();
 		return -1;
+	}
 	if (m_pSceneMgr->LateUpdate(fDeltaTime) < 0)
+	{
+		__debugbreak();
 		return -1;
+	}
 
 	return 0;
 }
@@ -104,39 +119,39 @@ _int CGameInstance::LateUpdate_Engine(_float fDeltaTime)
 HRESULT CGameInstance::Clear_Scene_Resource(_uint eSceneNum)
 {
 	if (m_pObjectMgr == nullptr || m_pComponenetMgr == nullptr)
+	{
+		__debugbreak();
 		return E_FAIL;
+	}
 
 
-	if (FAILED(m_pComponenetMgr->Clear_Scene_Componenets(eSceneNum)))
-		return E_FAIL;
+	FAILED_CHECK(m_pComponenetMgr->Clear_Scene_Componenets(eSceneNum));
 
-	if(FAILED(m_pObjectMgr->Clear_Scene_GameObjects(eSceneNum)))
-		return E_FAIL;
-
+	FAILED_CHECK(m_pObjectMgr->Clear_Scene_GameObjects(eSceneNum));
 
 	return S_OK;
 }
 
 HRESULT CGameInstance::Clear_BackBuffer_View(_float4 vClearColor)
 {
-	if (nullptr == m_pGraphicDevice)
-		return E_FAIL;
+	NULL_CHECK_BREAK(m_pGraphicDevice);
+
 
 	return m_pGraphicDevice->Clear_BackBuffer_View(vClearColor);
 }
 
 HRESULT CGameInstance::Clear_DepthStencil_View()
 {
-	if (nullptr == m_pGraphicDevice)
-		return E_FAIL;
+	NULL_CHECK_BREAK(m_pGraphicDevice);
+
 
 	return m_pGraphicDevice->Clear_DepthStencil_View();
 }
 
 HRESULT CGameInstance::Present()
 {
-	if (nullptr == m_pGraphicDevice)
-		return E_FAIL;
+	NULL_CHECK_BREAK(m_pGraphicDevice);
+
 
 	return m_pGraphicDevice->Present();
 }
@@ -144,16 +159,18 @@ HRESULT CGameInstance::Present()
 HRESULT CGameInstance::Add_GameObject_Prototype(const _tchar * tagPrototype, CGameObject * pPrototype)
 {
 	if (m_pObjectMgr == nullptr)
+	{
+		__debugbreak();
 		return E_FAIL;
+	}
 
 	return	m_pObjectMgr->Add_GameObject_Prototype(tagPrototype, pPrototype);
 }
 
 HRESULT CGameInstance::Add_GameObject_To_Layer(_uint eSceneNum, const _tchar * tagLayer, const _tchar * tagPrototype, void * pArg)
 {
+	NULL_CHECK_BREAK(m_pObjectMgr);
 
-	if (m_pObjectMgr == nullptr) 
-		return E_FAIL;
 
 
 	return	m_pObjectMgr->Add_GameObject_To_Layer(eSceneNum, tagLayer, tagPrototype, pArg);
@@ -161,8 +178,11 @@ HRESULT CGameInstance::Add_GameObject_To_Layer(_uint eSceneNum, const _tchar * t
 
 CComponent* CGameInstance::Get_Commponent_By_LayerIndex(_uint eSceneNum, const _tchar * tagLayer, const _tchar* tagComponet, _uint iLayerIndex)
 {
-	if (tagComponet == nullptr || tagLayer == nullptr|| m_pObjectMgr == nullptr)
+	if (tagComponet == nullptr || tagLayer == nullptr || m_pObjectMgr == nullptr)
+	{
+		__debugbreak();
 		return nullptr;
+	}
 
 	return m_pObjectMgr->Get_Commponent_By_LayerIndex(eSceneNum, tagLayer, tagComponet,iLayerIndex);
 }
@@ -170,7 +190,10 @@ CComponent* CGameInstance::Get_Commponent_By_LayerIndex(_uint eSceneNum, const _
 CGameObject * CGameInstance::Get_GameObject_By_LayerIndex(_uint eSceneNum, const _tchar * tagLayer, _uint iLayerIndex)
 {
 	if (tagLayer == nullptr || m_pObjectMgr == nullptr)
+	{
+		__debugbreak();
 		return nullptr;
+	}
 
 	return m_pObjectMgr->Get_GameObject_By_LayerIndex(eSceneNum, tagLayer,iLayerIndex);
 }
@@ -178,7 +201,10 @@ CGameObject * CGameInstance::Get_GameObject_By_LayerIndex(_uint eSceneNum, const
 list<CGameObject*>* CGameInstance::Get_ObjectList_from_Layer(_uint eSceneNum, const _tchar * tagLayer)
 {
 	if (tagLayer == nullptr || m_pObjectMgr == nullptr)
+	{
+		__debugbreak();
 		return nullptr;
+	}
 
 	return m_pObjectMgr->Get_ObjectList_from_Layer(eSceneNum, tagLayer);
 }
@@ -187,7 +213,11 @@ list<CGameObject*>* CGameInstance::Get_ObjectList_from_Layer(_uint eSceneNum, co
 HRESULT CGameInstance::Delete_GameObject_To_Layer_Index(_uint eSceneNum, const _tchar * tagLayer, _uint index)
 {
 	if (tagLayer == nullptr || m_pObjectMgr == nullptr)
+	{
+
+		__debugbreak();
 		return E_FAIL;
+	}
 	
 
 	return Delete_GameObject_To_Layer_Index(eSceneNum, tagLayer, index);
@@ -196,25 +226,27 @@ HRESULT CGameInstance::Delete_GameObject_To_Layer_Index(_uint eSceneNum, const _
 HRESULT CGameInstance::Delete_GameObject_To_Layer_Object(_uint eSceneNum, const _tchar * tagLayer, CGameObject * obj)
 {
 	if (tagLayer == nullptr || m_pObjectMgr == nullptr)
+	{
+		__debugbreak();
 		return E_FAIL;
+	}
 
 	return Delete_GameObject_To_Layer_Object(eSceneNum, tagLayer, obj);
 }
 
 
 
-_float CGameInstance::Get_DeltaTime(const _tchar * tagTimer)
+_double CGameInstance::Get_DeltaTime(const _tchar * tagTimer)
 {
-	if (nullptr == m_pTimerMgr)
-		return -1.f;
+	NULL_CHECK_BREAK(m_pTimerMgr);
+
 
 	return m_pTimerMgr->Get_DeltaTime(tagTimer);
 }
 
 HRESULT CGameInstance::Add_Timer(const _tchar * tagTimer)
 {
-	if (nullptr == m_pTimerMgr)
-		return E_FAIL;
+	NULL_CHECK_BREAK(m_pTimerMgr);
 
 	return m_pTimerMgr->Add_Timer(tagTimer);
 }
@@ -225,7 +257,10 @@ HRESULT CGameInstance::Scene_Change(CScene * pScene, _int iNextSceneIdx)
 {
 
 	if (m_pSceneMgr == nullptr || m_pObjectMgr == nullptr)
+	{
+		__debugbreak();
 		return E_FAIL;
+	}
 
 	if(FAILED(m_pSceneMgr->Scene_Chage(pScene, iNextSceneIdx)))
 		return E_FAIL;
@@ -238,23 +273,26 @@ HRESULT CGameInstance::Scene_Change(CScene * pScene, _int iNextSceneIdx)
 
 _int CGameInstance::Render_Scene()
 {
-	if (m_pSceneMgr == nullptr)
-		return -1;
+	NULL_CHECK_BREAK(m_pSceneMgr);
 
 	if (m_pSceneMgr->Render() < 0)
+	{
+		__debugbreak();
 		return -1;
+	}
 
 	if (m_pSceneMgr->LateRender() < 0)
+	{
+		__debugbreak();
 		return -1;
+	}
 
 	return 0;
 }
 
 _uint CGameInstance::Get_NowSceneNum()
 {
-	if (m_pSceneMgr == nullptr)
-		return -1;
-
+	NULL_CHECK_BREAK(m_pSceneMgr);
 
 	return m_pSceneMgr->Get_NowSceneNum();
 }
@@ -269,23 +307,22 @@ CScene * CGameInstance::Get_NowScene()
 
 HRESULT CGameInstance::Set_SceneChanging_to_Scene(_uint _INextScene)
 {
-	if (m_pSceneMgr == nullptr)
-		return E_FAIL;
+	NULL_CHECK_BREAK(m_pSceneMgr);
+
 	return m_pSceneMgr->Set_SceneChanging_to_Scene(_INextScene);
 }
 
 HRESULT CGameInstance::Add_Component_Prototype(_uint eSceneIdx, const _tchar * tagPrototypeComponent, CComponent * pComponenet)
 {
-	if (m_pComponenetMgr == nullptr)
-		return E_FAIL;
+	NULL_CHECK_BREAK(m_pComponenetMgr);
+
 
 	return m_pComponenetMgr->Add_Component_Prototype(eSceneIdx, tagPrototypeComponent,pComponenet);
 }
 
 CComponent * CGameInstance::Clone_Component(_uint eSceneIdx, const _tchar * tagPrototypeComponent, void * pArg)
 {
-	if (m_pComponenetMgr == nullptr)
-		return nullptr;
+	NULL_CHECK_BREAK(m_pComponenetMgr);
 
 
 	return m_pComponenetMgr->Clone_Component(eSceneIdx, tagPrototypeComponent, pArg);
@@ -293,48 +330,51 @@ CComponent * CGameInstance::Clone_Component(_uint eSceneIdx, const _tchar * tagP
 
 HRESULT CGameInstance::PlayThread(void * _ThreadFunc, void * _pArg)
 {
-	if (m_pThreadMgr == nullptr)
-		return E_FAIL;
+	NULL_CHECK_BREAK(m_pThreadMgr);
 
 	return m_pThreadMgr->PlayThread(_ThreadFunc, _pArg);
 }
 
 _byte CGameInstance::Get_DIKeyState(_ubyte eKeyID)
 {
-	if (m_pInputDevice == nullptr)
-		return 0;
+	NULL_CHECK_BREAK(m_pInputDevice);
 
 	return m_pInputDevice->Get_DIKeyState(eKeyID);
 }
 
 _long CGameInstance::Get_DIMouseMoveState(CInput_Device::MOUSEMOVESTATE eMouseMoveState)
 {
-	if (m_pInputDevice == nullptr)
-		return 0;
+	NULL_CHECK_BREAK(m_pInputDevice);
+
 
 	return m_pInputDevice->Get_DIMouseMoveState(eMouseMoveState);
 }
 
 _byte CGameInstance::Get_DIMouseButtonState(CInput_Device::MOUSEBUTTONSTATE eMouseButtonState)
 {
-	if (m_pInputDevice == nullptr)
-		return 0;
+	NULL_CHECK_BREAK(m_pInputDevice);
 
 	return m_pInputDevice->Get_DIMouseButtonState(eMouseButtonState);
 }
 
 _float CGameInstance::Easing(_uint eEasingType, _float fStartPoint, _float fTargetPoint, _float fPassedTime, _float fTotalTime)
 {
-	if (m_pEasingMgr == nullptr)
-		return 0;
+	NULL_CHECK_BREAK(m_pEasingMgr);
 
 	return m_pEasingMgr->Easing(eEasingType, fStartPoint, fTargetPoint, fPassedTime, fTotalTime);
 }
 
+_float3 CGameInstance::Easing_Vector(_uint eEasingType, _float3 fStartPoint, _float3 fTargetPoint, _float fPassedTime, _float fTotalTime)
+{
+
+	NULL_CHECK_BREAK(m_pEasingMgr);
+
+	return m_pEasingMgr->Easing_Vector(eEasingType, fStartPoint, fTargetPoint, fPassedTime, fTotalTime);
+}
+
 HRESULT CGameInstance::SetUp_WorldFrustumPlane()
 {
-	if (m_pFrustumMgr == nullptr)
-		return E_FAIL;
+	NULL_CHECK_BREAK(m_pFrustumMgr);
 
 	return m_pFrustumMgr->SetUp_WorldFrustumPlane();
 }
@@ -440,15 +480,15 @@ void CGameInstance::Release_Engine()
 	if (0 != GetSingle(CInput_Device)->DestroyInstance())
 		MSGBOX("Failed to Release Com CInput_Device ");
 
-	if (0 != GetSingle(CGraphic_Device)->DestroyInstance())
-		MSGBOX("Failed to Release Com Graphic_Device ");
-
 	if (0 != GetSingle(CTimeMgr)->DestroyInstance())
 		MSGBOX("Failed to Release Com TimeMgr ");
 
 	if (0 != GetSingle(CSoundMgr)->DestroyInstance())
 		MSGBOX("Failed to Release Com CSoundMgr ");
 	
+
+	if (0 != GetSingle(CGraphic_Device)->DestroyInstance())
+		MSGBOX("Failed to Release Com Graphic_Device ");
 
 }
 

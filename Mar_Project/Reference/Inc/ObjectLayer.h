@@ -17,8 +17,8 @@ private:
 public:
 	HRESULT Add_GameObject(class CGameObject* pGameObject);
 
-	_int Update(_float fDeltaTime);
-	_int LateUpdate(_float fDeltaTime);
+	_int Update(_double fDeltaTime);
+	_int LateUpdate(_double fDeltaTime);
 	
 public:
 	list<CGameObject*>*	Get_ObjectList() { return &m_ObjectList; };

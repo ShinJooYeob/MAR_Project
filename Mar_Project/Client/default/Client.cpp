@@ -3,11 +3,14 @@
 
 #include "stdafx.h"
 #include "Client.h"
+#include "MainApp.h"
 
 #define MAX_LOADSTRING 100
 
 // 전역 변수:
-HINSTANCE hInst;                                // 현재 인스턴스입니다.
+HWND		g_hWnd;
+HINSTANCE	g_hInst;                                // 현재 인스턴스입니다.
+_double		g_fDeltaTime;
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
 
@@ -22,6 +25,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_ LPWSTR    lpCmdLine,
                      _In_ int       nCmdShow)
 {
+
+#ifdef _DEBUG
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif // _DEBUG
+	srand(_uint(time(NULL)));
+
+
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
@@ -42,15 +52,60 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     MSG msg;
 
-    // 기본 메시지 루프입니다.
-    while (GetMessage(&msg, nullptr, 0, 0))
-    {
-        if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
-        {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-        }
-    }
+
+	CGameInstance*	pGameInstance = GetSingle(CGameInstance);
+	if (nullptr == pGameInstance)
+		return FALSE;
+	Safe_AddRef(pGameInstance);
+
+	CMainApp* pMainApp = CMainApp::Create();
+	if (pMainApp == nullptr)
+		return FALSE;
+
+	/* For.Timer_Default */
+	FAILED_CHECK(pGameInstance->Add_Timer(TEXT("Timer_Default")));
+
+	/* For.Timer_60 */
+	FAILED_CHECK(pGameInstance->Add_Timer(TEXT("Timer_60fps")));
+
+
+	_double			fTimeAcc = 0.f;
+
+	while (true)
+	{
+		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
+			if (msg.message == WM_QUIT)
+				break;
+
+			if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+			{
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
+
+		}
+
+		fTimeAcc += pGameInstance->Get_DeltaTime(TEXT("Timer_Default"));
+
+		if (fTimeAcc > FPS)
+		{
+			fTimeAcc = 0.f;
+			if (pMainApp->Update(pGameInstance->Get_DeltaTime(TEXT("Timer_60fps"))) < 0)
+				MSGBOX("Failed to Update");
+
+			if (FAILED(pMainApp->Render()))
+				MSGBOX("Failed to Render");
+		}
+
+	}
+
+	if (0 != Safe_Release(pMainApp))
+		MSGBOX("Failed to Release ClientApp ");
+
+
+	Safe_Release(pGameInstance);
+	CGameInstance::Release_Engine();
+
 
     return (int) msg.wParam;
 }
@@ -83,22 +138,15 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
     return RegisterClassExW(&wcex);
 }
 
-//
-//   함수: InitInstance(HINSTANCE, int)
-//
-//   목적: 인스턴스 핸들을 저장하고 주 창을 만듭니다.
-//
-//   설명:
-//
-//        이 함수를 통해 인스턴스 핸들을 전역 변수에 저장하고
-//        주 프로그램 창을 만든 다음 표시합니다.
-//
+
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
-   hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
+	g_hInst = hInstance;
+	RECT rcWindow{ 0,0,g_iWinCX,g_iWinCY };
 
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+	   CW_USEDEFAULT, 0, rcWindow.right - rcWindow.left, rcWindow.bottom - rcWindow.top,
+	   nullptr, nullptr, hInstance, nullptr);
 
    if (!hWnd)
    {
@@ -108,19 +156,11 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
 
+   g_hWnd = hWnd;
+
    return TRUE;
 }
 
-//
-//  함수: WndProc(HWND, UINT, WPARAM, LPARAM)
-//
-//  목적:  주 창의 메시지를 처리합니다.
-//
-//  WM_COMMAND  - 응용 프로그램 메뉴를 처리합니다.
-//  WM_PAINT    - 주 창을 그립니다.
-//  WM_DESTROY  - 종료 메시지를 게시하고 반환합니다.
-//
-//
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
@@ -132,7 +172,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             switch (wmId)
             {
             case IDM_ABOUT:
-                DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+                DialogBox(g_hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
                 break;
             case IDM_EXIT:
                 DestroyWindow(hWnd);

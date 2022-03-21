@@ -1,7 +1,7 @@
 #pragma once
 
 #include "GameObject.h"
-//#include "Transform.h"
+#include "Transform.h"
 
 BEGIN(Engine)
 
@@ -31,7 +31,7 @@ public:
 
 protected:
 	_bool						m_bIsOrtho = true;
-	//CTransform*					m_pTransform = nullptr;
+	CTransform*					m_pTransform = nullptr;
 	CAMERADESC					m_CameraDesc;
 
 

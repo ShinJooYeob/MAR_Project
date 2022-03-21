@@ -6,7 +6,7 @@ CInput_Device::CInput_Device()
 {
 }
 
-HRESULT CInput_Device::Ready_Input_Device(HINSTANCE hInst, HWND hWnd, _float fDoubleTimeInterver)
+HRESULT CInput_Device::Ready_Input_Device(HINSTANCE hInst, HWND hWnd, _double fDoubleTimeInterver)
 {
 	FAILED_CHECK(DirectInput8Create(hInst, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&m_pInput, nullptr));
 
@@ -31,13 +31,13 @@ HRESULT CInput_Device::Ready_Input_Device(HINSTANCE hInst, HWND hWnd, _float fDo
 
 	ZeroMemory(m_byKeyState, sizeof(_byte) * 256);
 	ZeroMemory(m_byOldKeyState, sizeof(_byte) * 256);
-	ZeroMemory(m_byDoubleKeyState, sizeof(_float) * 256);
+	ZeroMemory(m_byDoubleKeyState, sizeof(_double) * 256);
 	ZeroMemory(m_bIsKeyPulsDeltaTime, sizeof(_bool) * 256);
 
 
 	ZeroMemory(&m_MouseState, sizeof(MOUSEBUTTONSTATE));
 	ZeroMemory(&m_byOldMouseState, sizeof(_byte)* MBS_END);
-	ZeroMemory(m_byDoubleMouseState, sizeof(_float) * MBS_END);
+	ZeroMemory(m_byDoubleMouseState, sizeof(_double) * MBS_END);
 	ZeroMemory(m_bIsMousePulsDeltaTime, sizeof(_bool) * MBS_END);
 
 
@@ -138,7 +138,7 @@ _byte CInput_Device::Get_DIMouseButtonState(MOUSEBUTTONSTATE eMouseButtonState)
 }
 
 
-HRESULT CInput_Device::SetUp_InputDeviceState(_float fDeltaTime)
+HRESULT CInput_Device::SetUp_InputDeviceState(_double fDeltaTime)
 {
 	if (nullptr == m_pKeyboard ||
 		nullptr == m_pMouse)

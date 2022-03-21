@@ -32,7 +32,10 @@ HRESULT CRenderer::Add_RenderGroup(RENDERGROUP eRenderID, CGameObject * pGameObj
 {
 	if (eRenderID >= RENDER_END ||
 		pGameObject == nullptr)
+	{
+		__debugbreak();
 		return E_FAIL;
+	}
 
 	//if (eRenderID == CRenderer::RENDER_ALPHA)
 	//	pGameObject->Compute_CamDistance((CTransform*)(pGameObject->Get_Component(TEXT("Com_Transform"))));

@@ -29,9 +29,9 @@ private:
 	 
 
 public:/*엔진이 돌아갈 때 전반적으로 처리해줘야할 것들*/
-	HRESULT		Initialize_Engine(HINSTANCE hInst, const CGraphic_Device::GRAPHICDESC& GraphicDesc,_uint iMaxSceneNum , ID3D11Device** ppDeviceOut, ID3D11DeviceContext** ppDeviceContextOut, _float fDoubleInterver = 0.3f);
-	_int		Update_Engine(_float fDeltaTime);
-	_int		LateUpdate_Engine(_float fDeltaTime);
+	HRESULT		Initialize_Engine(HINSTANCE hInst, const CGraphic_Device::GRAPHICDESC& GraphicDesc,_uint iMaxSceneNum , ID3D11Device** ppDeviceOut, ID3D11DeviceContext** ppDeviceContextOut, _double fDoubleInterver = 0.3);
+	_int		Update_Engine(_double fDeltaTime);
+	_int		LateUpdate_Engine(_double fDeltaTime);
 
 	HRESULT		Clear_Scene_Resource(_uint eSceneNum);
 
@@ -58,7 +58,7 @@ public: /*For.ComMgr*/
 
 
 public: /* For.TimerMgr */
-	_float	Get_DeltaTime(const _tchar* tagTimer);
+	_double	Get_DeltaTime(const _tchar* tagTimer);
 	HRESULT Add_Timer(const _tchar* tagTimer);
 
 
@@ -78,7 +78,8 @@ public: /* For.Input_Device */
 	_byte Get_DIMouseButtonState(CInput_Device::MOUSEBUTTONSTATE eMouseButtonState);
 
 public:
-	_float Easing(_uint eEasingType,_float fStartPoint, _float fTargetPoint,  _float fPassedTime, _float fTotalTime = 1.0f);
+	_float Easing(_uint eEasingType, _float fStartPoint, _float fTargetPoint, _float fPassedTime, _float fTotalTime = 1.0f);
+	_float3	Easing_Vector(_uint eEasingType, _float3 fStartPoint, _float3 fTargetPoint, _float fPassedTime, _float fTotalTime = 1.0f);
 	
 	//FrustumMgr
 public:

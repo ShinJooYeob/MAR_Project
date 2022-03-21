@@ -19,3 +19,6 @@
 
 
 // TODO: 프로그램에 필요한 추가 헤더는 여기에서 참조합니다.
+
+#include "GameInstance.h"
+#include "Client_Define.h"

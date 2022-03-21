@@ -21,7 +21,10 @@ CFrustumMgr::CFrustumMgr()
 HRESULT CFrustumMgr::Initialize_FrustumMgr(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 {
 	if (pDevice == nullptr || pDeviceContext == nullptr)
+	{
+		__debugbreak();
 		return E_FAIL;
+	}
 
 	m_pDevice = pDevice;
 	m_pDeviceContext = pDeviceContext;
@@ -35,7 +38,10 @@ HRESULT CFrustumMgr::Initialize_FrustumMgr(ID3D11Device* pDevice, ID3D11DeviceCo
 HRESULT CFrustumMgr::SetUp_WorldFrustumPlane()
 {
 	if (m_pDevice == nullptr || m_pDeviceContext == nullptr)
+	{
+		__debugbreak();
 		return E_FAIL;
+	}
 
 	//_Matrix matVeiw, matProject;
 	//m_pGraphicDevice->GetTransform(D3DTS_VIEW, &matVeiw);

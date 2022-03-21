@@ -20,11 +20,13 @@ _double CTimeMgr::Get_DeltaTime(const _tchar * tagTimer)
 HRESULT CTimeMgr::Add_Timer(const _tchar * tagTimer)
 {
 	if (nullptr != Find_Timer(tagTimer))
+	{
+		__debugbreak();
 		return E_FAIL;
+	}
 
 	CTimer*	pTimer = CTimer::Create();
-	if (nullptr == pTimer)
-		return E_FAIL;
+	NULL_CHECK_BREAK(pTimer);
 
 	m_mapTimers.emplace(tagTimer, pTimer);
 

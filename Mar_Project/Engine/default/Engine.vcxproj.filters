@@ -183,6 +183,9 @@
     <ClInclude Include="..\public\Renderer.h">
       <Filter>01.Utility\01.ComponentMgr\01.Component\02.Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Transform.h">
+      <Filter>01.Utility\01.ComponentMgr\01.Component\01.Transform</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">
@@ -241,6 +244,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Renderer.cpp">
       <Filter>01.Utility\01.ComponentMgr\01.Component\02.Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Transform.cpp">
+      <Filter>01.Utility\01.ComponentMgr\01.Component\01.Transform</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

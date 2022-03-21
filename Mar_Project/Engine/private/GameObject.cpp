@@ -62,12 +62,16 @@ CComponent* CGameObject::Get_Component(const _tchar * tagComponent)
 HRESULT CGameObject::Add_Component(_uint iScenenNum, const _tchar* tagPrototype, const _tchar* tagComponent, CComponent** ppOut, void* pArg)
 {
 	if (Find_Components(tagComponent) != nullptr)
+	{
+		__debugbreak();
 		return E_FAIL;
+	}
 
 	 CComponent* pCloneComponent = GetSingle(CGameInstance)->Clone_Component(iScenenNum, tagPrototype, pArg);
 
-	 if (pCloneComponent == nullptr)
-		 return E_FAIL;
+	 NULL_CHECK_BREAK(pCloneComponent);
+
+
 
 	 m_mapComponets.emplace(tagComponent, pCloneComponent);
 
@@ -88,8 +92,7 @@ HRESULT CGameObject::Change_Component(_uint iScenenNum, const _tchar * tagProtot
 		Safe_Release(m_mapComponets[tagComponent]);
 
 		CComponent* pCloneComponent = GetSingle(CGameInstance)->Clone_Component(iScenenNum, tagPrototype, pArg);
-		if (pCloneComponent == nullptr)
-			return E_FAIL;
+		NULL_CHECK_BREAK(pCloneComponent);
 
 		// 키로 접근해 해당 컴포넌트 삭제 후에 다시 넣는다.
 		m_mapComponets[tagComponent] = pCloneComponent;

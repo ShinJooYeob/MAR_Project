@@ -25,8 +25,8 @@ public:
 	
 
 public:
-	HRESULT Ready_Input_Device(HINSTANCE hInst, HWND hWnd, _float fDoubleTimeInterver);
-	HRESULT SetUp_InputDeviceState(_float fDeltaTime);
+	HRESULT Ready_Input_Device(HINSTANCE hInst, HWND hWnd, _double fDoubleTimeInterver);
+	HRESULT SetUp_InputDeviceState(_double fDeltaTime);
 
 private:
 	LPDIRECTINPUT8				m_pInput = nullptr;
@@ -38,16 +38,16 @@ private:
 private:
 	_byte					m_byKeyState[256];
 	_byte					m_byOldKeyState[256];			//이전 프레임상태를 저장 (다운 체크과 업을 체그하기 위해)
-	_float					m_byDoubleKeyState[256];		//더블 키 입력 시간 간격을 체크하기 위한 배열
+	_double					m_byDoubleKeyState[256];		//더블 키 입력 시간 간격을 체크하기 위한 배열
 	_bool					m_bIsKeyPulsDeltaTime[256];		//더블 키 입력을 여러번 받는 것을 방지하기 위한 변수
 
 	DIMOUSESTATE			m_MouseState;
 	_byte					m_byOldMouseState[MBS_END];						//이전 프레임상태를 저장 (다운 체크과 업을 체그하기 위해)
-	_float					m_byDoubleMouseState[MBS_END];			//더블 키 입력 시간 간격을 체크하기 위한 배열
+	_double					m_byDoubleMouseState[MBS_END];			//더블 키 입력 시간 간격을 체크하기 위한 배열
 	_bool					m_bIsMousePulsDeltaTime[MBS_END];		//더블 키 입력을 여러번 받는 것을 방지하기 위한 변수
 
-	_float					m_DoubleInterver;
-	_float					m_fDeltaTime;
+	_double					m_DoubleInterver;
+	_double					m_fDeltaTime;
 
 public:
 	virtual void Free() override;

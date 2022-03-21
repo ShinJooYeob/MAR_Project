@@ -11,7 +11,11 @@ CEasingMgr::CEasingMgr()
 _float CEasingMgr::Easing(_uint eEasingType, _float fStartPoint, _float fTargetPoint, _float fPassedTime, _float fTotalTime)
 {
 	if (eEasingType >= TYPE_End)
+	{
+		MSGBOX("Failed to Easing");
+		__debugbreak();
 		return 0;
+	}
 
 	switch (eEasingType)
 	{
@@ -101,6 +105,26 @@ _float CEasingMgr::Easing(_uint eEasingType, _float fStartPoint, _float fTargetP
 	}
 
 	return 0;
+}
+
+_float3 CEasingMgr::Easing_Vector(_uint eEasingType, _float3 fStartPoint, _float3 fTargetPoint, _float fPassedTime, _float fTotalTime)
+{
+	_float3 vResult = NOT_EXIST_VECTOR;
+
+	if (eEasingType >= TYPE_End)
+	{
+		MSGBOX("Failed to Easing");
+		__debugbreak();
+		return vResult;
+	}
+
+
+	vResult.x = Easing(eEasingType, fStartPoint.x, fTargetPoint.x, fPassedTime, fTotalTime);
+	vResult.y = Easing(eEasingType, fStartPoint.y, fTargetPoint.y, fPassedTime, fTotalTime);
+	vResult.z = Easing(eEasingType, fStartPoint.z, fTargetPoint.z, fPassedTime, fTotalTime);
+
+
+	return vResult;
 }
 
 

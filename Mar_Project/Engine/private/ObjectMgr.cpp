@@ -21,8 +21,8 @@ HRESULT CObjectMgr::Reserve_Container(_uint _eSceneNum)
 
 HRESULT CObjectMgr::Add_GameObject_Prototype(const _tchar * tagPrototype, CGameObject * pPrototype)
 {
-	if (pPrototype == nullptr)
-		return E_FAIL;
+	NULL_CHECK_BREAK(pPrototype);
+
 
 	if (Find_Prototype(tagPrototype) != nullptr)
 	{
@@ -42,17 +42,19 @@ HRESULT CObjectMgr::Add_GameObject_Prototype(const _tchar * tagPrototype, CGameO
 HRESULT CObjectMgr::Add_GameObject_To_Layer(_uint eSceneNum, const _tchar * tagLayer, const _tchar * tagPrototype, void * pArg)
 {
 	if (eSceneNum >= m_iMaxSceneNum)
+	{
+		__debugbreak();
 		return E_FAIL;
+	}
 
 	CGameObject* pPrototype = Find_Prototype(tagPrototype);
 
-	if (pPrototype == nullptr)
-		return E_FAIL;
+	NULL_CHECK_BREAK(pPrototype);
+
 
 	CGameObject* pInstance =  pPrototype->Clone(pArg);
 
-	if (pInstance == nullptr)
-		return E_FAIL;
+	NULL_CHECK_BREAK(pInstance);
 
 	pInstance->Set_NowSceneNum(eSceneNum);
 
@@ -64,9 +66,8 @@ HRESULT CObjectMgr::Add_GameObject_To_Layer(_uint eSceneNum, const _tchar * tagL
 	if (pLayer == nullptr)
 	{
 		pLayer = CObjectLayer::Create();
+		NULL_CHECK_BREAK(pLayer);
 
-		if (pLayer == nullptr)
-			return E_FAIL;
 
 		FAILED_CHECK(pLayer->Add_GameObject(pInstance));
 
@@ -87,7 +88,10 @@ HRESULT CObjectMgr::Add_GameObject_To_Layer(_uint eSceneNum, const _tchar * tagL
 HRESULT CObjectMgr::Delete_GameObject_To_Layer_Index(_uint eSceneNum, const _tchar * tagLayer, int index)
 {
 	if (eSceneNum >= m_iMaxSceneNum || m_mapLayer == nullptr)
+	{
+		__debugbreak();
 		return E_FAIL;
+	}
 
 	CObjectLayer* pLayer = Find_Layer(eSceneNum, tagLayer);
 
@@ -107,8 +111,8 @@ HRESULT CObjectMgr::Delete_GameObject_To_Layer_Object(_uint eSceneNum, const _tc
 
 	CObjectLayer* pLayer = Find_Layer(eSceneNum, tagLayer);
 
-	if (pLayer == nullptr)
-		return E_FAIL;
+	NULL_CHECK_BREAK(pLayer);
+
 
 	FAILED_CHECK(pLayer->Delete_GameObject_By_LayerObject(obj));
 
@@ -120,7 +124,10 @@ HRESULT CObjectMgr::Clear_Scene_GameObjects(_uint eSceneNum)
 {
 
 	if (eSceneNum >= m_iMaxSceneNum)
+	{
+		__debugbreak();
 		return E_FAIL;
+	}
 
 	for (auto& pair : m_mapLayer[eSceneNum])
 		Safe_Release(pair.second);
@@ -173,6 +180,7 @@ list<CGameObject*>* CObjectMgr::Get_ObjectList_from_Layer(_uint iSceneNum, const
 {
 	if (iSceneNum >= m_iMaxSceneNum || m_mapLayer == nullptr)
 		return nullptr;
+
 	CObjectLayer* layer = Find_Layer(iSceneNum, tagLayer);
 	if (!layer)
 		return nullptr;
@@ -180,7 +188,7 @@ list<CGameObject*>* CObjectMgr::Get_ObjectList_from_Layer(_uint iSceneNum, const
 		return layer->Get_ObjectList();
 }
 
-_int CObjectMgr::Update(_float fDeltaTime)
+_int CObjectMgr::Update(_double fDeltaTime)
 {
 	for (_uint eSceneNym = 0 ; eSceneNym < m_iMaxSceneNum; eSceneNym++)
 	{
@@ -189,7 +197,10 @@ _int CObjectMgr::Update(_float fDeltaTime)
 		{
 
 			if (pair.second->Update(fDeltaTime) < 0)
+			{
+				__debugbreak();
 				return -1;
+			}
 
 		}
 	}
@@ -198,14 +209,17 @@ _int CObjectMgr::Update(_float fDeltaTime)
 	return 0;
 }
 
-_int CObjectMgr::LateUpdate(_float fDeltaTime)
+_int CObjectMgr::LateUpdate(_double fDeltaTime)
 {
 	for (_uint eSceneNym = 0; eSceneNym < m_iMaxSceneNum; eSceneNym++)
 	{
 		for (auto& pair : m_mapLayer[eSceneNym])
 		{
 			if (pair.second->LateUpdate(fDeltaTime) < 0)
+			{
+				__debugbreak();
 				return -1;
+			}
 
 		}
 	}
@@ -249,7 +263,7 @@ void CObjectMgr::Free()
 
 	Safe_Delete_Array(m_mapLayer);
 
-	for (auto& pair : m_mapPrototypes) 
+	for (auto& pair : m_mapPrototypes)
 	{
 		Safe_Release(pair.second);
 	}

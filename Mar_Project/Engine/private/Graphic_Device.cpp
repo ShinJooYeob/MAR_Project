@@ -57,7 +57,10 @@ HRESULT CGraphic_Device::Initialize_Graphic_Device(HWND hWnd, WINMODE WinMode, _
 HRESULT CGraphic_Device::Clear_BackBuffer_View(_float4 vClearColor)
 {
 	if (nullptr == m_pDeviceContext)
+	{
+		__debugbreak();
 		return E_FAIL;
+	}
 
 	/* 백버퍼를 초기화한다.  */
 	m_pDeviceContext->ClearRenderTargetView(m_pBackBufferRTV, (_float*)&vClearColor);
@@ -68,7 +71,10 @@ HRESULT CGraphic_Device::Clear_BackBuffer_View(_float4 vClearColor)
 HRESULT CGraphic_Device::Clear_DepthStencil_View()
 {
 	if (nullptr == m_pDeviceContext)
+	{
+		__debugbreak();
 		return E_FAIL;
+	}
 
 	m_pDeviceContext->ClearDepthStencilView(m_pDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
 
@@ -78,7 +84,10 @@ HRESULT CGraphic_Device::Clear_DepthStencil_View()
 HRESULT CGraphic_Device::Present()
 {
 	if (nullptr == m_pSwapChain)
+	{
+		__debugbreak();
 		return E_FAIL;
+	}
 
 	return m_pSwapChain->Present(0, 0);	
 }
@@ -127,7 +136,10 @@ HRESULT CGraphic_Device::Ready_SwapChain(HWND hWnd, WINMODE eWinMode, _uint iWin
 HRESULT CGraphic_Device::Ready_BackBufferRenderTargetView()
 {
 	if (nullptr == m_pDevice)
+	{
+		__debugbreak();
 		return E_FAIL;
+	}
 
 	ID3D11Texture2D*		pBackBufferTexture = nullptr;
 
@@ -143,7 +155,10 @@ HRESULT CGraphic_Device::Ready_BackBufferRenderTargetView()
 HRESULT CGraphic_Device::Ready_DepthStencilRenderTargetView(_uint iWinCX, _uint iWinCY)
 {
 	if (nullptr == m_pDevice)
+	{
+		__debugbreak();
 		return E_FAIL;
+	}
 
 	ID3D11Texture2D*		pDepthStencilTexture = nullptr;
 	
@@ -179,30 +194,19 @@ HRESULT CGraphic_Device::Ready_DepthStencilRenderTargetView(_uint iWinCX, _uint 
 
 void CGraphic_Device::Free()
 {
-	Safe_Release(m_pSwapChain);
-	Safe_Release(m_pDepthStencilView);
-	Safe_Release(m_pBackBufferRTV);
-	Safe_Release(m_pDeviceContext);
+	_ulong RefChecker = 0;
+	
+	RefChecker += Safe_Release(m_pSwapChain);
+	RefChecker += Safe_Release(m_pDepthStencilView);
+	RefChecker += Safe_Release(m_pBackBufferRTV);
+	RefChecker += Safe_Release(m_pDeviceContext);
+	RefChecker += Safe_Release(m_pDevice);
 
-
-#if defined(DEBUG) || defined(_DEBUG)
-	ID3D11Debug* d3dDebug;
-	HRESULT hr = m_pDevice->QueryInterface(__uuidof(ID3D11Debug), reinterpret_cast<void**>(&d3dDebug));
-	if (SUCCEEDED(hr))
+	if (RefChecker > 0)
 	{
-		OutputDebugStringW(L"----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- \r\n");
-		OutputDebugStringW(L"                                                                    D3D11 Live Object ref Count Checker \r\n");
-		OutputDebugStringW(L"----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- \r\n");
-
-		hr = d3dDebug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
-
-		OutputDebugStringW(L"----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- \r\n");
-		OutputDebugStringW(L"                                                                    D3D11 Live Object ref Count Checker END \r\n");
-		OutputDebugStringW(L"----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- \r\n");
+		MSGBOX("Device isn't Deleted");
+		__debugbreak();
 	}
-	if (d3dDebug != nullptr)            d3dDebug->Release();
-#endif
 
 
-	Safe_Release(m_pDevice);
 }
