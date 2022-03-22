@@ -12,8 +12,6 @@
 // Call IMGUI_CHECKVERSION() from your .cpp files to verify that the data structures your files are using are matching the ones imgui.cpp is using.
 //-----------------------------------------------------------------------------
 
-#ifdef USE_IMGUI
-
 #pragma once
 
 //---- Define assertion handler. Defaults to calling assert().
@@ -125,5 +123,3 @@ namespace ImGui
     void MyFunction(const char* name, const MyMatrix44& v);
 }
 */
-
-#endif // USE_IMGUI

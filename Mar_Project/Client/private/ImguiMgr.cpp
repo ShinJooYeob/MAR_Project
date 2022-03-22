@@ -100,9 +100,10 @@ _int CImguiMgr::Update_ImguiMgr(_double fDeltatime)
 	return _int();
 }
 
-_int CImguiMgr::Begin_Update_Frame(_double fDeltatime, const char * szManuBarName)
+_int CImguiMgr::Begin_Update_Frame(_double fDeltatime, const char * szManuBarName,_uint iFlag)
 {
-	ImGui::Begin(szManuBarName);
+	_bool _bOpen = true;
+	ImGui::Begin(szManuBarName,&_bOpen, iFlag);
 
 	return _int();
 }

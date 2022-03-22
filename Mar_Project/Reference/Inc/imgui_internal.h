@@ -1,6 +1,5 @@
 // dear imgui, v1.88 WIP
 // (internal structures/api)
-#ifdef USE_IMGUI
 
 // You may use this file to debug, understand or extend ImGui features but we don't provide any guarantee of forward compatibility!
 // Set:
@@ -2941,5 +2940,3 @@ extern const char*  ImGuiTestEngine_FindItemDebugLabel(ImGuiContext* ctx, ImGuiI
 #endif
 
 #endif // #ifndef IMGUI_DISABLE
-
-#endif // USE_IMGUI
