@@ -1,7 +1,9 @@
 #pragma once
 
-
+#ifdef _DEBUG
 #define USE_IMGUI
+#endif // _DEBUG
+
 
 
 #include "targetver.h"
@@ -17,9 +19,8 @@
 #include <tchar.h>
 
 
-#ifdef USE_IMGUI
+#ifndef USE_IMGUI
 
-#else
 
 #ifdef _DEBUG
 

@@ -8,6 +8,9 @@ extern HINSTANCE g_hInst;
 extern HWND g_hWnd;
 extern _double g_fDeltaTime;
 
+#ifdef USE_IMGUI
+#define GETIMGUI GetSingle(CImguiMgr)
+#endif // USE_IMGUI
 
 #define FPS		1.f/60.f
 

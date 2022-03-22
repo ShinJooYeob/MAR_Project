@@ -79,6 +79,9 @@
     <Filter Include="03.Manager\00.ImguiMgr">
       <UniqueIdentifier>{29328987-fc74-40a6-9e9f-099c4bed12c8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03.Manager\99.ImguiDefault">
+      <UniqueIdentifier>{dc128ed1-cc82-46aa-a7d4-ec3d27efce43}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -123,6 +126,30 @@
     <ClInclude Include="..\public\ImguiMgr.h">
       <Filter>03.Manager\00.ImguiMgr</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Reference\Inc\imconfig.h">
+      <Filter>03.Manager\99.ImguiDefault</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Reference\Inc\imgui.h">
+      <Filter>03.Manager\99.ImguiDefault</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Reference\Inc\imgui_impl_dx11.h">
+      <Filter>03.Manager\99.ImguiDefault</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Reference\Inc\imgui_impl_win32.h">
+      <Filter>03.Manager\99.ImguiDefault</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Reference\Inc\imgui_internal.h">
+      <Filter>03.Manager\99.ImguiDefault</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Reference\Inc\imstb_rectpack.h">
+      <Filter>03.Manager\99.ImguiDefault</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Reference\Inc\imstb_textedit.h">
+      <Filter>03.Manager\99.ImguiDefault</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Reference\Inc\imstb_truetype.h">
+      <Filter>03.Manager\99.ImguiDefault</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -152,6 +179,27 @@
     <ClCompile Include="..\private\ImguiMgr.cpp">
       <Filter>03.Manager\00.ImguiMgr</Filter>
     </ClCompile>
+    <ClCompile Include="..\public\Imgui\imgui.cpp">
+      <Filter>03.Manager\99.ImguiDefault</Filter>
+    </ClCompile>
+    <ClCompile Include="..\public\Imgui\imgui_demo.cpp">
+      <Filter>03.Manager\99.ImguiDefault</Filter>
+    </ClCompile>
+    <ClCompile Include="..\public\Imgui\imgui_draw.cpp">
+      <Filter>03.Manager\99.ImguiDefault</Filter>
+    </ClCompile>
+    <ClCompile Include="..\public\Imgui\imgui_impl_dx11.cpp">
+      <Filter>03.Manager\99.ImguiDefault</Filter>
+    </ClCompile>
+    <ClCompile Include="..\public\Imgui\imgui_impl_win32.cpp">
+      <Filter>03.Manager\99.ImguiDefault</Filter>
+    </ClCompile>
+    <ClCompile Include="..\public\Imgui\imgui_tables.cpp">
+      <Filter>03.Manager\99.ImguiDefault</Filter>
+    </ClCompile>
+    <ClCompile Include="..\public\Imgui\imgui_widgets.cpp">
+      <Filter>03.Manager\99.ImguiDefault</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -170,5 +218,10 @@
     <Text Include="ReadMe.txt">
       <Filter>Defualt\02.Etc</Filter>
     </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\public\Imgui\imgui.natvis">
+      <Filter>03.Manager\99.ImguiDefault</Filter>
+    </Natvis>
   </ItemGroup>
 </Project>

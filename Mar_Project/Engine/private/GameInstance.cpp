@@ -37,7 +37,8 @@ CGameInstance::CGameInstance()
 }
 
 
-HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInst, const CGraphic_Device::GRAPHICDESC & GraphicDesc, _uint iMaxSceneNum, ID3D11Device** ppDeviceOut, ID3D11DeviceContext** ppDeviceContextOut, _double fDoubleInterver)
+HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInst, const CGraphic_Device::GRAPHICDESC & GraphicDesc, _uint iMaxSceneNum, ID3D11Device** ppDeviceOut, ID3D11DeviceContext** ppDeviceContextOut,
+	ID3D11RenderTargetView** ppBackBufferRTV, ID3D11DepthStencilView** ppDepthStencilView, IDXGISwapChain**	ppSwapChain, _double fDoubleInterver)
 {
 	if (m_pGraphicDevice == nullptr || m_pObjectMgr == nullptr || m_pComponenetMgr == nullptr ||
 		m_pSceneMgr == nullptr || m_pFrustumMgr == nullptr || m_pSoundMgr == nullptr)
@@ -51,7 +52,7 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInst, const CGraphic_Device:
 	//	MSGBOX("Failed to Connecting Sever");
 	//}
 
-	FAILED_CHECK(m_pGraphicDevice->Initialize_Graphic_Device(GraphicDesc.hWnd, GraphicDesc.eWinMode, GraphicDesc.iWinCX, GraphicDesc.iWinCY, ppDeviceOut, ppDeviceContextOut));
+	FAILED_CHECK(m_pGraphicDevice->Initialize_Graphic_Device(GraphicDesc.hWnd, GraphicDesc.eWinMode, GraphicDesc.iWinCX, GraphicDesc.iWinCY, ppDeviceOut, ppDeviceContextOut, ppBackBufferRTV, ppDepthStencilView, ppSwapChain));
 
 	FAILED_CHECK(m_pObjectMgr->Reserve_Container(iMaxSceneNum));
 

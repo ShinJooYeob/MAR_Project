@@ -105,7 +105,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>../public/;../default/;../../Reference/Inc/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../public/;../default/;../../Reference/Inc/;../public/Imgui/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -139,7 +139,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>../public/;../default/;../../Reference/Inc/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../public/;../default/;../../Reference/Inc/;../public/Imgui/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -153,6 +153,14 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Reference\Inc\imconfig.h" />
+    <ClInclude Include="..\..\Reference\Inc\imgui.h" />
+    <ClInclude Include="..\..\Reference\Inc\imgui_impl_dx11.h" />
+    <ClInclude Include="..\..\Reference\Inc\imgui_impl_win32.h" />
+    <ClInclude Include="..\..\Reference\Inc\imgui_internal.h" />
+    <ClInclude Include="..\..\Reference\Inc\imstb_rectpack.h" />
+    <ClInclude Include="..\..\Reference\Inc\imstb_textedit.h" />
+    <ClInclude Include="..\..\Reference\Inc\imstb_truetype.h" />
     <ClInclude Include="..\public\Camera_Main.h" />
     <ClInclude Include="..\public\Client_Define.h" />
     <ClInclude Include="..\public\Client_Enum.h" />
@@ -176,6 +184,13 @@
     <ClCompile Include="..\private\Scene_Loading.cpp" />
     <ClCompile Include="..\private\Scene_Loby.cpp" />
     <ClCompile Include="..\private\Scene_StageSelect.cpp" />
+    <ClCompile Include="..\public\Imgui\imgui.cpp" />
+    <ClCompile Include="..\public\Imgui\imgui_demo.cpp" />
+    <ClCompile Include="..\public\Imgui\imgui_draw.cpp" />
+    <ClCompile Include="..\public\Imgui\imgui_impl_dx11.cpp" />
+    <ClCompile Include="..\public\Imgui\imgui_impl_win32.cpp" />
+    <ClCompile Include="..\public\Imgui\imgui_tables.cpp" />
+    <ClCompile Include="..\public\Imgui\imgui_widgets.cpp" />
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -190,6 +205,9 @@
   <ItemGroup>
     <Image Include="Client.ico" />
     <Image Include="small.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\public\Imgui\imgui.natvis" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -29,7 +29,8 @@ private:
 	 
 
 public:/*엔진이 돌아갈 때 전반적으로 처리해줘야할 것들*/
-	HRESULT		Initialize_Engine(HINSTANCE hInst, const CGraphic_Device::GRAPHICDESC& GraphicDesc,_uint iMaxSceneNum , ID3D11Device** ppDeviceOut, ID3D11DeviceContext** ppDeviceContextOut, _double fDoubleInterver = 0.3);
+	HRESULT		Initialize_Engine(HINSTANCE hInst, const CGraphic_Device::GRAPHICDESC& GraphicDesc,_uint iMaxSceneNum , ID3D11Device** ppDeviceOut, 
+		ID3D11DeviceContext** ppDeviceContextOut,  ID3D11RenderTargetView** ppBackBufferRTV, ID3D11DepthStencilView** ppDepthStencilView, IDXGISwapChain**	ppSwapChain, _double fDoubleInterver = 0.3);
 	_int		Update_Engine(_double fDeltaTime);
 	_int		LateUpdate_Engine(_double fDeltaTime);
 

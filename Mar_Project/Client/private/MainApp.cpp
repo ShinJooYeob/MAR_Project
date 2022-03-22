@@ -3,6 +3,10 @@
 #include "Scene_Loading.h"
 #include "Camera_Main.h"
 
+#ifdef USE_IMGUI
+#include "ImguiMgr.h"
+#endif // USE_IMGUI
+
 CMainApp::CMainApp()
 	:m_pGameInstance(GetSingle(CGameInstance))
 {
@@ -25,13 +29,12 @@ HRESULT CMainApp::Initialize()
 	//ShowCursor(false);
 
 
-	FAILED_CHECK(m_pGameInstance->Initialize_Engine(g_hInst, GraphicDesc, SCENEID::SCENE_END, &m_pDevice, &m_pDeviceContext));
+	FAILED_CHECK(m_pGameInstance->Initialize_Engine(g_hInst, GraphicDesc, SCENEID::SCENE_END, &m_pDevice, &m_pDeviceContext,&m_pBackBufferRTV,&m_pDepthStencilView,&m_pSwapChain));
 
 
 	FAILED_CHECK(Default_Setting());
 
 	FAILED_CHECK(Ready_SingletonMgr());
-
 
 	FAILED_CHECK(Ready_Static_Component_Prototype());
 
@@ -65,6 +68,13 @@ _int CMainApp::Update(_double fDeltaTime)
 
 	}
 
+
+#ifdef USE_IMGUI
+
+	GETIMGUI->Update_ImguiMgr(fDeltaTime);
+#endif // USE_IMGUI
+
+
 	
 	return 0;
 }
@@ -82,11 +92,19 @@ HRESULT CMainApp::Render()
 
 	m_pGameInstance->Render_Scene();
 
+#ifdef USE_IMGUI
+
+	GETIMGUI->Render_ImguiMgr();
+#endif // USE_IMGUI
+
 	m_pGameInstance->Present();
 
 
 	//콜리전 내부 비워주는중
 	//m_pCollision->Collision_Obsever_Release(); 
+
+
+
 
 	return S_OK;
 
@@ -149,15 +167,27 @@ HRESULT CMainApp::Default_Setting()
 HRESULT CMainApp::Ready_SingletonMgr()
 {
 
-	//FAILED_CHECK(GetSingle(CParticleMgr)->Initialize_ParticleMgr(m_pGraphicDevice));
+#ifdef USE_IMGUI
+	FAILED_CHECK(GETIMGUI->Initialize_ImguiMgr(m_pDevice, m_pDeviceContext, m_pBackBufferRTV, m_pDepthStencilView, m_pSwapChain));
+#endif // USE_IMGUI
 
-	//GetSingle(CQuest)->Initialize_Quest(QUEST_END);
-	//GetSingle(CQuest)->Set_QuestGoal(QUEST_1, 6);
-	//GetSingle(CQuest)->Set_QuestGoal(QUEST_2, 12);
-	//GetSingle(CQuest)->Set_QuestGoal(QUEST_3, 4);
-	//GetSingle(CQuest)->Set_QuestGoal(QUEST_4, 1);
 
-	//GetSingle(CLoginMgr)->Initialize_LoginMgr();
+
+	return S_OK;
+}
+
+HRESULT CMainApp::Free_SingletonMgr()
+{
+
+#ifdef USE_IMGUI
+
+	if (0 != GetSingle(CImguiMgr)->DestroyInstance())
+	{
+		MSGBOX("Failed to Release CImguiMgr");
+		return E_FAIL;
+	}
+
+#endif // USE_IMGUI
 
 	return S_OK;
 }
@@ -303,12 +333,15 @@ CMainApp * CMainApp::Create()
 void CMainApp::Free()
 {
 
-	//if (0 != GetSingle(CParticleMgr)->DestroyInstance())
-	//	MSGBOX("Failed to Release CParticleMgr");
+	if (FAILED(Free_SingletonMgr()))
+	{
+		__debugbreak();
+		MSGBOX("Failed to Free Singleton");
+	}
 
-
-	//Safe_Release(m_pCollision);
-	//Safe_Release(m_pComRenderer);
+	Safe_Release(m_pSwapChain);
+	Safe_Release(m_pDepthStencilView);
+	Safe_Release(m_pBackBufferRTV);
 	Safe_Release(m_pDeviceContext);
 	Safe_Release(m_pDevice);
 	Safe_Release(m_pGameInstance);

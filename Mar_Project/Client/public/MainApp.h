@@ -18,6 +18,10 @@ public:
 private:
 	ID3D11Device*			m_pDevice = nullptr;
 	ID3D11DeviceContext*	m_pDeviceContext = nullptr;
+	// ID3D11ShaderResourceView*
+	ID3D11RenderTargetView*		m_pBackBufferRTV = nullptr;
+	ID3D11DepthStencilView*		m_pDepthStencilView = nullptr;
+	IDXGISwapChain*				m_pSwapChain = nullptr;
 
 	CGameInstance*			m_pGameInstance = nullptr;
 	CRenderer*				m_pComRenderer = nullptr;
@@ -28,6 +32,7 @@ private:
 	HRESULT Default_Setting();
 
 	HRESULT Ready_SingletonMgr();
+	HRESULT Free_SingletonMgr();
 
 	HRESULT Ready_Static_Component_Prototype();
 	HRESULT Ready_Static_GameObject_Prototype();

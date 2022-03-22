@@ -8,7 +8,8 @@ CGraphic_Device::CGraphic_Device()
 {		
 }
 
-HRESULT CGraphic_Device::Initialize_Graphic_Device(HWND hWnd, WINMODE WinMode, _uint iWinCX, _uint iWinCY, ID3D11Device** ppDeviceOut, ID3D11DeviceContext** ppDeviceContextOut)
+HRESULT CGraphic_Device::Initialize_Graphic_Device(HWND hWnd, WINMODE WinMode, _uint iWinCX, _uint iWinCY, ID3D11Device** ppDeviceOut, ID3D11DeviceContext** ppDeviceContextOut,
+	ID3D11RenderTargetView** ppBackBufferRTV, ID3D11DepthStencilView** ppDepthStencilView, IDXGISwapChain**	ppSwapChain)
 {
 	_uint		iFlag = 0;
 
@@ -47,9 +48,16 @@ HRESULT CGraphic_Device::Initialize_Graphic_Device(HWND hWnd, WINMODE WinMode, _
 
 	*ppDeviceOut = m_pDevice;
 	*ppDeviceContextOut = m_pDeviceContext;
+	*ppBackBufferRTV = m_pBackBufferRTV;
+	*ppDepthStencilView = m_pDepthStencilView;
+	*ppSwapChain = m_pSwapChain;
 
 	Safe_AddRef(m_pDevice);
 	Safe_AddRef(m_pDeviceContext);
+
+	Safe_AddRef(m_pBackBufferRTV);
+	Safe_AddRef(m_pDepthStencilView);
+	Safe_AddRef(m_pSwapChain);
 
 	return S_OK;
 }
