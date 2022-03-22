@@ -22,6 +22,8 @@ private:
 public:
 	HRESULT Initialize_ImguiMgr(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, ID3D11RenderTargetView* pBackBufferRTV, ID3D11DepthStencilView* pDepthStencilView, IDXGISwapChain* pSwapChain);
 	_int	Update_ImguiMgr(_double fDeltatime);
+	_int	Begin_Update_Frame(_double fDeltatime, const char* szManuBarName = "ImguiBar");
+	_int	End_Update_Frame();
 	HRESULT	Render_ImguiMgr();
 
 	
@@ -33,10 +35,6 @@ private:
 	ID3D11DepthStencilView*		m_pDepthStencilView = nullptr;
 	IDXGISwapChain*				m_pSwapChain = nullptr;
 
-
-	_bool show_demo_window;
-	_bool show_another_window;
-	ImVec4 clear_color;
 
 public:
 	virtual void Free()override;

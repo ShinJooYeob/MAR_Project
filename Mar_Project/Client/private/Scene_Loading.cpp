@@ -7,6 +7,11 @@
 #include "Camera_Main.h"
 
 
+#ifdef USE_IMGUI
+#include "Scene_MapEditor.h"
+#endif // USE_IMGUI
+
+
 
 
 
@@ -67,9 +72,15 @@ _int CScene_Loading::LateUpdate(_double fDeltaTime)
 			FAILED_CHECK(GetSingle(CGameInstance)->Scene_Change(CScene_StageSelect::Create(m_pDevice, m_pDeviceContext), m_eNextSceneIndex));
 			break;
 
-		//case SCENEID::SCENE_STAGE1:
-		//	FAILED_CHECK(GetSingle(CGameInstance)->Scene_Change(CScene_Stage1::Create(m_pDevice, m_pDeviceContext), m_eNextSceneIndex));
-		//	break;
+
+
+#ifdef USE_IMGUI
+		case SCENEID::SCENE_MAPEDIT:
+			FAILED_CHECK(GetSingle(CGameInstance)->Scene_Change(CScene_MapEditor::Create(m_pDevice, m_pDeviceContext), m_eNextSceneIndex));
+			break;
+#endif // USE_IMGUI
+
+
 
 		default:
 			MSGBOX("Failed to SceneChange");

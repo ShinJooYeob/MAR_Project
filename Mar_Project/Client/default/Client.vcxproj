@@ -170,6 +170,7 @@
     <ClInclude Include="..\public\MainApp.h" />
     <ClInclude Include="..\public\Scene_Loading.h" />
     <ClInclude Include="..\public\Scene_Loby.h" />
+    <ClInclude Include="..\public\Scene_MapEditor.h" />
     <ClInclude Include="..\public\Scene_StageSelect.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="Resource.h" />
@@ -183,6 +184,7 @@
     <ClCompile Include="..\private\MainApp.cpp" />
     <ClCompile Include="..\private\Scene_Loading.cpp" />
     <ClCompile Include="..\private\Scene_Loby.cpp" />
+    <ClCompile Include="..\private\Scene_MapEditor.cpp" />
     <ClCompile Include="..\private\Scene_StageSelect.cpp" />
     <ClCompile Include="..\public\Imgui\imgui.cpp" />
     <ClCompile Include="..\public\Imgui\imgui_demo.cpp" />

@@ -69,11 +69,6 @@ _int CMainApp::Update(_double fDeltaTime)
 	}
 
 
-#ifdef USE_IMGUI
-
-	GETIMGUI->Update_ImguiMgr(fDeltaTime);
-#endif // USE_IMGUI
-
 
 	
 	return 0;
@@ -92,10 +87,6 @@ HRESULT CMainApp::Render()
 
 	m_pGameInstance->Render_Scene();
 
-#ifdef USE_IMGUI
-
-	GETIMGUI->Render_ImguiMgr();
-#endif // USE_IMGUI
 
 	m_pGameInstance->Present();
 

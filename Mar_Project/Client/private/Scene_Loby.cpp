@@ -37,11 +37,20 @@ _int CScene_Loby::Update(_double fDeltaTime)
 
 
 
-	// IMGUI / ¸Ê Åø Å×½ºÆ®¾ÀÀ¸·Î »ç¿ë
+#ifdef USE_IMGUI
 	if (GetKeyState(VK_F1) & 0x8000)
+	{
+		FAILED_CHECK(GetSingle(CGameInstance)->Scene_Change(CScene_Loading::Create(m_pDevice, m_pDeviceContext, SCENEID::SCENE_MAPEDIT), SCENEID::SCENE_LOADING));
+	}
+#endif // USE_IMGUI
+
+
+
+	if (GetKeyState(VK_F2) & 0x8000)
 	{
 		FAILED_CHECK(GetSingle(CGameInstance)->Scene_Change(CScene_Loading::Create(m_pDevice,m_pDeviceContext, SCENEID::SCENE_STAGESELECT), SCENEID::SCENE_LOADING));
 	}
+	
 	
 
 	return 0;

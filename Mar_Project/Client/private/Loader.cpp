@@ -24,6 +24,11 @@ _uint CALLBACK LoadingThread(void* _Prameter)
 		pLoader->Load_Scene_Stage1(tThreadArg.IsClientQuit, tThreadArg.CriSec);
 		break;
 
+	case SCENEID::SCENE_MAPEDIT:
+
+		pLoader->Load_Scene_MapEdit(tThreadArg.IsClientQuit, tThreadArg.CriSec);
+		break;
+
 	default:
 		MSGBOX("Failed to Create Scene");
 		break;
@@ -165,6 +170,39 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 	m_bIsLoadingFinished = true;
 	LeaveCriticalSection(_CriSec);
 	m_bIsLoadingFinished = true;
+	return S_OK;
+}
+
+HRESULT CLoader::Load_Scene_MapEdit(_bool * _IsClientQuit, CRITICAL_SECTION * _CriSec)
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+#pragma region PROTOTYPE_COMPONENT
+#pragma endregion
+
+
+#pragma  region PROTOTYPE_GAMEOBJECT
+#pragma endregion
+
+
+	RELEASE_INSTANCE(CGameInstance);
+	EnterCriticalSection(_CriSec);
+	m_iLoadingMaxCount = 1;
+	m_iLoadingProgressCount = 0;
+	LeaveCriticalSection(_CriSec);
+
+	for (int i = 0; i < m_iLoadingMaxCount; ++i)
+	{
+		EnterCriticalSection(_CriSec);
+		m_iLoadingProgressCount = i;
+		LeaveCriticalSection(_CriSec);
+	}
+
+	EnterCriticalSection(_CriSec);
+	m_bIsLoadingFinished = true;
+	LeaveCriticalSection(_CriSec);
+	m_bIsLoadingFinished = true;
+
 	return S_OK;
 }
 

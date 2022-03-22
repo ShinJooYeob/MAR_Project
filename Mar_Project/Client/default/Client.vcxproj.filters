@@ -82,6 +82,9 @@
     <Filter Include="03.Manager\99.ImguiDefault">
       <UniqueIdentifier>{dc128ed1-cc82-46aa-a7d4-ec3d27efce43}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.Scene\99.Scene_MapEditor">
+      <UniqueIdentifier>{38668a60-0c72-420e-9bbd-b332b2a4426b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -150,6 +153,9 @@
     <ClInclude Include="..\..\Reference\Inc\imstb_truetype.h">
       <Filter>03.Manager\99.ImguiDefault</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Scene_MapEditor.h">
+      <Filter>02.Scene\99.Scene_MapEditor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -199,6 +205,9 @@
     </ClCompile>
     <ClCompile Include="..\public\Imgui\imgui_widgets.cpp">
       <Filter>03.Manager\99.ImguiDefault</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Scene_MapEditor.cpp">
+      <Filter>02.Scene\99.Scene_MapEditor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
