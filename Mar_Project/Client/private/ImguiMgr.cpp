@@ -30,7 +30,7 @@ HRESULT CImguiMgr::Initialize_ImguiMgr(ID3D11Device * pDevice, ID3D11DeviceConte
 	m_pDeviceContext = pDeviceContext;
 	m_pBackBufferRTV = pBackBufferRTV;
 	m_pDepthStencilView = pDepthStencilView;
-	m_pSwapChain= pSwapChain;
+	m_pSwapChain = pSwapChain;
 
 	Safe_AddRef(m_pDevice);
 	Safe_AddRef(m_pDeviceContext);

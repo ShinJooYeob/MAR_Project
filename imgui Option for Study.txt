@@ -1,0 +1,29 @@
+configuration
+style scale 옵션
+
+window options
+no background 옵션
+
+widgets
+basic 전부		필수
+image			반필수
+combo			1. 셋중하나
+listbox			2
+selectable		3
+textinput			반필수
+plotting			애니매이션 할때 필요하면
+color			필요하면
+drag			필수
+rangeWidget		파티클할때 필요하면
+multicomponet widget 	필수
+drag and drop		보류
+querying			보류
+
+popup modalwindow
+modal
+
+
+table & colums
+openall close all
+
+filtering			보류
