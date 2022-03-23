@@ -11,6 +11,7 @@ CRenderer::CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 
 HRESULT CRenderer::Initialize_Prototype(void * pArg)
 {
+	FAILED_CHECK(__super::Initialize_Prototype(pArg));
 	//D3DVIEWPORT9		ViewPortDesc;
 	//m_pGraphicDevice->GetViewport(&ViewPortDesc);
 	//_int iWinCX = ViewPortDesc.Width;
@@ -25,6 +26,10 @@ HRESULT CRenderer::Initialize_Prototype(void * pArg)
 
 HRESULT CRenderer::Initialize_Clone(void * pArg)
 {
+	FAILED_CHECK(__super::Initialize_Clone(pArg));
+
+
+
 	return S_OK;
 }
 
@@ -37,7 +42,7 @@ HRESULT CRenderer::Add_RenderGroup(RENDERGROUP eRenderID, CGameObject * pGameObj
 		return E_FAIL;
 	}
 
-	//if (eRenderID == CRenderer::RENDER_ALPHA)
+	//if (eRenderID == CRenderer::RENDER_BLEND)
 	//	pGameObject->Compute_CamDistance((CTransform*)(pGameObject->Get_Component(TEXT("Com_Transform"))));
 
 	m_RenderObjectList[eRenderID].emplace_back(pGameObject);
@@ -84,7 +89,7 @@ HRESULT CRenderer::Render_Priority()
 HRESULT CRenderer::Render_NonAlpha()
 {
 
-	for (auto& RenderObject : m_RenderObjectList[RENDER_NONALPHA])
+	for (auto& RenderObject : m_RenderObjectList[RENDER_NONBLEND])
 	{
 		if (RenderObject != nullptr)
 		{
@@ -93,18 +98,18 @@ HRESULT CRenderer::Render_NonAlpha()
 		Safe_Release(RenderObject);
 	}
 
-	m_RenderObjectList[RENDER_NONALPHA].clear();
+	m_RenderObjectList[RENDER_NONBLEND].clear();
 	return S_OK;
 }
 
 HRESULT CRenderer::Render_Alpha()
 {
-	//m_RenderObjectList[RENDER_ALPHA].sort([](CGameObject* pSour, CGameObject* pDest)->_bool
+	//m_RenderObjectList[RENDER_BLEND].sort([](CGameObject* pSour, CGameObject* pDest)->_bool
 	//{
 	//	return pSour->Get_CamDistance() > pDest->Get_CamDistance();
 	//});
 
-	for (auto& RenderObject : m_RenderObjectList[RENDER_ALPHA])
+	for (auto& RenderObject : m_RenderObjectList[RENDER_BLEND])
 	{
 		if (RenderObject != nullptr)
 		{
@@ -112,7 +117,7 @@ HRESULT CRenderer::Render_Alpha()
 		}
 		Safe_Release(RenderObject);
 	}
-	m_RenderObjectList[RENDER_ALPHA].clear();
+	m_RenderObjectList[RENDER_BLEND].clear();
 	return S_OK;
 }
 

@@ -14,7 +14,7 @@ private:
 	explicit CObjectMgr();
 	virtual ~CObjectMgr() = default;
 
-
+	 
 public:
 	HRESULT Reserve_Container(_uint _eSceneNum);
 

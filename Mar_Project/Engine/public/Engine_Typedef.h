@@ -26,7 +26,7 @@ namespace Engine
 	typedef XMFLOAT3					_float3;
 	typedef XMFLOAT4					_float4;
 
-	typedef XMMATRIX					_Matrix;
+	typedef XMFLOAT4X4					_Matrix;
 	/*
 	typedef struct tagMyMatrix  _Matrix;
 	typedef struct tagMyVector3  _float3;

@@ -82,7 +82,7 @@
     <Filter Include="03.Manager\99.ImguiDefault">
       <UniqueIdentifier>{dc128ed1-cc82-46aa-a7d4-ec3d27efce43}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.Scene\99.Scene_MapEditor">
+    <Filter Include="02.Scene\99.Scene_Edit">
       <UniqueIdentifier>{38668a60-0c72-420e-9bbd-b332b2a4426b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -153,8 +153,11 @@
     <ClInclude Include="..\..\Reference\Inc\imstb_truetype.h">
       <Filter>03.Manager\99.ImguiDefault</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\Scene_MapEditor.h">
-      <Filter>02.Scene\99.Scene_MapEditor</Filter>
+    <ClInclude Include="..\public\Scene_Edit.h">
+      <Filter>02.Scene\99.Scene_Edit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Player.h">
+      <Filter>01.GameObject\00.Player</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -206,8 +209,11 @@
     <ClCompile Include="..\public\Imgui\imgui_widgets.cpp">
       <Filter>03.Manager\99.ImguiDefault</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\Scene_MapEditor.cpp">
-      <Filter>02.Scene\99.Scene_MapEditor</Filter>
+    <ClCompile Include="..\private\Scene_Edit.cpp">
+      <Filter>02.Scene\99.Scene_Edit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Player.cpp">
+      <Filter>01.GameObject\00.Player</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -232,5 +238,10 @@
     <Natvis Include="..\public\Imgui\imgui.natvis">
       <Filter>03.Manager\99.ImguiDefault</Filter>
     </Natvis>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\bin\ShaderFiles\Shader_VtxTex.hlsl">
+      <Filter>04.Shader</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

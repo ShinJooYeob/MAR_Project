@@ -23,8 +23,9 @@ HRESULT CScene_Loby::Initialize()
 
 
 	FAILED_CHECK(Ready_Layer_MainCamera(TAG_LAY(Layer_Camera_Main)));
+	FAILED_CHECK(Ready_Layer_TestObj(TAG_LAY(Layer_Player)));
 
-
+	
 
 
 	return S_OK;
@@ -40,7 +41,7 @@ _int CScene_Loby::Update(_double fDeltaTime)
 #ifdef USE_IMGUI
 	if (GetKeyState(VK_F1) & 0x8000)
 	{
-		FAILED_CHECK(GetSingle(CGameInstance)->Scene_Change(CScene_Loading::Create(m_pDevice, m_pDeviceContext, SCENEID::SCENE_MAPEDIT), SCENEID::SCENE_LOADING));
+		FAILED_CHECK(GetSingle(CGameInstance)->Scene_Change(CScene_Loading::Create(m_pDevice, m_pDeviceContext, SCENEID::SCENE_EDIT), SCENEID::SCENE_LOADING));
 	}
 #endif // USE_IMGUI
 
@@ -90,29 +91,31 @@ HRESULT CScene_Loby::Ready_Layer_MainCamera(const _tchar * pLayerTag)
 {
 	CAMERADESC CameraDesc;
 
-	//CameraDesc.bIsOrtho = true;
-	//CameraDesc.vEye = _float3(0.f, 0.f, -10.f);
-	//CameraDesc.vWorldRotAxis = _float3(0.f, 0.f, 0.f);
-	//CameraDesc.vAxisY = _float3(0, 1, 0);
-	//CameraDesc.fFovy = D3DXToRadian(60.0f);
-	//CameraDesc.fAspect = _float(g_iWinCX) / g_iWinCY;
-	//CameraDesc.fNear = 0.2f;
-	//CameraDesc.fFar = 300.f;
+	CameraDesc.bIsOrtho = true;
+	CameraDesc.vEye = _float3(0.f, 0.f, -10.f);
+	CameraDesc.vWorldRotAxis = _float3(0.f, 0.f, 0.f);
+	CameraDesc.vAxisY = _float3(0, 1, 0);
 
-	//CameraDesc.TransformDesc.fMovePerSec = 10.f;
-	//CameraDesc.TransformDesc.fRotationPerSec = D3DXToRadian(90.0f);
 
-	//m_pMainCam = (CCamera_Main*)(GetSingle(CGameInstance)->Get_GameObject_By_LayerIndex(SCENE_STATIC, TAG_LAY(Layer_Camera_Main)));
+	CameraDesc.fFovy = XMConvertToRadians(60.0f);
+	CameraDesc.fAspect = _float(g_iWinCX) / g_iWinCY;
+	CameraDesc.fNear = 0.2f;
+	CameraDesc.fFar = 300.f;
 
-	//if (m_pMainCam == nullptr)
-	//{
-	//	if (GetSingle(CGameInstance)->Add_GameObject_To_Layer(SCENEID::SCENE_STATIC, pLayerTag, TAG_OP(Prototype_Camera_Main), &CameraDesc))
-	//		return E_FAIL;
+	/*	CameraDesc.TransformDesc.fMovePerSec = 10.f;
+		CameraDesc.TransformDesc.fRotationPerSec = XMConvertToRadians(90.0f);*/
 
-	//	m_pMainCam = (CCamera_Main*)(GetSingle(CGameInstance)->Get_GameObject_By_LayerIndex(SCENE_STATIC, TAG_LAY(Layer_Camera_Main)));
-	//	if (m_pMainCam == nullptr)
-	//		return E_FAIL;
-	//}
+	m_pMainCam = (CCamera_Main*)(GetSingle(CGameInstance)->Get_GameObject_By_LayerIndex(SCENE_STATIC, TAG_LAY(Layer_Camera_Main)));
+
+	if (m_pMainCam == nullptr)
+	{
+		if (GetSingle(CGameInstance)->Add_GameObject_To_Layer(SCENEID::SCENE_STATIC, pLayerTag, TAG_OP(Prototype_Camera_Main), &CameraDesc))
+			return E_FAIL;
+
+		m_pMainCam = (CCamera_Main*)(GetSingle(CGameInstance)->Get_GameObject_By_LayerIndex(SCENE_STATIC, TAG_LAY(Layer_Camera_Main)));
+		if (m_pMainCam == nullptr)
+			return E_FAIL;
+	}
 	//else 
 	//{
 
@@ -125,6 +128,13 @@ HRESULT CScene_Loby::Ready_Layer_MainCamera(const _tchar * pLayerTag)
 
 	//}
 	
+	return S_OK;
+}
+
+HRESULT CScene_Loby::Ready_Layer_TestObj(const _tchar * pLayerTag)
+{
+	FAILED_CHECK(GetSingle(CGameInstance)->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_Player)));
+
 	return S_OK;
 }
 

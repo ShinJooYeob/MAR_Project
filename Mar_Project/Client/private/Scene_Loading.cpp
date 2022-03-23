@@ -8,7 +8,7 @@
 
 
 #ifdef USE_IMGUI
-#include "Scene_MapEditor.h"
+#include "Scene_Edit.h"
 #endif // USE_IMGUI
 
 
@@ -75,8 +75,8 @@ _int CScene_Loading::LateUpdate(_double fDeltaTime)
 
 
 #ifdef USE_IMGUI
-		case SCENEID::SCENE_MAPEDIT:
-			FAILED_CHECK(GetSingle(CGameInstance)->Scene_Change(CScene_MapEditor::Create(m_pDevice, m_pDeviceContext), m_eNextSceneIndex));
+		case SCENEID::SCENE_EDIT:
+			FAILED_CHECK(GetSingle(CGameInstance)->Scene_Change(CScene_Edit::Create(m_pDevice, m_pDeviceContext), m_eNextSceneIndex));
 			break;
 #endif // USE_IMGUI
 
@@ -138,21 +138,21 @@ HRESULT CScene_Loading::Ready_Layer_LoadingBar(const _tchar * pLayerTag)
 
 HRESULT CScene_Loading::Ready_Layer_MainCamera(const _tchar * pLayerTag)
 {
-	CAMERADESC CameraDesc;
+	//CAMERADESC CameraDesc;
 
 	//CameraDesc.bIsOrtho = true;
 	//CameraDesc.vWorldRotAxis = _float3(5.f, 3.f, 5.f);
 	//CameraDesc.vAxisY = _float3(0, 1, 0);
-	//CameraDesc.fFovy = D3DXToRadian(60.0f);
+	//CameraDesc.fFovy = XMConvertToRadians(60.0f);
 	//CameraDesc.fAspect = _float(g_iWinCX) / g_iWinCY;
 	//CameraDesc.fNear = 0.2f;
 	//CameraDesc.fFar = 300.f;
 
 	//CameraDesc.TransformDesc.fMovePerSec = 10.f;
-	//CameraDesc.TransformDesc.fRotationPerSec = D3DXToRadian(90.0f);
+	//CameraDesc.TransformDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
-	if (GetSingle(CGameInstance)->Add_GameObject_To_Layer(SCENEID::SCENE_STATIC, pLayerTag, TAG_OP(Prototype_Camera_Main), &CameraDesc))
-		return E_FAIL;
+	//if (GetSingle(CGameInstance)->Add_GameObject_To_Layer(SCENEID::SCENE_STATIC, pLayerTag, TAG_OP(Prototype_Camera_Main), &CameraDesc))
+	//	return E_FAIL;
 	return S_OK;
 }
 

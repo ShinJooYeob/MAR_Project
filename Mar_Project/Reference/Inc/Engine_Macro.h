@@ -136,7 +136,7 @@ if(_IF){__debugbreak();}
 
 
 //#define IF_CHECK_MESSAGE( _IF, _message) \
-if( _IF){MessageBox(NULL, _message, L"System Message", MB_OK);__debugbreak();};
+//if( _IF){MessageBox(NULL, _message, L"System Message", MB_OK);__debugbreak();};
 
 
 // HRESULT 오류체크

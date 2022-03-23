@@ -9,7 +9,7 @@ enum SCENEID
 	SCENE_STAGESELECT,
 	SCENE_STAGE1,
 
-	SCENE_MAPEDIT,
+	SCENE_EDIT,
 	SCENE_END
 };
 
@@ -78,8 +78,10 @@ enum COMPONENTPROTOTYPEID
 	Prototype_Renderer,
 	Prototype_Transform,
 	Prototype_Collision,
-	Prototype_Shader_Rect,
-	Prototype_Shader_Cube,
+	Prototype_Shader_VT,
+	Prototype_Shader_VCT,
+	Prototype_Shader_VNT,
+	Prototype_Shader_VNCT,
 	//////////////////////////////////////////////////////////////////////////
 	Prototype_VIBuffer_Rect,
 	Prototype_VIBuffer_Cube,
@@ -100,13 +102,25 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 	case Prototype_Collision:
 		return TEXT("Prototype_Component_Collision");
 		break;		
-	case Prototype_Shader_Cube:
-		return TEXT("Prototype_Component_Shader_Cube");
+
+
+	case Prototype_Shader_VT:
+		return TEXT("Prototype_Component_Shader_VTXTEX");
+		break;
+	case Prototype_Shader_VCT:
+		return TEXT("Prototype_Component_Shader_VTXCUBETEX");
 		break;
 
-	case Prototype_Shader_Rect:
-		return TEXT("Prototype_Component_Shader_Rect");
+	case Prototype_Shader_VNT:
+		return TEXT("Prototype_Component_Shader_VTXNORMTEX");
 		break;
+
+	case Prototype_Shader_VNCT:
+		return TEXT("Prototype_Component_Shader_VTXNORMCUBETEX");
+		break;
+
+
+
 
 	case Prototype_VIBuffer_Rect:
 		return TEXT("Prototype_Component_VIBuffer_Rect");

@@ -2,6 +2,7 @@
 #include "..\public\MainApp.h"
 #include "Scene_Loading.h"
 #include "Camera_Main.h"
+#include "Player.h"
 
 #ifdef USE_IMGUI
 #include "ImguiMgr.h"
@@ -82,13 +83,15 @@ HRESULT CMainApp::Render()
 		return E_FAIL;
 	}
 
-	m_pGameInstance->Clear_BackBuffer_View(_float4(0.0f, 0.f, 1.f, 1.f));
-	m_pGameInstance->Clear_DepthStencil_View();
-
-	m_pGameInstance->Render_Scene();
+	FAILED_CHECK(m_pGameInstance->Clear_BackBuffer_View(_float4(0.0f, 0.f, 1.f, 1.f)));
+	FAILED_CHECK(m_pGameInstance->Clear_DepthStencil_View());
 
 
-	m_pGameInstance->Present();
+	FAILED_CHECK(m_pComRenderer->Render_RenderGroup());
+	FAILED_CHECK(m_pGameInstance->Render_Scene());
+
+
+	FAILED_CHECK(m_pGameInstance->Present());
 
 
 	//콜리전 내부 비워주는중
@@ -113,6 +116,7 @@ HRESULT CMainApp::Scene_Change(SCENEID eSceneID)
 	case SCENEID::SCENE_LOBY:
 	case SCENEID::SCENE_STAGESELECT:
 	case SCENEID::SCENE_STAGE1:
+	case SCENEID::SCENE_EDIT:
 
 		//Scene_Change에 디폴트로 false true 이걸 트루로 바꿔준다?
 		m_pGameInstance->Scene_Change(CScene_Loading::Create(m_pDevice,m_pDeviceContext, eSceneID), SCENEID::SCENE_LOADING);
@@ -189,16 +193,17 @@ HRESULT CMainApp::Ready_Static_Component_Prototype()
 		return E_FAIL;
 
 
-	////렌더러 컴객체 프로토타입 생성
-	//if (FAILED(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Renderer), m_pComRenderer = CRenderer::Create(m_pGraphicDevice))))
-	//	return E_FAIL;
-	//Safe_AddRef(m_pComRenderer);
+	//렌더러 컴객체 프로토타입 생성
+	FAILED_CHECK(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Renderer), 
+		m_pComRenderer = CRenderer::Create(m_pDevice,m_pDeviceContext)));
+	Safe_AddRef(m_pComRenderer);
 
 	////버퍼인덱스 프로토타입 생성
-	//if (FAILED(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_VIBuffer_Rect), CVIBuffer_Rect::Create(m_pGraphicDevice))))
-	//	return E_FAIL;
+	FAILED_CHECK(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_VIBuffer_Rect),
+		CVIBuffer_Rect::Create(m_pDevice, m_pDeviceContext)));
 
-
+	FAILED_CHECK(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Shader_VT),
+		CShader::Create(m_pDevice, m_pDeviceContext, TEXT("Shader_VtxTex.hlsl"), VTXTEX_DECLARATION::Elements, VTXTEX_DECLARATION::iNumElements)));
 
 	////Transform 프로토타입 생성
 	//if (FAILED(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Transform), CTransform::Create(m_pGraphicDevice))))
@@ -281,27 +286,27 @@ HRESULT CMainApp::Ready_Static_Component_Prototype()
 }
 
 HRESULT CMainApp::Ready_Static_GameObject_Prototype()
-{	//Camera_Main 프로토타입 생성
-	//CCamera::CAMERADESC CameraDesc;
-	//CameraDesc.vWorldRotAxis = _float3(0, 0, 0);
-	//CameraDesc.vEye = _float3(0, 5.f, -10.f);
-	//CameraDesc.vAt = _float3(0, 5.f, 0);
-	//CameraDesc.vAxisY = _float3(0, 1, 0);
+{
+	///////////////////Camera_Main 프로토타입 생성
+	CAMERADESC CameraDesc;
+	CameraDesc.vWorldRotAxis = _float3(0, 0, 0);
+	CameraDesc.vEye = _float3(0, 5.f, -10.f);
+	CameraDesc.vAt = _float3(0, 5.f, 0);
+	CameraDesc.vAxisY = _float3(0, 1, 0);
 
-	//CameraDesc.fFovy = D3DXToRadian(60.0f);
-	//CameraDesc.fAspect = _float(g_iWinCX) / g_iWinCY;
-	//CameraDesc.fNear = 0.2f;
-	//CameraDesc.fFar = 300.f;
+
+	CameraDesc.fFovy = XMConvertToRadians(60.f);
+	CameraDesc.fAspect = _float(g_iWinCX) / g_iWinCY;
+	CameraDesc.fNear = 0.2f;
+	CameraDesc.fFar = 300.f;
 
 	//CameraDesc.TransformDesc.fMovePerSec = 10.f;
-	//CameraDesc.TransformDesc.fRotationPerSec = D3DXToRadian(90.0f);
+	//CameraDesc.TransformDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
-	//if (FAILED(m_pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_Camera_Main), CCamera_Main::Create(m_pGraphicDevice, &CameraDesc))))
-	//	return E_FAIL;
+	FAILED_CHECK(m_pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_Camera_Main), CCamera_Main::Create(m_pDevice, m_pDeviceContext, &CameraDesc)));
 	//
 	//
-	//if (FAILED(m_pGameInstance->Add_GameObject_Prototype(L"Prototype_Mouse_UI", CUI_Mouse::Create(m_pGraphicDevice, _float4(0, 0, 0, 0)))))
-	//	return E_FAIL;
+	FAILED_CHECK(m_pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_Player), CPlayer::Create(m_pDevice, m_pDeviceContext)));
 
 	//if (FAILED(m_pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_UI_Common), CUI_Common::Create(m_pGraphicDevice, _float4(0, 0, 0, 0)))))
 	//	return E_FAIL;
@@ -329,6 +334,8 @@ void CMainApp::Free()
 		__debugbreak();
 		MSGBOX("Failed to Free Singleton");
 	}
+
+	Safe_Release(m_pComRenderer);
 
 	Safe_Release(m_pSwapChain);
 	Safe_Release(m_pDepthStencilView);

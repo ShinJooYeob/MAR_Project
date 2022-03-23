@@ -186,6 +186,15 @@
     <ClInclude Include="..\public\Transform.h">
       <Filter>01.Utility\01.ComponentMgr\01.Component\01.Transform</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Shader.h">
+      <Filter>01.Utility\01.ComponentMgr\01.Component\04.Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\VIBuffer.h">
+      <Filter>01.Utility\01.ComponentMgr\01.Component\03.Model\02.VIBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\VIBuffer_Rect.h">
+      <Filter>01.Utility\01.ComponentMgr\01.Component\03.Model\02.VIBuffer\Rect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">
@@ -247,6 +256,18 @@
     </ClCompile>
     <ClCompile Include="..\private\Transform.cpp">
       <Filter>01.Utility\01.ComponentMgr\01.Component\01.Transform</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Shader.cpp">
+      <Filter>01.Utility\01.ComponentMgr\01.Component\04.Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\VIBuffer_Rect.cpp">
+      <Filter>01.Utility\01.ComponentMgr\01.Component\03.Model\02.VIBuffer\Rect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\VIBuffer.cpp">
+      <Filter>01.Utility\01.ComponentMgr\01.Component\03.Model\02.VIBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Engine_Struct.cpp">
+      <Filter>99.Define</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

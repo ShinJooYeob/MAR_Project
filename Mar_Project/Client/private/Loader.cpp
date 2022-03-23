@@ -24,7 +24,7 @@ _uint CALLBACK LoadingThread(void* _Prameter)
 		pLoader->Load_Scene_Stage1(tThreadArg.IsClientQuit, tThreadArg.CriSec);
 		break;
 
-	case SCENEID::SCENE_MAPEDIT:
+	case SCENEID::SCENE_EDIT:
 
 		pLoader->Load_Scene_MapEdit(tThreadArg.IsClientQuit, tThreadArg.CriSec);
 		break;

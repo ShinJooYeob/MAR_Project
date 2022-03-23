@@ -20,6 +20,7 @@ public:
 
 private:
 	HRESULT Ready_Layer_MainCamera(const _tchar* pLayerTag);
+	HRESULT Ready_Layer_TestObj(const _tchar* pLayerTag);
 
 private:
 	class CCamera_Main*				m_pMainCam = nullptr;

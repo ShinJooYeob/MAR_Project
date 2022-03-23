@@ -12,6 +12,8 @@
 HWND		g_hWnd;
 HINSTANCE	g_hInst;                                // 현재 인스턴스입니다.
 _double		g_fDeltaTime;
+
+
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
 
@@ -26,6 +28,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_ LPWSTR    lpCmdLine,
                      _In_ int       nCmdShow)
 {
+
+
 
 #ifndef USE_IMGUI
 #ifdef _DEBUG

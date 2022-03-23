@@ -1,12 +1,20 @@
 #pragma once
 #pragma warning(disable : 4251)
 
-
+#ifdef _DEBUG
+#pragma comment (lib,"Effects11d.lib")
+#else
+#pragma comment (lib,"Effects11.lib")
+#endif // DEBUG
 
 #include <d3d11.h>
 
 #include <DirectXMath.h>
 #include <typeinfo>
+
+
+#include <d3dcompiler.h>
+#include <d3dx11effect.h>
 
 using namespace DirectX;
 
@@ -45,10 +53,11 @@ using namespace std;
 
 
 #include "Engine_Typedef.h"
-#include "Engine_Struct.h"
 #include "Engine_Macro.h"
+#include "Engine_Struct.h"
 #include "Engine_Function.h"
 #include "Engine_Enum.h"
 #include "Engine_Description.h"
 
 using namespace Engine;
+

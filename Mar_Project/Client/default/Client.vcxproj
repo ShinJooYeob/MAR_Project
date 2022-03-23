@@ -105,13 +105,19 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>../public/;../default/;../../Reference/Inc/;../public/Imgui/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../public/;../default/;../../Reference/Inc/;../public/Imgui/;../bin/ShaderFiles/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>Engine.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <FxCompile>
+      <ShaderType>Effect</ShaderType>
+    </FxCompile>
+    <FxCompile>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -139,7 +145,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>../public/;../default/;../../Reference/Inc/;../public/Imgui/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../public/;../default/;../../Reference/Inc/;../public/Imgui/;../bin/ShaderFiles/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -148,6 +154,12 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>Engine.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <FxCompile>
+      <ShaderType>Effect</ShaderType>
+    </FxCompile>
+    <FxCompile>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -168,9 +180,10 @@
     <ClInclude Include="..\public\ImguiMgr.h" />
     <ClInclude Include="..\public\Loader.h" />
     <ClInclude Include="..\public\MainApp.h" />
+    <ClInclude Include="..\public\Player.h" />
     <ClInclude Include="..\public\Scene_Loading.h" />
     <ClInclude Include="..\public\Scene_Loby.h" />
-    <ClInclude Include="..\public\Scene_MapEditor.h" />
+    <ClInclude Include="..\public\Scene_Edit.h" />
     <ClInclude Include="..\public\Scene_StageSelect.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="Resource.h" />
@@ -182,9 +195,10 @@
     <ClCompile Include="..\private\ImguiMgr.cpp" />
     <ClCompile Include="..\private\Loader.cpp" />
     <ClCompile Include="..\private\MainApp.cpp" />
+    <ClCompile Include="..\private\Player.cpp" />
     <ClCompile Include="..\private\Scene_Loading.cpp" />
     <ClCompile Include="..\private\Scene_Loby.cpp" />
-    <ClCompile Include="..\private\Scene_MapEditor.cpp" />
+    <ClCompile Include="..\private\Scene_Edit.cpp" />
     <ClCompile Include="..\private\Scene_StageSelect.cpp" />
     <ClCompile Include="..\public\Imgui\imgui.cpp" />
     <ClCompile Include="..\public\Imgui\imgui_demo.cpp" />
@@ -210,6 +224,9 @@
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\public\Imgui\imgui.natvis" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\bin\ShaderFiles\Shader_VtxTex.hlsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -14,5 +14,12 @@ namespace Engine {
 	}CAMERADESC;
 
 
+	typedef struct tagArg
+	{
+		void* pArg;
+		CRITICAL_SECTION*	CriSec;
+		_bool* IsClientQuit;
+
+	}THREADARG;
 
 }

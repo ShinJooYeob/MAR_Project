@@ -42,8 +42,8 @@ _int CCamera_Main::Update(_double fDeltaTime)
 
 _int CCamera_Main::LateUpdate(_double fDeltaTime)
 {	
-	//렌더링 그룹에 넣어주는 역활
 
+	__super::LateUpdate(fDeltaTime);
 
 
 	return _int();

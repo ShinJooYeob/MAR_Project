@@ -10,6 +10,7 @@
 
 IMPLEMENT_SINGLETON(CGameInstance);
 
+
 CGameInstance::CGameInstance()
 	:m_pThreadMgr(GetSingle(CThreadMgr)), 
 	m_pTimerMgr(GetSingle(CTimeMgr)),

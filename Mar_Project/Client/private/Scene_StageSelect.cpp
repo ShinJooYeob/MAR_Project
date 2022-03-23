@@ -102,13 +102,13 @@ HRESULT CScene_StageSelect::Ready_Layer_MainCamera(const _tchar * pLayerTag)
 	//	CameraDesc.vWorldRotAxis = _float3(0.f, 3.f, 0.f);
 
 	//CameraDesc.vAxisY = _float3(0, 1, 0);
-	//CameraDesc.fFovy = D3DXToRadian(60.0f);
+	//CameraDesc.fFovy = XMConvertToRadians(60.0f);
 	//CameraDesc.fAspect = _float(g_iWinCX) / g_iWinCY;
 	//CameraDesc.fNear = 0.2f;
 	//CameraDesc.fFar = 300.f;
 
 	//CameraDesc.TransformDesc.fMovePerSec = 10.f;
-	//CameraDesc.TransformDesc.fRotationPerSec = D3DXToRadian(90.0f);
+	//CameraDesc.TransformDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
 	//CCamera_Main* pMainCam = (CCamera_Main*)(GetSingle(CGameInstance)->Get_GameObject_By_LayerIndex(SCENE_STATIC, TAG_LAY(Layer_Camera_Main)));
 
