@@ -21,7 +21,8 @@ class CScene_Edit final : public CScene
 #ifdef USE_IMGUI
 	typedef struct tagObjectElement
 	{
-		_uint			ObjectID;
+		_uint			ObjectID = Prototype_TestObject;
+		_uint			MeshID = Mesh_TestMesh;
 		_Matrix			matSRT;
 		CGameObject*	pObject;
 
@@ -58,23 +59,28 @@ private:
 	HRESULT Widget_SRT(_double fDeltatime);
 	HRESULT Widget_BatchedObjectList(_double fDeltatime);
 
+	HRESULT Widget_CreateDeleteObject(_double fDeltatime);
+	HRESULT Widget_SaveLoadMapData(_double fDeltatime);
+	
+
 	HRESULT Update_Second_Frame(_double fDeltatime, const char* szFrameBarName);
 
 
 	void Make_HelpWidget(const char* szString);
 	void Make_VerticalSpacing(_uint count);
+
 private:
 	_bool bArrWindowFlag[10];
 	_int m_bIsModelMove = 0;
 	_int m_iKindsOfMoving = 0;
 	_int m_iSelectedXYZ = 0;
 	_float m_ArrBuffer[4];
-
 	_Matrix* m_SelectedObjectSRT = nullptr;
-	//_Matrix m_matSRT;
 
 	_uint m_iBatchedVecIndex = 0;
 	vector<OBJELEMENT>		m_vecBatchedObject;
+
+	_uint m_iSelectedObjectNMesh[2];
 
 
 	_uint ibClickChecker = 0;

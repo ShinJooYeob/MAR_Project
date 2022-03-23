@@ -24,21 +24,9 @@ HRESULT CScene_Edit::Initialize()
 	OBJELEMENT ObjElement;
 	ObjElement.pObject = nullptr;
 	ZeroMemory(ObjElement.matSRT.m, sizeof(_float) * 16);
-	ObjElement.ObjectID = rand() % 20;
 	m_vecBatchedObject.push_back(ObjElement);
 
 
-	///////////////testObject///////////////////////////////////////////////////////////
-	for (_uint i = 0; i < 30; i++)
-	{
-		OBJELEMENT ObjElement;
-
-		ObjElement.pObject = nullptr;
-		ZeroMemory(ObjElement.matSRT.m, sizeof(_float) * 16);
-		ObjElement.ObjectID = rand() % 20;
-
-		m_vecBatchedObject.push_back(ObjElement);
-	}
 
 
 	Prevent_Order = false;
@@ -47,7 +35,10 @@ HRESULT CScene_Edit::Initialize()
 
 	ZeroMemory(m_ArrBuffer, sizeof(_float) * 4);
 	ZeroMemory(bArrWindowFlag, sizeof(_bool) * 10);
+	ZeroMemory(m_iSelectedObjectNMesh, sizeof(_uint) * 2);
 	
+	
+
 	m_ArrBuffer[3] = 0.1f;
 
 
@@ -171,6 +162,7 @@ HRESULT CScene_Edit::Update_First_Frame(_double fDeltatime, const char * szFrame
 
 	FAILED_CHECK(Widget_SRT(fDeltatime));
 	FAILED_CHECK(Widget_BatchedObjectList(fDeltatime));
+	FAILED_CHECK(Widget_CreateDeleteObject(fDeltatime));
 	
 
 
@@ -264,7 +256,10 @@ HRESULT CScene_Edit::Widget_SRT(_double fDeltatime)
 	{
 
 		char Label[64];
-		sprintf_s(Label, "\n  Selected Object Index : %d", m_iBatchedVecIndex);
+		if (m_iBatchedVecIndex)
+			sprintf_s(Label, "\n  Selected Object Index : %d", m_iBatchedVecIndex);
+		else
+			sprintf_s(Label, "\n  !!!!!!!!!!!Create New Object!!!!!!!!!");
 
 		ImGui::Text(Label);
 	}
@@ -418,7 +413,9 @@ HRESULT CScene_Edit::Widget_BatchedObjectList(_double fDeltatime)
 		{
 			char HeaderLabel[64];
 
-			sprintf_s(HeaderLabel, "%d. %ws (%d)", i, L"testObject", m_vecBatchedObject[i].ObjectID);
+			sprintf_s(HeaderLabel, "%d. %ws (Mesh : %ws)",i,	
+				TAG_OP(OBJECTPROTOTYPEID(m_vecBatchedObject[i].ObjectID)), 
+				MESHID(MESHTYPEID(m_vecBatchedObject[i].MeshID)));
 			//sprintf_s(HederLabel, "%d. %ws (%d)",i, m_vecBatchedObject[i].pObject->Get_NameTag(), m_vecBatchedObject[i].ObjectID);
 
 			ObjectLabelIist.push_back({ HeaderLabel });
@@ -462,6 +459,165 @@ HRESULT CScene_Edit::Widget_BatchedObjectList(_double fDeltatime)
 		ImGui::TreePop();
 	}
 
+	return S_OK;
+}
+
+HRESULT CScene_Edit::Widget_CreateDeleteObject(_double fDeltatime)
+{
+
+	Make_VerticalSpacing(5);
+	if (ImGui::TreeNode("Create Object"))
+	{
+
+		
+			ImGui::Text("Selected\n\n");
+		
+
+		{
+			ImGuiWindowFlags window_flags = ImGuiWindowFlags_None | ImGuiWindowFlags_MenuBar| ImGuiWindowFlags_HorizontalScrollbar;
+			{
+
+				ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
+				ImGui::BeginChild("ChildL", ImVec2(ImGui::GetContentRegionAvail().x * 0.5f, 130), true, window_flags);
+
+				if (ImGui::BeginMenuBar())
+				{
+
+
+
+
+					if (ImGui::BeginMenu("ObjectList"))
+					{
+						ImGui::EndMenu();
+					}
+					ImGui::EndMenuBar();
+
+					char buf[128];
+					sprintf_s(buf, "%ws\n", TAG_OP(OBJECTPROTOTYPEID(m_iSelectedObjectNMesh[0])));
+					ImGui::Text(buf);
+
+				}
+
+				if (ImGui::BeginTable("split", 1, ImGuiTableFlags_Resizable | ImGuiTableFlags_NoSavedSettings))
+				{
+	
+
+					for (int i = 0; i < Object_Prototype_End; i++)
+					{
+						char buf[128];
+						sprintf_s(buf, "%ws", TAG_OP(OBJECTPROTOTYPEID(i)));
+						ImGui::TableNextColumn();
+						ImGui::Button(buf, ImVec2(-FLT_MIN, 0.0f));
+
+						if (ImGui::IsItemClicked())
+							m_iSelectedObjectNMesh[0] = i;
+
+						if (m_iBatchedVecIndex != 0 && ImGui::IsItemHovered())
+						{
+							m_iBatchedVecIndex = 0;
+							m_SelectedObjectSRT = &(m_vecBatchedObject[m_iBatchedVecIndex].matSRT);
+							ZeroMemory(m_iSelectedObjectNMesh, sizeof(_uint) * 2);
+						}
+					}
+					ImGui::EndTable();
+				}
+				ImGui::EndChild();
+				ImGui::PopStyleVar();
+			}
+
+			ImGui::SameLine();
+
+			{
+
+				ImGui::BeginChild("ChildR", ImVec2(0, 130), true, window_flags);
+
+				if (ImGui::BeginMenuBar())
+				{
+			
+
+
+
+					if (ImGui::BeginMenu("Mesh List"))
+					{
+						ImGui::EndMenu();
+					}
+					ImGui::EndMenuBar();
+
+					char buf[128];
+					sprintf_s(buf, "%ws\n", MESHID(MESHTYPEID(m_iSelectedObjectNMesh[1])));
+					ImGui::Text(buf);
+				}
+
+				if (ImGui::BeginTable("split", 1, ImGuiTableFlags_Resizable | ImGuiTableFlags_NoSavedSettings))
+				{
+
+		
+
+					for (int i = 0; i < MeshID_End; i++)
+					{
+						char buf[128];
+						sprintf_s(buf, "%ws", MESHID(MESHTYPEID(i)));
+						ImGui::TableNextColumn();
+						ImGui::Button(buf, ImVec2(-FLT_MIN, 0.0f));
+
+
+						if (ImGui::IsItemClicked())
+							m_iSelectedObjectNMesh[1] = i;
+
+						if (m_iBatchedVecIndex != 0 &&ImGui::IsItemHovered())
+						{
+							m_iBatchedVecIndex = 0;
+							m_SelectedObjectSRT = &(m_vecBatchedObject[m_iBatchedVecIndex].matSRT);
+							ZeroMemory(m_iSelectedObjectNMesh, sizeof(_uint) * 2);
+						}
+					}
+					ImGui::EndTable();
+				}
+				ImGui::EndChild();
+			}
+		}
+
+		Make_VerticalSpacing(2);
+		ImGui::Button("Create Object", ImVec2(-FLT_MIN, 0.0f));
+
+		if (ImGui::IsItemClicked())
+		{
+			///오브젝트 생성 코드 집어넣기
+
+			OBJELEMENT ObjElement;
+
+			ObjElement.pObject = nullptr;
+			ZeroMemory(ObjElement.matSRT.m, sizeof(_float) * 16);
+			ObjElement.ObjectID = m_iSelectedObjectNMesh[0];
+
+			ObjElement.matSRT = m_vecBatchedObject[m_iBatchedVecIndex].matSRT;
+
+			ObjElement.MeshID = m_iSelectedObjectNMesh[1];
+
+
+
+			/////실제 생성하기
+
+
+			m_vecBatchedObject.push_back(ObjElement);
+
+			m_iBatchedVecIndex = m_vecBatchedObject.size() - 1;
+			m_SelectedObjectSRT = &(m_vecBatchedObject[m_iBatchedVecIndex].matSRT);
+
+
+		}
+
+
+		ImGui::Separator();
+		ImGui::TreePop();
+	}
+
+
+	return S_OK;
+}
+
+HRESULT CScene_Edit::Widget_SaveLoadMapData(_double fDeltatime)
+{
 	return S_OK;
 }
 

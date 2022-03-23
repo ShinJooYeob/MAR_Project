@@ -43,9 +43,6 @@ _int CPlayer::LateUpdate(_double fDeltaTime)
 	if (__super::LateUpdate(fDeltaTime) < 0)
 		return -1;
 
-
-
-
 	FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_PRIORITY, this));
 
 	return _int();

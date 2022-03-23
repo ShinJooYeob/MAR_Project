@@ -15,15 +15,15 @@ CCamera_Main::CCamera_Main(const CCamera_Main & rhs)
 //1
 HRESULT CCamera_Main::Initialize_Prototype(void * pArg)
 {
-	if (FAILED(__super::Initialize_Prototype(pArg)))
-		return E_FAIL;
-
+	FAILED_CHECK(__super::Initialize_Prototype(pArg));
 
 	return S_OK;
 }
 
 HRESULT CCamera_Main::Initialize_Clone(void * pArg)
 {
+
+	FAILED_CHECK(__super::Initialize_Clone(pArg));
 
 
 	if (FAILED(SetUp_Components()))

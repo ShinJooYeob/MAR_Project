@@ -18,7 +18,11 @@ enum SCENEID
 enum OBJECTPROTOTYPEID
 {
 	Prototype_Camera_Main, 
-	Prototype_Player
+	Prototype_Player,
+
+
+	Prototype_TestObject,
+	Object_Prototype_End,
 };
 
 
@@ -28,13 +32,16 @@ static const _tchar* Tag_Object_Prototype(OBJECTPROTOTYPEID eTag)
 	switch (eTag)
 	{
 	case Prototype_Camera_Main:
-		return TEXT("Prototype_GameObject_Camera_Main");
+		return TEXT("Camera_Main");
 		break;
 	case Prototype_Player:
-		return TEXT("Prototype_GameObject_Player");
+		return TEXT("Player");
 		break;
 
 		//////////////////////////////////////////////////////////////////////////
+	case Prototype_TestObject:
+		return TEXT("TestObject");
+		break;
 	default:
 		MSGBOX("Wrong Type Object Prototype");
 		return nullptr;
@@ -44,6 +51,50 @@ static const _tchar* Tag_Object_Prototype(OBJECTPROTOTYPEID eTag)
 
 }
 #define  TAG_OP Tag_Object_Prototype
+
+
+enum MESHTYPEID
+{
+	Mesh_Player,
+	Mesh_Monster,
+
+	Mesh_TestMesh,
+	MeshID_End
+};
+
+
+
+static const _tchar* Tag_MeshID(MESHTYPEID eTag)
+{
+	switch (eTag)
+	{
+	case Mesh_Monster:
+		return TEXT("Monster");
+		break;
+	case Mesh_Player:
+		return TEXT("Player");
+		break;
+
+
+
+
+
+
+
+
+		//////////////////////////////////////////////////////////////////////////
+	case Mesh_TestMesh:
+		return TEXT("TestMesh");
+		break;
+	default:
+		MSGBOX("Wrong Type Mesh");
+		return nullptr;
+		break;
+	}
+
+
+}
+#define  MESHID Tag_MeshID
 
 enum LAYERID
 {
