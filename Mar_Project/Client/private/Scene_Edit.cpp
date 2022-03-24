@@ -32,6 +32,7 @@ HRESULT CScene_Edit::Initialize()
 	Prevent_Order = false;
 	m_SelectedObjectSRT = &(m_vecBatchedObject[0].matSRT);
 	m_iBatchedVecIndex = 0;
+	m_iPassIndex = 0;
 
 	ZeroMemory(m_ArrBuffer, sizeof(_float) * 4);
 	ZeroMemory(bArrWindowFlag, sizeof(_bool) * 10);
@@ -67,7 +68,8 @@ _int CScene_Edit::Update(_double fDeltaTime)
 	{
 
 
-		FAILED_CHECK(Update_First_Frame(fDeltaTime, "FirstFrame"));
+
+		FAILED_CHECK(Update_First_Frame(fDeltaTime, "Editor"));
 
 
 		Prevent_Order = true;
@@ -139,6 +141,8 @@ _int CScene_Edit::Change_to_NextScene()
 }
 
 #ifdef USE_IMGUI
+
+#pragma region Total
 HRESULT CScene_Edit::Update_First_Frame(_double fDeltatime, const char * szFrameBarName)
 {
 	_bool demotrue = true;
@@ -167,12 +171,304 @@ HRESULT CScene_Edit::Update_First_Frame(_double fDeltatime, const char * szFrame
 		ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_None, ImVec2(0.0f, 0.0f));
 		bFirstSetting = true;
 	}
+
+
 	GETIMGUI->Begin_Update_Frame(fDeltatime, szFrameBarName, window_flags);
 
 
 
-
 	ImGui::PushStyleVar(ImGuiStyleVar_IndentSpacing, 0.0f);
+
+	ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
+	if (ImGui::BeginTabBar("MyTabBar", tab_bar_flags))
+	{
+		if (ImGui::BeginTabItem("Map Editor"))
+		{
+			FAILED_CHECK(Update_MapTab(fDeltatime));
+			ImGui::EndTabItem();
+		}
+		if (ImGui::BeginTabItem("UI Editor"))
+		{
+			FAILED_CHECK(Update_UITab(fDeltatime));
+			ImGui::EndTabItem();
+		}
+		if (ImGui::BeginTabItem("Particle Editor"))
+		{
+			FAILED_CHECK(Update_ParticleTab(fDeltatime));
+			ImGui::EndTabItem();
+		}
+		if (ImGui::BeginTabItem("CameraAction"))
+		{
+			FAILED_CHECK(Update_CameraActionTab(fDeltatime));
+			ImGui::EndTabItem();
+		}
+		ImGui::EndTabBar();
+	}
+
+	ImGui::PopStyleVar();
+
+
+	GETIMGUI->End_Update_Frame();
+	return S_OK;
+
+
+}
+
+void CScene_Edit::Make_HelpWidget(const char * szString)
+{
+
+	ImGui::TextDisabled("(?)");
+	if (ImGui::IsItemHovered())
+	{
+		ImGui::BeginTooltip();
+		ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+		ImGui::TextUnformatted(szString);
+		ImGui::PopTextWrapPos();
+		ImGui::EndTooltip();
+	}
+
+}
+
+void CScene_Edit::Make_VerticalSpacing(_uint count)
+{
+	for (_uint i = 0; i < count; i++)
+	{
+		ImGui::Spacing();
+	}
+
+}
+
+HRESULT CScene_Edit::Sava_Data(const char* szFileName, eDATATYPE iKinds)
+{
+	switch (iKinds)
+	{
+	case Client::CScene_Edit::Data_Map:
+	{
+		//../bin/Resources/Data/Map/
+		_tchar szFullPath[MAX_PATH] =L"../bin/Resources/Data/Map/";
+		_tchar wFileName[MAX_PATH] = L"";
+
+		MultiByteToWideChar(CP_UTF8, 0, szFileName, -1, wFileName, sizeof(wFileName));
+		//WideCharToMultiByte(CP_UTF8, 0, fd.name, -1, szFilename, sizeof(szFilename), NULL, NULL);
+		lstrcat(szFullPath, wFileName);
+
+
+		HANDLE hFile = CreateFile(szFullPath, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
+
+		if (INVALID_HANDLE_VALUE == hFile)
+			return E_FAIL;
+
+		DWORD	dwByte = 0;
+		/*
+		//vector<OBJELEMENT>		m_vecBatchedObject;
+		typedef struct tagObjectElement
+		{
+			_uint			ObjectID = Prototype_TestObject;
+			_uint			MeshID = Mesh_TestMesh;
+			_Matrix			matSRT;
+			CGameObject*	pObject;
+
+		}OBJELEMENT;
+		*/
+
+
+		for (auto& tObjectElement : m_vecBatchedObject)
+		{
+			// key 값 저장
+			WriteFile(hFile, &(tObjectElement.ObjectID), sizeof(_uint), &dwByte, nullptr);
+			WriteFile(hFile, &(tObjectElement.MeshID), sizeof(_uint), &dwByte, nullptr);
+			WriteFile(hFile, &(tObjectElement.PassIndex), sizeof(_uint), &dwByte, nullptr);
+			WriteFile(hFile, &(tObjectElement.matSRT.m[0][0]), sizeof(_float)*16, &dwByte, nullptr);
+
+		}
+		CloseHandle(hFile);
+
+	}
+		break;
+	case Client::CScene_Edit::Data_UI:
+	{
+
+	}
+		break;
+	case Client::CScene_Edit::Data_Particle:
+	{
+
+	}
+		break;
+	case Client::CScene_Edit::Data_CameraAction:
+	{
+
+	}
+		break;
+	default:
+
+		break;
+	}
+
+
+
+	return S_OK;
+}
+
+HRESULT CScene_Edit::Load_Data(const char * szFileName, eDATATYPE iKinds)
+{
+	switch (iKinds)
+	{
+	case Client::CScene_Edit::Data_Map:
+	{
+		{
+			for (auto& tObjElement : m_vecBatchedObject)
+			{
+				//오브젝트 제대로 델리트delete 해주기
+				Safe_Release(tObjElement.pObject);
+			}
+			m_vecBatchedObject.clear();
+
+			ZeroMemory(m_ArrBuffer, sizeof(_float) * 4);
+			m_ArrBuffer[3] = 0.1f;
+			ZeroMemory(m_iSelectedObjectNMesh, sizeof(_uint) * 2);
+
+			m_bIsModelMove = 0;
+			m_iKindsOfMoving = 0;
+			m_iSelectedXYZ = 0; 
+			m_iPassIndex = 0;
+		}
+
+
+
+		//../bin/Resources/Data/Map/
+		_tchar szFullPath[MAX_PATH] = L"../bin/Resources/Data/Map/";
+		_tchar wFileName[MAX_PATH] = L"";
+
+		MultiByteToWideChar(CP_UTF8, 0, szFileName, -1, wFileName, sizeof(wFileName));
+		//WideCharToMultiByte(CP_UTF8, 0, fd.name, -1, szFilename, sizeof(szFilename), NULL, NULL);
+		lstrcat(szFullPath, wFileName);
+
+
+
+		HANDLE hFile = CreateFile(szFullPath, GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+
+		if (INVALID_HANDLE_VALUE == hFile)
+			return E_FAIL;
+
+		DWORD	dwByte = 0;
+
+		OBJELEMENT	tData{};
+
+		while (true)
+		{
+			// key 값 로드
+			ReadFile(hFile, &(tData.ObjectID), sizeof(_uint), &dwByte, nullptr);
+			ReadFile(hFile, &(tData.MeshID), sizeof(_uint), &dwByte, nullptr);
+			ReadFile(hFile, &(tData.PassIndex), sizeof(_uint), &dwByte, nullptr);
+			ReadFile(hFile, &(tData.matSRT.m[0][0]), sizeof(_float) * 16, &dwByte, nullptr);
+
+			if (0 == dwByte)
+				break;
+			
+			//객채 생성해주기
+
+			m_vecBatchedObject.push_back(tData);
+
+		}
+
+
+		m_iBatchedVecIndex = 0;
+		m_SelectedObjectSRT = &(m_vecBatchedObject[m_iBatchedVecIndex].matSRT);
+
+		CloseHandle(hFile);
+	
+
+	}
+	break;
+	case Client::CScene_Edit::Data_UI:
+	{
+
+	}
+	break;
+	case Client::CScene_Edit::Data_Particle:
+	{
+
+	}
+	break;
+	case Client::CScene_Edit::Data_CameraAction:
+	{
+
+	}
+	break;
+	default:
+
+		break;
+	}
+	return S_OK;
+}
+
+HRESULT CScene_Edit::Input_KeyBoard(_double fDeltaTime)
+{
+
+	CGameInstance* pInstance = GetSingle(CGameInstance);
+
+	if (pInstance->Get_DIKeyState(DIK_SPACE) & DIS_Down)
+	{
+		if (m_bIsModelMove) m_bIsModelMove = 0;
+		else
+		{
+			if (m_iBatchedVecIndex != 0)//설정한 오브젝트가 있다면 있다면
+			{
+				// 해당 오브젝트의 메트릭스 받아오기
+				m_SelectedObjectSRT = &(m_vecBatchedObject[m_iBatchedVecIndex].matSRT);
+				ZeroMemory(m_ArrBuffer, sizeof(_float) * 4);
+				m_ArrBuffer[3] = 0.1f;
+
+				m_bIsModelMove = 1;
+			}
+		}
+
+	}
+
+
+	if (m_bIsModelMove)
+	{
+		if (pInstance->Get_DIKeyState(DIK_1) & DIS_Down)		m_iKindsOfMoving = 0;
+		else if (pInstance->Get_DIKeyState(DIK_2) & DIS_Down)	m_iKindsOfMoving = 1;
+		else if (pInstance->Get_DIKeyState(DIK_3) & DIS_Down)	m_iKindsOfMoving = 2;
+
+
+
+		if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_RBUTTON) & DIS_Down)
+		{
+			m_iSelectedXYZ++;
+			if (m_iSelectedXYZ > 2)
+				m_iSelectedXYZ = 0;
+		}
+
+		_long fWheelMove = pInstance->Get_DIMouseMoveState(CInput_Device::MMS_WHEEL);
+		if (fWheelMove)
+		{
+			_float tempValue;
+			memcpy(&tempValue, ((_float*)(&(m_SelectedObjectSRT->m[2 - m_iKindsOfMoving])) + m_iSelectedXYZ), sizeof(_float));
+
+			tempValue += _float(fWheelMove * m_ArrBuffer[3] * fDeltaTime);
+
+
+			memcpy(((_float*)(&(m_SelectedObjectSRT->m[2 - m_iKindsOfMoving])) + m_iSelectedXYZ), &tempValue, sizeof(_float));
+
+			int t = 0;
+		}
+
+	}
+
+
+	return S_OK;
+}
+
+#pragma endregion Total
+
+
+#pragma region MapTab
+HRESULT CScene_Edit::Update_MapTab(_double fDeltatime)
+{
+
 	FAILED_CHECK(Widget_SRT(fDeltatime));
 
 	Make_VerticalSpacing(2);
@@ -201,36 +497,7 @@ HRESULT CScene_Edit::Update_First_Frame(_double fDeltatime, const char * szFrame
 
 	FAILED_CHECK(Widget_SaveLoadMapData(fDeltatime));
 
-
-
-
-
-
-	ImGui::PopStyleVar();
-	GETIMGUI->End_Update_Frame();
 	return S_OK;
-
-	/*{
-
-	static float f = 0.0f;
-	static int counter = 0;
-
-
-	ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-	ImGui::Checkbox("Demo Window", &temp);      // Edit bools storing our window open/close state
-	ImGui::Checkbox("Another Window", &temp);
-
-	ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-	ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-
-	if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-	counter++;
-	ImGui::SameLine();
-	ImGui::Text("counter = %d", counter);
-
-	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-	}*/
-
 }
 
 HRESULT CScene_Edit::Widget_SRT(_double fDeltatime)
@@ -449,9 +716,11 @@ HRESULT CScene_Edit::Widget_BatchedObjectList(_double fDeltatime)
 		{
 			char HeaderLabel[64];
 
-			sprintf_s(HeaderLabel, "%d. %ws (Mesh : %ws)", i,
+			sprintf_s(HeaderLabel, "%d. %ws (Mesh : %ws) (PassIndex : %d)", i,
 				TAG_OP(OBJECTPROTOTYPEID(m_vecBatchedObject[i].ObjectID)),
-				TAG_MESH(MESHTYPEID(m_vecBatchedObject[i].MeshID)));
+				TAG_MESH(MESHTYPEID(m_vecBatchedObject[i].MeshID)) ,  
+				m_vecBatchedObject[i].PassIndex
+			);
 			//sprintf_s(HederLabel, "%d. %ws (%d)",i, m_vecBatchedObject[i].pObject->Get_NameTag(), m_vecBatchedObject[i].ObjectID);
 
 			ObjectLabelIist.push_back({ HeaderLabel });
@@ -504,6 +773,9 @@ HRESULT CScene_Edit::Widget_BatchedObjectList(_double fDeltatime)
 			for (_uint i = 0; i < m_iBatchedVecIndex; i++)
 				iter++;
 
+			////실제로 죽이기 없애기 delete//////////////////////////////////////////////////////////////////////
+
+
 			m_vecBatchedObject.erase(iter);
 
 			m_iBatchedVecIndex = 0;
@@ -534,9 +806,11 @@ HRESULT CScene_Edit::Widget_CreateDeleteObject(_double fDeltatime)
 
 		{
 			char buf[128];
-			sprintf_s(buf, "%ws (Mesh : %ws)",
+			sprintf_s(buf, "%ws (Mesh : %ws) (Pass : %d)",
 				TAG_OP(OBJECTPROTOTYPEID(m_iSelectedObjectNMesh[0])),
-				TAG_MESH(MESHTYPEID(m_iSelectedObjectNMesh[1])));
+				TAG_MESH(MESHTYPEID(m_iSelectedObjectNMesh[1])),
+				m_iPassIndex
+			);
 
 			ImGui::Text(buf);
 		}
@@ -630,7 +904,12 @@ HRESULT CScene_Edit::Widget_CreateDeleteObject(_double fDeltatime)
 					}
 					ImGui::EndTable();
 				}
+
+				Make_VerticalSpacing(1);
+
 				ImGui::EndChild();
+				ImGui::InputInt("PassIndex", &m_iPassIndex);
+				Make_VerticalSpacing(1);
 			}
 		}
 
@@ -648,7 +927,7 @@ HRESULT CScene_Edit::Widget_CreateDeleteObject(_double fDeltatime)
 			ObjElement.matSRT = m_vecBatchedObject[m_iBatchedVecIndex].matSRT;
 
 			ObjElement.MeshID = m_iSelectedObjectNMesh[1];
-
+			ObjElement.PassIndex = m_iPassIndex;
 
 
 			/////실제 생성하기
@@ -702,7 +981,7 @@ HRESULT CScene_Edit::Widget_SaveLoadMapData(_double fDeltatime)
 
 			for (auto& tObjElement : m_vecBatchedObject)
 			{
-				//오브젝트 제대로 델리트 해주기
+				//오브젝트 제대로 델리트delete 해주기
 				Safe_Release(tObjElement.pObject);
 			}
 			m_vecBatchedObject.clear();
@@ -722,6 +1001,7 @@ HRESULT CScene_Edit::Widget_SaveLoadMapData(_double fDeltatime)
 			m_bIsModelMove = 0;
 			m_iKindsOfMoving = 0;
 			m_iSelectedXYZ = 0;
+			m_iPassIndex = 0;
 
 
 
@@ -738,14 +1018,156 @@ HRESULT CScene_Edit::Widget_SaveLoadMapData(_double fDeltatime)
 	//////////////////////////////////////////////////////////////////////////
 
 
-	// Always center this window when appearing
 	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
 	if (ImGui::BeginPopupModal("Save Map", NULL, ImGuiWindowFlags_AlwaysAutoResize))
 	{
-		ImGui::Text("Save Map!\n\n");
+
+		if (m_FilePathList.size() == 0)
+		{
+			m_FilePathList.clear();
+			_tfinddata64_t fd;
+			__int64 handle = _tfindfirst64(TEXT("../bin/Resources/Data/Map/*.*"), &fd);
+			if (handle == -1 || handle == 0)
+				return E_FAIL;
+
+			_int iResult = 0;
+
+			//char szCurPath[128] = "../bin/Resources/Data/Map/";
+			//char szFullPath[128] = "";
+			char szFilename[MAX_PATH];
+
+			while (iResult != -1)
+			{
+				if (!lstrcmp(fd.name, L".") || !lstrcmp(fd.name, L".."))
+				{
+					iResult = _tfindnext64(handle, &fd);
+					continue;
+				}
 
 
+				WideCharToMultiByte(CP_UTF8, 0, fd.name, -1, szFilename, sizeof(szFilename), NULL, NULL);
+				//strcpy_s(szFullPath, szCurPath);
+				//strcat_s(szFullPath, szFilename);
+				m_FilePathList.push_back({ szFilename });
+
+
+				iResult = _tfindnext64(handle, &fd);
+			}
+
+
+			_findclose(handle);
+
+		}
+
+		ImGui::Text("Save Map!\n\nExist MapDataFiles");
+
+		static ImGuiTextFilter filter;
+
+		char	szCheckforSameFileName[256]="";
+
+		if (ImGui::BeginListBox(" "))
+		{
+			auto iter = m_FilePathList.begin();
+
+
+			for (; iter != m_FilePathList.end(); iter++)
+			{
+				const bool is_selected = false;
+
+				if (filter.PassFilter(iter->c_str()))
+				{
+					if (ImGui::Selectable(iter->c_str(), is_selected))
+					{
+						strcpy_s(filter.InputBuf, iter->c_str());
+					}
+
+					if (!strcmp(iter->c_str(), filter.InputBuf))
+						strcpy_s(szCheckforSameFileName, filter.InputBuf);
+				}
+			}
+			ImGui::EndListBox();
+
+		}
+
+		filter.Draw("Input FileName");
+
+
+		ImGui::Separator();
+		if (ImGui::Button("Save", ImVec2(120, 0)))
+		{
+
+			if (strcmp(filter.InputBuf, ""))
+			{
+
+				if (!strcmp(szCheckforSameFileName, filter.InputBuf))
+				{
+					ImGui::OpenPopup("One More Check");
+				}
+				else 
+				{
+					//실제 저장
+
+					Sava_Data(filter.InputBuf, Data_Map);
+
+					ImGui::CloseCurrentPopup();
+					m_FilePathList.clear();
+
+
+				}
+			}
+
+
+
+		}
+		ImGui::SetItemDefaultFocus();
+		ImGui::SameLine();
+		if (ImGui::Button("Cancel", ImVec2(120, 0)))
+		{
+			ImGui::CloseCurrentPopup();
+			m_FilePathList.clear();
+		}
+
+
+		//서브 팝업
+		ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+		if (ImGui::BeginPopupModal("One More Check", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+		{
+
+			ImGui::Text("Mapdata Already Exist\nDo you want to Override on it?");
+
+			if (ImGui::Button("Ok", ImVec2(130, 0)))
+			{
+
+				//실제 저장
+				Sava_Data(filter.InputBuf, Data_Map);
+
+				ImGui::CloseCurrentPopup();
+				m_FilePathList.clear();
+			}
+
+			ImGui::SameLine();
+			if (ImGui::Button("Cancel", ImVec2(130, 0)))
+			{
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::EndPopup();
+		}
+
+
+		ImGui::EndPopup();
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
+
+	// Always center this window when appearing
+	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+	if (ImGui::BeginPopupModal("Laod Map", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		ImGui::Text("Laod Map!\n\n");
+		ImGui::Separator();
 
 
 		if (m_FilePathList.size() == 0)
@@ -774,9 +1196,9 @@ HRESULT CScene_Edit::Widget_SaveLoadMapData(_double fDeltatime)
 				WideCharToMultiByte(CP_UTF8, 0, fd.name, -1, szFilename, sizeof(szFilename), NULL, NULL);
 				//strcpy_s(szFullPath, szCurPath);
 				//strcat_s(szFullPath, szFilename);
-				m_FilePathList.push_back({szFilename});
+				m_FilePathList.push_back({ szFilename });
 
-				
+
 				iResult = _tfindnext64(handle, &fd);
 			}
 
@@ -787,143 +1209,97 @@ HRESULT CScene_Edit::Widget_SaveLoadMapData(_double fDeltatime)
 
 
 
+		static ImGuiTextFilter filter;
 
-		ImGui::Separator();
-		if (ImGui::Button("OK", ImVec2(120, 0)))
+		char	szCheckforSameFileName[256] = "";
+
+		if (ImGui::BeginListBox(" "))
 		{
-			ImGui::CloseCurrentPopup();
-			m_FilePathList.clear();
-		}
-		ImGui::SetItemDefaultFocus();
-		ImGui::SameLine();
-		if (ImGui::Button("Cancel", ImVec2(120, 0)))
-		{
-			ImGui::CloseCurrentPopup();
-			m_FilePathList.clear();
-		}
-		ImGui::EndPopup();
-	}
+			auto iter = m_FilePathList.begin();
 
 
-	//////////////////////////////////////////////////////////////////////////
-
-	// Always center this window when appearing
-	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-
-	if (ImGui::BeginPopupModal("Laod Map", NULL, ImGuiWindowFlags_AlwaysAutoResize))
-	{
-		ImGui::Text("Laod Map!\n\n");
-		ImGui::Separator();
-
-		//static int unused_i = 0;
-		//ImGui::Combo("Combo", &unused_i, "Delete\0Delete harder\0");
-
-		static bool dont_ask_me_next_time = false;
-		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
-		ImGui::Checkbox("Don't ask me next time", &dont_ask_me_next_time);
-		ImGui::PopStyleVar();
-
-		if (ImGui::Button("OK", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
-		ImGui::SetItemDefaultFocus();
-		ImGui::SameLine();
-		if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
-		ImGui::EndPopup();
-	}
-	return S_OK;
-}
-
-HRESULT CScene_Edit::Update_Second_Frame(_double fDeltatime, const char * szFrameBarName)
-{
-	GETIMGUI->Begin_Update_Frame(fDeltatime, szFrameBarName);
-
-
-
-	GETIMGUI->End_Update_Frame();
-	return S_OK;
-}
-
-void CScene_Edit::Make_HelpWidget(const char * szString)
-{
-
-	ImGui::TextDisabled("(?)");
-	if (ImGui::IsItemHovered())
-	{
-		ImGui::BeginTooltip();
-		ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-		ImGui::TextUnformatted(szString);
-		ImGui::PopTextWrapPos();
-		ImGui::EndTooltip();
-	}
-
-}
-
-void CScene_Edit::Make_VerticalSpacing(_uint count)
-{
-	for (_uint i = 0; i < count; i++)
-	{
-		ImGui::Spacing();
-	}
-
-}
-
-HRESULT CScene_Edit::Input_KeyBoard(_double fDeltaTime)
-{
-
-	CGameInstance* pInstance = GetSingle(CGameInstance);
-
-	if (pInstance->Get_DIKeyState(DIK_SPACE) & DIS_Down)
-	{
-		if (m_bIsModelMove) m_bIsModelMove = 0;
-		else
-		{
-			if (m_iBatchedVecIndex != 0)//설정한 오브젝트가 있다면 있다면
+			for (; iter != m_FilePathList.end(); iter++)
 			{
-				// 해당 오브젝트의 메트릭스 받아오기
-				m_SelectedObjectSRT = &(m_vecBatchedObject[m_iBatchedVecIndex].matSRT);
-				ZeroMemory(m_ArrBuffer, sizeof(_float) * 4);
-				m_ArrBuffer[3] = 0.1f;
+				const bool is_selected = false;
 
-				m_bIsModelMove = 1;
+				if (filter.PassFilter(iter->c_str()))
+				{
+					if (ImGui::Selectable(iter->c_str(), is_selected))
+					{
+						strcpy_s(filter.InputBuf, iter->c_str());
+					}
+
+					if (!strcmp(iter->c_str(), filter.InputBuf))
+						strcpy_s(szCheckforSameFileName, filter.InputBuf);
+				}
+			}
+			ImGui::EndListBox();
+
+		}
+
+		filter.Draw("Input FileName");
+
+
+
+
+		if (ImGui::Button("OK", ImVec2(120, 0)))
+		{ 
+
+			if (strcmp(filter.InputBuf, ""))
+			{
+				if (!strcmp(szCheckforSameFileName, filter.InputBuf))
+				{
+					Load_Data(filter.InputBuf, Data_Map);
+					m_FilePathList.clear();
+					ImGui::CloseCurrentPopup();
+				}
 			}
 		}
-
-	}
-
-
-	if (m_bIsModelMove)
-	{
-		if (pInstance->Get_DIKeyState(DIK_1) & DIS_Down)		m_iKindsOfMoving = 0;
-		else if (pInstance->Get_DIKeyState(DIK_2) & DIS_Down)	m_iKindsOfMoving = 1;
-		else if (pInstance->Get_DIKeyState(DIK_3) & DIS_Down)	m_iKindsOfMoving = 2;
-
-
-
-		if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_RBUTTON) & DIS_Down)
-		{
-			m_iSelectedXYZ++;
-			if (m_iSelectedXYZ > 2)
-				m_iSelectedXYZ = 0;
+		ImGui::SetItemDefaultFocus();
+		ImGui::SameLine();
+		if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+			m_FilePathList.clear();
+			ImGui::CloseCurrentPopup();
 		}
-
-		_long fWheelMove = pInstance->Get_DIMouseMoveState(CInput_Device::MMS_WHEEL);
-		if (fWheelMove)
-		{
-			_float tempValue;
-			memcpy(&tempValue, ((_float*)(&(m_SelectedObjectSRT->m[2 - m_iKindsOfMoving])) + m_iSelectedXYZ), sizeof(_float));
-
-			tempValue += _float(fWheelMove * m_ArrBuffer[3] * fDeltaTime);
-
-
-			memcpy(((_float*)(&(m_SelectedObjectSRT->m[2 - m_iKindsOfMoving])) + m_iSelectedXYZ), &tempValue, sizeof(_float));
-
-			int t = 0;
-		}
-
+		ImGui::EndPopup();
 	}
+	return S_OK;
+}
+
+#pragma endregion MapTab
+
+#pragma region UITab
+HRESULT CScene_Edit::Update_UITab(_double fDeltatime)
+{
+
+
 
 
 	return S_OK;
 }
+
+
+#pragma endregion UITab
+
+#pragma region ParticleTab
+
+HRESULT CScene_Edit::Update_ParticleTab(_double fDeltatime)
+{
+	return S_OK;
+}
+
+#pragma endregion ParticleTab
+
+
+#pragma region CamTab
+
+HRESULT CScene_Edit::Update_CameraActionTab(_double fDeltatime)
+{
+	return S_OK;
+}
+
+#pragma endregion CamTab
+
 
 
 #endif // USE_IMGUI
@@ -954,5 +1330,12 @@ CScene_Edit * CScene_Edit::Create(ID3D11Device * pDevice, ID3D11DeviceContext * 
 void CScene_Edit::Free()
 {
 	__super::Free();
+
+	for (auto& iter : m_vecBatchedObject)
+	{
+
+		//객채 없애기 죽이기 비워주기
+	}
+	m_vecBatchedObject.clear();
 
 }

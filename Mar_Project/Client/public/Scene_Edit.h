@@ -22,12 +22,20 @@ class CScene_Edit final : public CScene
 	{
 		_uint			ObjectID = Prototype_TestObject;
 		_uint			MeshID = Mesh_TestMesh;
+		_uint			PassIndex = 0;
 		_Matrix			matSRT;
 		CGameObject*	pObject;
 
 	}OBJELEMENT;
 
-
+	enum eDATATYPE
+	{
+		Data_Map,
+		Data_UI,
+		Data_Particle,
+		Data_CameraAction,
+		Datatype_End
+	};
 #endif
 
 
@@ -51,28 +59,72 @@ public:
 
 #ifdef USE_IMGUI
 private:
-	HRESULT Input_KeyBoard(_double fDeltaTime);
 
+#pragma region Total
 
 	HRESULT Update_First_Frame(_double fDeltatime, const char* szFrameBarName);
+
+
+	void Make_HelpWidget(const char* szString);
+	void Make_VerticalSpacing(_uint count);
+	HRESULT Sava_Data(const char* szFileName, eDATATYPE iKinds);
+	HRESULT Load_Data(const char* szFileName, eDATATYPE iKinds);
+	HRESULT Input_KeyBoard(_double fDeltaTime);
+
+#pragma endregion Total
+
+#pragma region MapTab
+	HRESULT Update_MapTab(_double fDeltatime);
 	HRESULT Widget_SRT(_double fDeltatime);
 	HRESULT Widget_BatchedObjectList(_double fDeltatime);
 
 	HRESULT Widget_CreateDeleteObject(_double fDeltatime);
 	HRESULT Widget_SaveLoadMapData(_double fDeltatime);
-	
-
-	HRESULT Update_Second_Frame(_double fDeltatime, const char* szFrameBarName);
 
 
-	void Make_HelpWidget(const char* szString);
-	void Make_VerticalSpacing(_uint count);
+#pragma endregion MapTab
+
+#pragma region UITab
+
+	HRESULT Update_UITab(_double fDeltatime);
+
+
+#pragma endregion UITab
+
+#pragma region ParticleTab
+
+	HRESULT Update_ParticleTab(_double fDeltatime);
+
+
+#pragma endregion ParticleTab
+
+#pragma region CamTab
+
+	HRESULT Update_CameraActionTab(_double fDeltatime);
+
+
+#pragma endregion CamTab
+
+
+
 
 private:
+
+#pragma region Total
+	_bool	Prevent_Order = false;
 	_bool bArrWindowFlag[10];
+	_uint ibClickChecker = 0;
+
+
+	list<string>		m_FilePathList;
+#pragma endregion Total
+
+#pragma region MapTab
+
 	_int m_bIsModelMove = 0;
 	_int m_iKindsOfMoving = 0;
 	_int m_iSelectedXYZ = 0;
+	_int m_iPassIndex = 0;
 	_float m_ArrBuffer[4];
 	_Matrix* m_SelectedObjectSRT = nullptr;
 
@@ -81,11 +133,18 @@ private:
 
 	_uint m_iSelectedObjectNMesh[2];
 
+#pragma endregion MapTab
 
-	list<string>		m_FilePathList;
+#pragma region UITab
+#pragma endregion UITab
 
-	_uint ibClickChecker = 0;
-	_bool	Prevent_Order = false;
+#pragma region ParticleTab
+#pragma endregion ParticleTab
+
+#pragma region CamTab
+#pragma endregion CamTab
+
+
 #endif // USE_IMGUI
 
 private:
