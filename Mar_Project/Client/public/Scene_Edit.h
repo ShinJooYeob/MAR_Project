@@ -6,12 +6,11 @@
 
 #ifdef USE_IMGUI
 #include "ImguiMgr.h"
-
-
 #endif // USE_IMGUI
 
 
-
+//const char* DataFilePath = "../bin/Resources/Data/";
+//const _tchar* MeshFilePath = L"../bin/Resources/Mesh/";
 
 
 BEGIN(Client)
@@ -82,6 +81,8 @@ private:
 
 	_uint m_iSelectedObjectNMesh[2];
 
+
+	list<string>		m_FilePathList;
 
 	_uint ibClickChecker = 0;
 	_bool	Prevent_Order = false;

@@ -5,7 +5,7 @@
 
 
 CScene_Edit::CScene_Edit(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
-	:CScene(pDevice,pDeviceContext)
+	:CScene(pDevice, pDeviceContext)
 {
 }
 
@@ -36,8 +36,8 @@ HRESULT CScene_Edit::Initialize()
 	ZeroMemory(m_ArrBuffer, sizeof(_float) * 4);
 	ZeroMemory(bArrWindowFlag, sizeof(_bool) * 10);
 	ZeroMemory(m_iSelectedObjectNMesh, sizeof(_uint) * 2);
-	
-	
+
+
 
 	m_ArrBuffer[3] = 0.1f;
 
@@ -65,6 +65,8 @@ _int CScene_Edit::Update(_double fDeltaTime)
 
 	if (GETIMGUI->Update_ImguiMgr(fDeltaTime) >= 0)
 	{
+
+
 		FAILED_CHECK(Update_First_Frame(fDeltaTime, "FirstFrame"));
 
 
@@ -156,45 +158,79 @@ HRESULT CScene_Edit::Update_First_Frame(_double fDeltatime, const char * szFrame
 	if (bArrWindowFlag[9])				window_flags |= ImGuiWindowFlags_UnsavedDocument;
 	*/
 
+	static _bool bFirstSetting = false;
 
+	if (!bFirstSetting)
+	{
+		ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+		ImGui::SetNextWindowSize(ImVec2(center.x * 0.667f, center.y * 2.f), ImGuiCond_None);
+		ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_None, ImVec2(0.0f, 0.0f));
+		bFirstSetting = true;
+	}
 	GETIMGUI->Begin_Update_Frame(fDeltatime, szFrameBarName, window_flags);
 
 
+
+
+	ImGui::PushStyleVar(ImGuiStyleVar_IndentSpacing, 0.0f);
 	FAILED_CHECK(Widget_SRT(fDeltatime));
+
+	Make_VerticalSpacing(2);
+	ImGui::Separator();
+	Make_VerticalSpacing(3);
+
+	int open_action = -1;
+	if (ImGui::Button("Open all about Object"))
+		open_action = 1;
+	ImGui::SameLine();
+	if (ImGui::Button("Close all about Object"))
+		open_action = 0;
+	if (open_action != -1)
+		ImGui::SetNextItemOpen(open_action != 0);
 	FAILED_CHECK(Widget_BatchedObjectList(fDeltatime));
+
+	if (open_action != -1)
+		ImGui::SetNextItemOpen(open_action != 0);
 	FAILED_CHECK(Widget_CreateDeleteObject(fDeltatime));
-	
+
+
+	Make_VerticalSpacing(2);
+	ImGui::Separator();
+
+	Make_VerticalSpacing(3);
+
+	FAILED_CHECK(Widget_SaveLoadMapData(fDeltatime));
 
 
 
+
+
+
+	ImGui::PopStyleVar();
+	GETIMGUI->End_Update_Frame();
+	return S_OK;
 
 	/*{
 
-		static float f = 0.0f;
-		static int counter = 0;
+	static float f = 0.0f;
+	static int counter = 0;
 
 
-		ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-		ImGui::Checkbox("Demo Window", &temp);      // Edit bools storing our window open/close state
-		ImGui::Checkbox("Another Window", &temp);
+	ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+	ImGui::Checkbox("Demo Window", &temp);      // Edit bools storing our window open/close state
+	ImGui::Checkbox("Another Window", &temp);
 
-		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-		ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+	ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+	ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
 
-		if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-			counter++;
-		ImGui::SameLine();
-		ImGui::Text("counter = %d", counter);
+	if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+	counter++;
+	ImGui::SameLine();
+	ImGui::Text("counter = %d", counter);
 
-		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	}*/
 
-
-
-
-
-	GETIMGUI->End_Update_Frame();
-	return S_OK;
 }
 
 HRESULT CScene_Edit::Widget_SRT(_double fDeltatime)
@@ -208,7 +244,7 @@ HRESULT CScene_Edit::Widget_SRT(_double fDeltatime)
 	{
 		m_bIsModelMove = 0;
 	}
-	else 
+	else
 	{
 		if (ibClickChecker)
 		{
@@ -281,13 +317,13 @@ HRESULT CScene_Edit::Widget_SRT(_double fDeltatime)
 		break;
 	}
 
-	
+
 	switch (m_iKindsOfMoving)
 	{
 	case 0://포지션
 	{
 		memcpy(m_ArrBuffer, &(m_SelectedObjectSRT->m[2]), sizeof(_float) * 3);
-		ImGui::DragFloat3(" X Y Z", m_ArrBuffer, m_ArrBuffer[3], FLT_MIN, FLT_MAX);
+		ImGui::DragFloat3(" X Y Z", m_ArrBuffer, m_ArrBuffer[3], -FLT_MAX, FLT_MAX);
 		memcpy(&(m_SelectedObjectSRT->m[2]), m_ArrBuffer, sizeof(_float) * 3);
 	}
 	break;
@@ -295,7 +331,7 @@ HRESULT CScene_Edit::Widget_SRT(_double fDeltatime)
 	case 1://로테이션
 	{
 		memcpy(m_ArrBuffer, &(m_SelectedObjectSRT->m[1]), sizeof(_float) * 3);
-		ImGui::DragFloat3(" X Y Z", m_ArrBuffer, m_ArrBuffer[3], FLT_MIN, FLT_MAX);
+		ImGui::DragFloat3(" X Y Z", m_ArrBuffer, m_ArrBuffer[3], -FLT_MAX, FLT_MAX);
 		memcpy(&(m_SelectedObjectSRT->m[1]), m_ArrBuffer, sizeof(_float) * 3);
 
 	}
@@ -305,7 +341,7 @@ HRESULT CScene_Edit::Widget_SRT(_double fDeltatime)
 	case 2://Scale
 	{
 		memcpy(m_ArrBuffer, &(m_SelectedObjectSRT->m[0]), sizeof(_float) * 3);
-		ImGui::DragFloat3(" X Y Z", m_ArrBuffer, m_ArrBuffer[3], FLT_MIN, FLT_MAX);
+		ImGui::DragFloat3(" X Y Z", m_ArrBuffer, m_ArrBuffer[3], -FLT_MAX, FLT_MAX);
 		memcpy(&(m_SelectedObjectSRT->m[0]), m_ArrBuffer, sizeof(_float) * 3);
 	}
 	break;
@@ -340,58 +376,58 @@ HRESULT CScene_Edit::Widget_SRT(_double fDeltatime)
 	Make_VerticalSpacing(5);
 	if (ImGui::TreeNode("Show All"))
 	{
-	
-			static bool selected[4] = {};
 
-			if (ImGui::BeginTable("split2", 4, ImGuiTableFlags_Resizable | ImGuiTableFlags_NoSavedSettings | ImGuiTableFlags_Borders))
+		static bool selected[4] = {};
+
+		if (ImGui::BeginTable("split2", 4, ImGuiTableFlags_Resizable | ImGuiTableFlags_NoSavedSettings | ImGuiTableFlags_Borders))
+		{
+			char HederLabel[32];
+			sprintf_s(HederLabel, "SRT Type");
+			ImGui::TableNextRow();
+			ImGui::TableNextColumn();
+			ImGui::Selectable(HederLabel, &selected[0], ImGuiSelectableFlags_SpanAllColumns);
+			ImGui::TableNextColumn();
+			ImGui::Text("X");
+			ImGui::TableNextColumn();
+			ImGui::Text("Y");
+			ImGui::TableNextColumn();
+			ImGui::Text("Z");
+
+			for (int i = 0; i < 3; i++)
 			{
-				char HederLabel[32];
-				sprintf_s(HederLabel, "SRT Type");
+				char label[32];
+				switch (i)
+				{
+				case 0:
+					sprintf_s(label, "Position");
+					break;
+				case 1:
+					sprintf_s(label, "Rotation");
+					break;
+				case 2:
+					sprintf_s(label, "Scale");
+					break;
+				default:
+					sprintf_s(label, "ERROR");
+					break;
+				}
+
+				_float3 vSRT = {};
+				memcpy(&vSRT, &(m_SelectedObjectSRT->m[2 - i]), sizeof(_float) * 3);
+
 				ImGui::TableNextRow();
 				ImGui::TableNextColumn();
-				ImGui::Selectable(HederLabel, &selected[0], ImGuiSelectableFlags_SpanAllColumns);
+				ImGui::Selectable(label, &selected[i + 1], ImGuiSelectableFlags_SpanAllColumns);
 				ImGui::TableNextColumn();
-				ImGui::Text("X");
+				ImGui::Text("%f", vSRT.x);
 				ImGui::TableNextColumn();
-				ImGui::Text("Y");
+				ImGui::Text("%f", vSRT.y);
 				ImGui::TableNextColumn();
-				ImGui::Text("Z");
-
-				for (int i = 0; i < 3; i++)
-				{
-					char label[32];
-					switch (i)
-					{
-					case 0:
-						sprintf_s(label, "Position");
-						break;
-					case 1:
-						sprintf_s(label, "Rotation");
-						break;
-					case 2:
-						sprintf_s(label, "Scale");
-						break;
-					default:
-						sprintf_s(label, "ERROR");
-						break;
-					}
-
-					_float3 vSRT = {};
-					memcpy(&vSRT, &(m_SelectedObjectSRT->m[2 - i]), sizeof(_float) * 3);
-
-					ImGui::TableNextRow();
-					ImGui::TableNextColumn();
-					ImGui::Selectable(label, &selected[i + 1], ImGuiSelectableFlags_SpanAllColumns);
-					ImGui::TableNextColumn();
-					ImGui::Text("%f", vSRT.x);
-					ImGui::TableNextColumn();
-					ImGui::Text("%f", vSRT.y);
-					ImGui::TableNextColumn();
-					ImGui::Text("%f", vSRT.z);
-				}
-				ImGui::EndTable();
+				ImGui::Text("%f", vSRT.z);
 			}
-	
+			ImGui::EndTable();
+		}
+
 
 		ImGui::TreePop();
 	}
@@ -404,18 +440,18 @@ HRESULT CScene_Edit::Widget_SRT(_double fDeltatime)
 
 HRESULT CScene_Edit::Widget_BatchedObjectList(_double fDeltatime)
 {
-	Make_VerticalSpacing(5);
+	Make_VerticalSpacing(2);
 	if (ImGui::TreeNode("Batched Object List"))
 	{
 		vector<string> ObjectLabelIist;
 
-		for (_uint i = 0;  i< m_vecBatchedObject.size(); i++)
+		for (_uint i = 0; i < m_vecBatchedObject.size(); i++)
 		{
 			char HeaderLabel[64];
 
-			sprintf_s(HeaderLabel, "%d. %ws (Mesh : %ws)",i,	
-				TAG_OP(OBJECTPROTOTYPEID(m_vecBatchedObject[i].ObjectID)), 
-				MESHID(MESHTYPEID(m_vecBatchedObject[i].MeshID)));
+			sprintf_s(HeaderLabel, "%d. %ws (Mesh : %ws)", i,
+				TAG_OP(OBJECTPROTOTYPEID(m_vecBatchedObject[i].ObjectID)),
+				TAG_MESH(MESHTYPEID(m_vecBatchedObject[i].MeshID)));
 			//sprintf_s(HederLabel, "%d. %ws (%d)",i, m_vecBatchedObject[i].pObject->Get_NameTag(), m_vecBatchedObject[i].ObjectID);
 
 			ObjectLabelIist.push_back({ HeaderLabel });
@@ -424,7 +460,7 @@ HRESULT CScene_Edit::Widget_BatchedObjectList(_double fDeltatime)
 
 		{
 
-			char Label[64]; 
+			char Label[64];
 			sprintf_s(Label, "Selected Index : %d  | Total Object Count : %zd", m_iBatchedVecIndex, ObjectLabelIist.size() - 1);
 
 			ImGui::Text(Label);
@@ -433,9 +469,9 @@ HRESULT CScene_Edit::Widget_BatchedObjectList(_double fDeltatime)
 		{
 
 
-			for (int n = 1; n <  ObjectLabelIist.size(); n++)
+			for (int n = 1; n < ObjectLabelIist.size(); n++)
 			{
-				const bool is_selected = (m_iBatchedVecIndex == n );
+				const bool is_selected = (m_iBatchedVecIndex == n);
 				if (ImGui::Selectable(ObjectLabelIist[n].c_str(), is_selected))
 				{
 
@@ -456,6 +492,30 @@ HRESULT CScene_Edit::Widget_BatchedObjectList(_double fDeltatime)
 			ImGui::EndListBox();
 		}
 
+
+
+		Make_VerticalSpacing(2);
+
+		if (ImGui::Button("Delete Object", ImVec2(-FLT_MIN, 0.0f)) && m_iBatchedVecIndex)
+		{
+
+			auto iter = m_vecBatchedObject.begin();
+
+			for (_uint i = 0; i < m_iBatchedVecIndex; i++)
+				iter++;
+
+			m_vecBatchedObject.erase(iter);
+
+			m_iBatchedVecIndex = 0;
+			m_SelectedObjectSRT = &(m_vecBatchedObject[m_iBatchedVecIndex].matSRT);
+
+
+			m_iBatchedVecIndex = _uint(m_vecBatchedObject.size() - 1);
+			m_SelectedObjectSRT = &(m_vecBatchedObject[m_iBatchedVecIndex].matSRT);
+		}
+
+
+
 		ImGui::TreePop();
 	}
 
@@ -469,47 +529,50 @@ HRESULT CScene_Edit::Widget_CreateDeleteObject(_double fDeltatime)
 	if (ImGui::TreeNode("Create Object"))
 	{
 
-		
-			ImGui::Text("Selected\n\n");
-		
+
+		ImGui::Text("Selected\n\n");
 
 		{
-			ImGuiWindowFlags window_flags = ImGuiWindowFlags_None | ImGuiWindowFlags_MenuBar| ImGuiWindowFlags_HorizontalScrollbar;
+			char buf[128];
+			sprintf_s(buf, "%ws (Mesh : %ws)",
+				TAG_OP(OBJECTPROTOTYPEID(m_iSelectedObjectNMesh[0])),
+				TAG_MESH(MESHTYPEID(m_iSelectedObjectNMesh[1])));
+
+			ImGui::Text(buf);
+		}
+
+
+		{
+			ImGuiWindowFlags window_flags = ImGuiWindowFlags_None | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_HorizontalScrollbar;
 			{
 
 				ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
 				ImGui::BeginChild("ChildL", ImVec2(ImGui::GetContentRegionAvail().x * 0.5f, 130), true, window_flags);
 
+
 				if (ImGui::BeginMenuBar())
 				{
-
-
-
-
 					if (ImGui::BeginMenu("ObjectList"))
 					{
 						ImGui::EndMenu();
 					}
 					ImGui::EndMenuBar();
 
-					char buf[128];
-					sprintf_s(buf, "%ws\n", TAG_OP(OBJECTPROTOTYPEID(m_iSelectedObjectNMesh[0])));
-					ImGui::Text(buf);
+					//char buf[128];
+					//sprintf_s(buf, "%ws\n", TAG_OP(OBJECTPROTOTYPEID(m_iSelectedObjectNMesh[0])));
+					//ImGui::Text(buf);
 
 				}
 
 				if (ImGui::BeginTable("split", 1, ImGuiTableFlags_Resizable | ImGuiTableFlags_NoSavedSettings))
 				{
-	
-
 					for (int i = 0; i < Object_Prototype_End; i++)
 					{
 						char buf[128];
 						sprintf_s(buf, "%ws", TAG_OP(OBJECTPROTOTYPEID(i)));
 						ImGui::TableNextColumn();
-						ImGui::Button(buf, ImVec2(-FLT_MIN, 0.0f));
 
-						if (ImGui::IsItemClicked())
+						if (ImGui::Button(buf, ImVec2(-FLT_MIN, 0.0f)))
 							m_iSelectedObjectNMesh[0] = i;
 
 						if (m_iBatchedVecIndex != 0 && ImGui::IsItemHovered())
@@ -531,40 +594,34 @@ HRESULT CScene_Edit::Widget_CreateDeleteObject(_double fDeltatime)
 
 				ImGui::BeginChild("ChildR", ImVec2(0, 130), true, window_flags);
 
+
 				if (ImGui::BeginMenuBar())
 				{
-			
-
-
-
 					if (ImGui::BeginMenu("Mesh List"))
 					{
 						ImGui::EndMenu();
 					}
 					ImGui::EndMenuBar();
 
-					char buf[128];
-					sprintf_s(buf, "%ws\n", MESHID(MESHTYPEID(m_iSelectedObjectNMesh[1])));
-					ImGui::Text(buf);
+					//char buf[128];
+					//sprintf_s(buf, "%ws\n", TAG_MESH(MESHTYPEID(m_iSelectedObjectNMesh[1])));
+					//ImGui::Text(buf);
 				}
 
 				if (ImGui::BeginTable("split", 1, ImGuiTableFlags_Resizable | ImGuiTableFlags_NoSavedSettings))
 				{
 
-		
+
 
 					for (int i = 0; i < MeshID_End; i++)
 					{
 						char buf[128];
-						sprintf_s(buf, "%ws", MESHID(MESHTYPEID(i)));
+						sprintf_s(buf, "%ws", TAG_MESH(MESHTYPEID(i)));
 						ImGui::TableNextColumn();
-						ImGui::Button(buf, ImVec2(-FLT_MIN, 0.0f));
-
-
-						if (ImGui::IsItemClicked())
+						if (ImGui::Button(buf, ImVec2(-FLT_MIN, 0.0f)))
 							m_iSelectedObjectNMesh[1] = i;
 
-						if (m_iBatchedVecIndex != 0 &&ImGui::IsItemHovered())
+						if (m_iBatchedVecIndex != 0 && ImGui::IsItemHovered())
 						{
 							m_iBatchedVecIndex = 0;
 							m_SelectedObjectSRT = &(m_vecBatchedObject[m_iBatchedVecIndex].matSRT);
@@ -578,9 +635,7 @@ HRESULT CScene_Edit::Widget_CreateDeleteObject(_double fDeltatime)
 		}
 
 		Make_VerticalSpacing(2);
-		ImGui::Button("Create Object", ImVec2(-FLT_MIN, 0.0f));
-
-		if (ImGui::IsItemClicked())
+		if (ImGui::Button("Create Object", ImVec2(-FLT_MIN, 0.0f)))
 		{
 			///오브젝트 생성 코드 집어넣기
 
@@ -601,14 +656,13 @@ HRESULT CScene_Edit::Widget_CreateDeleteObject(_double fDeltatime)
 
 			m_vecBatchedObject.push_back(ObjElement);
 
-			m_iBatchedVecIndex = m_vecBatchedObject.size() - 1;
+			m_iBatchedVecIndex = _uint(m_vecBatchedObject.size() - 1);
 			m_SelectedObjectSRT = &(m_vecBatchedObject[m_iBatchedVecIndex].matSRT);
 
 
 		}
 
 
-		ImGui::Separator();
 		ImGui::TreePop();
 	}
 
@@ -618,6 +672,163 @@ HRESULT CScene_Edit::Widget_CreateDeleteObject(_double fDeltatime)
 
 HRESULT CScene_Edit::Widget_SaveLoadMapData(_double fDeltatime)
 {
+	if (ImGui::Button("New Map"))
+		ImGui::OpenPopup("New Map");
+	ImGui::SameLine();
+	if (ImGui::Button("Save Map"))
+		ImGui::OpenPopup("Save Map");
+	ImGui::SameLine();
+	if (ImGui::Button("Laod Map"))
+		ImGui::OpenPopup("Laod Map");
+	ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+
+	// Always center this window when appearing
+	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+	if (ImGui::BeginPopupModal("New Map", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		ImGui::Text("!!!!!!!!!!!!!!!!Waring!!!!!!!!!!!!!!!!\n\n Delete Batched Object Without Save!!!\n\n	Please Check Save One more\n\n\n");
+		ImGui::Separator();
+
+		//static int unused_i = 0;
+		//ImGui::Combo("Combo", &unused_i, "Delete\0Delete harder\0");
+
+		//static bool dont_ask_me_next_time = false;
+		//ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+		//ImGui::Checkbox("Don't ask me next time", &dont_ask_me_next_time);
+		//ImGui::PopStyleVar();
+
+		if (ImGui::Button("OK", ImVec2(130, 0))) { 
+
+			for (auto& tObjElement : m_vecBatchedObject)
+			{
+				//오브젝트 제대로 델리트 해주기
+				Safe_Release(tObjElement.pObject);
+			}
+			m_vecBatchedObject.clear();
+
+			OBJELEMENT ObjElement;
+			ObjElement.pObject = nullptr;
+			ZeroMemory(ObjElement.matSRT.m, sizeof(_float) * 16);
+			m_vecBatchedObject.push_back(ObjElement);
+
+			m_SelectedObjectSRT = &(m_vecBatchedObject[0].matSRT);
+			m_iBatchedVecIndex = 0;
+
+			ZeroMemory(m_ArrBuffer, sizeof(_float) * 4);
+			m_ArrBuffer[3] = 0.1f;
+			ZeroMemory(m_iSelectedObjectNMesh, sizeof(_uint) * 2);
+
+			m_bIsModelMove = 0;
+			m_iKindsOfMoving = 0;
+			m_iSelectedXYZ = 0;
+
+
+
+
+			ImGui::CloseCurrentPopup(); 
+		}
+		ImGui::SetItemDefaultFocus();
+		ImGui::SameLine();
+		if (ImGui::Button("Cancel", ImVec2(130, 0))) { ImGui::CloseCurrentPopup(); }
+		ImGui::EndPopup();
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
+
+
+	// Always center this window when appearing
+	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+	if (ImGui::BeginPopupModal("Save Map", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		ImGui::Text("Save Map!\n\n");
+
+
+
+
+		if (m_FilePathList.size() == 0)
+		{
+			m_FilePathList.clear();
+			_tfinddata64_t fd;
+			__int64 handle = _tfindfirst64(TEXT("../bin/Resources/Data/Map/*.*"), &fd);
+			if (handle == -1 || handle == 0)
+				return E_FAIL;
+
+			_int iResult = 0;
+
+			//char szCurPath[128] = "../bin/Resources/Data/Map/";
+			//char szFullPath[128] = "";
+			char szFilename[MAX_PATH];
+
+			while (iResult != -1)
+			{
+				if (!lstrcmp(fd.name, L".") || !lstrcmp(fd.name, L".."))
+				{
+					iResult = _tfindnext64(handle, &fd);
+					continue;
+				}
+
+
+				WideCharToMultiByte(CP_UTF8, 0, fd.name, -1, szFilename, sizeof(szFilename), NULL, NULL);
+				//strcpy_s(szFullPath, szCurPath);
+				//strcat_s(szFullPath, szFilename);
+				m_FilePathList.push_back({szFilename});
+
+				
+				iResult = _tfindnext64(handle, &fd);
+			}
+
+
+			_findclose(handle);
+
+		}
+
+
+
+
+		ImGui::Separator();
+		if (ImGui::Button("OK", ImVec2(120, 0)))
+		{
+			ImGui::CloseCurrentPopup();
+			m_FilePathList.clear();
+		}
+		ImGui::SetItemDefaultFocus();
+		ImGui::SameLine();
+		if (ImGui::Button("Cancel", ImVec2(120, 0)))
+		{
+			ImGui::CloseCurrentPopup();
+			m_FilePathList.clear();
+		}
+		ImGui::EndPopup();
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
+
+	// Always center this window when appearing
+	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+	if (ImGui::BeginPopupModal("Laod Map", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		ImGui::Text("Laod Map!\n\n");
+		ImGui::Separator();
+
+		//static int unused_i = 0;
+		//ImGui::Combo("Combo", &unused_i, "Delete\0Delete harder\0");
+
+		static bool dont_ask_me_next_time = false;
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+		ImGui::Checkbox("Don't ask me next time", &dont_ask_me_next_time);
+		ImGui::PopStyleVar();
+
+		if (ImGui::Button("OK", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+		ImGui::SetItemDefaultFocus();
+		ImGui::SameLine();
+		if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+		ImGui::EndPopup();
+	}
 	return S_OK;
 }
 
@@ -633,22 +844,22 @@ HRESULT CScene_Edit::Update_Second_Frame(_double fDeltatime, const char * szFram
 
 void CScene_Edit::Make_HelpWidget(const char * szString)
 {
-	
-		ImGui::TextDisabled("(?)");
-		if (ImGui::IsItemHovered())
-		{
-			ImGui::BeginTooltip();
-			ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-			ImGui::TextUnformatted(szString);
-			ImGui::PopTextWrapPos();
-			ImGui::EndTooltip();
-		}
-	
+
+	ImGui::TextDisabled("(?)");
+	if (ImGui::IsItemHovered())
+	{
+		ImGui::BeginTooltip();
+		ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+		ImGui::TextUnformatted(szString);
+		ImGui::PopTextWrapPos();
+		ImGui::EndTooltip();
+	}
+
 }
 
 void CScene_Edit::Make_VerticalSpacing(_uint count)
 {
-	for (_uint i = 0 ; i < count; i ++)
+	for (_uint i = 0; i < count; i++)
 	{
 		ImGui::Spacing();
 	}
@@ -663,15 +874,15 @@ HRESULT CScene_Edit::Input_KeyBoard(_double fDeltaTime)
 	if (pInstance->Get_DIKeyState(DIK_SPACE) & DIS_Down)
 	{
 		if (m_bIsModelMove) m_bIsModelMove = 0;
-		else 
+		else
 		{
-			if(m_iBatchedVecIndex != 0)//설정한 오브젝트가 있다면 있다면
+			if (m_iBatchedVecIndex != 0)//설정한 오브젝트가 있다면 있다면
 			{
 				// 해당 오브젝트의 메트릭스 받아오기
 				m_SelectedObjectSRT = &(m_vecBatchedObject[m_iBatchedVecIndex].matSRT);
 				ZeroMemory(m_ArrBuffer, sizeof(_float) * 4);
 				m_ArrBuffer[3] = 0.1f;
-				
+
 				m_bIsModelMove = 1;
 			}
 		}
@@ -687,7 +898,7 @@ HRESULT CScene_Edit::Input_KeyBoard(_double fDeltaTime)
 
 
 
-		if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_RBUTTON) & DIS_Down) 
+		if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_RBUTTON) & DIS_Down)
 		{
 			m_iSelectedXYZ++;
 			if (m_iSelectedXYZ > 2)
@@ -721,7 +932,7 @@ HRESULT CScene_Edit::Ready_Layer_MainCamera(const _tchar * pLayerTag)
 
 
 
-	
+
 	return S_OK;
 }
 

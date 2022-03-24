@@ -22,6 +22,7 @@ enum OBJECTPROTOTYPEID
 
 
 	Prototype_TestObject,
+	Prototype_TestObject2,
 	Object_Prototype_End,
 };
 
@@ -42,6 +43,9 @@ static const _tchar* Tag_Object_Prototype(OBJECTPROTOTYPEID eTag)
 	case Prototype_TestObject:
 		return TEXT("TestObject");
 		break;
+	case Prototype_TestObject2:
+		return TEXT("TestObject2");
+		break;
 	default:
 		MSGBOX("Wrong Type Object Prototype");
 		return nullptr;
@@ -59,6 +63,9 @@ enum MESHTYPEID
 	Mesh_Monster,
 
 	Mesh_TestMesh,
+	Mesh_TestMesh2,
+	Mesh_TestMesh3,
+	Mesh_TestMesh4,
 	MeshID_End
 };
 
@@ -86,6 +93,16 @@ static const _tchar* Tag_MeshID(MESHTYPEID eTag)
 	case Mesh_TestMesh:
 		return TEXT("TestMesh");
 		break;
+	case Mesh_TestMesh2:
+		return TEXT("TestMesh2");
+		break;
+	case Mesh_TestMesh3:
+		return TEXT("TestMesh3");
+		break;
+	case Mesh_TestMesh4:
+		return TEXT("TestMesh4");
+		break;
+
 	default:
 		MSGBOX("Wrong Type Mesh");
 		return nullptr;
@@ -94,7 +111,7 @@ static const _tchar* Tag_MeshID(MESHTYPEID eTag)
 
 
 }
-#define  MESHID Tag_MeshID
+#define  TAG_MESH Tag_MeshID
 
 enum LAYERID
 {
