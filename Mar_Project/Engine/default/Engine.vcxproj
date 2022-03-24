@@ -86,7 +86,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>../public/;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../public/</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;ENGINE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4010</DisableSpecificWarnings>
     </ClCompile>
@@ -121,7 +121,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>../public/;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../public/</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;ENGINE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4010</DisableSpecificWarnings>
     </ClCompile>
@@ -161,6 +161,8 @@
     <ClInclude Include="..\public\Renderer.h" />
     <ClInclude Include="..\public\Scene.h" />
     <ClInclude Include="..\public\SceneMgr.h" />
+    <ClInclude Include="..\public\TextureLayer.h" />
+    <ClInclude Include="..\public\Texture.h" />
     <ClInclude Include="..\public\Shader.h" />
     <ClInclude Include="..\public\SoundMgr.h" />
     <ClInclude Include="..\public\ThreadMgr.h" />
@@ -187,6 +189,8 @@
     <ClCompile Include="..\private\Renderer.cpp" />
     <ClCompile Include="..\private\Scene.cpp" />
     <ClCompile Include="..\private\SceneMgr.cpp" />
+    <ClCompile Include="..\private\TextureLayer.cpp" />
+    <ClCompile Include="..\private\Texture.cpp" />
     <ClCompile Include="..\private\Shader.cpp" />
     <ClCompile Include="..\private\SoundMgr.cpp" />
     <ClCompile Include="..\private\ThreadMgr.cpp" />

@@ -25,6 +25,7 @@ private:
 	CShader*			m_pShaderCom = nullptr;
 	CRenderer*			m_pRendererCom = nullptr;
 	CVIBuffer_Rect*		m_pVIBufferCom = nullptr;
+	CTexture*			m_pTextureCom = nullptr;
 
 private:
 	HRESULT SetUp_Components();

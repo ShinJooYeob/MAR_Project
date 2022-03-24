@@ -3,8 +3,10 @@
 
 #ifdef _DEBUG
 #pragma comment (lib,"Effects11d.lib")
+#pragma comment (lib,"DirectXTKd.lib")
 #else
 #pragma comment (lib,"Effects11.lib")
+#pragma comment (lib,"DirectXTK.lib")
 #endif // DEBUG
 
 #include <d3d11.h>
@@ -15,6 +17,10 @@
 
 #include <d3dcompiler.h>
 #include <d3dx11effect.h>
+
+#include <DirectXTK/DDSTextureLoader.h>
+#include <DirectXTK/WICTextureLoader.h>
+
 
 using namespace DirectX;
 

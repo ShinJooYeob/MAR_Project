@@ -35,6 +35,34 @@ _int CPlayer::Update(_double fDeltaTime)
 	if (__super::Update(fDeltaTime) < 0)
 		return -1;
 
+
+	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_RETURN)&DIS_Down)
+	{
+		static int test = 0;
+		test++;
+
+		if (test > 2)
+			test = 0;
+
+		switch (test)
+		{
+		case 0:
+			FAILED_CHECK(m_pTextureCom->Change_TextureLayer(L"lower"));
+			break;
+		case 1:
+			FAILED_CHECK(m_pTextureCom->Change_TextureLayer(L"upper"));
+			break;
+		case 2:
+			FAILED_CHECK(m_pTextureCom->Change_TextureLayer(L"number"));
+			break;
+		default:
+			break;
+		}
+	}
+
+
+
+
 	return _int();
 }
 
@@ -57,6 +85,10 @@ _int CPlayer::Render()
 	m_pShaderCom->Set_RawValue("g_WorldMatrix", &XMMatrixIdentity(), sizeof(_Matrix));
 	m_pShaderCom->Set_RawValue("g_ViewMatrix", &XMMatrixIdentity(), sizeof(_Matrix));
 	m_pShaderCom->Set_RawValue("g_ProjMatrix", &XMMatrixIdentity(), sizeof(_Matrix));
+
+	FAILED_CHECK(m_pTextureCom->Bind_OnShader_AutoFrame(m_pShaderCom, "g_DiffuseTexture", g_fDeltaTime));
+
+
 
 	m_pVIBufferCom->Render(m_pShaderCom, 0);
 
@@ -83,6 +115,11 @@ HRESULT CPlayer::SetUp_Components()
 
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_VIBuffer_Rect), TAG_COM(Com_VIBuffer), (CComponent**)&m_pVIBufferCom));
+
+	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Texture_Player), TAG_COM(Com_Texture), (CComponent**)&m_pTextureCom));
+
+
+	
 
 	return S_OK;
 }
@@ -118,4 +155,5 @@ void CPlayer::Free()
 	Safe_Release(m_pRendererCom);
 	Safe_Release(m_pVIBufferCom);
 	Safe_Release(m_pShaderCom);
+	Safe_Release(m_pTextureCom);
 }

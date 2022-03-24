@@ -103,6 +103,9 @@
     <Filter Include="01.Utility\05.TimerMgr\00.Manager">
       <UniqueIdentifier>{34b6d6c3-0a7b-43e8-8a4b-70ab43617cc9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\01.ComponentMgr\01.Component\05.Texture\TextureLayer">
+      <UniqueIdentifier>{e5eb9178-9df9-4b84-af4e-2ff63a184407}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Base.h">
@@ -195,6 +198,12 @@
     <ClInclude Include="..\public\VIBuffer_Rect.h">
       <Filter>01.Utility\01.ComponentMgr\01.Component\03.Model\02.VIBuffer\Rect</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Texture.h">
+      <Filter>01.Utility\01.ComponentMgr\01.Component\05.Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\TextureLayer.h">
+      <Filter>01.Utility\01.ComponentMgr\01.Component\05.Texture\TextureLayer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">
@@ -268,6 +277,12 @@
     </ClCompile>
     <ClCompile Include="..\private\Engine_Struct.cpp">
       <Filter>99.Define</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Texture.cpp">
+      <Filter>01.Utility\01.ComponentMgr\01.Component\05.Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\TextureLayer.cpp">
+      <Filter>01.Utility\01.ComponentMgr\01.Component\05.Texture\TextureLayer</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
