@@ -23,7 +23,7 @@ class CScene_Edit final : public CScene
 		_uint			ObjectID = Prototype_TestObject;
 		_uint			MeshID = Mesh_TestMesh;
 		_uint			PassIndex = 0;
-		_Matrix			matSRT;
+		_float4x4			matSRT;
 		CGameObject*	pObject;
 
 	}OBJELEMENT;
@@ -126,7 +126,7 @@ private:
 	_int m_iSelectedXYZ = 0;
 	_int m_iPassIndex = 0;
 	_float m_ArrBuffer[4];
-	_Matrix* m_SelectedObjectSRT = nullptr;
+	_float4x4* m_SelectedObjectSRT = nullptr;
 
 	_uint m_iBatchedVecIndex = 0;
 	vector<OBJELEMENT>		m_vecBatchedObject;

@@ -69,7 +69,10 @@ HRESULT CTexture::Bind_OnShader_AutoFrame(CShader * pShader, const char * pValue
 HRESULT CTexture::Change_TextureLayer(const _tchar * tagTexureLayer, _double fFramePerSec)
 {
 	if (!lstrcmp(m_TagNowTexture, tagTexureLayer))
+	{
+		m_fFramePerSec = fFramePerSec;
 		return S_FALSE;
+	}
 
 	auto iter = find_if(m_mapTextureLayers.begin(), m_mapTextureLayers.end(), CTagStringFinder(tagTexureLayer));
 
@@ -82,7 +85,6 @@ HRESULT CTexture::Change_TextureLayer(const _tchar * tagTexureLayer, _double fFr
 	Safe_AddRef(m_pBindedTextureLayer);
 
 	m_fFrameTime = 0;
-	m_fFramePerSec = fFramePerSec;
 	m_TagNowTexture = tagTexureLayer;
 	m_iNumMaxTexture = m_pBindedTextureLayer->Get_TextureListSize();
 

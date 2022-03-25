@@ -23,8 +23,10 @@ HRESULT CScene_Loby::Initialize()
 
 
 	FAILED_CHECK(Ready_Layer_MainCamera(TAG_LAY(Layer_Camera_Main)));
-	FAILED_CHECK(Ready_Layer_TestObj(TAG_LAY(Layer_Player)));
-
+	
+	//FAILED_CHECK(Ready_Layer_TestObj(TAG_LAY(Layer_Player)));
+	FAILED_CHECK(Ready_Layer_UIImage(TAG_LAY(Layer_UI_IMG)));
+	
 	
 
 
@@ -135,6 +137,12 @@ HRESULT CScene_Loby::Ready_Layer_TestObj(const _tchar * pLayerTag)
 {
 	FAILED_CHECK(GetSingle(CGameInstance)->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_Player)));
 
+	return S_OK;
+}
+
+HRESULT CScene_Loby::Ready_Layer_UIImage(const _tchar * pLayerTag)
+{
+	FAILED_CHECK(GetSingle(CGameInstance)->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_UIImage)));
 	return S_OK;
 }
 

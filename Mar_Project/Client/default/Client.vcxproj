@@ -187,6 +187,8 @@
     <ClInclude Include="..\public\Scene_Loby.h" />
     <ClInclude Include="..\public\Scene_Edit.h" />
     <ClInclude Include="..\public\Scene_StageSelect.h" />
+    <ClInclude Include="..\public\UIImage.h" />
+    <ClInclude Include="..\public\UI.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
@@ -202,6 +204,8 @@
     <ClCompile Include="..\private\Scene_Loby.cpp" />
     <ClCompile Include="..\private\Scene_Edit.cpp" />
     <ClCompile Include="..\private\Scene_StageSelect.cpp" />
+    <ClCompile Include="..\private\UIImage.cpp" />
+    <ClCompile Include="..\private\UI.cpp" />
     <ClCompile Include="..\public\Imgui\imgui.cpp" />
     <ClCompile Include="..\public\Imgui\imgui_demo.cpp" />
     <ClCompile Include="..\public\Imgui\imgui_draw.cpp" />
@@ -228,6 +232,7 @@
     <Natvis Include="..\public\Imgui\imgui.natvis" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="..\bin\ShaderFiles\Shader_VtxCubeTex.hlsl" />
     <FxCompile Include="..\bin\ShaderFiles\Shader_VtxTex.hlsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

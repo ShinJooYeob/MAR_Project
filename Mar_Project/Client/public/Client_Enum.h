@@ -21,8 +21,12 @@ enum OBJECTPROTOTYPEID
 	Prototype_Player,
 
 
+	Prototype_UIImage,
+
+
 	Prototype_TestObject,
 	Prototype_TestObject2,
+
 	Object_Prototype_End,
 };
 
@@ -37,6 +41,11 @@ static const _tchar* Tag_Object_Prototype(OBJECTPROTOTYPEID eTag)
 		break;
 	case Prototype_Player:
 		return TEXT("Player");
+		break;
+
+
+	case Prototype_UIImage:
+		return TEXT("UI_Image");
 		break;
 
 		//////////////////////////////////////////////////////////////////////////
@@ -116,7 +125,13 @@ static const _tchar* Tag_MeshID(MESHTYPEID eTag)
 enum LAYERID
 {
 	Layer_Camera_Main, 
-	Layer_Player
+	Layer_Player,
+
+	Layer_UI_IMG,
+	Layer_UI_BTN,
+	Layer_UI_SLIDE,
+	Layer_UI_INPUT
+
 };
 
 static const _tchar* Tag_Layer(LAYERID eTag)
@@ -128,6 +143,20 @@ static const _tchar* Tag_Layer(LAYERID eTag)
 		break;
 	case Layer_Player:
 		return TEXT("Layer_Player");
+		break;
+
+
+	case Layer_UI_IMG:
+		return TEXT("Layer_UI_IMG");
+		break;
+	case Layer_UI_BTN:
+		return TEXT("Layer_UI_BTN");
+		break;
+	case Layer_UI_SLIDE:
+		return TEXT("Layer_UI_SLIDE");
+		break;
+	case Layer_UI_INPUT:
+		return TEXT("Layer_UI_INPUT");
 		break;
 
 		//////////////////////////////////////////////////////////////////////////
@@ -154,7 +183,8 @@ enum COMPONENTPROTOTYPEID
 	Prototype_VIBuffer_Rect,
 	Prototype_VIBuffer_Cube,
 	//////////////////////////////////////////////////////////////////////////
-	Prototype_Texture_Player, 
+	Prototype_Texture_Player,
+	Prototype_Texture_SkyBox,
 
 };
 static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
@@ -203,6 +233,9 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 
 	case Prototype_Texture_Player:
 		return TEXT("Prototype_Component_Texture_Player");
+		break;
+	case Prototype_Texture_SkyBox:
+		return TEXT("Prototype_Component_Texture_SkyBox");
 		break;
 
 		//////////////////////////////////////////////////////////////////////////

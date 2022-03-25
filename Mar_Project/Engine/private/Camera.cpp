@@ -33,10 +33,10 @@ HRESULT CCamera::Initialize_Clone(void * pArg)
 	if (m_pDevice == nullptr || m_pDeviceContext == nullptr)
 		return E_FAIL;
 
-	//m_pTransform = CTransform::Create(m_pDevice, m_pDeviceContext);
+	m_pTransform = CTransform::Create(m_pDevice, m_pDeviceContext);
 
-	//if (nullptr == m_pTransform)
-	//	return E_FAIL;
+	if (nullptr == m_pTransform)
+		return E_FAIL;
 
 	//m_bIsOrtho = true;
 
@@ -67,7 +67,7 @@ _int CCamera::Update(_double fDeltaTime)
 	//if (FAILED(m_pGraphicDevice->SetTransform(D3DTS_VIEW, &(m_pTransform->Get_InverseWorldMatrix()))))
 	//	return -1;
 
-	//_Matrix matProj;
+	//_float4x4 matProj;
 	//
 
 	//if (FAILED(Set_ProjectMatrix(m_bIsOrtho)))
@@ -96,7 +96,7 @@ _int CCamera::LateRender()
 
 HRESULT CCamera::Set_ProjectMatrix(_bool bIsOrtho)
 {
-	//_Matrix matProj;
+	//_float4x4 matProj;
 
 	//if (bIsOrtho)
 	//	D3DXMatrixOrthoLH(&matProj, m_fOrthoZoomInOut * m_CameraDesc.fAspect, m_fOrthoZoomInOut, -m_CameraDesc.fFar, m_CameraDesc.fFar);

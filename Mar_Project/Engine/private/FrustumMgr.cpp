@@ -43,7 +43,7 @@ HRESULT CFrustumMgr::SetUp_WorldFrustumPlane()
 		return E_FAIL;
 	}
 
-	//_Matrix matVeiw, matProject;
+	//_float4x4 matVeiw, matProject;
 	//m_pGraphicDevice->GetTransform(D3DTS_VIEW, &matVeiw);
 	//m_pGraphicDevice->GetTransform(D3DTS_PROJECTION, &matProject);
 

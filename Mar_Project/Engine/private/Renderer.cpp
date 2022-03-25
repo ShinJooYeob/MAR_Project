@@ -142,12 +142,12 @@ HRESULT CRenderer::Render_UI()
 	if (m_pDevice == nullptr || m_pDeviceContext ==nullptr)
 		return E_FAIL;
 
-	//_Matrix BeforeViewMatrix, BeforeProjectmat;
+	//_float4x4 BeforeViewMatrix, BeforeProjectmat;
 	//m_pGraphicDevice->GetTransform(D3DTS_VIEW, &BeforeViewMatrix);
 	//m_pGraphicDevice->GetTransform(D3DTS_PROJECTION, &BeforeProjectmat);
 
 
-	//_Matrix ViewMatrix;
+	//_float4x4 ViewMatrix;
 	//D3DXMatrixIdentity(&ViewMatrix);
 	//m_pGraphicDevice->SetTransform(D3DTS_VIEW, &ViewMatrix);
 	//m_pGraphicDevice->SetTransform(D3DTS_PROJECTION, &m_ProjMatrix);

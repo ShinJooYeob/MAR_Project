@@ -85,6 +85,18 @@
     <Filter Include="02.Scene\99.Scene_Edit">
       <UniqueIdentifier>{38668a60-0c72-420e-9bbd-b332b2a4426b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.GameObject\99.UI\UIImage">
+      <UniqueIdentifier>{86e20955-8df1-4f29-bc7a-8841aae72fcc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\99.UI\UIButton">
+      <UniqueIdentifier>{27217be2-3a62-4dfe-9d37-e8a07906ea8d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\99.UI\UISlider">
+      <UniqueIdentifier>{af313332-d63b-4706-ac1b-148df2cbaf53}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\99.UI\UIInput">
+      <UniqueIdentifier>{6f0f54a0-1870-4676-95b1-5d18a12d7b52}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -159,6 +171,12 @@
     <ClInclude Include="..\public\Player.h">
       <Filter>01.GameObject\00.Player</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\UI.h">
+      <Filter>01.GameObject\99.UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\UIImage.h">
+      <Filter>01.GameObject\99.UI\UIImage</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -215,6 +233,12 @@
     <ClCompile Include="..\private\Player.cpp">
       <Filter>01.GameObject\00.Player</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\UI.cpp">
+      <Filter>01.GameObject\99.UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UIImage.cpp">
+      <Filter>01.GameObject\99.UI\UIImage</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -241,6 +265,9 @@
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\bin\ShaderFiles\Shader_VtxTex.hlsl">
+      <Filter>04.Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\bin\ShaderFiles\Shader_VtxCubeTex.hlsl">
       <Filter>04.Shader</Filter>
     </FxCompile>
   </ItemGroup>

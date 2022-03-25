@@ -170,6 +170,7 @@
     <ClInclude Include="..\public\Timer.h" />
     <ClInclude Include="..\public\Transform.h" />
     <ClInclude Include="..\public\VIBuffer.h" />
+    <ClInclude Include="..\public\VIBuffer_Cube.h" />
     <ClInclude Include="..\public\VIBuffer_Rect.h" />
   </ItemGroup>
   <ItemGroup>
@@ -198,6 +199,7 @@
     <ClCompile Include="..\private\Timer.cpp" />
     <ClCompile Include="..\private\Transform.cpp" />
     <ClCompile Include="..\private\VIBuffer.cpp" />
+    <ClCompile Include="..\private\VIBuffer_Cube.cpp" />
     <ClCompile Include="..\private\VIBuffer_Rect.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

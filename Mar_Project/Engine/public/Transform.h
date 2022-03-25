@@ -11,10 +11,9 @@ public:
 	enum TransformState { STATE_RIGHT, STATE_UP, STATE_LOOK, STATE_POS, STATE_END };
 	typedef struct tagTransformDesc
 	{
-		//Move Speed Per Sec
 		_float		fMovePerSec;
-		//(Radian)Rotation Speed Per Sec 
 		_float		fRotationPerSec;
+		_float		fScalingPerSec = 0.f;
 		//텍스쳐를 그릴 때 로컬의 중점 좌표 설정 용
 		_float3		vPivot = _float3(0, 0, 0);
 	}TRANSFORMDESC;
@@ -29,64 +28,78 @@ private:
 	HRESULT Initialize_Prototype(void * pArg);
 	HRESULT Initialize_Clone(void * pArg);
 
-//public:
-//	//SetDesc
-//	void Set_MoveSpeed(_float fMoveSpeed) { m_TransforDesc.fMovePerSec = fMoveSpeed; };
-//
-////Move////////////////////////////////////////////////////////////////////////
-//	void Move_Forward(_float fDeltaTime);
-//	void Move_Backward(_float fDeltaTime);
-//	void Move_Right(_float fDeltaTime);
-//	void Move_Left(_float fDeltaTime);
-//	void Move_Up(_float fDeltaTime);
-//	void Move_Down(_float fDeltaTime);
-//
-//	void MovetoDir(_float3 vDir, _float fDeltaTime);
-//	void MovetoTarget(_float3 vTarget, _float fDeltaTime);
-//
-//
-////Turn////////////////////////////////////////////////////////////////////////
-//	void LookAt(_float3 vTarget);
-//	
-//	//월드 좌표 기준으로 현제 회전 상태에서 이어서 회전을 하고싶을 떄
-//	void Turn_CW(_float3 vAxis, _float fDeltaTime);
-//	void Turn_CCW(_float3 vAxis, _float fDeltaTime);
-//
-//	//로컬 좌표 기준으로 회전을 시켜주고 싶을 떄
-//	void Rotation_CW(_float3 vAxis, _float fRadian);
-//	void Rotation_CCW(_float3 vAxis, _float fRadian);
-//
-////Scale////////////////////////////////////////////////////////////////////////
-//	//로컬 기준으로 특정 사이즈로 세팅하고 싶을 떄
-//	void Scaled(_float3 vScale);
-//	//월드 기준으로 이어서 사이즈를 조정하고 싶을 떄
-//	void Scaling(_float3 vScale, _float fDeltaTime);
-//
-//
-//public:
-//	_float3 Get_MatrixState(TransformState eState) { return *(_float3*)(m_WorldMatrix.m[eState]); };
-//	_float3 Get_MatrixScale() { return _float3(Get_MatrixState(STATE_RIGHT).Get_Lenth(), Get_MatrixState(STATE_UP).Get_Lenth(), Get_MatrixState(STATE_LOOK).Get_Lenth()); };
-//
-//	void Set_MatrixState(TransformState eState, const _float3& vRow) { memcpy(m_WorldMatrix.m[eState], &vRow, sizeof(_float3)); };
-//	void Set_Matrix(const _Matrix& mat) { memcpy(m_WorldMatrix, mat, sizeof(_Matrix)); };
-//
-//	_Matrix Get_InverseWorldMatrix() { return m_WorldMatrix.InverseMatrix(); };
-//
-//	void Set_TransformDesc(const TRANSFORMDESC& TransformDesc) {m_TransforDesc = TransformDesc;	};
-//
-//	_Matrix Get_WorldMatrix() { return m_WorldMatrix; }
-//
-//public:
-//	//장치에 월드 행렬을 연결시키는 함수
-//	HRESULT Bind_WorldMatrix();
+public:
+	//SetDesc
+	void Set_TransformDesc(const TRANSFORMDESC& TransformDesc) { m_TransformDesc = TransformDesc; };
+
+	void Set_MoveSpeed(_float fMoveSpeed) { m_TransformDesc.fMovePerSec = fMoveSpeed; };
+	void Set_TurnSpeed(_float TurnSpeed) { m_TransformDesc.fRotationPerSec = TurnSpeed; };
+	void Set_ScalingSpeed(_float ScalingSpeed) { m_TransformDesc.fScalingPerSec = ScalingSpeed; };
+	void Set_Pivot(_float3 vPivot) { memcpy( &(m_TransformDesc.fScalingPerSec), &vPivot, sizeof(_float3)); };
+
+public:
+	/*Get Set Matrix*/
+	_Vector Get_MatrixState(TransformState eState) { return ((_float4*)(m_WorldMatrix.m[eState]))->XMVector(); };
+	_Vector Get_MatrixState_Normalized(TransformState eState) { return ((_float4*)(m_WorldMatrix.m[eState]))->Get_Nomalize(); };
+	_Vector Get_MatrixScale(TransformState eState);
+	_Matrix Get_MatrixScale_All();
+
+	void Set_MatrixState(TransformState eState, const _fVector& vVec);
+	void Set_MatrixState(TransformState eState, const _float3& vVec);
+	void Set_Matrix(const _float4x4& mat) { memcpy((m_WorldMatrix.m), mat.m, sizeof(_float) * 16); };
+	void Set_Matrix(const _Matrix& mat);
+
+	_float4x4 Get_WorldFloat4x4() { return m_WorldMatrix; };
+	_Matrix Get_WorldMatrix() { return m_WorldMatrix.XMatrix(); };
+	_Matrix Get_InverseWorldMatrix() { return m_WorldMatrix.InverseXMatrix(); };
+	_Matrix Get_TransposeXMatrix() { return m_WorldMatrix.TransposeXMatrix(); };
+
+
+public:
+	//Move////////////////////////////////////////////////////////////////////////
+	void Move_Forward(_double fDeltaTime);
+	void Move_Backward(_double fDeltaTime);
+	void Move_Right(_double fDeltaTime);
+	void Move_Left(_double fDeltaTime);
+	void Move_Up(_double fDeltaTime);
+	void Move_Down(_double fDeltaTime);
+
+	void MovetoDir(_fVector vDir, _double fDeltaTime);
+	void MovetoTarget(_fVector vTarget, _double fDeltaTime);
+
+
+//Turn////////////////////////////////////////////////////////////////////////
+	void LookAt(_fVector vTarget);
+	
+	//월드 좌표 기준으로 현제 회전 상태에서 이어서 회전을 하고싶을 떄
+	void Turn_CW(_fVector vAxis, _double fDeltaTime);
+	void Turn_CCW(_fVector vAxis, _double fDeltaTime);
+
+	//로컬 좌표 기준으로 회전을 시켜주고 싶을 떄
+	void Rotation_CW(_fVector vAxis, _float fRadian);
+	void Rotation_CCW(_fVector vAxis, _float fRadian);
+
+//Scale////////////////////////////////////////////////////////////////////////
+	//로컬 기준으로 특정 사이즈로 세팅하고 싶을 떄
+	void Scaled(TransformState eState, _float fScale);
+	void Scaled_All(_float3 vfScale);
+	//월드 기준으로 이어서 사이즈를 조정하고 싶을 떄
+	void Scaling(TransformState eState, _double fDeltaTime);
+	void Scaling_All(_double fDeltaTime);
+
+
+
+public:
+	//쉐이더에 월드 행렬을 연결시키는 함수
+	HRESULT Bind_OnShader(class CShader* pShader, const char* pValueName);
 //	HRESULT Bind_WorldMatrix_Look_Camera();
 //
 //
 //
-//private:
-//	_Matrix			m_WorldMatrix;
-//	TRANSFORMDESC	m_TransforDesc;
-//
+private:
+	TRANSFORMDESC		m_TransformDesc;
+	_float4x4			m_WorldMatrix;
+
 public:
 	static CTransform* Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, void* pArg = nullptr);
 	virtual CComponent* Clone(void* pArg)override;

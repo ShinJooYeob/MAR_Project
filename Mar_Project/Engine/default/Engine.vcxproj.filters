@@ -204,6 +204,9 @@
     <ClInclude Include="..\public\TextureLayer.h">
       <Filter>01.Utility\01.ComponentMgr\01.Component\05.Texture\TextureLayer</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\VIBuffer_Cube.h">
+      <Filter>01.Utility\01.ComponentMgr\01.Component\03.Model\02.VIBuffer\Cube</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">
@@ -283,6 +286,9 @@
     </ClCompile>
     <ClCompile Include="..\private\TextureLayer.cpp">
       <Filter>01.Utility\01.ComponentMgr\01.Component\05.Texture\TextureLayer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\VIBuffer_Cube.cpp">
+      <Filter>01.Utility\01.ComponentMgr\01.Component\03.Model\02.VIBuffer\Cube</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

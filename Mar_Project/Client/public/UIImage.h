@@ -1,15 +1,15 @@
 #pragma once
 
-#include "GameObject.h"
+#include "UI.h"
 
 BEGIN(Client)
 
-class CPlayer final : public CGameObject
+class CUIImage : public CUI
 {
-private:
-	CPlayer(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
-	CPlayer(const CPlayer& rhs);
-	virtual ~CPlayer() = default;
+protected:
+	explicit CUIImage(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext);
+	explicit CUIImage(const CUIImage&  rhs);
+	virtual ~CUIImage() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype(void* pArg)override;
@@ -22,22 +22,21 @@ public:
 	virtual _int LateRender()override;
 
 
-
-private:
+protected:
 	CShader*			m_pShaderCom = nullptr;
 	CRenderer*			m_pRendererCom = nullptr;
 	CVIBuffer_Cube*		m_pVIBufferCom = nullptr;
 	CTexture*			m_pTextureCom = nullptr;
-	CTransform*			m_pTransformCom = nullptr;
 
-private:
+
+protected:
 	HRESULT SetUp_Components();
 
 public:
-	static CPlayer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext,void* pArg = nullptr);
+	static CUIImage* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, void* pArg = nullptr);
 	virtual CGameObject* Clone(void* pArg);
-	virtual void Free() override;
+	virtual void Free()override;
 
 };
-
 END
+

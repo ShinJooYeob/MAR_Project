@@ -82,15 +82,25 @@ _int CPlayer::Render()
 		return -1;
 	NULL_CHECK_RETURN(m_pVIBufferCom, E_FAIL);
 
-	m_pShaderCom->Set_RawValue("g_WorldMatrix", &XMMatrixIdentity(), sizeof(_Matrix));
-	m_pShaderCom->Set_RawValue("g_ViewMatrix", &XMMatrixIdentity(), sizeof(_Matrix));
-	m_pShaderCom->Set_RawValue("g_ProjMatrix", &XMMatrixIdentity(), sizeof(_Matrix));
+
+	FAILED_CHECK(m_pTransformCom->Bind_OnShader(m_pShaderCom, "g_WorldMatrix"));
+
+	_Matrix		ViewMatrix = XMMatrixTranspose(XMMatrixLookAtLH(XMVectorSet(0.f, 3.f, -2.f, 1.f), XMVectorSet(0.f, 0.f, 0.f, 1.f), XMVectorSet(0.f, 1.f, 0.f, 0.f)));
+	_Matrix		ProjMatrix = XMMatrixTranspose(XMMatrixPerspectiveFovLH(XMConvertToRadians(60.0f), (_float)g_iWinCX / g_iWinCY, 0.2f, 300.f));
+
+	_float4x4		ViewFloat4x4, ProjFloat4x4;
+
+	XMStoreFloat4x4(&ViewFloat4x4, ViewMatrix);
+	XMStoreFloat4x4(&ProjFloat4x4, ProjMatrix);
+
+	m_pShaderCom->Set_RawValue("g_ViewMatrix", &ViewFloat4x4, sizeof(_float4x4));
+	m_pShaderCom->Set_RawValue("g_ProjMatrix", &ProjFloat4x4, sizeof(_float4x4));
 
 	FAILED_CHECK(m_pTextureCom->Bind_OnShader_AutoFrame(m_pShaderCom, "g_DiffuseTexture", g_fDeltaTime));
 
 
 
-	m_pVIBufferCom->Render(m_pShaderCom, 0);
+	FAILED_CHECK(m_pVIBufferCom->Render(m_pShaderCom, 0));
 
 	return _int();
 }
@@ -108,15 +118,25 @@ _int CPlayer::LateRender()
 
 HRESULT CPlayer::SetUp_Components()
 {
+
+
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Renderer), TAG_COM(Com_Renderer), (CComponent**)&m_pRendererCom));
 
+	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Shader_VCT), TAG_COM(Com_Shader), (CComponent**)&m_pShaderCom));
 
-	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Shader_VT), TAG_COM(Com_Shader), (CComponent**)&m_pShaderCom));
+	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_VIBuffer_Cube), TAG_COM(Com_VIBuffer), (CComponent**)&m_pVIBufferCom));
+
+	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Texture_SkyBox), TAG_COM(Com_Texture), (CComponent**)&m_pTextureCom));
 
 
-	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_VIBuffer_Rect), TAG_COM(Com_VIBuffer), (CComponent**)&m_pVIBufferCom));
+	CTransform::TRANSFORMDESC tDesc = {};
 
-	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Texture_Player), TAG_COM(Com_Texture), (CComponent**)&m_pTextureCom));
+	tDesc.fMovePerSec = 5;
+	tDesc.fRotationPerSec = XMConvertToRadians(60);
+	tDesc.fScalingPerSec = 1;
+	tDesc.vPivot = _float3(0, 0, 0);
+
+	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Transform), TAG_COM(Com_Transform), (CComponent**)&m_pTransformCom, &tDesc));
 
 
 	
@@ -152,8 +172,10 @@ void CPlayer::Free()
 {
 	__super::Free();
 
+	Safe_Release(m_pTransformCom);
 	Safe_Release(m_pRendererCom);
 	Safe_Release(m_pVIBufferCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pTextureCom);
+	
 }

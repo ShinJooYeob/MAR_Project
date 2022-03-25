@@ -265,7 +265,7 @@ HRESULT CScene_Edit::Sava_Data(const char* szFileName, eDATATYPE iKinds)
 		{
 			_uint			ObjectID = Prototype_TestObject;
 			_uint			MeshID = Mesh_TestMesh;
-			_Matrix			matSRT;
+			_float4x4			matSRT;
 			CGameObject*	pObject;
 
 		}OBJELEMENT;
@@ -623,7 +623,7 @@ HRESULT CScene_Edit::Widget_SRT(_double fDeltatime)
 	/*회전값 용
 
 	D3DXQUATERNION quat_x, quat_y, quat_z, quat_1, quat_2;
-	_Matrix matrix;
+	_float4x4 matrix;
 	D3DXVECTOR3 axis_x(1.0f, 0.0f, 0.0f);
 	D3DXVECTOR3 axis_y(0.0f, 1.0f, 0.0f);
 	D3DXVECTOR3 axis_z(0.0f, 0.0f, 1.0f);

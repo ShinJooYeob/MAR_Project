@@ -3,6 +3,7 @@
 #include "Scene_Loading.h"
 #include "Camera_Main.h"
 #include "Player.h"
+#include "UIImage.h"
 
 #ifdef USE_IMGUI
 #include "ImguiMgr.h"
@@ -198,94 +199,34 @@ HRESULT CMainApp::Ready_Static_Component_Prototype()
 		m_pComRenderer = CRenderer::Create(m_pDevice,m_pDeviceContext)));
 	Safe_AddRef(m_pComRenderer);
 
+
+	FAILED_CHECK(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Transform),
+		CTransform::Create(m_pDevice, m_pDeviceContext)));
+
 	////버퍼인덱스 프로토타입 생성
 	FAILED_CHECK(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_VIBuffer_Rect),
 		CVIBuffer_Rect::Create(m_pDevice, m_pDeviceContext)));
 
+	FAILED_CHECK(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_VIBuffer_Cube),
+		CVIBuffer_Cube::Create(m_pDevice, m_pDeviceContext)));
+
+	////쉐이더
 	FAILED_CHECK(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Shader_VT),
 		CShader::Create(m_pDevice, m_pDeviceContext, TEXT("Shader_VtxTex.hlsl"), VTXTEX_DECLARATION::Elements, VTXTEX_DECLARATION::iNumElements)));
+
+	FAILED_CHECK(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Shader_VCT),
+		CShader::Create(m_pDevice, m_pDeviceContext, TEXT("Shader_VtxCubeTex.hlsl"), VTXCUBETEX_DECLARATION::Elements, VTXCUBETEX_DECLARATION::iNumElements)));
+
 
 	////텍스처 프로토타입 생성
 	FAILED_CHECK(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Texture_Player),
 		CTexture::Create(m_pDevice, m_pDeviceContext, L"Font2.txt" )));
 
-
-	////Transform 프로토타입 생성
-	//if (FAILED(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Transform), CTransform::Create(m_pGraphicDevice))))
-	//	return E_FAIL;
-
-	///* 디폴트 텍스처 프로토타입 생성 */
-	//CTexture::TEXTUREDESC TextureDesc{};
-	//TextureDesc.eTextureType = CTexture::TYPE_DEFAULT;
-	//TextureDesc.szTextFilePath = TEXT("Player.txt");
-
-	//if (FAILED(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Texture_Default), CTexture::Create(m_pGraphicDevice,&TextureDesc))))
-	//	return E_FAIL;
-
-	////플레이어 텍스처 생성
-	////Player Texture
-	//TextureDesc.szTextFilePath = TEXT("Player.txt");
-
-	//if (FAILED(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Texture_Player), CTexture::Create(m_pGraphicDevice, &TextureDesc))))
-	//	return E_FAIL;
-
-
-	//TextureDesc.szTextFilePath = TEXT("Mouse.txt");
-	//TextureDesc.eTextureType = CTexture::TYPE_DEFAULT;
-
-	//if (FAILED(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TEXT("Prototype_Component_Texture_Mouse"), CTexture::Create(m_pGraphicDevice, &TextureDesc))))
-	//	return E_FAIL;
-
-	////UI_Common 텍스처
-	//TextureDesc.szTextFilePath = TEXT("UI.txt");
-	//TextureDesc.eTextureType = CTexture::TYPE_DEFAULT;
-
-	//if (FAILED(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Texture_UI), CTexture::Create(m_pGraphicDevice, &TextureDesc))))
-	//	return E_FAIL;
-	////블랭크 텍스처
-	//TextureDesc.szTextFilePath = TEXT("Cam_Effect.txt");
-	//
-	//if (FAILED(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Texture_Blank), CTexture::Create(m_pGraphicDevice, &TextureDesc))))
-	//	return E_FAIL;
-
-	////미니맵 텍스쳐
-	//TextureDesc.szTextFilePath = TEXT("MiniMap.txt");
-	//if (FAILED(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Texture_MiniMap), CTexture::Create(m_pGraphicDevice, &TextureDesc))))
-	//	return E_FAIL;
-
-
-	//TextureDesc.eTextureType = CTexture::TYPE_CUBEMAP;
-	//TextureDesc.szTextFilePath = TEXT("SkyBoxTexture.txt");
-	//if (FAILED(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TEXT("Prototype_Component_Texture_SkyBox"), CTexture::Create(m_pGraphicDevice, &TextureDesc))))
-	//	return E_FAIL;
+	FAILED_CHECK(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Texture_SkyBox),
+		CTexture::Create(m_pDevice, m_pDeviceContext, L"SkyBox.txt")));
 
 
 
-	//// 콜리전 프로토타입 생성
-	//if (FAILED(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TEXT("Prototype_Component_Collision"), m_pCollision = CCollision::Create(m_pGraphicDevice))))
-	//	return E_FAIL;
-	//Safe_AddRef(m_pCollision);
-
-	//// 뷰포트용 콜리전 프로토타입 생성
-	//if (FAILED(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_CollisionView), m_pCollisionView = CCom_CollisionViewPort::Create(m_pGraphicDevice))))
-	//	return E_FAIL;
-	//Safe_AddRef(m_pCollisionView);
-
-	////버퍼인덱스 큐브 프로토타입 생성
-	//if (FAILED(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TEXT("Prototype_Component_VIBuffer_Cube"), CVIBuffer_Cube::Create(m_pGraphicDevice))))
-	//	return E_FAIL;
-
-	//if (FAILED(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TEXT("Prototype_Component_Inventory"), CInventory::Create(m_pGraphicDevice))))
-	//	return E_FAIL;
-
-	//// 셰이더 프로토타입 생성
-	//if (FAILED(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Shader_Test), CShader::Create(m_pGraphicDevice, TEXT("../Bin/ShaderFiles/Shader_Test.hlsl")))))
-	//	return E_FAIL;
-	//if (FAILED(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Shader_Cube), CShader::Create(m_pGraphicDevice, TEXT("../Bin/ShaderFiles/Shader_TerrainCube.hlsl")))))
-	//	return E_FAIL;
-	//// 총 컴포넌트 생성
-	//if (FAILED(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Gun), CCom_Gun::Create(m_pGraphicDevice))))
-	//	return E_FAIL;
 
 	return S_OK;
 }
@@ -312,6 +253,9 @@ HRESULT CMainApp::Ready_Static_GameObject_Prototype()
 	//
 	//
 	FAILED_CHECK(m_pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_Player), CPlayer::Create(m_pDevice, m_pDeviceContext)));
+
+
+	FAILED_CHECK(m_pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_UIImage), CUIImage::Create(m_pDevice, m_pDeviceContext)));
 
 	//if (FAILED(m_pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_UI_Common), CUI_Common::Create(m_pGraphicDevice, _float4(0, 0, 0, 0)))))
 	//	return E_FAIL;

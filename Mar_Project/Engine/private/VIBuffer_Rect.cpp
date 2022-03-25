@@ -19,7 +19,6 @@ HRESULT CVIBuffer_Rect::Initialize_Prototype(void * pArg)
 #pragma region VERTEX_BUFFER
 	ZeroMemory(&m_VBDesc, sizeof(D3D11_BUFFER_DESC));
 
-	m_iNumIndicesPerPrimitive = 3;
 	m_iNumVertices = 4;
 	m_iNumVertexBuffers = 1;
 
@@ -59,6 +58,7 @@ HRESULT CVIBuffer_Rect::Initialize_Prototype(void * pArg)
 
 #pragma region INDEX_BUFFER
 	m_iNumPrimitive = 2;
+	m_iNumIndicesPerPrimitive = 3;
 	m_eIndexFormat = DXGI_FORMAT_R16_UINT;
 	// m_eIndexFormat = DXGI_FORMAT_R32_UINT;
 	m_eTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;

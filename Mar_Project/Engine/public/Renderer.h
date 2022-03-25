@@ -35,7 +35,7 @@ private:
 	typedef list<CGameObject*>		RENDEROBJECTS;
 private:
 
-	_Matrix						m_ProjMatrix;
+	_float4x4						m_ProjMatrix;
 
 private:
 	HRESULT Render_Priority();

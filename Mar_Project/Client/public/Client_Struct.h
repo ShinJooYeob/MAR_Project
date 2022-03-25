@@ -79,6 +79,20 @@ typedef struct tagLoginDesc
 
 }LOGINDESC;
 
+typedef struct tagUIDesc
+{
+	_float fX = 0, fY = 0, fCX = 0, fCY = 0;
+
+}UIDESC;
+
+typedef struct tagFloatRect
+{
+	_float left = 0;
+	_float top = 0;
+	_float right = 0;
+	_float bottom = 0;
+
+}FLOATRECT;
 
 // 전역화함
 static float GetRandomFloat(float lowBound, float highBound)
