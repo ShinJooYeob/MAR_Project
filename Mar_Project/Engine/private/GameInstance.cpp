@@ -7,6 +7,7 @@
 #include "EasingMgr.h"
 #include "FrustumMgr.h"
 #include "SoundMgr.h"
+#include "PipeLineMgr.h"
 
 IMPLEMENT_SINGLETON(CGameInstance);
 
@@ -21,19 +22,22 @@ CGameInstance::CGameInstance()
 	m_pInputDevice(GetSingle(CInput_Device)),
 	m_pEasingMgr(GetSingle(CEasingMgr)),
 	m_pFrustumMgr(GetSingle(CFrustumMgr)),
-	m_pSoundMgr(GetSingle(CSoundMgr))
+	m_pSoundMgr(GetSingle(CSoundMgr)),
+	m_pPipeLineMgr(GetSingle(CPipeLineMgr))
 
 {
-	m_pThreadMgr->AddRef();
-	m_pTimerMgr->AddRef();
-	m_pGraphicDevice->AddRef();
-	m_pSceneMgr->AddRef();
-	m_pObjectMgr->AddRef();
-	m_pComponenetMgr->AddRef();
-	m_pInputDevice->AddRef();
-	m_pEasingMgr->AddRef();
-	m_pFrustumMgr->AddRef();
-	m_pSoundMgr->AddRef();
+
+	Safe_AddRef(m_pThreadMgr);
+	Safe_AddRef(m_pTimerMgr);
+	Safe_AddRef(m_pGraphicDevice);
+	Safe_AddRef(m_pSceneMgr);
+	Safe_AddRef(m_pObjectMgr);
+	Safe_AddRef(m_pComponenetMgr);
+	Safe_AddRef(m_pInputDevice);
+	Safe_AddRef(m_pEasingMgr);
+	Safe_AddRef(m_pFrustumMgr);
+	Safe_AddRef(m_pSoundMgr);
+	Safe_AddRef(m_pPipeLineMgr);
 	
 }
 
@@ -178,6 +182,13 @@ HRESULT CGameInstance::Add_GameObject_To_Layer(_uint eSceneNum, const _tchar * t
 	return	m_pObjectMgr->Add_GameObject_To_Layer(eSceneNum, tagLayer, tagPrototype, pArg);
 }
 
+HRESULT CGameInstance::Add_GameObject_Out_of_Manager(CGameObject ** ppOutGameObj, _uint eSceneNum, const _tchar * tagPrototype, void * pArg)
+{
+	NULL_CHECK_BREAK(m_pObjectMgr);
+
+	return	m_pObjectMgr->Add_GameObject_Out_of_Manager(ppOutGameObj,eSceneNum, tagPrototype, pArg);
+}
+
 CComponent* CGameInstance::Get_Commponent_By_LayerIndex(_uint eSceneNum, const _tchar * tagLayer, const _tchar* tagComponet, _uint iLayerIndex)
 {
 	if (tagComponet == nullptr || tagLayer == nullptr || m_pObjectMgr == nullptr)
@@ -234,6 +245,76 @@ HRESULT CGameInstance::Delete_GameObject_To_Layer_Object(_uint eSceneNum, const 
 	}
 
 	return Delete_GameObject_To_Layer_Object(eSceneNum, tagLayer, obj);
+}
+
+HRESULT CGameInstance::Set_Transform(TRANSFORMSTATETYPE eStateType, const _fMatrix & TransformMatrix)
+{
+	NULL_CHECK_RETURN(m_pPipeLineMgr, E_FAIL);
+
+	return m_pPipeLineMgr->Set_Transform(eStateType,TransformMatrix);
+}
+
+HRESULT CGameInstance::Set_Transform(TRANSFORMSTATETYPE eStateType, const _float4x4 & TransformMatrix)
+{
+	NULL_CHECK_RETURN(m_pPipeLineMgr, E_FAIL);
+
+	return m_pPipeLineMgr->Set_Transform(eStateType, TransformMatrix);
+}
+
+_fMatrix CGameInstance::Get_Transform_Matrix(TRANSFORMSTATETYPE eStateType)
+{
+	NULL_CHECK_BREAK(m_pPipeLineMgr);
+
+	return m_pPipeLineMgr->Get_Transform_Matrix(eStateType);
+}
+
+_float4x4 CGameInstance::Get_Transform_Float4x4(TRANSFORMSTATETYPE eStateType)
+{
+	NULL_CHECK_BREAK(m_pPipeLineMgr);
+
+	return m_pPipeLineMgr->Get_Transform_Float4x4(eStateType);
+}
+
+_fMatrix CGameInstance::Get_Transform_Matrix_TP(TRANSFORMSTATETYPE eStateType)
+{
+	NULL_CHECK_BREAK(m_pPipeLineMgr);
+
+	return m_pPipeLineMgr->Get_Transform_Matrix_TP(eStateType);
+}
+
+_float4x4 CGameInstance::Get_Transform_Float4x4_TP(TRANSFORMSTATETYPE eStateType)
+{
+	NULL_CHECK_BREAK(m_pPipeLineMgr);
+
+	return m_pPipeLineMgr->Get_Transform_Float4x4_TP(eStateType);
+}
+
+HRESULT CGameInstance::Set_TargetPostion(TARGETPOSITIONTYPE eStateType, const _fVector & TargetPos)
+{
+	NULL_CHECK_RETURN(m_pPipeLineMgr,E_FAIL);
+
+	return m_pPipeLineMgr->Set_TargetPostion(eStateType,TargetPos);
+}
+
+HRESULT CGameInstance::Set_TargetPostion(TARGETPOSITIONTYPE eStateType, const _float3 & TargetPos)
+{
+	NULL_CHECK_RETURN(m_pPipeLineMgr, E_FAIL);
+
+	return m_pPipeLineMgr->Set_TargetPostion(eStateType, TargetPos);
+}
+
+_fVector CGameInstance::Get_TargetPostion_Vector(TARGETPOSITIONTYPE eStateType)
+{
+	NULL_CHECK_BREAK(m_pPipeLineMgr);
+
+	return m_pPipeLineMgr->Get_TargetPostion_Vector(eStateType);
+}
+
+_float3 CGameInstance::Get_TargetPostion_float3(TARGETPOSITIONTYPE eStateType)
+{
+	NULL_CHECK_BREAK(m_pPipeLineMgr);
+
+	return m_pPipeLineMgr->Get_TargetPostion_float3(eStateType);
 }
 
 
@@ -487,7 +568,10 @@ void CGameInstance::Release_Engine()
 
 	if (0 != GetSingle(CSoundMgr)->DestroyInstance())
 		MSGBOX("Failed to Release Com CSoundMgr ");
-	
+
+	if (0 != GetSingle(CPipeLineMgr)->DestroyInstance())
+		MSGBOX("Failed to Release CPipeLineMgr ");
+
 
 	if (0 != GetSingle(CGraphic_Device)->DestroyInstance())
 		MSGBOX("Failed to Release Com Graphic_Device ");
@@ -506,5 +590,6 @@ void CGameInstance::Free()
 	Safe_Release(m_pTimerMgr);
 	Safe_Release(m_pEasingMgr);
 	Safe_Release(m_pFrustumMgr);
+	Safe_Release(m_pPipeLineMgr);
 	
 }

@@ -17,11 +17,23 @@ enum SCENEID
 
 enum OBJECTPROTOTYPEID
 {
-	Prototype_Camera_Main, 
+	Prototype_UIImage,
+	Prototype_SkyBox,
+
+
+	Prototype_Camera_Main,
+	Prototype_Camera_Editor,
+
+	Prototype_EditorCursor,
+	Prototype_Rect,
+	Prototype_Cube,
+	Prototype_Terrain,
+	Prototype_Ball,
+
 	Prototype_Player,
 
 
-	Prototype_UIImage,
+
 
 
 	Prototype_TestObject,
@@ -36,8 +48,32 @@ static const _tchar* Tag_Object_Prototype(OBJECTPROTOTYPEID eTag)
 {
 	switch (eTag)
 	{
+	case Prototype_Camera_Editor:
+		return TEXT("Camera_Editor");
+		break;
 	case Prototype_Camera_Main:
 		return TEXT("Camera_Main");
+		break;
+	case Prototype_SkyBox:
+		return TEXT("SkyBox");
+		break;
+	case Prototype_EditorCursor:
+		return TEXT("EditorCursor");
+		break;
+
+		
+	case Prototype_Rect:
+		return TEXT("Rect");
+		break;
+	case Prototype_Cube:
+		return TEXT("Cube");
+		break;
+	case Prototype_Terrain:
+		return TEXT("Terrain");
+		break;
+
+	case Prototype_Ball:
+		return TEXT("Ball");
 		break;
 	case Prototype_Player:
 		return TEXT("Player");
@@ -68,6 +104,7 @@ static const _tchar* Tag_Object_Prototype(OBJECTPROTOTYPEID eTag)
 
 enum MESHTYPEID
 {
+	Mesh_None,
 	Mesh_Player,
 	Mesh_Monster,
 
@@ -84,6 +121,10 @@ static const _tchar* Tag_MeshID(MESHTYPEID eTag)
 {
 	switch (eTag)
 	{
+	case Mesh_None:
+		return TEXT("Mesh_None");
+		break;
+
 	case Mesh_Monster:
 		return TEXT("Monster");
 		break;
@@ -124,7 +165,9 @@ static const _tchar* Tag_MeshID(MESHTYPEID eTag)
 
 enum LAYERID
 {
-	Layer_Camera_Main, 
+	Layer_Camera_Main,
+	Layer_Camera_Editor,
+	Layer_SkyBox,
 	Layer_Player,
 
 	Layer_UI_IMG,
@@ -141,6 +184,14 @@ static const _tchar* Tag_Layer(LAYERID eTag)
 	case Layer_Camera_Main:
 		return TEXT("Layer_Camera_Main");
 		break;
+	case Layer_Camera_Editor:
+		return TEXT("Layer_Camera_Editor");
+		break;
+		
+	case Layer_SkyBox:
+		return TEXT("Layer_SkyBox");
+		break;
+		
 	case Layer_Player:
 		return TEXT("Layer_Player");
 		break;
@@ -185,6 +236,7 @@ enum COMPONENTPROTOTYPEID
 	//////////////////////////////////////////////////////////////////////////
 	Prototype_Texture_Player,
 	Prototype_Texture_SkyBox,
+	Prototype_Texture_EditScene,
 
 };
 static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
@@ -236,6 +288,10 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 		break;
 	case Prototype_Texture_SkyBox:
 		return TEXT("Prototype_Component_Texture_SkyBox");
+		break;
+
+	case Prototype_Texture_EditScene:
+		return TEXT("Prototype_Component_Texture_EditScene");
 		break;
 
 		//////////////////////////////////////////////////////////////////////////

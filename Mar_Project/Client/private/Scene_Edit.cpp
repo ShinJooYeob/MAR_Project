@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "..\Public\Scene_Edit.h"
 #include "Scene_Loading.h"
-#include "Camera_Main.h"
+#include "Camera_Editor.h"
 
 
 CScene_Edit::CScene_Edit(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
@@ -14,6 +14,9 @@ HRESULT CScene_Edit::Initialize()
 	if (FAILED(__super::Initialize()))
 		return E_FAIL;
 
+	m_pGameInstance = GetSingle(CGameInstance);
+	Safe_AddRef(m_pGameInstance);
+
 	FAILED_CHECK(Ready_Layer_MainCamera(TAG_LAY(Layer_Camera_Main)));
 
 
@@ -22,12 +25,23 @@ HRESULT CScene_Edit::Initialize()
 
 	//터짐 방지용 빈 오브젝트
 	OBJELEMENT ObjElement;
-	ObjElement.pObject = nullptr;
+
+
+	FAILED_CHECK(m_pGameInstance->Add_GameObject_Out_of_Manager(&ObjElement.pObject, SCENE_EDIT, TAG_OP(Prototype_EditorCursor)));
+
 	ZeroMemory(ObjElement.matSRT.m, sizeof(_float) * 16);
+
+
+	ObjElement.matSRT.m[0][0] = 1.f;
+	ObjElement.matSRT.m[0][1] = 1.f;
+	ObjElement.matSRT.m[0][2] = 1.f;
+	ObjElement.matSRT.m[1][0] = 1.f;
+	ObjElement.matSRT.m[1][1] = 1.f;
+	ObjElement.matSRT.m[1][2] = 1.f;
+
+	RenewElenmetTransform(&ObjElement);
+
 	m_vecBatchedObject.push_back(ObjElement);
-
-
-
 
 	Prevent_Order = false;
 	m_SelectedObjectSRT = &(m_vecBatchedObject[0].matSRT);
@@ -60,6 +74,18 @@ _int CScene_Edit::Update(_double fDeltaTime)
 	if (m_bIsNeedToSceneChange)
 		return Change_to_NextScene();
 
+	if (m_iNowTab == 0)
+	{
+		for (auto& Element : m_vecBatchedObject)
+		{
+			if (Element.pObject->Update(fDeltaTime) < 0)
+			{
+				__debugbreak();
+				return -1;
+			}
+		}
+	}
+
 #ifdef USE_IMGUI
 
 	FAILED_CHECK(Input_KeyBoard(fDeltaTime));
@@ -86,6 +112,19 @@ _int CScene_Edit::LateUpdate(_double fDeltaTime)
 
 	if (m_bIsNeedToSceneChange)
 		return Change_to_NextScene();
+
+
+	if (m_iNowTab == 0)
+	{
+		for (auto& Element : m_vecBatchedObject)
+		{
+			if (Element.pObject->LateUpdate(fDeltaTime) < 0)
+			{
+				__debugbreak();
+				return -1;
+			}
+		}
+	}
 
 	return 0;
 }
@@ -184,21 +223,25 @@ HRESULT CScene_Edit::Update_First_Frame(_double fDeltatime, const char * szFrame
 	{
 		if (ImGui::BeginTabItem("Map Editor"))
 		{
+			m_iNowTab = 0;
 			FAILED_CHECK(Update_MapTab(fDeltatime));
 			ImGui::EndTabItem();
 		}
 		if (ImGui::BeginTabItem("UI Editor"))
 		{
+			m_iNowTab = 1;
 			FAILED_CHECK(Update_UITab(fDeltatime));
 			ImGui::EndTabItem();
 		}
 		if (ImGui::BeginTabItem("Particle Editor"))
 		{
+			m_iNowTab = 2;
 			FAILED_CHECK(Update_ParticleTab(fDeltatime));
 			ImGui::EndTabItem();
 		}
 		if (ImGui::BeginTabItem("CameraAction"))
 		{
+			m_iNowTab = 3;
 			FAILED_CHECK(Update_CameraActionTab(fDeltatime));
 			ImGui::EndTabItem();
 		}
@@ -253,32 +296,54 @@ HRESULT CScene_Edit::Sava_Data(const char* szFileName, eDATATYPE iKinds)
 		lstrcat(szFullPath, wFileName);
 
 
-		HANDLE hFile = CreateFile(szFullPath, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
+		//HANDLE hFile = CreateFileW(szFullPath, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
+
+		HANDLE hFile = ::CreateFileW(szFullPath, GENERIC_WRITE , FILE_SHARE_READ, 0, CREATE_ALWAYS, 0, NULL);
+
+
+
 
 		if (INVALID_HANDLE_VALUE == hFile)
 			return E_FAIL;
 
 		DWORD	dwByte = 0;
-		/*
-		//vector<OBJELEMENT>		m_vecBatchedObject;
-		typedef struct tagObjectElement
-		{
-			_uint			ObjectID = Prototype_TestObject;
-			_uint			MeshID = Mesh_TestMesh;
-			_float4x4			matSRT;
-			CGameObject*	pObject;
 
-		}OBJELEMENT;
-		*/
+		//// 유니코드임을 알리는 BOM
+		//BYTE wc = 0xEF;
+		//WriteFile(hFile, &wc, 1, &dwByte, NULL);
+		//wc = 0xBB;
+		//WriteFile(hFile, &wc, 1, &dwByte, NULL);
+		//wc = 0xBF;
+		//WriteFile(hFile, &wc, 1, &dwByte, NULL);
 
+		_int iIDLength = 0;
 
 		for (auto& tObjectElement : m_vecBatchedObject)
 		{
 			// key 값 저장
-			WriteFile(hFile, &(tObjectElement.ObjectID), sizeof(_uint), &dwByte, nullptr);
-			WriteFile(hFile, &(tObjectElement.MeshID), sizeof(_uint), &dwByte, nullptr);
+
+
+			iIDLength = lstrlen(tObjectElement.ObjectID);
+			WriteFile(hFile, &(iIDLength), sizeof(_int), &dwByte, nullptr);
+			WriteFile(hFile, (tObjectElement.ObjectID), sizeof(_tchar) * iIDLength, &dwByte, nullptr);
+
+			iIDLength = lstrlen(tObjectElement.MeshID);
+			WriteFile(hFile, &(iIDLength), sizeof(_int), &dwByte, nullptr);
+			WriteFile(hFile, (tObjectElement.MeshID), sizeof(_tchar) * iIDLength, &dwByte, nullptr);
+
+			iIDLength = lstrlen(tObjectElement.TexturePath);
+			WriteFile(hFile, &(iIDLength), sizeof(_int), &dwByte, nullptr);
+			WriteFile(hFile, (tObjectElement.TexturePath), sizeof(_tchar) * iIDLength, &dwByte, nullptr);
+
+			iIDLength = lstrlen(tObjectElement.TextureKey);
+			WriteFile(hFile, &(iIDLength), sizeof(_int), &dwByte, nullptr);
+			WriteFile(hFile, (tObjectElement.TextureKey), sizeof(_tchar) * iIDLength, &dwByte, nullptr);
+
 			WriteFile(hFile, &(tObjectElement.PassIndex), sizeof(_uint), &dwByte, nullptr);
-			WriteFile(hFile, &(tObjectElement.matSRT.m[0][0]), sizeof(_float)*16, &dwByte, nullptr);
+			WriteFile(hFile, &(tObjectElement.matSRT.m[0][0]), sizeof(_float) * 16, &dwByte, nullptr);
+			WriteFile(hFile, &(tObjectElement.matTransform.m[0][0]), sizeof(_float) * 16, &dwByte, nullptr);
+
+
 
 		}
 		CloseHandle(hFile);
@@ -346,30 +411,79 @@ HRESULT CScene_Edit::Load_Data(const char * szFileName, eDATATYPE iKinds)
 
 
 
-		HANDLE hFile = CreateFile(szFullPath, GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+		//HANDLE hFile = CreateFileW(szFullPath, GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+
+
+		HANDLE hFile = ::CreateFileW(szFullPath, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, 0, NULL);
+
 
 		if (INVALID_HANDLE_VALUE == hFile)
 			return E_FAIL;
 
 		DWORD	dwByte = 0;
 
-		OBJELEMENT	tData{};
+		CGameInstance* pInstance = GetSingle(CGameInstance);
+
+		_uint iIDLength = 0;
+
+		// 유니코드임을 알리는 BOM
+		//DWORD wc = 0xFF;
+		//ReadFile(hFile, &wc, 3, &dwByte, NULL);
 
 		while (true)
 		{
+			OBJELEMENT	tData{};
+			_tchar szBuffer[MAX_PATH] = L"";
 			// key 값 로드
-			ReadFile(hFile, &(tData.ObjectID), sizeof(_uint), &dwByte, nullptr);
-			ReadFile(hFile, &(tData.MeshID), sizeof(_uint), &dwByte, nullptr);
+			ReadFile(hFile, &(iIDLength), sizeof(_uint), &dwByte, nullptr);
+			ReadFile(hFile, (szBuffer), sizeof(_tchar) * iIDLength, &dwByte, nullptr);
+			lstrcpy(tData.ObjectID, szBuffer);
+
+			lstrcpy(szBuffer, L"");
+			ReadFile(hFile, &(iIDLength), sizeof(_uint), &dwByte, nullptr);
+			//ReadFile(hFile, &(tData.MeshID), sizeof(_tchar) * iIDLength, &dwByte, nullptr);
+			ReadFile(hFile, (szBuffer), sizeof(_tchar) * iIDLength, &dwByte, nullptr);
+			lstrcpy(tData.MeshID, szBuffer);
+
+			lstrcpy(szBuffer, L"");
+			ReadFile(hFile, &(iIDLength), sizeof(_uint), &dwByte, nullptr);
+			//ReadFile(hFile, &(tData.TexturePath), sizeof(_tchar) * iIDLength, &dwByte, nullptr);
+			ReadFile(hFile, (szBuffer), sizeof(_tchar) * iIDLength, &dwByte, nullptr);
+			lstrcpy(tData.TexturePath, szBuffer);
+
+			lstrcpy(szBuffer, L"");
+			ReadFile(hFile, &(iIDLength), sizeof(_uint), &dwByte, nullptr);
+			//ReadFile(hFile, &(tData.TextureKey), sizeof(_tchar) * iIDLength, &dwByte, nullptr);
+			ReadFile(hFile, (szBuffer), sizeof(_tchar) * iIDLength, &dwByte, nullptr);
+			lstrcpy(tData.TextureKey, szBuffer);
+
 			ReadFile(hFile, &(tData.PassIndex), sizeof(_uint), &dwByte, nullptr);
 			ReadFile(hFile, &(tData.matSRT.m[0][0]), sizeof(_float) * 16, &dwByte, nullptr);
+			ReadFile(hFile, &(tData.matTransform.m[0][0]), sizeof(_float) * 16, &dwByte, nullptr);
 
 			if (0 == dwByte)
 				break;
 			
 			//객채 생성해주기
 
-			m_vecBatchedObject.push_back(tData);
+			pInstance->Add_GameObject_Out_of_Manager(&(tData.pObject), SCENE_EDIT, tData.ObjectID);
 
+			NULL_CHECK_RETURN(tData.pObject, E_FAIL);
+
+
+			if (lstrcmp(tData.MeshID, TAG_MESH(Mesh_None)))
+			{
+				//매쉬 바꿔주기 
+			}
+
+			//트렌스폼
+			CTransform* pTrans = (CTransform*)(tData.pObject->Get_Component(TAG_COM(Com_Transform)));
+			NULL_CHECK_RETURN(pTrans, E_FAIL);
+			pTrans->Set_Matrix(tData.matTransform);
+
+
+
+			m_vecBatchedObject.push_back(tData);
 		}
 
 
@@ -413,15 +527,14 @@ HRESULT CScene_Edit::Input_KeyBoard(_double fDeltaTime)
 		if (m_bIsModelMove) m_bIsModelMove = 0;
 		else
 		{
-			if (m_iBatchedVecIndex != 0)//설정한 오브젝트가 있다면 있다면
-			{
-				// 해당 오브젝트의 메트릭스 받아오기
-				m_SelectedObjectSRT = &(m_vecBatchedObject[m_iBatchedVecIndex].matSRT);
-				ZeroMemory(m_ArrBuffer, sizeof(_float) * 4);
-				m_ArrBuffer[3] = 0.1f;
 
-				m_bIsModelMove = 1;
-			}
+			// 해당 오브젝트의 메트릭스 받아오기
+			m_SelectedObjectSRT = &(m_vecBatchedObject[m_iBatchedVecIndex].matSRT);
+			ZeroMemory(m_ArrBuffer, sizeof(_float) * 4);
+			m_ArrBuffer[3] = 0.1f;
+
+			m_bIsModelMove = 1;
+
 		}
 
 	}
@@ -448,9 +561,14 @@ HRESULT CScene_Edit::Input_KeyBoard(_double fDeltaTime)
 			_float tempValue;
 			memcpy(&tempValue, ((_float*)(&(m_SelectedObjectSRT->m[2 - m_iKindsOfMoving])) + m_iSelectedXYZ), sizeof(_float));
 
-			tempValue += _float(fWheelMove * m_ArrBuffer[3] * fDeltaTime);
+			if (fWheelMove > 0)
+				tempValue += _float(m_ArrBuffer[3]);
+			else
+				tempValue += _float(-m_ArrBuffer[3]);
+			//tempValue += _float(fWheelMove * m_ArrBuffer[3] * fDeltaTime);
 
 
+			FAILED_CHECK(RenewElenmetTransform(&(m_vecBatchedObject[m_iBatchedVecIndex])));
 			memcpy(((_float*)(&(m_SelectedObjectSRT->m[2 - m_iKindsOfMoving])) + m_iSelectedXYZ), &tempValue, sizeof(_float));
 
 			int t = 0;
@@ -507,11 +625,12 @@ HRESULT CScene_Edit::Widget_SRT(_double fDeltatime)
 	ImGui::RadioButton("Model Moving      ", &m_bIsModelMove, 1); ImGui::SameLine();
 	ibClickChecker += _uint(ImGui::IsItemClicked());
 
-	if (m_iBatchedVecIndex == 0)
-	{
-		m_bIsModelMove = 0;
-	}
-	else
+	//if (m_iBatchedVecIndex == 0)
+	//{
+	//	m_bIsModelMove = 0;
+	//}
+	//else
+	if(m_bIsModelMove)
 	{
 		if (ibClickChecker)
 		{
@@ -591,6 +710,7 @@ HRESULT CScene_Edit::Widget_SRT(_double fDeltatime)
 	{
 		memcpy(m_ArrBuffer, &(m_SelectedObjectSRT->m[2]), sizeof(_float) * 3);
 		ImGui::DragFloat3(" X Y Z", m_ArrBuffer, m_ArrBuffer[3], -FLT_MAX, FLT_MAX);
+
 		memcpy(&(m_SelectedObjectSRT->m[2]), m_ArrBuffer, sizeof(_float) * 3);
 	}
 	break;
@@ -599,6 +719,7 @@ HRESULT CScene_Edit::Widget_SRT(_double fDeltatime)
 	{
 		memcpy(m_ArrBuffer, &(m_SelectedObjectSRT->m[1]), sizeof(_float) * 3);
 		ImGui::DragFloat3(" X Y Z", m_ArrBuffer, m_ArrBuffer[3], -FLT_MAX, FLT_MAX);
+
 		memcpy(&(m_SelectedObjectSRT->m[1]), m_ArrBuffer, sizeof(_float) * 3);
 
 	}
@@ -609,6 +730,7 @@ HRESULT CScene_Edit::Widget_SRT(_double fDeltatime)
 	{
 		memcpy(m_ArrBuffer, &(m_SelectedObjectSRT->m[0]), sizeof(_float) * 3);
 		ImGui::DragFloat3(" X Y Z", m_ArrBuffer, m_ArrBuffer[3], -FLT_MAX, FLT_MAX);
+
 		memcpy(&(m_SelectedObjectSRT->m[0]), m_ArrBuffer, sizeof(_float) * 3);
 	}
 	break;
@@ -618,7 +740,8 @@ HRESULT CScene_Edit::Widget_SRT(_double fDeltatime)
 		break;
 	}
 
-
+	if (m_bIsModelMove)
+		FAILED_CHECK(RenewElenmetTransform(&(m_vecBatchedObject[m_iBatchedVecIndex])));
 
 	/*회전값 용
 
@@ -717,8 +840,8 @@ HRESULT CScene_Edit::Widget_BatchedObjectList(_double fDeltatime)
 			char HeaderLabel[64];
 
 			sprintf_s(HeaderLabel, "%d. %ws (Mesh : %ws) (PassIndex : %d)", i,
-				TAG_OP(OBJECTPROTOTYPEID(m_vecBatchedObject[i].ObjectID)),
-				TAG_MESH(MESHTYPEID(m_vecBatchedObject[i].MeshID)) ,  
+				m_vecBatchedObject[i].ObjectID,
+				m_vecBatchedObject[i].MeshID ,  
 				m_vecBatchedObject[i].PassIndex
 			);
 			//sprintf_s(HederLabel, "%d. %ws (%d)",i, m_vecBatchedObject[i].pObject->Get_NameTag(), m_vecBatchedObject[i].ObjectID);
@@ -774,7 +897,7 @@ HRESULT CScene_Edit::Widget_BatchedObjectList(_double fDeltatime)
 				iter++;
 
 			////실제로 죽이기 없애기 delete//////////////////////////////////////////////////////////////////////
-
+			Safe_Release(iter->pObject);
 
 			m_vecBatchedObject.erase(iter);
 
@@ -852,6 +975,7 @@ HRESULT CScene_Edit::Widget_CreateDeleteObject(_double fDeltatime)
 						if (m_iBatchedVecIndex != 0 && ImGui::IsItemHovered())
 						{
 							m_iBatchedVecIndex = 0;
+							m_bIsModelMove = 0;
 							m_SelectedObjectSRT = &(m_vecBatchedObject[m_iBatchedVecIndex].matSRT);
 							ZeroMemory(m_iSelectedObjectNMesh, sizeof(_uint) * 2);
 						}
@@ -897,7 +1021,7 @@ HRESULT CScene_Edit::Widget_CreateDeleteObject(_double fDeltatime)
 
 						if (m_iBatchedVecIndex != 0 && ImGui::IsItemHovered())
 						{
-							m_iBatchedVecIndex = 0;
+							m_iBatchedVecIndex = 0; m_bIsModelMove = 0;
 							m_SelectedObjectSRT = &(m_vecBatchedObject[m_iBatchedVecIndex].matSRT);
 							ZeroMemory(m_iSelectedObjectNMesh, sizeof(_uint) * 2);
 						}
@@ -920,18 +1044,31 @@ HRESULT CScene_Edit::Widget_CreateDeleteObject(_double fDeltatime)
 
 			OBJELEMENT ObjElement;
 
-			ObjElement.pObject = nullptr;
+
+
+
 			ZeroMemory(ObjElement.matSRT.m, sizeof(_float) * 16);
-			ObjElement.ObjectID = m_iSelectedObjectNMesh[0];
+
+			lstrcpy(ObjElement.ObjectID, TAG_OP((OBJECTPROTOTYPEID)m_iSelectedObjectNMesh[0]));
+			//ObjElement.ObjectID = TAG_OP((OBJECTPROTOTYPEID) m_iSelectedObjectNMesh[0]);
 
 			ObjElement.matSRT = m_vecBatchedObject[m_iBatchedVecIndex].matSRT;
 
-			ObjElement.MeshID = m_iSelectedObjectNMesh[1];
+			lstrcpy(ObjElement.MeshID, TAG_MESH((MESHTYPEID)m_iSelectedObjectNMesh[1]));
+			//ObjElement.MeshID = TAG_MESH( (MESHTYPEID) m_iSelectedObjectNMesh[1]);
 			ObjElement.PassIndex = m_iPassIndex;
 
 
 			/////실제 생성하기
 
+			FAILED_CHECK(m_pGameInstance->Add_GameObject_Out_of_Manager(&(ObjElement.pObject), SCENE_EDIT, ObjElement.ObjectID));
+
+			FAILED_CHECK(RenewElenmetTransform(&ObjElement));
+
+			if (lstrcmp(ObjElement.MeshID, TAG_MESH(Mesh_None)))
+			{
+				//매쉬 바꿔주기 
+			}
 
 			m_vecBatchedObject.push_back(ObjElement);
 
@@ -987,9 +1124,24 @@ HRESULT CScene_Edit::Widget_SaveLoadMapData(_double fDeltatime)
 			m_vecBatchedObject.clear();
 
 			OBJELEMENT ObjElement;
-			ObjElement.pObject = nullptr;
+			
+			FAILED_CHECK(m_pGameInstance->Add_GameObject_Out_of_Manager(&ObjElement.pObject, SCENE_EDIT, TAG_OP(Prototype_EditorCursor)));
+
 			ZeroMemory(ObjElement.matSRT.m, sizeof(_float) * 16);
+
+			ObjElement.matSRT.m[0][0] = 1.f;
+			ObjElement.matSRT.m[0][1] = 1.f;
+			ObjElement.matSRT.m[0][2] = 1.f;
+			ObjElement.matSRT.m[1][0] = 1.f;
+			ObjElement.matSRT.m[1][1] = 1.f;
+			ObjElement.matSRT.m[1][2] = 1.f;
+
+			RenewElenmetTransform(&ObjElement);
+			
+		
 			m_vecBatchedObject.push_back(ObjElement);
+
+
 
 			m_SelectedObjectSRT = &(m_vecBatchedObject[0].matSRT);
 			m_iBatchedVecIndex = 0;
@@ -1266,6 +1418,31 @@ HRESULT CScene_Edit::Widget_SaveLoadMapData(_double fDeltatime)
 	return S_OK;
 }
 
+HRESULT CScene_Edit::RenewElenmetTransform(OBJELEMENT * pObjElement)
+{
+	if (pObjElement == nullptr)
+		return E_FAIL;
+
+	_Matrix Trans = XMMatrixTranslation(pObjElement->matSRT.m[2][0], pObjElement->matSRT.m[2][1], pObjElement->matSRT.m[2][2]);
+	_Matrix RotX = XMMatrixRotationX(XMConvertToRadians(pObjElement->matSRT.m[1][0]));
+	_Matrix RotY = XMMatrixRotationY(XMConvertToRadians(pObjElement->matSRT.m[1][1]));
+	_Matrix RotZ = XMMatrixRotationZ(XMConvertToRadians(pObjElement->matSRT.m[1][2]));
+	_Matrix Scale = XMMatrixScaling((pObjElement->matSRT.m[0][0]), (pObjElement->matSRT.m[0][1]), (pObjElement->matSRT.m[0][2]));
+
+
+	
+	//pObjElement->matTransform = XMMatrixMultiply(XMMatrixMultiply(XMMatrixMultiply((XMMatrixMultiply(Scale, RotX)), RotY), RotZ), Trans);
+	pObjElement->matTransform = Scale* RotX *RotY* RotZ* Trans;
+
+	if (pObjElement->pObject != nullptr)
+	{
+		CTransform* pTrans = (CTransform*)(pObjElement->pObject->Get_Component(TAG_COM(Com_Transform)));
+		pTrans->Set_Matrix(pObjElement->matTransform);
+	}
+
+	return S_OK;
+}
+
 #pragma endregion MapTab
 
 #pragma region UITab
@@ -1306,6 +1483,62 @@ HRESULT CScene_Edit::Update_CameraActionTab(_double fDeltatime)
 HRESULT CScene_Edit::Ready_Layer_MainCamera(const _tchar * pLayerTag)
 {
 
+	CCamera::CAMERADESC CameraDesc;
+	CameraDesc.vWorldRotAxis = _float3(0, 0, 0);
+	CameraDesc.vEye = _float3(0, 5.f, -10.f);
+	CameraDesc.vAt = _float3(0, 0.f, 0);
+	CameraDesc.vAxisY = _float3(0, 1, 0);
+
+	CameraDesc.fFovy = XMConvertToRadians(60.f);
+	CameraDesc.fAspect = _float(g_iWinCX) / g_iWinCY;
+	CameraDesc.fNear = 0.2f;
+	CameraDesc.fFar = 300.f;
+
+	CameraDesc.iWinCX = g_iWinCX;
+	CameraDesc.iWinCY = g_iWinCY;
+
+	CameraDesc.TransformDesc.fMovePerSec = 5.f;
+	CameraDesc.TransformDesc.fRotationPerSec = XMConvertToRadians(60.0f);
+	CameraDesc.TransformDesc.fScalingPerSec = 1.f;
+
+
+	CGameInstance* pInstance = GetSingle(CGameInstance);
+
+	list<CGameObject*>* MainCameraList = pInstance->Get_ObjectList_from_Layer(SCENE_STATIC, TAG_LAY(Layer_Camera_Main));
+
+	if (MainCameraList != nullptr)
+	{
+		auto iter = MainCameraList->begin();
+		for (; iter != MainCameraList->end();)
+		{
+			Safe_Release(*(iter));
+			iter = MainCameraList->erase(iter);
+		}
+		MainCameraList->clear();
+	}
+
+	m_pEditorCam = (CCamera_Editor*)(pInstance->Get_GameObject_By_LayerIndex(SCENE_EDIT, TAG_LAY(Layer_Camera_Main)));
+
+	if (m_pEditorCam == nullptr)
+	{
+		FAILED_CHECK(pInstance->Add_GameObject_To_Layer(SCENEID::SCENE_EDIT, pLayerTag, TAG_OP(Prototype_Camera_Editor), &CameraDesc));
+
+		m_pEditorCam = (CCamera_Editor*)(pInstance->Get_GameObject_By_LayerIndex(SCENE_EDIT, TAG_LAY(Layer_Camera_Main)));
+
+		NULL_CHECK_RETURN(m_pEditorCam, E_FAIL);
+
+		// 초기 새팅
+		//m_pEditorCam
+
+		//
+	}
+	else
+	{
+		//리셋
+
+		m_pEditorCam->Set_NowSceneNum(SCENE_EDIT);
+
+	}
 
 
 
@@ -1333,9 +1566,11 @@ void CScene_Edit::Free()
 
 	for (auto& iter : m_vecBatchedObject)
 	{
-
 		//객채 없애기 죽이기 비워주기
+		Safe_Release(iter.pObject);
 	}
 	m_vecBatchedObject.clear();
 
+
+	Safe_Release(m_pGameInstance);
 }

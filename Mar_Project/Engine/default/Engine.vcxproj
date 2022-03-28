@@ -151,6 +151,7 @@
     <ClInclude Include="..\public\Engine_Macro.h" />
     <ClInclude Include="..\public\Engine_Struct.h" />
     <ClInclude Include="..\public\Engine_Typedef.h" />
+    <ClInclude Include="..\public\PipeLineMgr.h" />
     <ClInclude Include="..\public\FrustumMgr.h" />
     <ClInclude Include="..\public\GameInstance.h" />
     <ClInclude Include="..\public\GameObject.h" />
@@ -180,6 +181,7 @@
     <ClCompile Include="..\private\ComponentMgr.cpp" />
     <ClCompile Include="..\private\EasingMgr.cpp" />
     <ClCompile Include="..\private\Engine_Struct.cpp" />
+    <ClCompile Include="..\private\PipeLineMgr.cpp" />
     <ClCompile Include="..\private\FrustumMgr.cpp" />
     <ClCompile Include="..\private\GameInstance.cpp" />
     <ClCompile Include="..\private\GameObject.cpp" />

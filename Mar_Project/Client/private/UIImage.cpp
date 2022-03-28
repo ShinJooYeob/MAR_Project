@@ -42,6 +42,29 @@ _int CUIImage::Update(_double fDeltaTime)
 {
 	if (__super::Update(fDeltaTime) < 0)
 		return -1;
+	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_RETURN)&DIS_Down)
+	{
+		static int test = 0;
+		test++;
+
+		if (test > 2)
+			test = 0;
+
+		switch (test)
+		{
+		case 0:
+			FAILED_CHECK(m_pTextureCom->Change_TextureLayer(L"lower"));
+			break;
+		case 1:
+			FAILED_CHECK(m_pTextureCom->Change_TextureLayer(L"upper"));
+			break;
+		case 2:
+			FAILED_CHECK(m_pTextureCom->Change_TextureLayer(L"number"));
+			break;
+		default:
+			break;
+		}
+	}
 
 	return _int();
 }
@@ -65,9 +88,6 @@ _int CUIImage::Render()
 
 	FAILED_CHECK(Apply_Rect_To_Transform());
 	FAILED_CHECK(Bind_Transform_OnShader(m_pShaderCom, "g_WorldMatrix"));
-
-	//_Matrix		ViewMatrix = XMMatrixTranspose(XMMatrixLookAtLH(XMVectorSet(0.f, 3.f, -2.f, 1.f), XMVectorSet(0.f, 0.f, 0.f, 1.f), XMVectorSet(0.f, 1.f, 0.f, 0.f)));
-	//_Matrix		ProjMatrix = XMMatrixTranspose(XMMatrixPerspectiveFovLH(XMConvertToRadians(60.0f), (_float)g_iWinCX / g_iWinCY, 0.2f, 300.f));
 
 	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ViewMatrix", &XMMatrixIdentity(), sizeof(_float4x4)));
 	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ProjMatrix", &m_ProjMatrix, sizeof(_float4x4)));

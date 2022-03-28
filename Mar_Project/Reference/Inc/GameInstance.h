@@ -16,6 +16,7 @@ class CGameObject;
 class CLayer;
 class CFrustumMgr;
 class CSoundMgr;
+class CPipeLineMgr;
 
 
 class ENGINE_DLL CGameInstance final :public CBase
@@ -45,13 +46,27 @@ public:  /*For Graphic Device*/
 public:/* For.ObjectMgr */
 	HRESULT			Add_GameObject_Prototype(const _tchar* tagPrototype, CGameObject* pPrototype);
 	HRESULT			Add_GameObject_To_Layer(_uint eSceneNum, const _tchar* tagLayer, const _tchar* tagPrototype, void* pArg = nullptr);
+	HRESULT			Add_GameObject_Out_of_Manager(CGameObject** ppOutGameObj, _uint eSceneNum, const _tchar* tagPrototype, void* pArg = nullptr);
 	CComponent*		Get_Commponent_By_LayerIndex(_uint eSceneNum, const _tchar* tagLayer, const _tchar* tagComponet, _uint iLayerIndex = 0);
 	CGameObject*	Get_GameObject_By_LayerIndex(_uint eSceneNum, const _tchar* tagLayer, _uint iLayerIndex = 0);
 	list<CGameObject*>*	Get_ObjectList_from_Layer(_uint eSceneNum, const _tchar* tagLayer);
 	HRESULT			Delete_GameObject_To_Layer_Index(_uint eSceneNum, const _tchar* tagLayer, _uint index);
 	HRESULT			Delete_GameObject_To_Layer_Object(_uint eSceneNum, const _tchar* tagLayer, CGameObject* obj);
 
+public:/* For.PipeLineMgr */
+	HRESULT Set_Transform(TRANSFORMSTATETYPE eStateType, const _fMatrix& TransformMatrix);
+	HRESULT Set_Transform(TRANSFORMSTATETYPE eStateType, const _float4x4& TransformMatrix);
 
+	_fMatrix Get_Transform_Matrix(TRANSFORMSTATETYPE eStateType);
+	_float4x4 Get_Transform_Float4x4(TRANSFORMSTATETYPE eStateType);
+	_fMatrix Get_Transform_Matrix_TP(TRANSFORMSTATETYPE eStateType);
+	_float4x4 Get_Transform_Float4x4_TP(TRANSFORMSTATETYPE eStateType);
+
+	HRESULT Set_TargetPostion(TARGETPOSITIONTYPE eStateType, const _fVector& TargetPos);
+	HRESULT Set_TargetPostion(TARGETPOSITIONTYPE eStateType, const _float3& TargetPos);
+
+	_fVector Get_TargetPostion_Vector(TARGETPOSITIONTYPE eStateType);
+	_float3  Get_TargetPostion_float3(TARGETPOSITIONTYPE eStateType);
 
 public: /*For.ComMgr*/
 	HRESULT			Add_Component_Prototype(_uint eSceneIdx, const _tchar* tagPrototypeComponent, CComponent* pComponenet);
@@ -116,6 +131,7 @@ private:
 	CEasingMgr*			m_pEasingMgr = nullptr;
 	CFrustumMgr*		m_pFrustumMgr = nullptr;
 	CSoundMgr*			m_pSoundMgr = nullptr;
+	CPipeLineMgr*		m_pPipeLineMgr = nullptr;
 
 public:
 	static void Release_Engine();

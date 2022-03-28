@@ -8,6 +8,18 @@ BEGIN(Engine)
 class ENGINE_DLL CCamera abstract : public CGameObject
 {
 
+public:
+	typedef struct tagCameraDesc
+	{
+		_bool		bIsOrtho = false;
+		_float3		vWorldRotAxis = _float3(0, 0, 0);
+		_float3		vEye, vAt, vAxisY;
+		_float		fFovy,fAspect , fNear, fFar;
+		_uint		iWinCX = 1280, iWinCY = 720;
+		CTransform::TRANSFORMDESC TransformDesc;
+	}CAMERADESC;
+
+
 protected:
 	explicit CCamera(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext);
 		explicit CCamera(const CCamera&  rhs);
@@ -16,7 +28,7 @@ public:
 	virtual HRESULT Initialize_Prototype(void* pArg);
 	virtual HRESULT Initialize_Clone(void* pArg);
 
-	virtual _int Update(_double fDeltaTime);
+	virtual _int Update(_double fDeltaTime,  _bool IsOrth = false);
 	virtual _int LateUpdate(_double fDeltaTime);
 	virtual _int Render();
 	virtual _int LateRender();
@@ -25,8 +37,8 @@ public:
 	CTransform*	 Get_Camera_Transform() { return m_pTransform; };
 
 public:
-	
-	HRESULT Set_ProjectMatrix(_bool bIsOrtho);
+	HRESULT Set_ViewMatrix();
+	HRESULT Set_ProjectMatrix(_bool bIsOrtho = false);
 
 
 protected:

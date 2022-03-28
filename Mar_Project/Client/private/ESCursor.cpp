@@ -1,19 +1,19 @@
 #include "stdafx.h"
-#include "..\public\Player.h"
+#include "..\public\ESCursor.h"
 
 
 
-CPlayer::CPlayer(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext) 
+CESCursor::CESCursor(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext) 
 	: CGameObject(pDevice, pDeviceContext)
 {
 }
 
-CPlayer::CPlayer(const CPlayer & rhs)
+CESCursor::CESCursor(const CESCursor & rhs)
 	: CGameObject(rhs)
 {
 }
 
-HRESULT CPlayer::Initialize_Prototype(void * pArg)
+HRESULT CESCursor::Initialize_Prototype(void * pArg)
 {
 	FAILED_CHECK(__super::Initialize_Prototype(pArg));
 
@@ -21,7 +21,7 @@ HRESULT CPlayer::Initialize_Prototype(void * pArg)
 	return S_OK;
 }
 
-HRESULT CPlayer::Initialize_Clone(void * pArg)
+HRESULT CESCursor::Initialize_Clone(void * pArg)
 {
 	FAILED_CHECK(__super::Initialize_Clone(pArg));
 
@@ -30,20 +30,15 @@ HRESULT CPlayer::Initialize_Clone(void * pArg)
 	return S_OK;
 }
 
-_int CPlayer::Update(_double fDeltaTime)
+_int CESCursor::Update(_double fDeltaTime)
 {
 	if (__super::Update(fDeltaTime) < 0)
 		return -1;
 
-
-
-
-
-
 	return _int();
 }
 
-_int CPlayer::LateUpdate(_double fDeltaTime)
+_int CESCursor::LateUpdate(_double fDeltaTime)
 {
 	if (__super::LateUpdate(fDeltaTime) < 0)
 		return -1;
@@ -53,7 +48,7 @@ _int CPlayer::LateUpdate(_double fDeltaTime)
 	return _int();
 }
 
-_int CPlayer::Render()
+_int CESCursor::Render()
 {
 	if (__super::Render() < 0)
 		return -1;
@@ -62,11 +57,11 @@ _int CPlayer::Render()
 
 	FAILED_CHECK(m_pTransformCom->Bind_OnShader(m_pShaderCom, "g_WorldMatrix"));
 
+
 	CGameInstance* pInstance = GetSingle(CGameInstance);
 
 	_float4x4		ViewFloat4x4 = pInstance->Get_Transform_Float4x4_TP(PLM_VIEW);
-	_float4x4		ProjFloat4x4 = pInstance->Get_Transform_Float4x4_TP(PLM_PROJ);;
-
+	_float4x4		ProjFloat4x4 = pInstance->Get_Transform_Float4x4_TP(PLM_PROJ);
 
 	m_pShaderCom->Set_RawValue("g_ViewMatrix", &ViewFloat4x4, sizeof(_float4x4));
 	m_pShaderCom->Set_RawValue("g_ProjMatrix", &ProjFloat4x4, sizeof(_float4x4));
@@ -80,7 +75,7 @@ _int CPlayer::Render()
 	return _int();
 }
 
-_int CPlayer::LateRender()
+_int CESCursor::LateRender()
 {
 	if (__super::LateRender() < 0)
 		return -1;
@@ -91,7 +86,7 @@ _int CPlayer::LateRender()
 	return _int();
 }
 
-HRESULT CPlayer::SetUp_Components()
+HRESULT CESCursor::SetUp_Components()
 {
 
 
@@ -101,8 +96,8 @@ HRESULT CPlayer::SetUp_Components()
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_VIBuffer_Cube), TAG_COM(Com_VIBuffer), (CComponent**)&m_pVIBufferCom));
 
-	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Texture_SkyBox), TAG_COM(Com_Texture), (CComponent**)&m_pTextureCom));
-
+	FAILED_CHECK(Add_Component(SCENE_EDIT, TAG_CP(Prototype_Texture_EditScene), TAG_COM(Com_Texture), (CComponent**)&m_pTextureCom));
+	FAILED_CHECK(m_pTextureCom->Change_TextureLayer(L"Cursor"));
 
 	CTransform::TRANSFORMDESC tDesc = {};
 
@@ -119,31 +114,31 @@ HRESULT CPlayer::SetUp_Components()
 	return S_OK;
 }
 
-CPlayer * CPlayer::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, void * pArg)
+CESCursor * CESCursor::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, void * pArg)
 {
-	CPlayer*	pInstance = new CPlayer(pDevice,pDeviceContext);
+	CESCursor*	pInstance = new CESCursor(pDevice,pDeviceContext);
 
 	if (FAILED(pInstance->Initialize_Prototype(pArg)))
 	{
-		MSGBOX("Failed to Created CPlayer");
+		MSGBOX("Failed to Created CESCursor");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-CGameObject * CPlayer::Clone(void * pArg)
+CGameObject * CESCursor::Clone(void * pArg)
 {
-	CPlayer*	pInstance = new CPlayer(*this);
+	CESCursor*	pInstance = new CESCursor(*this);
 
 	if (FAILED(pInstance->Initialize_Clone(pArg)))
 	{
-		MSGBOX("Failed to Created CPlayer");
+		MSGBOX("Failed to Created CESCursor");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-void CPlayer::Free()
+void CESCursor::Free()
 {
 	__super::Free();
 

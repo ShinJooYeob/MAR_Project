@@ -20,11 +20,14 @@ class CScene_Edit final : public CScene
 #ifdef USE_IMGUI
 	typedef struct tagObjectElement
 	{
-		_uint			ObjectID = Prototype_TestObject;
-		_uint			MeshID = Mesh_TestMesh;
+		_tchar			ObjectID[128] = L"EditorCursor";
+		_tchar			MeshID[128] = L"Mesh_None";
+		_tchar			TexturePath[128] = L"TPath_None";
+		_tchar			TextureKey[128] = L"TKey_None";
 		_uint			PassIndex = 0;
-		_float4x4			matSRT;
-		CGameObject*	pObject;
+		_float4x4		matSRT;
+		_float4x4		matTransform;
+		CGameObject*	pObject = nullptr;
 
 	}OBJELEMENT;
 
@@ -81,7 +84,8 @@ private:
 	HRESULT Widget_CreateDeleteObject(_double fDeltatime);
 	HRESULT Widget_SaveLoadMapData(_double fDeltatime);
 
-
+	HRESULT	RenewElenmetTransform(OBJELEMENT* pObjElement);
+	
 #pragma endregion MapTab
 
 #pragma region UITab
@@ -111,6 +115,11 @@ private:
 private:
 
 #pragma region Total
+
+	CGameInstance* m_pGameInstance = nullptr;
+	
+	_uint m_iNowTab = 0;
+
 	_bool	Prevent_Order = false;
 	_bool bArrWindowFlag[10];
 	_uint ibClickChecker = 0;
@@ -147,6 +156,9 @@ private:
 
 #endif // USE_IMGUI
 
+
+private:
+	class CCamera_Editor*				m_pEditorCam = nullptr;
 private:
 	HRESULT Ready_Layer_MainCamera(const _tchar* pLayerTag);
 

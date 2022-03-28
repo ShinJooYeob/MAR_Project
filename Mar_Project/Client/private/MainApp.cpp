@@ -4,6 +4,7 @@
 #include "Camera_Main.h"
 #include "Player.h"
 #include "UIImage.h"
+#include "SkyBox.h"
 
 #ifdef USE_IMGUI
 #include "ImguiMgr.h"
@@ -84,7 +85,7 @@ HRESULT CMainApp::Render()
 		return E_FAIL;
 	}
 
-	FAILED_CHECK(m_pGameInstance->Clear_BackBuffer_View(_float4(0.0f, 0.f, 1.f, 1.f)));
+	FAILED_CHECK(m_pGameInstance->Clear_BackBuffer_View(_float4(0.5f, 0.5f, 0.5f, 1.f)));
 	FAILED_CHECK(m_pGameInstance->Clear_DepthStencil_View());
 
 
@@ -234,20 +235,25 @@ HRESULT CMainApp::Ready_Static_Component_Prototype()
 HRESULT CMainApp::Ready_Static_GameObject_Prototype()
 {
 	///////////////////Camera_Main 프로토타입 생성
-	CAMERADESC CameraDesc;
+	CCamera::CAMERADESC CameraDesc;
 	CameraDesc.vWorldRotAxis = _float3(0, 0, 0);
 	CameraDesc.vEye = _float3(0, 5.f, -10.f);
-	CameraDesc.vAt = _float3(0, 5.f, 0);
+	CameraDesc.vAt = _float3(0, 0.f, 0);
 	CameraDesc.vAxisY = _float3(0, 1, 0);
-
 
 	CameraDesc.fFovy = XMConvertToRadians(60.f);
 	CameraDesc.fAspect = _float(g_iWinCX) / g_iWinCY;
 	CameraDesc.fNear = 0.2f;
 	CameraDesc.fFar = 300.f;
 
-	//CameraDesc.TransformDesc.fMovePerSec = 10.f;
-	//CameraDesc.TransformDesc.fRotationPerSec = XMConvertToRadians(90.0f);
+	CameraDesc.iWinCX = g_iWinCX;
+	CameraDesc.iWinCY = g_iWinCY;
+
+	CameraDesc.TransformDesc.fMovePerSec = 5.f;
+	CameraDesc.TransformDesc.fRotationPerSec = XMConvertToRadians(60.0f);
+	CameraDesc.TransformDesc.fScalingPerSec = 1.f;
+
+
 
 	FAILED_CHECK(m_pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_Camera_Main), CCamera_Main::Create(m_pDevice, m_pDeviceContext, &CameraDesc)));
 	//
@@ -256,6 +262,9 @@ HRESULT CMainApp::Ready_Static_GameObject_Prototype()
 
 
 	FAILED_CHECK(m_pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_UIImage), CUIImage::Create(m_pDevice, m_pDeviceContext)));
+
+	FAILED_CHECK(m_pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_SkyBox), CSkyBox::Create(m_pDevice, m_pDeviceContext)));
+
 
 	//if (FAILED(m_pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_UI_Common), CUI_Common::Create(m_pGraphicDevice, _float4(0, 0, 0, 0)))))
 	//	return E_FAIL;
@@ -277,6 +286,7 @@ CMainApp * CMainApp::Create()
 
 void CMainApp::Free()
 {
+	m_pGameInstance->Get_NowScene()->Free();
 
 	if (FAILED(Free_SingletonMgr()))
 	{

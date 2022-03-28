@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #include "..\Public\Loader.h"
 
+#include "ESCursor.h"
+#include "Camera_Editor.h"
+
 
 _uint CALLBACK LoadingThread(void* _Prameter)
 {
@@ -26,7 +29,7 @@ _uint CALLBACK LoadingThread(void* _Prameter)
 
 	case SCENEID::SCENE_EDIT:
 
-		pLoader->Load_Scene_MapEdit(tThreadArg.IsClientQuit, tThreadArg.CriSec);
+		pLoader->Load_Scene_Edit(tThreadArg.IsClientQuit, tThreadArg.CriSec);
 		break;
 
 	default:
@@ -173,7 +176,7 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 	return S_OK;
 }
 
-HRESULT CLoader::Load_Scene_MapEdit(_bool * _IsClientQuit, CRITICAL_SECTION * _CriSec)
+HRESULT CLoader::Load_Scene_Edit(_bool * _IsClientQuit, CRITICAL_SECTION * _CriSec)
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
@@ -181,27 +184,36 @@ HRESULT CLoader::Load_Scene_MapEdit(_bool * _IsClientQuit, CRITICAL_SECTION * _C
 #pragma endregion
 
 
+
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_EDIT, TAG_CP(Prototype_Texture_EditScene),
+		CTexture::Create(m_pDevice, m_pDeviceContext, L"EditScene.txt")));
+
+
+
 #pragma  region PROTOTYPE_GAMEOBJECT
 #pragma endregion
 
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_EditorCursor), CESCursor::Create(m_pDevice, m_pDeviceContext)));
+
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_Camera_Editor), CCamera_Editor::Create(m_pDevice, m_pDeviceContext)));
+
 
 	RELEASE_INSTANCE(CGameInstance);
-	EnterCriticalSection(_CriSec);
-	m_iLoadingMaxCount = 1;
-	m_iLoadingProgressCount = 0;
-	LeaveCriticalSection(_CriSec);
+	//EnterCriticalSection(_CriSec);
+	//m_iLoadingMaxCount = 1;
+	//m_iLoadingProgressCount = 0;
+	//LeaveCriticalSection(_CriSec);
 
-	for (int i = 0; i < m_iLoadingMaxCount; ++i)
-	{
-		EnterCriticalSection(_CriSec);
-		m_iLoadingProgressCount = i;
-		LeaveCriticalSection(_CriSec);
-	}
+	//for (int i = 0; i < m_iLoadingMaxCount; ++i)
+	//{
+	//	EnterCriticalSection(_CriSec);
+	//	m_iLoadingProgressCount = i;
+	//	LeaveCriticalSection(_CriSec);
+	//}
 
 	EnterCriticalSection(_CriSec);
 	m_bIsLoadingFinished = true;
 	LeaveCriticalSection(_CriSec);
-	m_bIsLoadingFinished = true;
 
 	return S_OK;
 }

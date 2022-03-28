@@ -39,6 +39,30 @@ HRESULT CObjectMgr::Add_GameObject_Prototype(const _tchar * tagPrototype, CGameO
 	return S_OK;
 }
 
+HRESULT CObjectMgr::Add_GameObject_Out_of_Manager(CGameObject ** ppOutGameObj, _uint eSceneNum, const _tchar * tagPrototype, void * pArg)
+{
+	if (eSceneNum >= m_iMaxSceneNum)
+	{
+		__debugbreak();
+		return E_FAIL;
+	}
+	CGameObject* pPrototype = Find_Prototype(tagPrototype);
+	NULL_CHECK_BREAK(pPrototype);
+
+	CGameObject* pInstance = pPrototype->Clone(pArg);
+	NULL_CHECK_BREAK(pInstance);
+
+	pInstance->Set_NowSceneNum(eSceneNum);
+
+	//if (pInstance->Get_NameTag() == nullptr)
+	//	pInstance->Set_NameTag(tagLayer);
+
+	*ppOutGameObj = pInstance;
+
+
+	return S_OK;
+}
+
 HRESULT CObjectMgr::Add_GameObject_To_Layer(_uint eSceneNum, const _tchar * tagLayer, const _tchar * tagPrototype, void * pArg)
 {
 	if (eSceneNum >= m_iMaxSceneNum)

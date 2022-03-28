@@ -23,8 +23,10 @@ HRESULT CScene_Loby::Initialize()
 
 
 	FAILED_CHECK(Ready_Layer_MainCamera(TAG_LAY(Layer_Camera_Main)));
+	FAILED_CHECK(Ready_Layer_SkyBox(TAG_LAY(Layer_SkyBox)));
 	
-	//FAILED_CHECK(Ready_Layer_TestObj(TAG_LAY(Layer_Player)));
+	
+	FAILED_CHECK(Ready_Layer_TestObj(TAG_LAY(Layer_Player)));
 	FAILED_CHECK(Ready_Layer_UIImage(TAG_LAY(Layer_UI_IMG)));
 	
 	
@@ -91,45 +93,52 @@ _int CScene_Loby::LateRender()
 
 HRESULT CScene_Loby::Ready_Layer_MainCamera(const _tchar * pLayerTag)
 {
-	CAMERADESC CameraDesc;
-
-	CameraDesc.bIsOrtho = true;
-	CameraDesc.vEye = _float3(0.f, 0.f, -10.f);
-	CameraDesc.vWorldRotAxis = _float3(0.f, 0.f, 0.f);
+	CCamera::CAMERADESC CameraDesc;
+	CameraDesc.vWorldRotAxis = _float3(0, 0, 0);
+	CameraDesc.vEye = _float3(0, 5.f, -10.f);
+	CameraDesc.vAt = _float3(0, 0.f, 0);
 	CameraDesc.vAxisY = _float3(0, 1, 0);
 
-
-	CameraDesc.fFovy = XMConvertToRadians(60.0f);
+	CameraDesc.fFovy = XMConvertToRadians(60.f);
 	CameraDesc.fAspect = _float(g_iWinCX) / g_iWinCY;
 	CameraDesc.fNear = 0.2f;
 	CameraDesc.fFar = 300.f;
 
-	/*	CameraDesc.TransformDesc.fMovePerSec = 10.f;
-		CameraDesc.TransformDesc.fRotationPerSec = XMConvertToRadians(90.0f);*/
+	CameraDesc.iWinCX = g_iWinCX;
+	CameraDesc.iWinCY = g_iWinCY;
+
+	CameraDesc.TransformDesc.fMovePerSec = 5.f;
+	CameraDesc.TransformDesc.fRotationPerSec = XMConvertToRadians(60.0f);
+	CameraDesc.TransformDesc.fScalingPerSec = 1.f;
+
 
 	m_pMainCam = (CCamera_Main*)(GetSingle(CGameInstance)->Get_GameObject_By_LayerIndex(SCENE_STATIC, TAG_LAY(Layer_Camera_Main)));
 
 	if (m_pMainCam == nullptr)
 	{
-		if (GetSingle(CGameInstance)->Add_GameObject_To_Layer(SCENEID::SCENE_STATIC, pLayerTag, TAG_OP(Prototype_Camera_Main), &CameraDesc))
-			return E_FAIL;
+		FAILED_CHECK(GetSingle(CGameInstance)->Add_GameObject_To_Layer(SCENEID::SCENE_STATIC, pLayerTag, TAG_OP(Prototype_Camera_Main), &CameraDesc));
 
 		m_pMainCam = (CCamera_Main*)(GetSingle(CGameInstance)->Get_GameObject_By_LayerIndex(SCENE_STATIC, TAG_LAY(Layer_Camera_Main)));
-		if (m_pMainCam == nullptr)
-			return E_FAIL;
+
+		NULL_CHECK_RETURN(m_pMainCam, E_FAIL);
+
 	}
-	//else 
-	//{
-
-	//	if (FAILED(m_pMainCam->Reset_LookAtAxis(&CameraDesc)))
-	//		return E_FAIL;
+	else 
+	{
 
 
-	//	m_pMainCam->Set_NowSceneNum(SCENE_LOBY);
 
 
-	//}
+		m_pMainCam->Set_NowSceneNum(SCENE_LOBY);
+	}
 	
+	return S_OK;
+}
+
+HRESULT CScene_Loby::Ready_Layer_SkyBox(const _tchar * pLayerTag)
+{
+	FAILED_CHECK(GetSingle(CGameInstance)->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_SkyBox)));
+
 	return S_OK;
 }
 

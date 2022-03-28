@@ -1,21 +1,10 @@
 
-cbuffer	RenderingPipeLine
-{
-	matrix			g_WorldMatrix;
-	matrix			g_ViewMatrix;
-	matrix			g_ProjMatrix;
-};
+#include "Shader_Define.hpp"
+
 
 texture2D			g_DiffuseTexture;
 texture2D			g_SourTexture;
 
-sampler DefaultSampler = sampler_state
-{
-	// D3D11_SAMPLER_DESC
-	filter = min_mag_mip_linear;
-	AddressU = wrap;
-	AddressV = wrap;
-};
 
 struct VS_IN
 {
@@ -87,6 +76,10 @@ technique11		DefaultTechnique
 {
 	pass Rect
 	{
+		SetBlendState(AlphaBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(ZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_ccw);
+
 		VertexShader = compile vs_5_0 VS_MAIN_RECT();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN_RECT();

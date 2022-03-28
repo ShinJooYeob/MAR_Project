@@ -1,19 +1,19 @@
 #include "stdafx.h"
-#include "..\public\Player.h"
+#include "..\public\SkyBox.h"
 
 
 
-CPlayer::CPlayer(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext) 
+CSkyBox::CSkyBox(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
 	: CGameObject(pDevice, pDeviceContext)
 {
 }
 
-CPlayer::CPlayer(const CPlayer & rhs)
+CSkyBox::CSkyBox(const CSkyBox & rhs)
 	: CGameObject(rhs)
 {
 }
 
-HRESULT CPlayer::Initialize_Prototype(void * pArg)
+HRESULT CSkyBox::Initialize_Prototype(void * pArg)
 {
 	FAILED_CHECK(__super::Initialize_Prototype(pArg));
 
@@ -21,7 +21,7 @@ HRESULT CPlayer::Initialize_Prototype(void * pArg)
 	return S_OK;
 }
 
-HRESULT CPlayer::Initialize_Clone(void * pArg)
+HRESULT CSkyBox::Initialize_Clone(void * pArg)
 {
 	FAILED_CHECK(__super::Initialize_Clone(pArg));
 
@@ -30,12 +30,12 @@ HRESULT CPlayer::Initialize_Clone(void * pArg)
 	return S_OK;
 }
 
-_int CPlayer::Update(_double fDeltaTime)
+_int CSkyBox::Update(_double fDeltaTime)
 {
 	if (__super::Update(fDeltaTime) < 0)
 		return -1;
 
-
+	m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, GetSingle(CGameInstance)->Get_TargetPostion_float3(PLV_CAMERA));
 
 
 
@@ -43,7 +43,7 @@ _int CPlayer::Update(_double fDeltaTime)
 	return _int();
 }
 
-_int CPlayer::LateUpdate(_double fDeltaTime)
+_int CSkyBox::LateUpdate(_double fDeltaTime)
 {
 	if (__super::LateUpdate(fDeltaTime) < 0)
 		return -1;
@@ -53,7 +53,7 @@ _int CPlayer::LateUpdate(_double fDeltaTime)
 	return _int();
 }
 
-_int CPlayer::Render()
+_int CSkyBox::Render()
 {
 	if (__super::Render() < 0)
 		return -1;
@@ -63,7 +63,6 @@ _int CPlayer::Render()
 	FAILED_CHECK(m_pTransformCom->Bind_OnShader(m_pShaderCom, "g_WorldMatrix"));
 
 	CGameInstance* pInstance = GetSingle(CGameInstance);
-
 	_float4x4		ViewFloat4x4 = pInstance->Get_Transform_Float4x4_TP(PLM_VIEW);
 	_float4x4		ProjFloat4x4 = pInstance->Get_Transform_Float4x4_TP(PLM_PROJ);;
 
@@ -71,16 +70,17 @@ _int CPlayer::Render()
 	m_pShaderCom->Set_RawValue("g_ViewMatrix", &ViewFloat4x4, sizeof(_float4x4));
 	m_pShaderCom->Set_RawValue("g_ProjMatrix", &ProjFloat4x4, sizeof(_float4x4));
 
-	FAILED_CHECK(m_pTextureCom->Bind_OnShader_AutoFrame(m_pShaderCom, "g_DiffuseTexture", g_fDeltaTime));
+	//FAILED_CHECK(m_pTextureCom->Bind_OnShader_AutoFrame(m_pShaderCom, "g_DiffuseTexture", g_fDeltaTime));
+	FAILED_CHECK(m_pTextureCom->Bind_OnShader(m_pShaderCom, "g_DiffuseTexture"));
 
 
 
-	FAILED_CHECK(m_pVIBufferCom->Render(m_pShaderCom, 0));
+	FAILED_CHECK(m_pVIBufferCom->Render(m_pShaderCom, 1));
 
 	return _int();
 }
 
-_int CPlayer::LateRender()
+_int CSkyBox::LateRender()
 {
 	if (__super::LateRender() < 0)
 		return -1;
@@ -91,7 +91,7 @@ _int CPlayer::LateRender()
 	return _int();
 }
 
-HRESULT CPlayer::SetUp_Components()
+HRESULT CSkyBox::SetUp_Components()
 {
 
 
@@ -119,31 +119,31 @@ HRESULT CPlayer::SetUp_Components()
 	return S_OK;
 }
 
-CPlayer * CPlayer::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, void * pArg)
+CSkyBox * CSkyBox::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, void * pArg)
 {
-	CPlayer*	pInstance = new CPlayer(pDevice,pDeviceContext);
+	CSkyBox*	pInstance = new CSkyBox(pDevice,pDeviceContext);
 
 	if (FAILED(pInstance->Initialize_Prototype(pArg)))
 	{
-		MSGBOX("Failed to Created CPlayer");
+		MSGBOX("Failed to Created CSkyBox");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-CGameObject * CPlayer::Clone(void * pArg)
+CGameObject * CSkyBox::Clone(void * pArg)
 {
-	CPlayer*	pInstance = new CPlayer(*this);
+	CSkyBox*	pInstance = new CSkyBox(*this);
 
 	if (FAILED(pInstance->Initialize_Clone(pArg)))
 	{
-		MSGBOX("Failed to Created CPlayer");
+		MSGBOX("Failed to Created CSkyBox");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-void CPlayer::Free()
+void CSkyBox::Free()
 {
 	__super::Free();
 
