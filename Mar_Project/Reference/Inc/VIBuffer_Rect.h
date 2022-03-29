@@ -8,7 +8,7 @@ class ENGINE_DLL CVIBuffer_Rect final : public CVIBuffer
 {
 public:
 	CVIBuffer_Rect(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
-	CVIBuffer_Rect(const CVIBuffer& rhs);
+	CVIBuffer_Rect(const CVIBuffer_Rect& rhs);
 	virtual ~CVIBuffer_Rect() = default;
 
 public:

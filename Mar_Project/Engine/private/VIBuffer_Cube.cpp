@@ -6,7 +6,7 @@ CVIBuffer_Cube::CVIBuffer_Cube(ID3D11Device * pDevice, ID3D11DeviceContext * pDe
 
 }
 
-CVIBuffer_Cube::CVIBuffer_Cube(const CVIBuffer & rhs)
+CVIBuffer_Cube::CVIBuffer_Cube(const CVIBuffer_Cube & rhs)
 	: CVIBuffer(rhs)
 {
 

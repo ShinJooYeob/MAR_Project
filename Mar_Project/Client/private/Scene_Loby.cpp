@@ -24,6 +24,7 @@ HRESULT CScene_Loby::Initialize()
 
 	FAILED_CHECK(Ready_Layer_MainCamera(TAG_LAY(Layer_Camera_Main)));
 	FAILED_CHECK(Ready_Layer_SkyBox(TAG_LAY(Layer_SkyBox)));
+	FAILED_CHECK(Ready_Layer_Terrain(TAG_LAY(Layer_Terrain)));
 	
 	
 	FAILED_CHECK(Ready_Layer_TestObj(TAG_LAY(Layer_Player)));
@@ -138,6 +139,13 @@ HRESULT CScene_Loby::Ready_Layer_MainCamera(const _tchar * pLayerTag)
 HRESULT CScene_Loby::Ready_Layer_SkyBox(const _tchar * pLayerTag)
 {
 	FAILED_CHECK(GetSingle(CGameInstance)->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_SkyBox)));
+
+	return S_OK;
+}
+
+HRESULT CScene_Loby::Ready_Layer_Terrain(const _tchar * pLayerTag)
+{
+	FAILED_CHECK(GetSingle(CGameInstance)->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_Terrain)));
 
 	return S_OK;
 }

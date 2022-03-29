@@ -62,6 +62,7 @@ _int CScene_Loading::LateUpdate(_double fDeltaTime)
 	//로딩이 끝낫을 경우
 	if ( m_pLoader->IsLoadFinished())
 	{
+		GetSingle(CGameInstance)->Set_TargetSceneNum(m_eNextSceneIndex);
 		switch (m_eNextSceneIndex)
 		{
 		case SCENEID::SCENE_LOBY:

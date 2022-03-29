@@ -185,6 +185,7 @@
     <ClInclude Include="..\public\Loader.h" />
     <ClInclude Include="..\public\MainApp.h" />
     <ClInclude Include="..\public\ESCursor.h" />
+    <ClInclude Include="..\public\Terrain.h" />
     <ClInclude Include="..\public\SkyBox.h" />
     <ClInclude Include="..\public\Player.h" />
     <ClInclude Include="..\public\Scene_Loading.h" />
@@ -205,6 +206,7 @@
     <ClCompile Include="..\private\Loader.cpp" />
     <ClCompile Include="..\private\MainApp.cpp" />
     <ClCompile Include="..\private\ESCursor.cpp" />
+    <ClCompile Include="..\private\Terrain.cpp" />
     <ClCompile Include="..\private\SkyBox.cpp" />
     <ClCompile Include="..\private\Player.cpp" />
     <ClCompile Include="..\private\Scene_Loading.cpp" />
@@ -240,6 +242,7 @@
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\bin\ShaderFiles\Shader_VtxCubeTex.hlsl" />
+    <FxCompile Include="..\bin\ShaderFiles\Shader_VtxNorTex.hlsl" />
     <FxCompile Include="..\bin\ShaderFiles\Shader_VtxTex.hlsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

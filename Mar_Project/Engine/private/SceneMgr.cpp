@@ -26,6 +26,7 @@ HRESULT CSceneMgr::Scene_Chage(CScene * _pScene , _int iNextSceneIndex)
 	Safe_Release(m_pScene);
 	m_pScene = _pScene;
 	m_iCurrentSceneIdx = iNextSceneIndex;
+	m_iTargetSceneIdx = iNextSceneIndex;
 
 	return S_OK;
 }

@@ -103,6 +103,9 @@
     <Filter Include="01.GameObject\05.SkyBox">
       <UniqueIdentifier>{afbbcadd-d319-4671-aca0-e4bf4302f8e2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.GameObject\06.Terrain">
+      <UniqueIdentifier>{7abde202-f39a-4ddb-9e8e-c76b98577665}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -195,6 +198,9 @@
     <ClInclude Include="..\public\Camera_Editor.h">
       <Filter>01.GameObject\01.Camera</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Terrain.h">
+      <Filter>01.GameObject\06.Terrain</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -266,6 +272,9 @@
     <ClCompile Include="..\private\Camera_Editor.cpp">
       <Filter>01.GameObject\01.Camera</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\Terrain.cpp">
+      <Filter>01.GameObject\06.Terrain</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -295,6 +304,9 @@
       <Filter>04.Shader</Filter>
     </FxCompile>
     <FxCompile Include="..\bin\ShaderFiles\Shader_VtxCubeTex.hlsl">
+      <Filter>04.Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\bin\ShaderFiles\Shader_VtxNorTex.hlsl">
       <Filter>04.Shader</Filter>
     </FxCompile>
   </ItemGroup>

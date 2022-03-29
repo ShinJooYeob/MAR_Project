@@ -380,6 +380,21 @@ _uint CGameInstance::Get_NowSceneNum()
 	return m_pSceneMgr->Get_NowSceneNum();
 }
 
+_uint CGameInstance::Get_TargetSceneNum()
+{
+	NULL_CHECK_BREAK(m_pSceneMgr);
+
+	return m_pSceneMgr->Get_TargetSceneNum();
+}
+
+void CGameInstance::Set_TargetSceneNum(_uint iSceneNum)
+{
+	NULL_CHECK_BREAK(m_pSceneMgr);
+
+	m_pSceneMgr->Set_TargetSceneNum(iSceneNum);
+	return;
+}
+
 
 CScene * CGameInstance::Get_NowScene()
 {

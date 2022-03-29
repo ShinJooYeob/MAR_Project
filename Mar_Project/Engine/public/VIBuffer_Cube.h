@@ -8,7 +8,7 @@ class ENGINE_DLL CVIBuffer_Cube final : public CVIBuffer
 {
 public:
 	CVIBuffer_Cube(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
-	CVIBuffer_Cube(const CVIBuffer& rhs);
+	CVIBuffer_Cube(const CVIBuffer_Cube& rhs);
 	virtual ~CVIBuffer_Cube() = default;
 
 public:

@@ -16,7 +16,9 @@ private:
 
 public:
 	HRESULT Scene_Chage(CScene * _pScene, _int iNextSceneIndex);
-	_uint	Get_NowSceneNum() {	return (_uint)m_iCurrentSceneIdx;}
+	_uint	Get_NowSceneNum() { return (_uint)m_iCurrentSceneIdx; }
+	void	Set_TargetSceneNum(_uint iSceneNum) { m_iTargetSceneIdx = (_int)iSceneNum; }
+	_uint	Get_TargetSceneNum() { return (_uint)m_iTargetSceneIdx; }
 public:
 	_int Update(_double fDeltaTime);
 	_int LateUpdate(_double fDeltaTime);
@@ -29,6 +31,7 @@ public:
 
 private:
 	_int				m_iCurrentSceneIdx = 0;
+	_int				m_iTargetSceneIdx = 0;
 
 	CScene*				m_pScene = nullptr;
 public:

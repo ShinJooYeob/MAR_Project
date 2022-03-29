@@ -1,19 +1,19 @@
 #include "stdafx.h"
-#include "..\public\ESCursor.h"
+#include "..\public\Terrain.h"
 
 
 
-CESCursor::CESCursor(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext) 
+CTerrain::CTerrain(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext) 
 	: CGameObject(pDevice, pDeviceContext)
 {
 }
 
-CESCursor::CESCursor(const CESCursor & rhs)
+CTerrain::CTerrain(const CTerrain & rhs)
 	: CGameObject(rhs)
 {
 }
 
-HRESULT CESCursor::Initialize_Prototype(void * pArg)
+HRESULT CTerrain::Initialize_Prototype(void * pArg)
 {
 	FAILED_CHECK(__super::Initialize_Prototype(pArg));
 
@@ -21,7 +21,7 @@ HRESULT CESCursor::Initialize_Prototype(void * pArg)
 	return S_OK;
 }
 
-HRESULT CESCursor::Initialize_Clone(void * pArg)
+HRESULT CTerrain::Initialize_Clone(void * pArg)
 {
 	FAILED_CHECK(__super::Initialize_Clone(pArg));
 
@@ -30,15 +30,20 @@ HRESULT CESCursor::Initialize_Clone(void * pArg)
 	return S_OK;
 }
 
-_int CESCursor::Update(_double fDeltaTime)
+_int CTerrain::Update(_double fDeltaTime)
 {
 	if (__super::Update(fDeltaTime) < 0)
 		return -1;
 
+
+
+
+
+
 	return _int();
 }
 
-_int CESCursor::LateUpdate(_double fDeltaTime)
+_int CTerrain::LateUpdate(_double fDeltaTime)
 {
 	if (__super::LateUpdate(fDeltaTime) < 0)
 		return -1;
@@ -48,7 +53,7 @@ _int CESCursor::LateUpdate(_double fDeltaTime)
 	return _int();
 }
 
-_int CESCursor::Render()
+_int CTerrain::Render()
 {
 	if (__super::Render() < 0)
 		return -1;
@@ -57,11 +62,11 @@ _int CESCursor::Render()
 
 	FAILED_CHECK(m_pTransformCom->Bind_OnShader(m_pShaderCom, "g_WorldMatrix"));
 
-
 	CGameInstance* pInstance = GetSingle(CGameInstance);
 
 	_float4x4		ViewFloat4x4 = pInstance->Get_Transform_Float4x4_TP(PLM_VIEW);
-	_float4x4		ProjFloat4x4 = pInstance->Get_Transform_Float4x4_TP(PLM_PROJ);
+	_float4x4		ProjFloat4x4 = pInstance->Get_Transform_Float4x4_TP(PLM_PROJ);;
+
 
 	m_pShaderCom->Set_RawValue("g_ViewMatrix", &ViewFloat4x4, sizeof(_float4x4));
 	m_pShaderCom->Set_RawValue("g_ProjMatrix", &ProjFloat4x4, sizeof(_float4x4));
@@ -75,7 +80,7 @@ _int CESCursor::Render()
 	return _int();
 }
 
-_int CESCursor::LateRender()
+_int CTerrain::LateRender()
 {
 	if (__super::LateRender() < 0)
 		return -1;
@@ -86,25 +91,20 @@ _int CESCursor::LateRender()
 	return _int();
 }
 
-HRESULT CESCursor::SetUp_Components()
+HRESULT CTerrain::SetUp_Components()
 {
 
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Renderer), TAG_COM(Com_Renderer), (CComponent**)&m_pRendererCom));
 
-	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Shader_VCT), TAG_COM(Com_Shader), (CComponent**)&m_pShaderCom));
+	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Shader_VNT), TAG_COM(Com_Shader), (CComponent**)&m_pShaderCom));
 
-	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_VIBuffer_Cube), TAG_COM(Com_VIBuffer), (CComponent**)&m_pVIBufferCom));
+	FAILED_CHECK(Add_Component(m_eNowSceneNum, TAG_CP(Prototype_VIBuffer_Terrain_1), TAG_COM(Com_VIBuffer), (CComponent**)&m_pVIBufferCom));
 
-	FAILED_CHECK(Add_Component(m_eNowSceneNum, TAG_CP(Prototype_Texture_EditScene), TAG_COM(Com_Texture), (CComponent**)&m_pTextureCom));
-	FAILED_CHECK(m_pTextureCom->Change_TextureLayer(L"Cursor"));
+	FAILED_CHECK(Add_Component(m_eNowSceneNum, TAG_CP(Prototype_Texture_Terrain), TAG_COM(Com_Texture), (CComponent**)&m_pTextureCom));
+
 
 	CTransform::TRANSFORMDESC tDesc = {};
-
-	tDesc.fMovePerSec = 5;
-	tDesc.fRotationPerSec = XMConvertToRadians(60);
-	tDesc.fScalingPerSec = 1;
-	tDesc.vPivot = _float3(0, 0, 0);
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Transform), TAG_COM(Com_Transform), (CComponent**)&m_pTransformCom, &tDesc));
 
@@ -114,31 +114,31 @@ HRESULT CESCursor::SetUp_Components()
 	return S_OK;
 }
 
-CESCursor * CESCursor::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, void * pArg)
+CTerrain * CTerrain::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, void * pArg)
 {
-	CESCursor*	pInstance = new CESCursor(pDevice,pDeviceContext);
+	CTerrain*	pInstance = new CTerrain(pDevice,pDeviceContext);
 
 	if (FAILED(pInstance->Initialize_Prototype(pArg)))
 	{
-		MSGBOX("Failed to Created CESCursor");
+		MSGBOX("Failed to Created CTerrain");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-CGameObject * CESCursor::Clone(void * pArg)
+CGameObject * CTerrain::Clone(void * pArg)
 {
-	CESCursor*	pInstance = new CESCursor(*this);
+	CTerrain*	pInstance = new CTerrain(*this);
 
 	if (FAILED(pInstance->Initialize_Clone(pArg)))
 	{
-		MSGBOX("Failed to Created CESCursor");
+		MSGBOX("Failed to Created CTerrain");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-void CESCursor::Free()
+void CTerrain::Free()
 {
 	__super::Free();
 

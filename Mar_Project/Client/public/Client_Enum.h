@@ -169,6 +169,7 @@ enum LAYERID
 	Layer_Camera_Editor,
 	Layer_SkyBox,
 	Layer_Player,
+	Layer_Terrain,
 
 	Layer_UI_IMG,
 	Layer_UI_BTN,
@@ -195,7 +196,9 @@ static const _tchar* Tag_Layer(LAYERID eTag)
 	case Layer_Player:
 		return TEXT("Layer_Player");
 		break;
-
+	case Layer_Terrain:
+		return TEXT("Layer_Terrain");
+		break;
 
 	case Layer_UI_IMG:
 		return TEXT("Layer_UI_IMG");
@@ -233,10 +236,15 @@ enum COMPONENTPROTOTYPEID
 	//////////////////////////////////////////////////////////////////////////
 	Prototype_VIBuffer_Rect,
 	Prototype_VIBuffer_Cube,
+	Prototype_VIBuffer_Terrain_1,
+	Prototype_VIBuffer_Terrain_2,
+	Prototype_VIBuffer_Terrain_3,
+	Prototype_VIBuffer_Terrain_4,
 	//////////////////////////////////////////////////////////////////////////
 	Prototype_Texture_Player,
 	Prototype_Texture_SkyBox,
 	Prototype_Texture_EditScene,
+	Prototype_Texture_Terrain
 
 };
 static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
@@ -292,6 +300,21 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 
 	case Prototype_Texture_EditScene:
 		return TEXT("Prototype_Component_Texture_EditScene");
+		break;
+	case 	Prototype_Texture_Terrain:
+		return TEXT("Prototype_Component_Texture_Terrain");
+		break;
+	case 	Prototype_VIBuffer_Terrain_1:
+		return TEXT("Prototype_Component_VIBuffer_Terrain_1");
+		break;
+	case 	Prototype_VIBuffer_Terrain_2:
+		return TEXT("Prototype_Component_VIBuffer_Terrain_2");
+		break;
+	case 	Prototype_VIBuffer_Terrain_3:
+		return TEXT("Prototype_Component_VIBuffer_Terrain_3");
+		break;
+	case 	Prototype_VIBuffer_Terrain_4:
+		return TEXT("Prototype_Component_VIBuffer_Terrain_4");
 		break;
 
 		//////////////////////////////////////////////////////////////////////////

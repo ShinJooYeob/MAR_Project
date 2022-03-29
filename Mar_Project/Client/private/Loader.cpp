@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "..\Public\Loader.h"
-
+#include "Terrain.h"
 #include "ESCursor.h"
 #include "Camera_Editor.h"
 
@@ -68,7 +68,14 @@ HRESULT CLoader::Load_Scene_Loby(_bool * _IsClientQuit, CRITICAL_SECTION * _CriS
 
 #pragma region PROTOTYPE_COMPONENT
 
-	
+	//////////Terrain
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_LOBY, TAG_CP(Prototype_VIBuffer_Terrain_1),
+		CVIBuffer_Terrain::Create(m_pDevice, m_pDeviceContext, L"Height.bmp")));
+
+
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_LOBY, TAG_CP(Prototype_Texture_Terrain),
+		CTexture::Create(m_pDevice, m_pDeviceContext, L"Terrain.txt")));
+
 
 
 
@@ -76,7 +83,9 @@ HRESULT CLoader::Load_Scene_Loby(_bool * _IsClientQuit, CRITICAL_SECTION * _CriS
 
 #pragma  region PROTOTYPE_GAMEOBJECT
 
-	
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_Terrain),
+		CTerrain::Create(m_pDevice, m_pDeviceContext)));
+
 
 #pragma endregion
 
@@ -84,13 +93,6 @@ HRESULT CLoader::Load_Scene_Loby(_bool * _IsClientQuit, CRITICAL_SECTION * _CriS
 	m_iLoadingMaxCount = 1;
 	m_iLoadingProgressCount = 0;
 	LeaveCriticalSection(_CriSec);
-
-	for (int i = 0; i < m_iLoadingMaxCount; ++i)
-	{
-		EnterCriticalSection(_CriSec);
-		m_iLoadingProgressCount = i;
-		LeaveCriticalSection(_CriSec);
-	}
 
 	EnterCriticalSection(_CriSec);
 	m_bIsLoadingFinished = true;
@@ -182,6 +184,7 @@ HRESULT CLoader::Load_Scene_Edit(_bool * _IsClientQuit, CRITICAL_SECTION * _CriS
 
 #pragma region PROTOTYPE_COMPONENT
 #pragma endregion
+
 
 
 
