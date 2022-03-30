@@ -36,36 +36,7 @@ _int CCamera_Main::Update(_double fDeltaTime)
 {
 	__super::Update(fDeltaTime);
 
-	CGameInstance* pInstance = GetSingle(CGameInstance);
 
-	if (pInstance->Get_DIKeyState(DIK_W) & DIS_Press)
-	{
-		m_pTransform->Move_Forward(fDeltaTime);
-	}
-	if (pInstance->Get_DIKeyState(DIK_A) & DIS_Press)
-	{
-		m_pTransform->Move_Left(fDeltaTime);
-	}
-	if (pInstance->Get_DIKeyState(DIK_S) & DIS_Press)
-	{
-		m_pTransform->Move_Backward(fDeltaTime);
-	}
-	if (pInstance->Get_DIKeyState(DIK_D) & DIS_Press)
-	{
-		m_pTransform->Move_Right(fDeltaTime);
-	}
-
-	_long		MouseMove = 0;
-
-	if (MouseMove = pInstance->Get_DIMouseMoveState(CInput_Device::MMS_X))
-	{
-		m_pTransform->Turn_CW(XMVectorSet(0.f, 1.f, 0.f, 0.f), fDeltaTime * MouseMove * 0.1f);
-	}
-
-	if (MouseMove = pInstance->Get_DIMouseMoveState(CInput_Device::MMS_Y))
-	{
-		m_pTransform->Turn_CW(m_pTransform->Get_MatrixState(CTransform::STATE_RIGHT), fDeltaTime * MouseMove * 0.1f);
-	}
 
 	return _int();
 }

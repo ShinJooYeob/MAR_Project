@@ -65,11 +65,18 @@ _int CTerrain::Render()
 	CGameInstance* pInstance = GetSingle(CGameInstance);
 
 	_float4x4		ViewFloat4x4 = pInstance->Get_Transform_Float4x4_TP(PLM_VIEW);
-	_float4x4		ProjFloat4x4 = pInstance->Get_Transform_Float4x4_TP(PLM_PROJ);;
+	_float4x4		ProjFloat4x4 = pInstance->Get_Transform_Float4x4_TP(PLM_PROJ);
+	_float3			vCamPos  = pInstance->Get_TargetPostion_float3(PLV_CAMERA);
+	_float3			vCamLookDir = pInstance->Get_TargetPostion_float3(PLV_CAMLOOK);
 
 
-	m_pShaderCom->Set_RawValue("g_ViewMatrix", &ViewFloat4x4, sizeof(_float4x4));
-	m_pShaderCom->Set_RawValue("g_ProjMatrix", &ProjFloat4x4, sizeof(_float4x4));
+	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ViewMatrix", &ViewFloat4x4, sizeof(_float4x4)));
+	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ProjMatrix", &ProjFloat4x4, sizeof(_float4x4)));
+
+
+	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_CamPosition", &vCamPos, sizeof(_float3)));
+	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_CamLookDir", &vCamLookDir, sizeof(_float3)));
+	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vLightDir", &vLightDir, sizeof(_float3)));
 
 	FAILED_CHECK(m_pTextureCom->Bind_OnShader_AutoFrame(m_pShaderCom, "g_DiffuseTexture", g_fDeltaTime));
 
@@ -89,6 +96,21 @@ _int CTerrain::LateRender()
 
 
 	return _int();
+}
+
+_float3 CTerrain::PutOnTerrain(_bool* pbIsObTerrain,_fVector ObjectWorldPos)
+{
+	_float CaculatedY = m_pVIBufferCom->Caculate_TerrainY(pbIsObTerrain, 
+		XMVector3TransformCoord(ObjectWorldPos, m_pTransformCom->Get_InverseWorldMatrix()));
+	_float3 vResult = ObjectWorldPos;
+
+	if (*pbIsObTerrain)
+	{
+		vResult.y = CaculatedY;
+		return vResult;
+	}
+
+	return vResult;
 }
 
 HRESULT CTerrain::SetUp_Components()

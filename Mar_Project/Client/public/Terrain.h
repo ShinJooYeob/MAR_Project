@@ -21,6 +21,9 @@ public:
 	virtual _int Render()override;
 	virtual _int LateRender()override;
 
+public:
+
+	_float3 PutOnTerrain(_bool* pbIsObTerrain, _fVector ObjectWorldPos);
 
 
 private:
@@ -32,6 +35,8 @@ private:
 
 private:
 	HRESULT SetUp_Components();
+	
+	_float3 vLightDir = _float3(1,-1,1);
 
 public:
 	static CTerrain* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext,void* pArg = nullptr);

@@ -1,4 +1,5 @@
 #include "..\Public\FrustumMgr.h"
+#include "PipeLineMgr.h"
 
 IMPLEMENT_SINGLETON(CFrustumMgr);
 
@@ -6,15 +7,15 @@ IMPLEMENT_SINGLETON(CFrustumMgr);
 CFrustumMgr::CFrustumMgr()
 {
 	
-	vDefaultProjectFrustumMgrPos[0] = _float3(-1, 1, 0);
-	vDefaultProjectFrustumMgrPos[1] = _float3(1, 1, 0);
-	vDefaultProjectFrustumMgrPos[2] = _float3(1, -1, 0);
-	vDefaultProjectFrustumMgrPos[3] = _float3(-1, -1, 0);
+	vDefaultProjectFrustumCubePos[0] = _float3(-1, 1, 0);
+	vDefaultProjectFrustumCubePos[1] = _float3(1, 1, 0);
+	vDefaultProjectFrustumCubePos[2] = _float3(1, -1, 0);
+	vDefaultProjectFrustumCubePos[3] = _float3(-1, -1, 0);
 
-	vDefaultProjectFrustumMgrPos[4] = _float3(-1, 1, 1);
-	vDefaultProjectFrustumMgrPos[5] = _float3(1, 1, 1);
-	vDefaultProjectFrustumMgrPos[6] = _float3(1, -1, 1);
-	vDefaultProjectFrustumMgrPos[7] = _float3(-1, -1, 1);
+	vDefaultProjectFrustumCubePos[4] = _float3(-1, 1, 1);
+	vDefaultProjectFrustumCubePos[5] = _float3(1, 1, 1);
+	vDefaultProjectFrustumCubePos[6] = _float3(1, -1, 1);
+	vDefaultProjectFrustumCubePos[7] = _float3(-1, -1, 1);
 
 }
 
@@ -43,40 +44,73 @@ HRESULT CFrustumMgr::SetUp_WorldFrustumPlane()
 		return E_FAIL;
 	}
 
-	//_float4x4 matVeiw, matProject;
-	//m_pGraphicDevice->GetTransform(D3DTS_VIEW, &matVeiw);
-	//m_pGraphicDevice->GetTransform(D3DTS_PROJECTION, &matProject);
+	CPipeLineMgr* pPipeline = GetSingle(CPipeLineMgr);
+
+
+	_Matrix matVeiwInverse = XMMatrixInverse(nullptr, pPipeline->Get_Transform_Matrix(PLM_VIEW));
+	_Matrix matProjectInverse = XMMatrixInverse(nullptr, pPipeline->Get_Transform_Matrix(PLM_PROJ));
+
+//#ifdef _DEBUG
+//	_Vector pDeterminate;
+//
+//	_Matrix matVeiwInverse = XMMatrixInverse(&pDeterminate, pPipeline->Get_Transform_Matrix(PLM_VIEW));
+//	if (!XMVectorGetX(pDeterminate)) {
+//		__debugbreak();
+//		MessageBox(0, TEXT("Failed to Make Inverse Matrix"), TEXT("System Message"), MB_OK);
+//	}
+//
+//	_Matrix matProjectInverse = XMMatrixInverse(&pDeterminate, pPipeline->Get_Transform_Matrix(PLM_PROJ));
+//
+//	if (!XMVectorGetX(pDeterminate))
+//	{
+//		__debugbreak();
+//		MessageBox(0, TEXT("Failed to Make Inverse Matrix"), TEXT("System Message"), MB_OK);
+//	}
+//
+//
+//#else
+//
+//	_Matrix matVeiwInverse = XMMatrixInverse(nullptr, pPipeline->Get_Transform_Matrix(PLM_VIEW));
+//	_Matrix matProjectInverse = XMMatrixInverse(nullptr, pPipeline->Get_Transform_Matrix(PLM_PROJ));
+//
+//#endif
+
+
 
 
 	////투영 -> 뷰 -> 월드
-	//_float3 vWorldFrustumMgrPos[8] = {};
+	_Vector vWorldFrustumCubePos[8] = {};
 
-	//memcpy(vWorldFrustumMgrPos, vDefaultProjectFrustumMgrPos, sizeof(_float3) * 8);
+	for (_uint i = 0; i < 8; i++)
+	{
+		//기본 투영 111, -1-1-1 큐브를 받아옴
+		vWorldFrustumCubePos[i] = vDefaultProjectFrustumCubePos[i].XMVector();
+		//투영 역행렬 곱해줌
+		vWorldFrustumCubePos[i] = XMVector3TransformCoord(vWorldFrustumCubePos[i], matProjectInverse);
+		//뷰 역행렬 곱해줌
+		vWorldFrustumCubePos[i] = XMVector3TransformCoord(vWorldFrustumCubePos[i], matVeiwInverse);
+	}
 
-	//for (_uint i = 0; i < 8; i++)
-	//{
-	//	vWorldFrustumMgrPos[i] = vWorldFrustumMgrPos[i].PosVector_Matrix(matProject.InverseMatrix());
-	//	vWorldFrustumMgrPos[i] = vWorldFrustumMgrPos[i].PosVector_Matrix(matVeiw.InverseMatrix());
-	//}
-	////6평면 구하기
-	//ZeroMemory(tWorldFrustumPlane, sizeof(D3DXPLANE) * 6);
+
+	//6평면 구하기
+	ZeroMemory(tWorldFrustumPlane, sizeof(_float4) * 6);
 
 	////평면 순서 좌 우 상 하 앞 뒤   => 앞에 있는 애들이 빨리 걸러지는게 좋을거 같아서 생각해보면 이순서대로가 제일 빠르게 걸러지지 않을까
 
 	////좌
-	//D3DXPlaneFromPoints(&(tWorldFrustumPlane[0]), &(vWorldFrustumMgrPos[0]), &(vWorldFrustumMgrPos[3]), &(vWorldFrustumMgrPos[4]));
+	tWorldFrustumPlane[0] = XMPlaneFromPoints(vWorldFrustumCubePos[0], vWorldFrustumCubePos[3], vWorldFrustumCubePos[4]);
 	////우
-	//D3DXPlaneFromPoints(&(tWorldFrustumPlane[1]), &(vWorldFrustumMgrPos[2]), &(vWorldFrustumMgrPos[1]), &(vWorldFrustumMgrPos[6]));
+	tWorldFrustumPlane[1] = XMPlaneFromPoints(vWorldFrustumCubePos[2], vWorldFrustumCubePos[1], vWorldFrustumCubePos[6]);
 
 	////상
-	//D3DXPlaneFromPoints(&(tWorldFrustumPlane[2]), &(vWorldFrustumMgrPos[1]), &(vWorldFrustumMgrPos[0]), &(vWorldFrustumMgrPos[5]));
+	tWorldFrustumPlane[2] = XMPlaneFromPoints(vWorldFrustumCubePos[1], vWorldFrustumCubePos[0], vWorldFrustumCubePos[5]);
 	////하
-	//D3DXPlaneFromPoints(&(tWorldFrustumPlane[3]), &(vWorldFrustumMgrPos[3]), &(vWorldFrustumMgrPos[2]), &(vWorldFrustumMgrPos[7]));
+	tWorldFrustumPlane[3] = XMPlaneFromPoints(vWorldFrustumCubePos[3], vWorldFrustumCubePos[2], vWorldFrustumCubePos[7]);
 
 	////앞
-	//D3DXPlaneFromPoints(&(tWorldFrustumPlane[4]), &(vWorldFrustumMgrPos[0]), &(vWorldFrustumMgrPos[1]), &(vWorldFrustumMgrPos[3]));
+	tWorldFrustumPlane[4] = XMPlaneFromPoints(vWorldFrustumCubePos[0], vWorldFrustumCubePos[1], vWorldFrustumCubePos[3]);
 	////뒤
-	//D3DXPlaneFromPoints(&(tWorldFrustumPlane[5]), &(vWorldFrustumMgrPos[5]), &(vWorldFrustumMgrPos[4]), &(vWorldFrustumMgrPos[6]));
+	tWorldFrustumPlane[5] = XMPlaneFromPoints(vWorldFrustumCubePos[5], vWorldFrustumCubePos[4], vWorldFrustumCubePos[6]);
 
 
 
@@ -86,12 +120,12 @@ HRESULT CFrustumMgr::SetUp_WorldFrustumPlane()
 _bool CFrustumMgr::IsNeedToRender(_float3 vWorldPosition, _float fLenth)
 {
 
-	//for (_uint i = 0; i < 6; i++)
-	//{
-	//	if (tWorldFrustumPlane[i].a * vWorldPosition.x + tWorldFrustumPlane[i].b * vWorldPosition.y +
-	//		tWorldFrustumPlane[i].c * vWorldPosition.z + tWorldFrustumPlane[i].d > fLenth)
-	//		return false;
-	//}
+	for (_uint i = 0; i < 6; i++)
+	{
+		if (tWorldFrustumPlane[i].x * vWorldPosition.x + tWorldFrustumPlane[i].y * vWorldPosition.y +
+			tWorldFrustumPlane[i].z * vWorldPosition.z + tWorldFrustumPlane[i].w > fLenth)
+			return false;
+	}
 
 	return true;
 }

@@ -179,7 +179,12 @@ CComponent * CObjectMgr::Get_Commponent_By_LayerIndex(_uint eSceneNum, const _tc
 	CObjectLayer* pLayer = Find_Layer(eSceneNum, tagLayer);
 
 	if (pLayer == nullptr)
-		return nullptr;
+	{
+		pLayer = Find_Layer(0, tagLayer);
+
+		if (pLayer == nullptr)
+			return nullptr;
+	}
 
 	return pLayer->Get_Commponent_By_LayerIndex(tagComponet, iLayerIndex);
 }
@@ -192,7 +197,12 @@ CGameObject * CObjectMgr::Get_GameObject_By_LayerIndex(_uint eSceneNum, const _t
 	CObjectLayer* pLayer = Find_Layer(eSceneNum, tagLayer);
 
 	if (pLayer == nullptr)
-		return nullptr;
+	{
+		pLayer = Find_Layer(0, tagLayer);
+
+		if (pLayer == nullptr)
+			return nullptr;
+	}
 
 	return pLayer->Get_GameObject_By_LayerIndex(iLayerIndex);
 }
@@ -205,11 +215,17 @@ list<CGameObject*>* CObjectMgr::Get_ObjectList_from_Layer(_uint iSceneNum, const
 	if (iSceneNum >= m_iMaxSceneNum || m_mapLayer == nullptr)
 		return nullptr;
 
-	CObjectLayer* layer = Find_Layer(iSceneNum, tagLayer);
-	if (!layer)
-		return nullptr;
-	else
-		return layer->Get_ObjectList();
+	CObjectLayer* pLayer = Find_Layer(iSceneNum, tagLayer);
+	
+	if (pLayer == nullptr)
+	{
+		pLayer = Find_Layer(0, tagLayer);
+
+		if (pLayer == nullptr)
+			return nullptr;
+	}
+
+	return pLayer->Get_ObjectList();
 }
 
 _int CObjectMgr::Update(_double fDeltaTime)

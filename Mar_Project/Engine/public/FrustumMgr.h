@@ -20,8 +20,8 @@ public:
 	_bool IsNeedToRender(_float3 vWorldPosition, _float fLenth = 1.4142135623f);
 
 private:
-	_float3 vDefaultProjectFrustumMgrPos[8];
-	//D3DXPLANE tWorldFrustumPlane[6];
+	_float3 vDefaultProjectFrustumCubePos[8];
+	_float4 tWorldFrustumPlane[6];
 
 private:
 	ID3D11Device*			m_pDevice = nullptr;

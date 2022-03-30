@@ -168,6 +168,33 @@ void CTransform::LookAt(_fVector vTarget)
 
 }
 
+void CTransform::LookDir(_fVector vTargetLook)
+{
+	_Matrix matScale = Get_MatrixScale_All();
+
+	_Vector vRight;
+	_Vector vLook = XMVector3Normalize(vTargetLook);
+
+	XMStoreFloat3((_float3*)(m_WorldMatrix.m[STATE_LOOK]), vLook * matScale.r[STATE_LOOK]);
+
+	if (XMVector3Equal(vLook, _float3(0, 1, 0).XMVector()))
+	{
+		__debugbreak();
+		MSGBOX("Can't Cross With Same Vector");
+
+		vRight = XMVector3Normalize(XMVector3Cross(_float3(0.0000001f, 1, 0).XMVector(), vLook));
+		XMStoreFloat3((_float3*)(m_WorldMatrix.m[STATE_RIGHT]), vRight * matScale.r[STATE_RIGHT]);
+	}
+	else
+	{
+		vRight = XMVector3Normalize(XMVector3Cross(_float3(0, 1, 0).XMVector(), vLook));
+		XMStoreFloat3((_float3*)(m_WorldMatrix.m[STATE_RIGHT]), vRight * matScale.r[STATE_RIGHT]);
+	}
+
+	XMStoreFloat3((_float3*)(m_WorldMatrix.m[STATE_UP]), XMVector3Normalize(XMVector3Cross(vRight, vLook)) * matScale.r[STATE_UP]);
+
+}
+
 void CTransform::Turn_CW(_fVector vAxis, _double fDeltaTime)
 {
 	_Matrix matRUL = m_WorldMatrix.XMatrix();

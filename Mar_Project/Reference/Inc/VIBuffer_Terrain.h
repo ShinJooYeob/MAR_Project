@@ -15,10 +15,13 @@ public:
 	virtual HRESULT Initialize_Prototype(const _tchar* pHeightMap);
 	virtual HRESULT Initialize_Clone(void* pArg)override;
 
+	_float Caculate_TerrainY(_bool* pbIsOnTerrain, _float3 PosOnTerrainLocal);
 
 private:
 	_uint			m_iNumVerticesX = 0;
 	_uint			m_iNumVerticesZ = 0;
+
+	VTXNORTEX*		m_pVertices = nullptr;
 
 public:
 	static CVIBuffer_Terrain* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, const _tchar* pHeightMap);

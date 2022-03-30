@@ -2,6 +2,11 @@
 
 #include "GameObject.h"
 
+BEGIN(Engine)
+class CCamera;
+END
+
+
 BEGIN(Client)
 
 class CPlayer final : public CGameObject
@@ -31,7 +36,20 @@ private:
 	CTransform*			m_pTransformCom = nullptr;
 
 private:
+	CCamera*			m_pMainCamera = nullptr;
+	_float3				m_CamDegreeAngle = _float3(20.f,0,-5.f);
+
+	/*For. Jump*/
+	_float				m_fJumpPower = 0;
+	_double				m_JumpTime = 1;
+
+private:
 	HRESULT SetUp_Components();
+	
+	HRESULT Input_Keyboard(_double fDeltaTime);
+
+	HRESULT Set_Player_On_Terrain();
+	HRESULT Set_Camera_On_Player(_double fDeltaTime);
 
 public:
 	static CPlayer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext,void* pArg = nullptr);

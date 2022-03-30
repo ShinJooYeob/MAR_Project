@@ -180,6 +180,7 @@
     <ClInclude Include="..\public\Camera_Main.h" />
     <ClInclude Include="..\public\Client_Define.h" />
     <ClInclude Include="..\public\Client_Enum.h" />
+    <ClInclude Include="..\public\Client_Macro.h" />
     <ClInclude Include="..\public\Client_Struct.h" />
     <ClInclude Include="..\public\ImguiMgr.h" />
     <ClInclude Include="..\public\Loader.h" />

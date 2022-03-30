@@ -39,6 +39,7 @@ public:
 
 public:
 	/*Get Set Matrix*/
+	_float3 Get_MatrixState_Float3(TransformState eState) { return *((_float3*)(m_WorldMatrix.m[eState])); };
 	_Vector Get_MatrixState(TransformState eState) { return ((_float4*)(m_WorldMatrix.m[eState]))->XMVector(); };
 	_Vector Get_MatrixState_Normalized(TransformState eState) { return ((_float4*)(m_WorldMatrix.m[eState]))->Get_Nomalize(); };
 	_Vector Get_MatrixScale(TransformState eState);
@@ -70,6 +71,7 @@ public:
 
 //Turn////////////////////////////////////////////////////////////////////////
 	void LookAt(_fVector vTarget);
+	void LookDir(_fVector vTargetLook);
 	
 	//월드 좌표 기준으로 현제 회전 상태에서 이어서 회전을 하고싶을 떄
 	void Turn_CW(_fVector vAxis, _double fDeltaTime);

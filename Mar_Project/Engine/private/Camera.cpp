@@ -102,6 +102,8 @@ HRESULT CCamera::Set_ViewMatrix()
 
 	pIsntance->Set_TargetPostion(PLV_CAMERA, *((_float3*)(m_pTransform->Get_WorldFloat4x4().m[3])));
 
+	pIsntance->Set_TargetPostion(PLV_CAMLOOK, *((_float3*)(m_pTransform->Get_WorldFloat4x4().m[2])));
+
 	return S_OK;
 }
 

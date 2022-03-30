@@ -201,6 +201,9 @@
     <ClInclude Include="..\public\Terrain.h">
       <Filter>01.GameObject\06.Terrain</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Client_Macro.h">
+      <Filter>99.Define</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
