@@ -43,7 +43,7 @@ protected:
 protected:
 	ID3D11Device*				m_pDevice = nullptr;
 	ID3D11DeviceContext*		m_pDeviceContext = nullptr;
-
+	_float3						m_vOldPos = _float3(0, 0, 0);
 	_uint						m_eNowSceneNum = 0;
 	const _tchar*				m_szNameTag = nullptr;
 	_bool						m_bIsClone = false;

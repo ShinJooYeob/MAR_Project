@@ -46,7 +46,7 @@ HRESULT CPipeLineMgr::Set_TargetPostion(TARGETPOSITIONTYPE eStateType, const _fV
 	return S_OK;
 }
 
-HRESULT CPipeLineMgr::Set_TargetPostion(TARGETPOSITIONTYPE eStateType, const _float3 & TargetPos)
+HRESULT CPipeLineMgr::Set_TargetPostion(TARGETPOSITIONTYPE eStateType, const _float4 & TargetPos)
 {
 	m_vTargetPosition[eStateType] = TargetPos;
 	return S_OK;
@@ -57,7 +57,7 @@ _fVector CPipeLineMgr::Get_TargetPostion_Vector(TARGETPOSITIONTYPE eStateType)
 	return m_vTargetPosition[eStateType].XMVector();
 }
 
-_float3 CPipeLineMgr::Get_TargetPostion_float3(TARGETPOSITIONTYPE eStateType)
+_float4 CPipeLineMgr::Get_TargetPostion_float4(TARGETPOSITIONTYPE eStateType)
 {
 	return m_vTargetPosition[eStateType];
 }

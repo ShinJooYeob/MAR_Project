@@ -25,7 +25,7 @@ HRESULT CScene_Loading::Initialize(SCENEID eSceneID)
 	if (FAILED(__super::Initialize()))
 		return E_FAIL;
 
-	GetSingle(CGameInstance)->Stop_AllChannel();
+	g_pGameInstance->Stop_AllChannel();
 
 	m_eNextSceneIndex = eSceneID;
 	m_pLoader = CLoader::Create(m_pDevice,m_pDeviceContext,eSceneID);
@@ -62,22 +62,22 @@ _int CScene_Loading::LateUpdate(_double fDeltaTime)
 	//로딩이 끝낫을 경우
 	if ( m_pLoader->IsLoadFinished())
 	{
-		GetSingle(CGameInstance)->Set_TargetSceneNum(m_eNextSceneIndex);
+		g_pGameInstance->Set_TargetSceneNum(m_eNextSceneIndex);
 		switch (m_eNextSceneIndex)
 		{
 		case SCENEID::SCENE_LOBY:
-			FAILED_CHECK(GetSingle(CGameInstance)->Scene_Change(CScene_Loby::Create(m_pDevice,m_pDeviceContext), m_eNextSceneIndex));
+			FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Loby::Create(m_pDevice,m_pDeviceContext), m_eNextSceneIndex));
 			break;
 
 		case SCENEID::SCENE_STAGESELECT:
-			FAILED_CHECK(GetSingle(CGameInstance)->Scene_Change(CScene_StageSelect::Create(m_pDevice, m_pDeviceContext), m_eNextSceneIndex));
+			FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_StageSelect::Create(m_pDevice, m_pDeviceContext), m_eNextSceneIndex));
 			break;
 
 
 
 #ifdef USE_IMGUI
 		case SCENEID::SCENE_EDIT:
-			FAILED_CHECK(GetSingle(CGameInstance)->Scene_Change(CScene_Edit::Create(m_pDevice, m_pDeviceContext), m_eNextSceneIndex));
+			FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Edit::Create(m_pDevice, m_pDeviceContext), m_eNextSceneIndex));
 			break;
 #endif // USE_IMGUI
 

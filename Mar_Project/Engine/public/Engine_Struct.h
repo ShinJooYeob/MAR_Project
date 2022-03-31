@@ -2,6 +2,17 @@
 
 namespace Engine
 {
+	typedef struct tagLightDesc
+	{
+		enum TYPE { TYPE_DIRECTIONAL, TYPE_POINT, TYPE_END };
+
+		TYPE		eLightType = TYPE_END;
+		_float4		vDiffuse;
+		_float4		vAmbient;
+		_float4		vSpecular;
+		//Directional : 방향 / Point : 위치
+		_float4		vVector;
+	}LIGHTDESC;
 
 
 

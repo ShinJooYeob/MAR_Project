@@ -41,7 +41,7 @@ private:
 
 	/*For. Jump*/
 	_float				m_fJumpPower = 0;
-	_double				m_JumpTime = 1;
+	_double				m_LevitationTime = 0;
 
 private:
 	HRESULT SetUp_Components();

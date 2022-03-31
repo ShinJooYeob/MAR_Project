@@ -42,7 +42,7 @@ _int CUIImage::Update(_double fDeltaTime)
 {
 	if (__super::Update(fDeltaTime) < 0)
 		return -1;
-	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_RETURN)&DIS_Down)
+	if (g_pGameInstance->Get_DIKeyState(DIK_RETURN)&DIS_Down)
 	{
 		static int test = 0;
 		test++;

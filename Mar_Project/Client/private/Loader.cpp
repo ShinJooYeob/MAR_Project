@@ -57,7 +57,7 @@ HRESULT CLoader::Initialize(ID3D11Device * pDevice, ID3D11DeviceContext * pDevic
 	Safe_AddRef(m_pDevice);
 	Safe_AddRef(m_pDeviceContext);
 
-	GetSingle(CGameInstance)->PlayThread(LoadingThread, this);
+	g_pGameInstance->PlayThread(LoadingThread, this);
 
 	return S_OK;
 }

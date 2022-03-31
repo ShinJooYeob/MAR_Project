@@ -17,6 +17,7 @@ class CLayer;
 class CFrustumMgr;
 class CSoundMgr;
 class CPipeLineMgr;
+class CLightMgr;
 
 
 class ENGINE_DLL CGameInstance final :public CBase
@@ -63,10 +64,10 @@ public:/* For.PipeLineMgr */
 	_float4x4 Get_Transform_Float4x4_TP(TRANSFORMSTATETYPE eStateType);
 
 	HRESULT Set_TargetPostion(TARGETPOSITIONTYPE eStateType, const _fVector& TargetPos);
-	HRESULT Set_TargetPostion(TARGETPOSITIONTYPE eStateType, const _float3& TargetPos);
+	HRESULT Set_TargetPostion(TARGETPOSITIONTYPE eStateType, const _float4& TargetPos);
 
 	_fVector Get_TargetPostion_Vector(TARGETPOSITIONTYPE eStateType);
-	_float3  Get_TargetPostion_float3(TARGETPOSITIONTYPE eStateType);
+	_float4  Get_TargetPostion_float4(TARGETPOSITIONTYPE eStateType);
 
 public: /*For.ComMgr*/
 	HRESULT			Add_Component_Prototype(_uint eSceneIdx, const _tchar* tagPrototypeComponent, CComponent* pComponenet);
@@ -122,6 +123,10 @@ public:
 	_bool  Get_Channel_IsPaused(CHANNELID eID);
 
 
+public:// LightMgr
+	const LIGHTDESC* Get_LightDesc(LIGHTDESC::TYPE eLightType, _uint iIndex) const;
+	HRESULT Add_Light(const LIGHTDESC& LightDesc);
+
 
 
 private:
@@ -136,6 +141,7 @@ private:
 	CFrustumMgr*		m_pFrustumMgr = nullptr;
 	CSoundMgr*			m_pSoundMgr = nullptr;
 	CPipeLineMgr*		m_pPipeLineMgr = nullptr;
+	CLightMgr*			m_pLightMgr = nullptr;
 
 public:
 	static void Release_Engine();

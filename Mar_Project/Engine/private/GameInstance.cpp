@@ -8,6 +8,7 @@
 #include "FrustumMgr.h"
 #include "SoundMgr.h"
 #include "PipeLineMgr.h"
+#include "LightMgr.h"
 
 IMPLEMENT_SINGLETON(CGameInstance);
 
@@ -23,7 +24,8 @@ CGameInstance::CGameInstance()
 	m_pEasingMgr(GetSingle(CEasingMgr)),
 	m_pFrustumMgr(GetSingle(CFrustumMgr)),
 	m_pSoundMgr(GetSingle(CSoundMgr)),
-	m_pPipeLineMgr(GetSingle(CPipeLineMgr))
+	m_pPipeLineMgr(GetSingle(CPipeLineMgr)),
+	m_pLightMgr(GetSingle(CLightMgr))
 
 {
 
@@ -38,6 +40,7 @@ CGameInstance::CGameInstance()
 	Safe_AddRef(m_pFrustumMgr);
 	Safe_AddRef(m_pSoundMgr);
 	Safe_AddRef(m_pPipeLineMgr);
+	Safe_AddRef(m_pLightMgr);
 	
 }
 
@@ -46,7 +49,7 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInst, const CGraphic_Device:
 	ID3D11RenderTargetView** ppBackBufferRTV, ID3D11DepthStencilView** ppDepthStencilView, IDXGISwapChain**	ppSwapChain, _double fDoubleInterver)
 {
 	if (m_pGraphicDevice == nullptr || m_pObjectMgr == nullptr || m_pComponenetMgr == nullptr ||
-		m_pSceneMgr == nullptr || m_pFrustumMgr == nullptr || m_pSoundMgr == nullptr)
+		m_pSceneMgr == nullptr || m_pFrustumMgr == nullptr || m_pSoundMgr == nullptr|| m_pLightMgr==nullptr)
 	{
 		__debugbreak();
 		return E_FAIL;
@@ -66,8 +69,10 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInst, const CGraphic_Device:
 	FAILED_CHECK(m_pComponenetMgr->Reserve_Container(iMaxSceneNum));
 
 
-
+	//메니저 초기화
 	FAILED_CHECK(m_pFrustumMgr->Initialize_FrustumMgr(*ppDeviceOut, *ppDeviceContextOut));
+
+	FAILED_CHECK(m_pLightMgr->Initialize_LightMgr(*ppDeviceOut, *ppDeviceContextOut));
 
 	FAILED_CHECK(m_pSoundMgr->Initialize_FMOD());
 
@@ -296,7 +301,7 @@ HRESULT CGameInstance::Set_TargetPostion(TARGETPOSITIONTYPE eStateType, const _f
 	return m_pPipeLineMgr->Set_TargetPostion(eStateType,TargetPos);
 }
 
-HRESULT CGameInstance::Set_TargetPostion(TARGETPOSITIONTYPE eStateType, const _float3 & TargetPos)
+HRESULT CGameInstance::Set_TargetPostion(TARGETPOSITIONTYPE eStateType, const _float4 & TargetPos)
 {
 	NULL_CHECK_RETURN(m_pPipeLineMgr, E_FAIL);
 
@@ -310,11 +315,11 @@ _fVector CGameInstance::Get_TargetPostion_Vector(TARGETPOSITIONTYPE eStateType)
 	return m_pPipeLineMgr->Get_TargetPostion_Vector(eStateType);
 }
 
-_float3 CGameInstance::Get_TargetPostion_float3(TARGETPOSITIONTYPE eStateType)
+_float4 CGameInstance::Get_TargetPostion_float4(TARGETPOSITIONTYPE eStateType)
 {
 	NULL_CHECK_BREAK(m_pPipeLineMgr);
 
-	return m_pPipeLineMgr->Get_TargetPostion_float3(eStateType);
+	return m_pPipeLineMgr->Get_TargetPostion_float4(eStateType);
 }
 
 
@@ -547,6 +552,20 @@ _bool CGameInstance::Get_Channel_IsPaused(CHANNELID eID)
 	return 	m_pSoundMgr->Get_Channel_IsPaused(eID);
 }
 
+const LIGHTDESC * CGameInstance::Get_LightDesc(LIGHTDESC::TYPE eLightType, _uint iIndex) const
+{
+	NULL_CHECK_BREAK(m_pLightMgr);
+
+	return m_pLightMgr->Get_LightDesc(eLightType,iIndex);
+}
+
+HRESULT CGameInstance::Add_Light(const LIGHTDESC & LightDesc)
+{
+	NULL_CHECK_BREAK(m_pLightMgr);
+
+	return m_pLightMgr->Add_Light(LightDesc);
+}
+
 
 
 
@@ -587,6 +606,9 @@ void CGameInstance::Release_Engine()
 	if (0 != GetSingle(CPipeLineMgr)->DestroyInstance())
 		MSGBOX("Failed to Release CPipeLineMgr ");
 
+	if (0 != GetSingle(CLightMgr)->DestroyInstance())
+		MSGBOX("Failed to Release CLightMgr ");
+
 
 	if (0 != GetSingle(CGraphic_Device)->DestroyInstance())
 		MSGBOX("Failed to Release Com Graphic_Device ");
@@ -606,5 +628,6 @@ void CGameInstance::Free()
 	Safe_Release(m_pEasingMgr);
 	Safe_Release(m_pFrustumMgr);
 	Safe_Release(m_pPipeLineMgr);
+	Safe_Release(m_pLightMgr);
 	
 }

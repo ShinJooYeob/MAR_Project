@@ -9,10 +9,10 @@
 #define MAX_LOADSTRING 100
 
 // 전역 변수:
-HWND		g_hWnd;
-HINSTANCE	g_hInst;                                // 현재 인스턴스입니다.
-_double		g_fDeltaTime;
-
+HWND			g_hWnd;
+HINSTANCE		g_hInst;                                // 현재 인스턴스입니다.
+_double			g_fDeltaTime;
+CGameInstance*	g_pGameInstance = nullptr;
 
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
@@ -61,7 +61,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     MSG msg;
 
 
-	CGameInstance*	pGameInstance = GetSingle(CGameInstance);
+	CGameInstance*	pGameInstance = g_pGameInstance = GetSingle(CGameInstance);
 	if (nullptr == pGameInstance)
 		return FALSE;
 	Safe_AddRef(pGameInstance);

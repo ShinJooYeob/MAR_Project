@@ -3,15 +3,19 @@
 
 cbuffer LightDesc
 {
-	float3		g_vLightDir = float3(1.f, -1.f, 1.f);
-	float4		g_vLightDiffuse = (float4)1.f;
-	float4		g_vLightAmbient = (float4)1.f;
-	float4		g_vLightSpecular = (float4)1.f;
+	float4		g_vLightVector;
+	float4		g_vLightDiffuse;
+	float4		g_vLightAmbient;
+	float4		g_vLightSpecular;
 };
 
 texture2D		g_DiffuseTexture;
-float3			g_CamPosition;
-float3			g_CamLookDir;
+
+cbuffer CameraDesc
+{
+	float4			g_CamPosition;
+	float4			g_CamLookDir;
+};
 
 cbuffer MtrlDesc
 {
@@ -30,44 +34,44 @@ struct VS_IN
 struct VS_OUT
 {
 	float4		vPosition : SV_POSITION;
-	float3		vWorldNormal : NORMAL;
+	float4		vWorldNormal : NORMAL;
 	float2		vTexUV : TEXCOORD0;
 
-	float		vSpecPower : TEXCOORD1;
+	float4		vWorldPos : TEXCOORD1;
+	float		bIsNotDraw : TEXCOORD2;
 };
 
 VS_OUT VS_MAIN_TERRAIN(VS_IN In)
 {
 	VS_OUT			Out = (VS_OUT)0;
 
-	vector			vWorldPosition;
-	matrix			matVP;
+	if (In.vPosition.y <= -99999.f)
+	{
+		Out.bIsNotDraw = 1.f;
+	}
+	else
+	{
+		matrix			matWV, matWVP;
 
-	vWorldPosition = mul(vector(In.vPosition, 1.f), g_WorldMatrix);
-	matVP = mul(g_ViewMatrix, g_ProjMatrix);
+		matWV = mul(g_WorldMatrix, g_ViewMatrix);
+		matWVP = mul(matWV, g_ProjMatrix);
 
-	Out.vPosition = mul(vWorldPosition, matVP);
-	Out.vWorldNormal = normalize(mul(vector(In.vNormal,0), g_WorldMatrix).xyz);
-	Out.vTexUV = In.vTexUV;
-
-	float3	fSpecDir = g_vLightDir + Out.vWorldNormal * dot((g_vLightDir * -1.f), Out.vWorldNormal) * 2.f;
-	
-	float CosValue = max(dot(normalize(fSpecDir), normalize(g_CamLookDir * -1.f)), 0);
-	//float CosValue = max(dot(normalize(fSpecDir), normalize(g_CamPosition - vWorldPosition.xyz)), 0);
-
-	Out.vSpecPower =  pow(CosValue, 20.f);
-
+		Out.vPosition = mul(vector(In.vPosition, 1.f), matWVP);
+		Out.vWorldNormal = mul(vector(In.vNormal, 0.f), g_WorldMatrix);
+		Out.vTexUV = In.vTexUV;
+		Out.vWorldPos = mul(vector(In.vPosition, 1.f), g_WorldMatrix);
+	}
 	return Out;
 }
 
 struct PS_IN
 {
 	float4		vPosition : SV_POSITION;
-	float3		vWorldNormal  : NORMAL;
+	float4		vWorldNormal : NORMAL;
 	float2		vTexUV : TEXCOORD0;
 
-
-	float		vSpecPower : TEXCOORD1;
+	float4		vWorldPos : TEXCOORD1;
+	float		bIsNotDraw : TEXCOORD2;
 };
 
 struct PS_OUT
@@ -79,15 +83,25 @@ PS_OUT PS_MAIN_TERRAIN(PS_IN In)
 {
 	PS_OUT		Out = (PS_OUT)0;
 
+	if (In.bIsNotDraw)
+	{
+		discard;
+	}
+	else {
 
-	vector	vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV * 30.f);
+		vector	vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV * 30.f);
 
+		float	fShade = max(dot(normalize(g_vLightVector) * -1.f, In.vWorldNormal), 0.f);
 
-	float	fShade = max(dot(normalize(g_vLightDir) * -1.f, In.vWorldNormal), 0.f);
+		vector	vReflect = reflect(normalize(g_vLightVector), In.vWorldNormal);
+		vector	vLook = normalize(In.vWorldPos - g_CamPosition);
 
-	
-	Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * (fShade + g_vLightAmbient * g_vMtrlAmbient)
-		+ (g_vLightSpecular * g_vMtrlSpecular) * In.vSpecPower;
+		float	fSpecular = pow(max(dot(normalize(vReflect) * -1.f, vLook), 0.f), 30.f);
+
+		Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient))
+			+ (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
+
+	}
 
 	return Out;
 }

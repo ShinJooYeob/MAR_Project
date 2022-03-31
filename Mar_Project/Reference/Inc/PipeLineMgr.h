@@ -23,17 +23,17 @@ public:
 
 public:
 	HRESULT Set_TargetPostion(TARGETPOSITIONTYPE eStateType, const _fVector& TargetPos);
-	HRESULT Set_TargetPostion(TARGETPOSITIONTYPE eStateType, const _float3& TargetPos);
+	HRESULT Set_TargetPostion(TARGETPOSITIONTYPE eStateType, const _float4& TargetPos);
 
 	_fVector Get_TargetPostion_Vector(TARGETPOSITIONTYPE eStateType);
-	_float3  Get_TargetPostion_float3(TARGETPOSITIONTYPE eStateType);
+	_float4  Get_TargetPostion_float4(TARGETPOSITIONTYPE eStateType);
 
 public:
 
 
 private:
 	_float4x4		m_TransfromMatrix[PLM_END];
-	_float3			m_vTargetPosition[PLV_END];
+	_float4			m_vTargetPosition[PLV_END];
 
 public:
 	virtual void Free() override;

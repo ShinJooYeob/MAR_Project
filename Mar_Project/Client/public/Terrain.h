@@ -23,7 +23,7 @@ public:
 
 public:
 
-	_float3 PutOnTerrain(_bool* pbIsObTerrain, _fVector ObjectWorldPos);
+	_float3 PutOnTerrain(_bool* pbIsObTerrain, _fVector ObjectWorldPos, _fVector ObjectOldWorldPos);
 
 
 private:
@@ -36,7 +36,9 @@ private:
 private:
 	HRESULT SetUp_Components();
 	
-	_float3 vLightDir = _float3(1,-1,1);
+
+private:
+	_float4x4			m_InverseWorldMat;
 
 public:
 	static CTerrain* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext,void* pArg = nullptr);

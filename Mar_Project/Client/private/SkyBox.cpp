@@ -35,7 +35,7 @@ _int CSkyBox::Update(_double fDeltaTime)
 	if (__super::Update(fDeltaTime) < 0)
 		return -1;
 
-	m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, GetSingle(CGameInstance)->Get_TargetPostion_float3(PLV_CAMERA));
+	m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, g_pGameInstance->Get_TargetPostion_float4(PLV_CAMERA));
 
 
 

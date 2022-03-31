@@ -129,6 +129,15 @@ void CTransform::MovetoDir(_fVector vDir, _double fDeltaTime)
 	Set_MatrixState(CTransform::STATE_POS, vPos);
 }
 
+void CTransform::MovetoDir_bySpeed(_fVector vDir, _float fSpeed, _double fDeltaTime)
+{
+	_Vector vPos = Get_MatrixState(CTransform::STATE_POS);
+
+	vPos += XMVector3Normalize(vDir)* fSpeed *(_float)fDeltaTime;
+
+	Set_MatrixState(CTransform::STATE_POS, vPos);
+}
+
 void CTransform::MovetoTarget(_fVector vTarget, _double fDeltaTime)
 {
 

@@ -52,8 +52,10 @@ _int CPlayer::LateUpdate(_double fDeltaTime)
 	FAILED_CHECK(Set_Player_On_Terrain());
 	FAILED_CHECK(Set_Camera_On_Player(fDeltaTime));
 
-	if (GetSingle(CGameInstance)->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS)))
+	if (g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS)))
 		FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_PRIORITY, this));
+
+	m_vOldPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
 	return _int();
 }
 
@@ -117,9 +119,11 @@ HRESULT CPlayer::SetUp_Components()
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Transform), TAG_COM(Com_Transform), (CComponent**)&m_pTransformCom, &tDesc));
 
+	m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, _float3(0, 5.f, 0));
+	m_fJumpPower = PlayerMaxJumpPower;
+	m_LevitationTime = g_fDeltaTime;
 
-	m_pMainCamera =(CCamera*)( GetSingle(CGameInstance)->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Camera_Main)));
-
+	m_pMainCamera =(CCamera*)(g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Camera_Main)));
 	NULL_CHECK_RETURN(m_pMainCamera, E_FAIL);
 
 	return S_OK;
@@ -153,18 +157,32 @@ HRESULT CPlayer::Input_Keyboard(_double fDeltaTime)
 		m_pTransformCom->MovetoDir(XMVector3Normalize(Dir), fDeltaTime);
 	}
 
-	if (pInstance->Get_DIKeyState(DIK_SPACE) & DIS_Down)
+	if (g_pGameInstance->Get_DIKeyState(DIK_SPACE) & DIS_Down)
 	{
 		m_fJumpPower = PlayerMaxJumpPower;
-		m_JumpTime += fDeltaTime;
+		m_LevitationTime = fDeltaTime;
 	}
 
-	_float fGravity = m_fJumpPower - m_JumpTime*m_JumpTime * m_fJumpPower;
+	m_LevitationTime += fDeltaTime;
+	_float fGravity = 0;
+	if (m_fJumpPower > 0)
+	{
+		m_fJumpPower = _float(PlayerMaxJumpPower * (m_LevitationTime - 1.f)* (m_LevitationTime - 1.f));
+		fGravity = m_fJumpPower;
+
+		if (m_fJumpPower <= 1.0f)
+		{
+			m_fJumpPower = 0;
+			m_LevitationTime = fDeltaTime;
+		}
+	}
+	else 
+	{
+		fGravity = _float((m_LevitationTime) * (m_LevitationTime)* -29.4f);
+	}
 	
 
-	m_pTransformCom->MovetoDir(XMVectorSet(0, fGravity, 0, 0), fDeltaTime);
-	m_JumpTime += fDeltaTime;
-	m_fJumpPower -= m_JumpTime * m_JumpTime * PlayerMaxJumpPower;
+	m_pTransformCom->MovetoDir_bySpeed(XMVectorSet(0, 1.f, 0, 0), fGravity, fDeltaTime);
 
 	return S_OK;
 }
@@ -173,15 +191,15 @@ HRESULT CPlayer::Set_Player_On_Terrain()
 {
 	CGameInstance* pInstance = GetSingle(CGameInstance);
 	
-	CTerrain* pTerrain =(CTerrain*)( pInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Terrain)));
+	CTerrain* pTerrain =(CTerrain*)(pInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Terrain)));
 
 	_bool bIsOn = false;
 
-	_float3 CaculatedPos = pTerrain->PutOnTerrain(&bIsOn, m_pTransformCom->Get_MatrixState(CTransform::STATE_POS));
+	_float3 CaculatedPos = pTerrain->PutOnTerrain(&bIsOn, m_pTransformCom->Get_MatrixState(CTransform::STATE_POS),m_vOldPos.XMVector());
 
 	if (bIsOn)
 	{
-		m_JumpTime = 0;
+		m_LevitationTime = 0;
 		m_fJumpPower = -1.f;
 		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, CaculatedPos);
 	}
@@ -198,11 +216,15 @@ HRESULT CPlayer::Set_Camera_On_Player(_double fDeltaTime)
 	if (MouseMove = pInstance->Get_DIMouseMoveState(CInput_Device::MMS_X))
 	{
 		m_CamDegreeAngle.y += _float(fDeltaTime) *20 * MouseMove * 0.1f;
+
 	}
 	
 	if (MouseMove = pInstance->Get_DIMouseMoveState(CInput_Device::MMS_Y))
 	{
 		m_CamDegreeAngle.x += _float(fDeltaTime) * 20 * MouseMove * 0.1f;
+
+		if (m_CamDegreeAngle.x < -20.f)m_CamDegreeAngle.x = -20.f;
+		else if (m_CamDegreeAngle.x > 60.f)m_CamDegreeAngle.x = 60.f;
 	}
 
 	_Matrix NewCamMatrix;
@@ -217,6 +239,8 @@ HRESULT CPlayer::Set_Camera_On_Player(_double fDeltaTime)
 	CTransform* pCamTransform = m_pMainCamera->Get_Camera_Transform();
 
 	pCamTransform->Set_Matrix(NewCamMatrix);
+	//FAILED_CHECK(m_pMainCamera->Set_ViewMatrix());
+	//FAILED_CHECK(m_pMainCamera->Set_ProjectMatrix());
 
 	return S_OK;
 }

@@ -66,6 +66,7 @@ public:
 	void Move_Down(_double fDeltaTime);
 
 	void MovetoDir(_fVector vDir, _double fDeltaTime);
+	void MovetoDir_bySpeed(_fVector vDir,_float fSpeed ,_double fDeltaTime);
 	void MovetoTarget(_fVector vTarget, _double fDeltaTime);
 
 

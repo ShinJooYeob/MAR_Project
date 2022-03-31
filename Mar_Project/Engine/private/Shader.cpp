@@ -105,7 +105,7 @@ HRESULT CShader::Set_InputLayout(_uint iPassIndex)
 	return S_OK;
 }
 
-HRESULT CShader::Set_RawValue(const char * pValueName, void * pData, _uint iLength)
+HRESULT CShader::Set_RawValue(const char * pValueName, const void * pData, _uint iLength)
 {
 	ID3DX11EffectVariable*		pValue = m_pEffect->GetVariableByName(pValueName);
 	NULL_CHECK_RETURN(pValue, E_FAIL);

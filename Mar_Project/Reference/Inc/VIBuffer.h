@@ -28,6 +28,9 @@ protected:
 	//버텍스 버퍼가 몇개인가(한번에 여러개의 버퍼를 바인드하여 그릴수있다)
 	_uint						m_iNumVertexBuffers = 0;
 
+
+	_float3*					m_pVertices = nullptr;
+
 protected:
 	ID3D11Buffer*				m_pIB = nullptr;
 	D3D11_BUFFER_DESC			m_IBDesc;

@@ -36,19 +36,19 @@ _int CCamera_Editor::Update(_double fDeltaTime)
 {
 	__super::Update(fDeltaTime);
 
-	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_W) & DIS_Press)
+	if (g_pGameInstance->Get_DIKeyState(DIK_W) & DIS_Press)
 	{
 		m_pTransform->Move_Forward(fDeltaTime);
 	}
-	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_A) & DIS_Press)
+	if (g_pGameInstance->Get_DIKeyState(DIK_A) & DIS_Press)
 	{
 		m_pTransform->Move_Left(fDeltaTime);
 	}
-	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_S) & DIS_Press)
+	if (g_pGameInstance->Get_DIKeyState(DIK_S) & DIS_Press)
 	{
 		m_pTransform->Move_Backward(fDeltaTime);
 	}
-	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_D) & DIS_Press)
+	if (g_pGameInstance->Get_DIKeyState(DIK_D) & DIS_Press)
 	{
 		m_pTransform->Move_Right(fDeltaTime);
 	}

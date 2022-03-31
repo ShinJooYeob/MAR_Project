@@ -22,6 +22,8 @@ HRESULT CScene_Loby::Initialize()
 
 
 
+	FAILED_CHECK(Ready_Light());
+
 	FAILED_CHECK(Ready_Layer_MainCamera(TAG_LAY(Layer_Camera_Main)));
 	FAILED_CHECK(Ready_Layer_SkyBox(TAG_LAY(Layer_SkyBox)));
 	FAILED_CHECK(Ready_Layer_Terrain(TAG_LAY(Layer_Terrain)));
@@ -46,7 +48,7 @@ _int CScene_Loby::Update(_double fDeltaTime)
 #ifdef USE_IMGUI
 	if (GetKeyState(VK_F1) & 0x8000)
 	{
-		FAILED_CHECK(GetSingle(CGameInstance)->Scene_Change(CScene_Loading::Create(m_pDevice, m_pDeviceContext, SCENEID::SCENE_EDIT), SCENEID::SCENE_LOADING));
+		FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Loading::Create(m_pDevice, m_pDeviceContext, SCENEID::SCENE_EDIT), SCENEID::SCENE_LOADING));
 	}
 #endif // USE_IMGUI
 
@@ -54,7 +56,7 @@ _int CScene_Loby::Update(_double fDeltaTime)
 
 	if (GetKeyState(VK_F2) & 0x8000)
 	{
-		FAILED_CHECK(GetSingle(CGameInstance)->Scene_Change(CScene_Loading::Create(m_pDevice,m_pDeviceContext, SCENEID::SCENE_STAGESELECT), SCENEID::SCENE_LOADING));
+		FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Loading::Create(m_pDevice,m_pDeviceContext, SCENEID::SCENE_STAGESELECT), SCENEID::SCENE_LOADING));
 	}
 	
 	
@@ -92,6 +94,21 @@ _int CScene_Loby::LateRender()
 
 
 
+HRESULT CScene_Loby::Ready_Light()
+{
+	LIGHTDESC LightDesc;
+
+	LightDesc.eLightType = tagLightDesc::TYPE_DIRECTIONAL;
+	LightDesc.vDiffuse = _float4(1);
+	LightDesc.vAmbient = _float4(1);
+	LightDesc.vSpecular = _float4(1);
+	LightDesc.vVector = _float4(1, -1, 1, 0);
+
+	g_pGameInstance->Add_Light(LightDesc);
+
+	return S_OK;
+}
+
 HRESULT CScene_Loby::Ready_Layer_MainCamera(const _tchar * pLayerTag)
 {
 	CCamera::CAMERADESC CameraDesc;
@@ -113,13 +130,13 @@ HRESULT CScene_Loby::Ready_Layer_MainCamera(const _tchar * pLayerTag)
 	CameraDesc.TransformDesc.fScalingPerSec = 1.f;
 
 
-	m_pMainCam = (CCamera_Main*)(GetSingle(CGameInstance)->Get_GameObject_By_LayerIndex(SCENE_STATIC, TAG_LAY(Layer_Camera_Main)));
+	m_pMainCam = (CCamera_Main*)(g_pGameInstance->Get_GameObject_By_LayerIndex(SCENE_STATIC, TAG_LAY(Layer_Camera_Main)));
 
 	if (m_pMainCam == nullptr)
 	{
-		FAILED_CHECK(GetSingle(CGameInstance)->Add_GameObject_To_Layer(SCENEID::SCENE_STATIC, pLayerTag, TAG_OP(Prototype_Camera_Main), &CameraDesc));
+		FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENEID::SCENE_STATIC, pLayerTag, TAG_OP(Prototype_Camera_Main), &CameraDesc));
 
-		m_pMainCam = (CCamera_Main*)(GetSingle(CGameInstance)->Get_GameObject_By_LayerIndex(SCENE_STATIC, TAG_LAY(Layer_Camera_Main)));
+		m_pMainCam = (CCamera_Main*)(g_pGameInstance->Get_GameObject_By_LayerIndex(SCENE_STATIC, TAG_LAY(Layer_Camera_Main)));
 
 		NULL_CHECK_RETURN(m_pMainCam, E_FAIL);
 
@@ -138,28 +155,28 @@ HRESULT CScene_Loby::Ready_Layer_MainCamera(const _tchar * pLayerTag)
 
 HRESULT CScene_Loby::Ready_Layer_SkyBox(const _tchar * pLayerTag)
 {
-	FAILED_CHECK(GetSingle(CGameInstance)->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_SkyBox)));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_SkyBox)));
 
 	return S_OK;
 }
 
 HRESULT CScene_Loby::Ready_Layer_Terrain(const _tchar * pLayerTag)
 {
-	FAILED_CHECK(GetSingle(CGameInstance)->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_Terrain)));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_Terrain)));
 
 	return S_OK;
 }
 
 HRESULT CScene_Loby::Ready_Layer_TestObj(const _tchar * pLayerTag)
 {
-	FAILED_CHECK(GetSingle(CGameInstance)->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_Player)));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_Player)));
 
 	return S_OK;
 }
 
 HRESULT CScene_Loby::Ready_Layer_UIImage(const _tchar * pLayerTag)
 {
-	FAILED_CHECK(GetSingle(CGameInstance)->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_UIImage)));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_UIImage)));
 	return S_OK;
 }
 

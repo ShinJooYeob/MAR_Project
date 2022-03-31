@@ -10,7 +10,6 @@ CVIBuffer_Terrain::CVIBuffer_Terrain(const CVIBuffer_Terrain & rhs)
 	: CVIBuffer(rhs)
 	, m_iNumVerticesX(rhs.m_iNumVerticesX)
 	, m_iNumVerticesZ(rhs.m_iNumVerticesZ)
-	, m_pVertices(rhs.m_pVertices)
 {
 
 }
@@ -54,8 +53,9 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(const _tchar* pHeightMap)
 	m_VBDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	m_VBDesc.StructureByteStride = sizeof(VTXNORTEX);
 
-	m_pVertices = new VTXNORTEX[m_iNumVertices];
-	ZeroMemory(m_pVertices, sizeof(VTXNORTEX) * m_iNumVertices);
+	VTXNORTEX* pVertices = new VTXNORTEX[m_iNumVertices];
+	ZeroMemory(pVertices, sizeof(VTXNORTEX) * m_iNumVertices);
+	m_pVertices = new _float3[m_iNumVertices];
 
 
 	for (_uint i = 0; i < m_iNumVerticesZ; ++i)
@@ -63,10 +63,14 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(const _tchar* pHeightMap)
 		for (_uint j = 0; j < m_iNumVerticesX; ++j)
 		{
 			_uint		iIndex = i * m_iNumVerticesX + j;
+			_float ValueY = (pPixel[iIndex] & 0x000000ff) / 10.f;
+			if (ValueY <= 0.5f)
+				pVertices[iIndex].vPosition = m_pVertices[iIndex] =  _float3(_float(j), -FLT_MAX, _float(i));
+			else
+				pVertices[iIndex].vPosition = m_pVertices[iIndex] = _float3(_float(j), (pPixel[iIndex] & 0x000000ff) / 10.f, _float(i));
 
-			m_pVertices[iIndex].vPosition = _float3(_float(j), (pPixel[iIndex] & 0x000000ff) / 10.f, _float(i));
-			m_pVertices[iIndex].vNormal = _float3(0.f, 0.f, 0.f);
-			m_pVertices[iIndex].vTexUV = _float2(j / (m_iNumVerticesX - 1.f), i / (m_iNumVerticesZ - 1.f));
+			pVertices[iIndex].vNormal = _float3(0.f, 0.f, 0.f);
+			pVertices[iIndex].vTexUV = _float2(j / (m_iNumVerticesX - 1.f), i / (m_iNumVerticesZ - 1.f));
 		}
 	}
 
@@ -75,7 +79,7 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(const _tchar* pHeightMap)
 	//락언락으로 값을 채워주는 것이 이제는 불가능하기 떄문에
 	//D3D11_SUBRESOURCE_DATA 구조체에 값을 던져서 해당 값을 복사해서 생성하도록 한다.
 	//이렇게 되면 우리는 해당 정점에 접근하고 싶다면?
-	m_VBSubResourceData.pSysMem = m_pVertices;
+	m_VBSubResourceData.pSysMem = pVertices;
 
 	Safe_Delete_Array(pPixel);
 	CloseHandle(hFile);
@@ -111,54 +115,27 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(const _tchar* pHeightMap)
 				iIndex
 			};
 
+			_Vector vSrc,vDest,vNorm;
+
 			pIndices[iNumFace]._0 = iIndices[0];
 			pIndices[iNumFace]._1 = iIndices[1];
 			pIndices[iNumFace]._2 = iIndices[2];
 
-
-			_Vector vSrc,vDest,vNorm;
-
-			vSrc = (_float3(m_pVertices[pIndices[iNumFace]._1].vPosition).XMVector() - _float3(m_pVertices[pIndices[iNumFace]._0].vPosition).XMVector());
-			vDest = (_float3(m_pVertices[pIndices[iNumFace]._2].vPosition).XMVector() - _float3(m_pVertices[pIndices[iNumFace]._0].vPosition).XMVector());
-			vNorm = XMVector3Normalize(XMVector3Cross(vSrc, vDest));
-
-			if (XMVector3Equal(_float3(m_pVertices[pIndices[iNumFace]._0].vNormal).XMVector(), XMVectorSet(0, 0, 0, 0)))
+			if (m_pVertices[pIndices[iNumFace]._0].y > -99999.f && m_pVertices[pIndices[iNumFace]._1].y > -99999.f && m_pVertices[pIndices[iNumFace]._2].y > -99999.f)
 			{
-				XMStoreFloat3(&m_pVertices[pIndices[iNumFace]._0].vNormal, vNorm);
-			}
-			else {
-				_Vector vTempSrc = XMLoadFloat3(&(m_pVertices[pIndices[iNumFace]._0].vNormal));
 
-				XMStoreFloat3(&m_pVertices[pIndices[iNumFace]._0].vNormal, (XMVector3Normalize(vTempSrc + vNorm)));
-			}
+				vSrc = (m_pVertices[pIndices[iNumFace]._1].XMVector()) - (m_pVertices[pIndices[iNumFace]._0].XMVector());
+				vDest = (m_pVertices[pIndices[iNumFace]._2].XMVector()) - (m_pVertices[pIndices[iNumFace]._0].XMVector());
+				vNorm = XMVector3Normalize(XMVector3Cross(vSrc, vDest));
 
+				XMStoreFloat3(&pVertices[pIndices[iNumFace]._0].vNormal,
+					(XMVector3Normalize(XMLoadFloat3(&pVertices[pIndices[iNumFace]._0].vNormal) + vNorm)));
 
+				XMStoreFloat3(&pVertices[pIndices[iNumFace]._1].vNormal,
+					(XMVector3Normalize(XMLoadFloat3(&pVertices[pIndices[iNumFace]._1].vNormal) + vNorm)));
 
-			if (XMVector3Equal(_float3(m_pVertices[pIndices[iNumFace]._1].vNormal).XMVector(), XMVectorSet(0, 0, 0, 0)))
-			{
-				XMStoreFloat3(&m_pVertices[pIndices[iNumFace]._1].vNormal, vNorm);
-			}
-			else {
-
-				_Vector vTempSrc = XMLoadFloat3(&(m_pVertices[pIndices[iNumFace]._1].vNormal));
-
-				XMStoreFloat3(&m_pVertices[pIndices[iNumFace]._1].vNormal, (XMVector3Normalize(vTempSrc + vNorm)));
-
-			}
-
-
-
-
-			if (XMVector3Equal(_float3(m_pVertices[pIndices[iNumFace]._2].vNormal).XMVector(), XMVectorSet(0, 0, 0, 0)))
-			{
-				XMStoreFloat3(&m_pVertices[pIndices[iNumFace]._2].vNormal, vNorm);
-
-			}
-			else {
-
-				_Vector vTempSrc = XMLoadFloat3(&(m_pVertices[pIndices[iNumFace]._2].vNormal));
-
-				XMStoreFloat3(&m_pVertices[pIndices[iNumFace]._2].vNormal, (XMVector3Normalize(vTempSrc + vNorm)));
+				XMStoreFloat3(&pVertices[pIndices[iNumFace]._2].vNormal,
+					(XMVector3Normalize(XMLoadFloat3(&pVertices[pIndices[iNumFace]._2].vNormal) + vNorm)));
 
 			}
 
@@ -168,48 +145,20 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(const _tchar* pHeightMap)
 			pIndices[iNumFace]._1 = iIndices[2];
 			pIndices[iNumFace]._2 = iIndices[3];
 
-
-
-			vSrc = (_float3(m_pVertices[pIndices[iNumFace]._1].vPosition).XMVector() - _float3(m_pVertices[pIndices[iNumFace]._0].vPosition).XMVector());
-			vDest = (_float3(m_pVertices[pIndices[iNumFace]._2].vPosition).XMVector() - _float3(m_pVertices[pIndices[iNumFace]._0].vPosition).XMVector());
-			vNorm = XMVector3Normalize(XMVector3Cross(vSrc, vDest));
-
-			if (XMVector3Equal(_float3(m_pVertices[pIndices[iNumFace]._0].vNormal).XMVector(), XMVectorSet(0, 0, 0, 0)))
+			if (m_pVertices[pIndices[iNumFace]._0].y > -99999.f && m_pVertices[pIndices[iNumFace]._1].y > -99999.f && m_pVertices[pIndices[iNumFace]._2].y > -99999.f)
 			{
-				XMStoreFloat3(&m_pVertices[pIndices[iNumFace]._0].vNormal, vNorm);
-			}
-			else {
-				_Vector vTempSrc = XMLoadFloat3(&(m_pVertices[pIndices[iNumFace]._0].vNormal));
+				vSrc = (m_pVertices[pIndices[iNumFace]._1].XMVector()) - (m_pVertices[pIndices[iNumFace]._0].XMVector());
+				vDest = (m_pVertices[pIndices[iNumFace]._2].XMVector()) - (m_pVertices[pIndices[iNumFace]._0].XMVector());
+				vNorm = XMVector3Normalize(XMVector3Cross(vSrc, vDest));
 
-				XMStoreFloat3(&m_pVertices[pIndices[iNumFace]._0].vNormal, (XMVector3Normalize(vTempSrc + vNorm)));
-			}
+				XMStoreFloat3(&pVertices[pIndices[iNumFace]._0].vNormal,
+					(XMVector3Normalize(XMLoadFloat3(&pVertices[pIndices[iNumFace]._0].vNormal) + vNorm)));
 
+				XMStoreFloat3(&pVertices[pIndices[iNumFace]._1].vNormal,
+					(XMVector3Normalize(XMLoadFloat3(&pVertices[pIndices[iNumFace]._1].vNormal) + vNorm)));
 
-
-			if (XMVector3Equal(_float3(m_pVertices[pIndices[iNumFace]._1].vNormal).XMVector(), XMVectorSet(0, 0, 0, 0)))
-			{
-				XMStoreFloat3(&m_pVertices[pIndices[iNumFace]._1].vNormal, vNorm);
-			}
-			else {
-
-				_Vector vTempSrc = XMLoadFloat3(&(m_pVertices[pIndices[iNumFace]._1].vNormal));
-
-				XMStoreFloat3(&m_pVertices[pIndices[iNumFace]._1].vNormal, (XMVector3Normalize(vTempSrc + vNorm)));
-
-			}
-
-
-			if (XMVector3Equal(_float3(m_pVertices[pIndices[iNumFace]._2].vNormal).XMVector(), XMVectorSet(0, 0, 0, 0)))
-			{
-				XMStoreFloat3(&m_pVertices[pIndices[iNumFace]._2].vNormal, vNorm);
-
-			}
-			else {
-
-				_Vector vTempSrc = XMLoadFloat3(&(m_pVertices[pIndices[iNumFace]._2].vNormal));
-
-				XMStoreFloat3(&m_pVertices[pIndices[iNumFace]._2].vNormal, (XMVector3Normalize(vTempSrc + vNorm)));
-
+				XMStoreFloat3(&pVertices[pIndices[iNumFace]._2].vNormal,
+					(XMVector3Normalize(XMLoadFloat3(&pVertices[pIndices[iNumFace]._2].vNormal) + vNorm)));
 			}
 
 			++iNumFace;
@@ -252,7 +201,39 @@ HRESULT CVIBuffer_Terrain::Initialize_Clone(void * pArg)
 	return S_OK;
 }
 
-_float CVIBuffer_Terrain::Caculate_TerrainY(_bool* pbIsOnTerrain ,_float3 PosOnTerrainLocal)
+_float3 CVIBuffer_Terrain::Caculate_TerrainY(_bool* pbIsOnTerrain ,_float3 PosOnTerrainLocal, _float3 OldPosOnTerrainLocal)
+{
+	
+
+	_float CacluatedOld = EquationPlane(pbIsOnTerrain, OldPosOnTerrainLocal);
+	//if (*pbIsOnTerrain == false || CacluatedOld < 0)
+	//{
+	//	*pbIsOnTerrain = false;
+	//	return _float3(PosOnTerrainLocal.x, -FLT_MAX, PosOnTerrainLocal.z);
+	//}
+
+	_float CaculatedY = 0;
+	_float CacluatedNow = EquationPlane(pbIsOnTerrain, PosOnTerrainLocal, &CaculatedY);
+
+	if (*pbIsOnTerrain == false ) {
+		*pbIsOnTerrain = false;
+		return PosOnTerrainLocal;
+	}
+
+	if (PosOnTerrainLocal.y <= CaculatedY && CacluatedOld >= -0.2f)
+	{
+		*pbIsOnTerrain = true;
+		return _float3(PosOnTerrainLocal.x, CaculatedY, PosOnTerrainLocal.z);
+
+	}
+	else {
+		*pbIsOnTerrain = false;
+		return PosOnTerrainLocal;
+	}
+}
+
+
+_float CVIBuffer_Terrain::EquationPlane(_bool * pbIsOnTerrain, _float3 PosOnTerrainLocal, _float* pCaculateY)
 {
 	if (PosOnTerrainLocal.x < 0 || PosOnTerrainLocal.x >= m_iNumVerticesX ||
 		PosOnTerrainLocal.z < 0 || PosOnTerrainLocal.z >= m_iNumVerticesZ)
@@ -267,9 +248,9 @@ _float CVIBuffer_Terrain::Caculate_TerrainY(_bool* pbIsOnTerrain ,_float3 PosOnT
 		iIndex + m_iNumVerticesX,
 		iIndex + m_iNumVerticesX + 1,
 		iIndex + 1,
-		iIndex};
+		iIndex };
 
-	if (m_pVertices[iIndices[0]].vPosition.y < -99999.f || m_pVertices[iIndices[2]].vPosition.y < -99999.f)
+	if (m_pVertices[iIndices[0]].y < -99999.f || m_pVertices[iIndices[2]].y < -99999.f)
 	{
 		*pbIsOnTerrain = false;
 		return -FLT_MAX;
@@ -277,39 +258,34 @@ _float CVIBuffer_Terrain::Caculate_TerrainY(_bool* pbIsOnTerrain ,_float3 PosOnT
 
 	_float4 Plane;
 
-	if (PosOnTerrainLocal.x - m_pVertices[iIndices[0]].vPosition.x < m_pVertices[iIndices[0]].vPosition.z - PosOnTerrainLocal.z)
+	if (PosOnTerrainLocal.x - m_pVertices[iIndices[0]].x < m_pVertices[iIndices[0]].z - PosOnTerrainLocal.z)
 	{//아래 023
-		if (m_pVertices[iIndices[3]].vPosition.y < -99999.f)
+		if (m_pVertices[iIndices[3]].y < -99999.f)
 		{
 			*pbIsOnTerrain = false;
 			return -FLT_MAX;
 		}
 
-		Plane =XMPlaneFromPoints(XMLoadFloat3(&m_pVertices[iIndices[0]].vPosition),
-			XMLoadFloat3(&m_pVertices[iIndices[2]].vPosition), XMLoadFloat3(&m_pVertices[iIndices[3]].vPosition));
+		Plane = XMPlaneFromPoints(XMLoadFloat3(&m_pVertices[iIndices[0]]),
+			XMLoadFloat3(&m_pVertices[iIndices[2]]), XMLoadFloat3(&m_pVertices[iIndices[3]]));
 	}
-	else 
+	else
 	{//위 012
-		if (m_pVertices[iIndices[1]].vPosition.y < -99999.f)
+		if (m_pVertices[iIndices[1]].y < -99999.f)
 		{
 			*pbIsOnTerrain = false;
 			return -FLT_MAX;
 		}
 
-		Plane = XMPlaneFromPoints(XMLoadFloat3(&m_pVertices[iIndices[0]].vPosition),
-			XMLoadFloat3(&m_pVertices[iIndices[1]].vPosition), XMLoadFloat3(&m_pVertices[iIndices[2]].vPosition));
+		Plane = XMPlaneFromPoints(XMLoadFloat3(&m_pVertices[iIndices[0]]),
+			XMLoadFloat3(&m_pVertices[iIndices[1]]), XMLoadFloat3(&m_pVertices[iIndices[2]]));
 	}
 
-	_float CacluatedY = ((Plane.x * PosOnTerrainLocal.x + Plane.z * PosOnTerrainLocal.z + Plane.w) / -Plane.y);
-
-	if (CacluatedY < PosOnTerrainLocal.y)
-	{
-		*pbIsOnTerrain = false;
-		return -FLT_MAX;
-	}
+	if (pCaculateY != nullptr)
+		*pCaculateY = ((Plane.x * PosOnTerrainLocal.x + Plane.z * PosOnTerrainLocal.z + Plane.w) / -Plane.y);
 
 	*pbIsOnTerrain = true;
-	return CacluatedY;
+	return (Plane.x * PosOnTerrainLocal.x + Plane.y * PosOnTerrainLocal.y + Plane.z * PosOnTerrainLocal.z + Plane.w);
 }
 
 CVIBuffer_Terrain * CVIBuffer_Terrain::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, const _tchar* pHeightMap)
@@ -339,6 +315,4 @@ CComponent * CVIBuffer_Terrain::Clone(void * pArg)
 void CVIBuffer_Terrain::Free()
 {
 	__super::Free();
-	if (!m_bIsClone)
-		Safe_Delete_Array(m_pVertices);
 }

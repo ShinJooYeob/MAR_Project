@@ -35,6 +35,7 @@ _int CTerrain::Update(_double fDeltaTime)
 	if (__super::Update(fDeltaTime) < 0)
 		return -1;
 
+	//m_InverseWorldMat = m_pTransformCom->Get_InverseWorldMatrix();
 
 
 
@@ -64,23 +65,25 @@ _int CTerrain::Render()
 
 	CGameInstance* pInstance = GetSingle(CGameInstance);
 
-	_float4x4		ViewFloat4x4 = pInstance->Get_Transform_Float4x4_TP(PLM_VIEW);
-	_float4x4		ProjFloat4x4 = pInstance->Get_Transform_Float4x4_TP(PLM_PROJ);
-	_float3			vCamPos  = pInstance->Get_TargetPostion_float3(PLV_CAMERA);
-	_float3			vCamLookDir = pInstance->Get_TargetPostion_float3(PLV_CAMLOOK);
+
+	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ViewMatrix", &pInstance->Get_Transform_Float4x4_TP(PLM_VIEW), sizeof(_float4x4)));
+	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ProjMatrix", &pInstance->Get_Transform_Float4x4_TP(PLM_PROJ), sizeof(_float4x4)));
+	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_CamPosition", &pInstance->Get_TargetPostion_float4(PLV_CAMERA), sizeof(_float4)));
+	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_CamLookDir", &pInstance->Get_TargetPostion_float4(PLV_CAMLOOK), sizeof(_float4)));
 
 
-	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ViewMatrix", &ViewFloat4x4, sizeof(_float4x4)));
-	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ProjMatrix", &ProjFloat4x4, sizeof(_float4x4)));
+	const LIGHTDESC* pLightDesc = pInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL,0);
+	NULL_CHECK_RETURN(pLightDesc, -1);
 
 
-	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_CamPosition", &vCamPos, sizeof(_float3)));
-	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_CamLookDir", &vCamLookDir, sizeof(_float3)));
-	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vLightDir", &vLightDir, sizeof(_float3)));
+	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vLightVector", &(pLightDesc->vVector), sizeof(_float4)));
+	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4)));
+	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4)));
+	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4)));
+
+
 
 	FAILED_CHECK(m_pTextureCom->Bind_OnShader_AutoFrame(m_pShaderCom, "g_DiffuseTexture", g_fDeltaTime));
-
-
 
 	FAILED_CHECK(m_pVIBufferCom->Render(m_pShaderCom, 0));
 
@@ -98,19 +101,23 @@ _int CTerrain::LateRender()
 	return _int();
 }
 
-_float3 CTerrain::PutOnTerrain(_bool* pbIsObTerrain,_fVector ObjectWorldPos)
+_float3 CTerrain::PutOnTerrain(_bool* pbIsObTerrain,_fVector ObjectWorldPos, _fVector ObjectOldWorldPos)
 {
-	_float CaculatedY = m_pVIBufferCom->Caculate_TerrainY(pbIsObTerrain, 
-		XMVector3TransformCoord(ObjectWorldPos, m_pTransformCom->Get_InverseWorldMatrix()));
-	_float3 vResult = ObjectWorldPos;
+	if (XMVectorGetY(ObjectOldWorldPos) < XMVectorGetY(ObjectWorldPos))
+		return ObjectWorldPos;
+
+	_Matrix InverMat = m_InverseWorldMat.XMatrix();
+
+	_float3 CaculatedFloat3 = m_pVIBufferCom->Caculate_TerrainY(pbIsObTerrain,
+		(XMVector3TransformCoord(ObjectWorldPos, InverMat)), (XMVector3TransformCoord(ObjectOldWorldPos, InverMat)));
+
 
 	if (*pbIsObTerrain)
 	{
-		vResult.y = CaculatedY;
-		return vResult;
+		return CaculatedFloat3;
 	}
 
-	return vResult;
+	return ObjectWorldPos;
 }
 
 HRESULT CTerrain::SetUp_Components()
@@ -131,6 +138,7 @@ HRESULT CTerrain::SetUp_Components()
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Transform), TAG_COM(Com_Transform), (CComponent**)&m_pTransformCom, &tDesc));
 
 
+	m_InverseWorldMat = m_pTransformCom->Get_InverseWorldMatrix();
 	
 
 	return S_OK;
