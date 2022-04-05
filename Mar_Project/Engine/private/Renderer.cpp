@@ -42,8 +42,8 @@ HRESULT CRenderer::Add_RenderGroup(RENDERGROUP eRenderID, CGameObject * pGameObj
 		return E_FAIL;
 	}
 
-	//if (eRenderID == CRenderer::RENDER_BLEND)
-	//	pGameObject->Compute_CamDistance((CTransform*)(pGameObject->Get_Component(TEXT("Com_Transform"))));
+	if (eRenderID == CRenderer::RENDER_BLEND)
+		pGameObject->Compute_RenderSortValue();
 
 	m_RenderObjectList[eRenderID].emplace_back(pGameObject);
 	
@@ -104,10 +104,10 @@ HRESULT CRenderer::Render_NonAlpha()
 
 HRESULT CRenderer::Render_Alpha()
 {
-	//m_RenderObjectList[RENDER_BLEND].sort([](CGameObject* pSour, CGameObject* pDest)->_bool
-	//{
-	//	return pSour->Get_CamDistance() > pDest->Get_CamDistance();
-	//});
+	m_RenderObjectList[RENDER_BLEND].sort([](CGameObject* pSour, CGameObject* pDest)->_bool
+	{
+		return pSour->Get_RenderSortValue() > pDest->Get_RenderSortValue();
+	});
 
 	for (auto& RenderObject : m_RenderObjectList[RENDER_BLEND])
 	{
@@ -156,11 +156,10 @@ HRESULT CRenderer::Render_UI()
 	//m_pGraphicDevice->SetRenderState(D3DRS_ZENABLE, FALSE);
 	//m_pGraphicDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
 
-	//m_RenderObjectList[RENDER_UI].sort([](CGameObject* pSour, CGameObject* pDest)->_bool
-	//{
-	//	return pSour->Get_CamDistance() > pDest->Get_CamDistance();
-	//});
-
+	m_RenderObjectList[RENDER_UI].sort([](CGameObject* pSour, CGameObject* pDest)->_bool
+	{
+		return pSour->Get_RenderSortValue() > pDest->Get_RenderSortValue();
+	});
 	for (auto& RenderObject : m_RenderObjectList[RENDER_UI])
 	{
 		if (RenderObject != nullptr)

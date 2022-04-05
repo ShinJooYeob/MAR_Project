@@ -53,6 +53,20 @@ _int CGameObject::LateRender()
 	return _int();
 }
 
+_float CGameObject::Compute_RenderSortValue()
+{
+	CGameInstance* pGameInstance = GetSingle(CGameInstance);
+
+	_Vector CamPos = pGameInstance->Get_TargetPostion_Vector(PLV_CAMERA);
+	_Vector ObjPos = ((CTransform*)(this->Get_Component(TEXT("Com_Transform"))))->Get_MatrixState(CTransform::STATE_POS);
+
+	m_fRenderSortValue = XMVectorGetX(XMVector3Length(CamPos - ObjPos));
+
+	return m_fRenderSortValue;
+}
+
+
+
 CComponent* CGameObject::Get_Component(const _tchar * tagComponent)
 {
 	return Find_Components(tagComponent);
@@ -106,7 +120,11 @@ HRESULT CGameObject::Change_Component_by_NewAssign(_uint iScenenNum, const _tcha
 	Safe_Release(pObjMemberPointer);
 
 	CComponent* pCloneComponent = GetSingle(CGameInstance)->Clone_Component(iScenenNum, tagPrototype, pArg);
-	NULL_CHECK_BREAK(pCloneComponent);
+	if (pCloneComponent == nullptr)
+	{
+		pCloneComponent = GetSingle(CGameInstance)->Clone_Component(0, tagPrototype, pArg);
+		NULL_CHECK_BREAK(pCloneComponent);
+	}
 
 
 

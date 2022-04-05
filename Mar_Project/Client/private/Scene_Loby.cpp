@@ -40,6 +40,8 @@ HRESULT CScene_Loby::Initialize()
 	FAILED_CHECK(Ready_Layer_RoseObj(TAG_LAY(Layer_RoseObj)));
 	
 	
+	FAILED_CHECK(Ready_Layer_StaticMapObj(TAG_LAY(Layer_StaticMapObj)));
+
 	
 
 
@@ -53,6 +55,16 @@ _int CScene_Loby::Update(_double fDeltaTime)
 
 
 
+	
+
+	return 0;
+}
+
+_int CScene_Loby::LateUpdate(_double fDeltaTime)
+{
+	if (__super::LateUpdate(fDeltaTime) < 0)
+		return -1;
+
 #ifdef USE_IMGUI
 	if (GetKeyState(VK_F1) & 0x8000)
 	{
@@ -64,18 +76,8 @@ _int CScene_Loby::Update(_double fDeltaTime)
 
 	if (GetKeyState(VK_F2) & 0x8000)
 	{
-		FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Loading::Create(m_pDevice,m_pDeviceContext, SCENEID::SCENE_STAGESELECT), SCENEID::SCENE_LOADING));
+		FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Loading::Create(m_pDevice, m_pDeviceContext, SCENEID::SCENE_STAGESELECT), SCENEID::SCENE_LOADING));
 	}
-	
-	
-
-	return 0;
-}
-
-_int CScene_Loby::LateUpdate(_double fDeltaTime)
-{
-	if (__super::LateUpdate(fDeltaTime) < 0)
-		return -1;
 
 	return 0;
 }
@@ -228,6 +230,13 @@ HRESULT CScene_Loby::Ready_Layer_RoseObj(const _tchar * pLayerTag)
 
 	return S_OK;
 }
+
+HRESULT CScene_Loby::Ready_Layer_StaticMapObj(const _tchar * pLayerTag)
+{
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_StaticMapObject)));
+
+	return S_OK;
+}	
 
 CScene_Loby * CScene_Loby::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
 {

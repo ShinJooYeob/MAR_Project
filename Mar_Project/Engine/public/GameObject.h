@@ -24,6 +24,9 @@ public:
 	void Set_NameTag(const _tchar* szNameTag) {	m_szNameTag = szNameTag;};
 	const _tchar* Get_NameTag() { return m_szNameTag; };
 	
+	virtual _float	Get_RenderSortValue() { return m_fRenderSortValue; };
+	virtual _float	Compute_RenderSortValue();
+
 	void Set_IsDead() { m_bIsDead = true; }
 	_bool Get_IsDead() { return m_bIsDead; }
 
@@ -51,6 +54,7 @@ protected:
 	_bool						m_bIsClone = false;
 	_bool						m_bIsDead = false;
 
+	_float						m_fRenderSortValue = 0;
 
 protected:
 	HRESULT Add_Component(_uint iScenenNum, const _tchar* tagPrototype,const _tchar* tagComponent, CComponent** ppOut , void* pArg =nullptr);

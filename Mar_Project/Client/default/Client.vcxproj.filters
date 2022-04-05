@@ -303,6 +303,9 @@
     <ClInclude Include="..\public\RoseObj.h">
       <Filter>01.GameObject\07.MapObject\01.DynamicObj\07.RoseObj</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\StaticMapObject.h">
+      <Filter>01.GameObject\07.MapObject\00.StaticObj</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -406,6 +409,9 @@
     </ClCompile>
     <ClCompile Include="..\private\RoseObj.cpp">
       <Filter>01.GameObject\07.MapObject\01.DynamicObj\07.RoseObj</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\StaticMapObject.cpp">
+      <Filter>01.GameObject\07.MapObject\00.StaticObj</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

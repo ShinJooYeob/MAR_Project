@@ -18,9 +18,10 @@ HRESULT CScene_Edit::Initialize()
 	m_pGameInstance = GetSingle(CGameInstance);
 	Safe_AddRef(m_pGameInstance);
 
+	FAILED_CHECK(Ready_Layer_Player(TAG_LAY(Layer_Player)));
 	FAILED_CHECK(Ready_Layer_MainCamera(TAG_LAY(Layer_Camera_Main)));
 
-
+	
 
 
 	//ÅÍÁü ¹æÁö¿ë ºó ¿ÀºêÁ§Æ®
@@ -438,26 +439,20 @@ HRESULT CScene_Edit::Load_Data(const char * szFileName, eDATATYPE iKinds)
 			_tchar szBuffer[MAX_PATH] = L"";
 			// key °ª ·Îµå
 			ReadFile(hFile, &(iIDLength), sizeof(_uint), &dwByte, nullptr);
-			ReadFile(hFile, (szBuffer), sizeof(_tchar) * iIDLength, &dwByte, nullptr);
-			lstrcpy(tData.ObjectID, szBuffer);
+			ReadFile(hFile, (tData.ObjectID), sizeof(_tchar) * iIDLength, &dwByte, nullptr);
+			//lstrcpy(tData.ObjectID, szBuffer);
 
-			lstrcpy(szBuffer, L"");
 			ReadFile(hFile, &(iIDLength), sizeof(_uint), &dwByte, nullptr);
-			//ReadFile(hFile, &(tData.MeshID), sizeof(_tchar) * iIDLength, &dwByte, nullptr);
-			ReadFile(hFile, (szBuffer), sizeof(_tchar) * iIDLength, &dwByte, nullptr);
-			lstrcpy(tData.MeshID, szBuffer);
+			ReadFile(hFile, (tData.MeshID), sizeof(_tchar) * iIDLength, &dwByte, nullptr);
+			//lstrcpy(tData.MeshID, szBuffer);
 
-			lstrcpy(szBuffer, L"");
 			ReadFile(hFile, &(iIDLength), sizeof(_uint), &dwByte, nullptr);
-			//ReadFile(hFile, &(tData.TexturePath), sizeof(_tchar) * iIDLength, &dwByte, nullptr);
-			ReadFile(hFile, (szBuffer), sizeof(_tchar) * iIDLength, &dwByte, nullptr);
-			lstrcpy(tData.TexturePath, szBuffer);
+			ReadFile(hFile, (tData.TexturePath), sizeof(_tchar) * iIDLength, &dwByte, nullptr);
+			//lstrcpy(tData.TexturePath, szBuffer);
 
-			lstrcpy(szBuffer, L"");
 			ReadFile(hFile, &(iIDLength), sizeof(_uint), &dwByte, nullptr);
-			//ReadFile(hFile, &(tData.TextureKey), sizeof(_tchar) * iIDLength, &dwByte, nullptr);
-			ReadFile(hFile, (szBuffer), sizeof(_tchar) * iIDLength, &dwByte, nullptr);
-			lstrcpy(tData.TextureKey, szBuffer);
+			ReadFile(hFile, (tData.TextureKey), sizeof(_tchar) * iIDLength, &dwByte, nullptr);
+			//lstrcpy(tData.TextureKey, szBuffer);
 
 			ReadFile(hFile, &(tData.PassIndex), sizeof(_uint), &dwByte, nullptr);
 			ReadFile(hFile, &(tData.matSRT.m[0][0]), sizeof(_float) * 16, &dwByte, nullptr);
@@ -473,9 +468,10 @@ HRESULT CScene_Edit::Load_Data(const char * szFileName, eDATATYPE iKinds)
 			NULL_CHECK_RETURN(tData.pObject, E_FAIL);
 
 
-			if (lstrcmp(tData.MeshID, TAG_MESH(Mesh_None)))
+			if (lstrcmp(tData.MeshID, TAG_CP(Prototype_Mesh_None)))
 			{
 				//¸Å½¬ ¹Ù²ãÁÖ±â 
+				tData.pObject->Change_Component_by_NewAssign(SCENE_EDIT, tData.MeshID, TAG_COM(Com_Model));
 			}
 
 			//Æ®·»½ºÆû
@@ -541,6 +537,51 @@ HRESULT CScene_Edit::Input_KeyBoard(_double fDeltaTime)
 
 	}
 
+	{
+		static _bool IsWheelClicked = false;
+		_byte BtnState = pInstance->Get_DIMouseButtonState(CInput_Device::MBS_WHEEL);
+		if (BtnState & DIS_Press)
+		{
+			if (!IsWheelClicked && (BtnState & DIS_Down))
+				IsWheelClicked = true;
+			else if (IsWheelClicked && (BtnState & DIS_Up))
+				IsWheelClicked = false;
+			else if (IsWheelClicked && (BtnState & DIS_Press))
+			{
+				if (pInstance->Get_DIKeyState(DIK_LSHIFT)&DIS_Press)
+				{
+
+					_long fWheelMove = pInstance->Get_DIMouseMoveState(CInput_Device::MMS_Y);
+					CTransform* CamTransform = m_pEditorCam->Get_Camera_Transform();
+					CamTransform->Turn_CW(CamTransform->Get_MatrixState(CTransform::STATE_RIGHT), fWheelMove*fDeltaTime);
+
+					fWheelMove = pInstance->Get_DIMouseMoveState(CInput_Device::MMS_X);
+
+					CamTransform->Turn_CW(XMVectorSet(0, 1, 0, 0), fWheelMove* fDeltaTime);
+
+
+				}
+				else {
+
+					_long fWheelMove = pInstance->Get_DIMouseMoveState(CInput_Device::MMS_Y);
+					CTransform* CamTransform = m_pEditorCam->Get_Camera_Transform();
+
+					CamTransform->MovetoDir_bySpeed(
+						CamTransform->Get_MatrixState(CTransform::STATE_UP), (_float)fWheelMove, fDeltaTime);
+
+					fWheelMove = pInstance->Get_DIMouseMoveState(CInput_Device::MMS_X);
+
+					CamTransform->MovetoDir_bySpeed(
+						CamTransform->Get_MatrixState(CTransform::STATE_RIGHT) , (_float)-fWheelMove,  fDeltaTime);
+
+
+				}
+
+				
+			}
+			
+		}
+	}
 
 	if (m_bIsModelMove)
 	{
@@ -577,6 +618,7 @@ HRESULT CScene_Edit::Input_KeyBoard(_double fDeltaTime)
 		}
 
 	}
+	
 
 
 	return S_OK;
@@ -839,7 +881,7 @@ HRESULT CScene_Edit::Widget_BatchedObjectList(_double fDeltatime)
 
 		for (_uint i = 0; i < m_vecBatchedObject.size(); i++)
 		{
-			char HeaderLabel[64];
+			char HeaderLabel[MAX_PATH];
 
 			sprintf_s(HeaderLabel, "%d. %ws (Mesh : %ws) (PassIndex : %d)", i,
 				m_vecBatchedObject[i].ObjectID,
@@ -930,10 +972,10 @@ HRESULT CScene_Edit::Widget_CreateDeleteObject(_double fDeltatime)
 		ImGui::Text("Selected\n\n");
 
 		{
-			char buf[128];
+			char buf[MAX_PATH];
 			sprintf_s(buf, "%ws (Mesh : %ws) (Pass : %d)",
 				TAG_OP(OBJECTPROTOTYPEID(m_iSelectedObjectNMesh[0])),
-				TAG_MESH(MESHTYPEID(m_iSelectedObjectNMesh[1])),
+				TAG_CP(COMPONENTPROTOTYPEID(m_iSelectedObjectNMesh[1])),
 				m_iPassIndex
 			);
 
@@ -965,9 +1007,9 @@ HRESULT CScene_Edit::Widget_CreateDeleteObject(_double fDeltatime)
 
 				if (ImGui::BeginTable("split", 1, ImGuiTableFlags_Resizable | ImGuiTableFlags_NoSavedSettings))
 				{
-					for (int i = 0; i < Object_Prototype_End; i++)
+					for (int i = Prototype_EditorCursor; i <= Prototype_StaticMapObject; i++)
 					{
-						char buf[128];
+						char buf[MAX_PATH];
 						sprintf_s(buf, "%ws", TAG_OP(OBJECTPROTOTYPEID(i)));
 						ImGui::TableNextColumn();
 
@@ -1013,10 +1055,10 @@ HRESULT CScene_Edit::Widget_CreateDeleteObject(_double fDeltatime)
 
 
 
-					for (int i = 0; i < MeshID_End; i++)
+					for (int i = Prototype_Mesh_None; i <= Prototype_Mesh_Player; i++)
 					{
-						char buf[128];
-						sprintf_s(buf, "%ws", TAG_MESH(MESHTYPEID(i)));
+						char buf[MAX_PATH];
+						sprintf_s(buf, "%ws", TAG_CP(COMPONENTPROTOTYPEID(i)));
 						ImGui::TableNextColumn();
 						if (ImGui::Button(buf, ImVec2(-FLT_MIN, 0.0f)))
 							m_iSelectedObjectNMesh[1] = i;
@@ -1056,7 +1098,7 @@ HRESULT CScene_Edit::Widget_CreateDeleteObject(_double fDeltatime)
 
 			ObjElement.matSRT = m_vecBatchedObject[m_iBatchedVecIndex].matSRT;
 
-			lstrcpy(ObjElement.MeshID, TAG_MESH((MESHTYPEID)m_iSelectedObjectNMesh[1]));
+			lstrcpy(ObjElement.MeshID, TAG_CP((COMPONENTPROTOTYPEID)m_iSelectedObjectNMesh[1]));
 			//ObjElement.MeshID = TAG_MESH( (MESHTYPEID) m_iSelectedObjectNMesh[1]);
 			ObjElement.PassIndex = m_iPassIndex;
 
@@ -1067,9 +1109,10 @@ HRESULT CScene_Edit::Widget_CreateDeleteObject(_double fDeltatime)
 
 			FAILED_CHECK(RenewElenmetTransform(&ObjElement));
 
-			if (lstrcmp(ObjElement.MeshID, TAG_MESH(Mesh_None)))
+			if (lstrcmp(ObjElement.MeshID, TAG_CP(Prototype_Mesh_None)))
 			{
 				//¸Å½¬ ¹Ù²ãÁÖ±â 
+				ObjElement.pObject->Change_Component_by_NewAssign(SCENE_EDIT, ObjElement.MeshID, TAG_COM(Com_Model));
 			}
 
 			m_vecBatchedObject.push_back(ObjElement);
@@ -1500,7 +1543,7 @@ HRESULT CScene_Edit::Ready_Layer_MainCamera(const _tchar * pLayerTag)
 	CameraDesc.iWinCY = g_iWinCY;
 
 	CameraDesc.TransformDesc.fMovePerSec = 5.f;
-	CameraDesc.TransformDesc.fRotationPerSec = XMConvertToRadians(60.0f);
+	CameraDesc.TransformDesc.fRotationPerSec = XMConvertToRadians(2.0f);
 	CameraDesc.TransformDesc.fScalingPerSec = 1.f;
 
 
@@ -1543,6 +1586,27 @@ HRESULT CScene_Edit::Ready_Layer_MainCamera(const _tchar * pLayerTag)
 	}
 
 
+
+	return S_OK;
+}
+
+HRESULT CScene_Edit::Ready_Layer_Player(const _tchar * pLayerTag)
+{
+
+	CGameInstance* pInstance = GetSingle(CGameInstance);
+
+	list<CGameObject*>* PlayerList= pInstance->Get_ObjectList_from_Layer(SCENE_STATIC, TAG_LAY(Layer_Player));
+
+	if (PlayerList != nullptr)
+	{
+		auto iter = PlayerList->begin();
+		for (; iter != PlayerList->end();)
+		{
+			Safe_Release(*(iter));
+			iter = PlayerList->erase(iter);
+		}
+		PlayerList->clear();
+	}
 
 	return S_OK;
 }

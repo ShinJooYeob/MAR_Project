@@ -16,6 +16,13 @@ public:
 	virtual HRESULT Initialize_Clone(void* pArg)override;
 
 public:
+	virtual _float	Get_RenderSortValue() override;
+	virtual _float	Compute_RenderSortValue() override;
+
+	void Set_UIDepth(_float fDepth) { m_fDepth = fDepth; };
+	_float Get_UIDepth() { return m_fDepth; };
+
+public:
 	virtual _int Update(_double fDeltaTime)override;
 	virtual _int LateUpdate(_double fDeltaTime)override;
 	virtual _int Render()override;
@@ -31,9 +38,10 @@ public:
 	HRESULT Apply_Rect_To_Transform();
 
 protected:
+	_float			m_fDepth = 0;
 	UIDESC			m_UIDesc;
 	FLOATRECT		m_UIRect;
-	_float4x4			m_ProjMatrix;
+	_float4x4		m_ProjMatrix;
 	CTransform*		m_pTransformCom = nullptr;
 
 public:

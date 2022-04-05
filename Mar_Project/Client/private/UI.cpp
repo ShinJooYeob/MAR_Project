@@ -33,6 +33,16 @@ HRESULT CUI::Initialize_Clone(void * pArg)
 	return S_OK;
 }
 
+_float CUI::Get_RenderSortValue()
+{
+	return  m_fRenderSortValue = m_fDepth;
+}
+
+_float CUI::Compute_RenderSortValue()
+{
+	return  m_fRenderSortValue = m_fDepth;
+}
+
 _int CUI::Update(_double fDeltaTime)
 {
 	if (__super::Update(fDeltaTime) < 0)

@@ -19,6 +19,7 @@ enum OBJECTPROTOTYPEID
 {
 	Prototype_UIImage,
 	Prototype_SkyBox,
+	Prototype_Player,
 
 
 	Prototype_Camera_Main,
@@ -30,7 +31,6 @@ enum OBJECTPROTOTYPEID
 	Prototype_Terrain,
 	Prototype_Ball,
 
-	Prototype_Player,
 
 	Prototype_JumpPad,
 	Prototype_SteamPad,
@@ -39,10 +39,9 @@ enum OBJECTPROTOTYPEID
 	Prototype_RoseObj,
 
 
+	Prototype_StaticMapObject,
 
 
-	Prototype_TestObject,
-	Prototype_TestObject2,
 
 	Object_Prototype_End,
 };
@@ -65,7 +64,9 @@ static const _tchar* Tag_Object_Prototype(OBJECTPROTOTYPEID eTag)
 	case Prototype_EditorCursor:
 		return TEXT("EditorCursor");
 		break;
-
+	case Prototype_UIImage:
+		return TEXT("UI_Image");
+		break;
 		
 	case Prototype_Rect:
 		return TEXT("Rect");
@@ -104,17 +105,15 @@ static const _tchar* Tag_Object_Prototype(OBJECTPROTOTYPEID eTag)
 		
 		
 
-	case Prototype_UIImage:
-		return TEXT("UI_Image");
-		break;
+	
 
+
+	case Prototype_StaticMapObject:
+		return TEXT("StaticMapObject");
+		break;
 		//////////////////////////////////////////////////////////////////////////
-	case Prototype_TestObject:
-		return TEXT("TestObject");
-		break;
-	case Prototype_TestObject2:
-		return TEXT("TestObject2");
-		break;
+
+
 	default:
 		MSGBOX("Wrong Type Object Prototype");
 		return nullptr;
@@ -125,67 +124,69 @@ static const _tchar* Tag_Object_Prototype(OBJECTPROTOTYPEID eTag)
 }
 #define  TAG_OP Tag_Object_Prototype
 
-
-enum MESHTYPEID
-{
-	Mesh_None,
-	Mesh_Player,
-	Mesh_Monster,
-
-	Mesh_TestMesh,
-	Mesh_TestMesh2,
-	Mesh_TestMesh3,
-	Mesh_TestMesh4,
-	MeshID_End
-};
-
-
-
-static const _tchar* Tag_MeshID(MESHTYPEID eTag)
-{
-	switch (eTag)
-	{
-	case Mesh_None:
-		return TEXT("Mesh_None");
-		break;
-
-	case Mesh_Monster:
-		return TEXT("Monster");
-		break;
-	case Mesh_Player:
-		return TEXT("Player");
-		break;
-
-
-
-
-
-
-
-
-		//////////////////////////////////////////////////////////////////////////
-	case Mesh_TestMesh:
-		return TEXT("TestMesh");
-		break;
-	case Mesh_TestMesh2:
-		return TEXT("TestMesh2");
-		break;
-	case Mesh_TestMesh3:
-		return TEXT("TestMesh3");
-		break;
-	case Mesh_TestMesh4:
-		return TEXT("TestMesh4");
-		break;
-
-	default:
-		MSGBOX("Wrong Type Mesh");
-		return nullptr;
-		break;
-	}
-
-
-}
-#define  TAG_MESH Tag_MeshID
+//
+//enum MESHTYPEID
+//{
+//	Mesh_None,
+//	Mesh_Player,
+//	Mesh_Monster,
+//
+//
+//
+//	Mesh_AlgaeRock_Ledge,
+//	Mesh_AlgaeRock_Pillar,
+//	Mesh_AlgaeRock_Wall,
+//
+//	MeshID_End
+//};
+//
+//
+//
+//static const _tchar* Tag_MeshID(MESHTYPEID eTag)
+//{
+//	switch (eTag)
+//	{
+//	case Mesh_None:
+//		return TEXT("Mesh_None");
+//		break;
+//
+//	case Mesh_Monster:
+//		return TEXT("Monster");
+//		break;
+//	case Mesh_Player:
+//		return TEXT("Player");
+//		break;
+//
+//
+//
+//
+//
+//
+//
+//
+//		//////////////////////////////////////////////////////////////////////////
+//	case Mesh_AlgaeRock_Ledge:
+//		return TEXT("Mesh_AlgaeRock_Ledge");
+//		break;
+//	case Mesh_TestMesh2:
+//		return TEXT("TestMesh2");
+//		break;
+//	case Mesh_TestMesh3:
+//		return TEXT("TestMesh3");
+//		break;
+//	case Mesh_TestMesh4:
+//		return TEXT("TestMesh4");
+//		break;
+//
+//	default:
+//		MSGBOX("Wrong Type Mesh");
+//		return nullptr;
+//		break;
+//	}
+//
+//
+//}
+//#define  TAG_MESH Tag_MeshID
 
 enum LAYERID
 {
@@ -201,6 +202,9 @@ enum LAYERID
 	Layer_HiddenPad,
 	Layer_TeethObj,
 	Layer_RoseObj,
+
+	Layer_StaticMapObj,
+
 
 	Layer_UI_IMG,
 	Layer_UI_BTN,
@@ -244,6 +248,10 @@ static const _tchar* Tag_Layer(LAYERID eTag)
 		break;
 	case Layer_RoseObj:
 		return TEXT("Layer_RoseObj");
+		break;
+		
+	case Layer_StaticMapObj:
+		return TEXT("Layer_StaticMapObj");
 		break;
 		
 		
@@ -290,8 +298,12 @@ enum COMPONENTPROTOTYPEID
 	Prototype_VIBuffer_Terrain_3,
 	Prototype_VIBuffer_Terrain_4,
 	//////////////////////////////////////////////////////////////////////////
-	Prototype_Mesh_Player,
+	Prototype_Mesh_None,
+	Prototype_Mesh_AlgaeRock_Ledge,
+	Prototype_Mesh_AlgaeRock_Pillar,
+	Prototype_Mesh_AlgaeRock_Wall,
 
+	Prototype_Mesh_Player,
 	//////////////////////////////////////////////////////////////////////////
 	Prototype_Texture_Player,
 	Prototype_Texture_SkyBox,
@@ -345,11 +357,27 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 		return TEXT("Prototype_Component_VIBuffer_Cube");
 		break;
 
-	case Prototype_Mesh_Player:
-		return TEXT("Prototype_Component_Mesh_Player");
+
+		//메쉬////////////////////////////////////////////////////////////////////////
+		
+	case Prototype_Mesh_None:
+		return TEXT("Mesh_None");
 		break;
 
-		
+	case Prototype_Mesh_AlgaeRock_Ledge:
+		return TEXT("Mesh_AlgaeRock_Ledge");
+		break;
+	case Prototype_Mesh_AlgaeRock_Pillar:
+		return TEXT("Mesh_AlgaeRock_Pillar");
+		break;
+	case Prototype_Mesh_AlgaeRock_Wall:
+		return TEXT("Mesh_AlgaeRock_Wall");
+		break;
+
+	case Prototype_Mesh_Player:
+		return TEXT("Mesh_Player");
+		break;
+		//메쉬////////////////////////////////////////////////////////////////////////
 
 
 	case Prototype_Texture_Player:

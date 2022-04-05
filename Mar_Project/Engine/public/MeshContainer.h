@@ -15,6 +15,11 @@ public:
 	virtual HRESULT Initialize_Prototype(CModel::MODELTYPE eMeshtype, aiMesh* pAIMesh, _fMatrix TransformMatrix);
 	virtual HRESULT Initialize_Clone(void* pArg);
 
+	_uint Get_MaterialIndex();
+
+private:
+	_uint		m_MaterialIndex = 0;
+
 private:
 	HRESULT Ready_NonAnimMeshContainer(aiMesh* pAIMesh, _fMatrix TransformMatrix);
 	HRESULT Ready_AnimMeshContainer(aiMesh* pAIMesh);

@@ -11,6 +11,11 @@
 #include "TeethObj.h"
 #include "RoseObj.h"
 
+#include "StaticMapObject.h"
+
+//
+
+
 
 _uint CALLBACK LoadingThread(void* _Prameter)
 {
@@ -107,6 +112,12 @@ HRESULT CLoader::Load_Scene_Loby(_bool * _IsClientQuit, CRITICAL_SECTION * _CriS
 
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_RoseObj),
 		CRoseObj::Create(m_pDevice, m_pDeviceContext)));
+
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_StaticMapObject),
+		CStaticMapObject::Create(m_pDevice, m_pDeviceContext)));
+
+
+	
 
 #pragma endregion
 

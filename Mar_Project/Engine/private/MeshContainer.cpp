@@ -8,7 +8,8 @@ CMeshContainer::CMeshContainer(ID3D11Device * pDevice, ID3D11DeviceContext * pDe
 }
 
 CMeshContainer::CMeshContainer(const CMeshContainer & rhs)
-	: CVIBuffer(rhs)
+	: CVIBuffer(rhs),
+	m_MaterialIndex(rhs.m_MaterialIndex)
 {
 }
 
@@ -25,6 +26,8 @@ HRESULT CMeshContainer::Initialize_Prototype(CModel::MODELTYPE eMeshtype, aiMesh
 		hr = Ready_NonAnimMeshContainer(pAIMesh, TransformMatrix);
 	else
 		hr = Ready_AnimMeshContainer(pAIMesh);
+
+	m_MaterialIndex = pAIMesh->mMaterialIndex;
 
 #pragma endregion
 
@@ -68,6 +71,11 @@ HRESULT CMeshContainer::Initialize_Prototype(CModel::MODELTYPE eMeshtype, aiMesh
 HRESULT CMeshContainer::Initialize_Clone(void * pArg)
 {
 	return E_NOTIMPL;
+}
+
+_uint CMeshContainer::Get_MaterialIndex()
+{
+	return m_MaterialIndex;
 }
 
 HRESULT CMeshContainer::Ready_NonAnimMeshContainer(aiMesh * pAIMesh, _fMatrix TransformMatrix)

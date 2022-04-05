@@ -79,7 +79,7 @@ HRESULT CTextureLayer::Add_Model_Texture(_uint iIndex, const _tchar * pTextureFi
 	_tchar		szTextureFilePath[MAX_PATH] = TEXT("");
 	_tchar		szExt[MAX_PATH] = TEXT("");
 
-
+	_bool		IsNotExistPath = false;
 	wsprintf(szTextureFilePath, pTextureFilePath);
 
 	ID3D11ShaderResourceView*		pSRV = nullptr;
@@ -88,22 +88,49 @@ HRESULT CTextureLayer::Add_Model_Texture(_uint iIndex, const _tchar * pTextureFi
 
 	if (!lstrcmp(szExt, TEXT(".dds")))
 	{
-		FAILED_CHECK(CreateDDSTextureFromFile(m_pDevice, szTextureFilePath, nullptr, &pSRV));
+		if(FAILED(CreateDDSTextureFromFile(m_pDevice, szTextureFilePath, nullptr, &pSRV)))
+		{
+			IsNotExistPath = true;
+			wstring DebugString = L"\nNot Exist DDS File : " + wstring(szTextureFilePath)+ L"\n";
+			OutputDebugString(DebugString.c_str());
+		}
 	}
 
 	else if (!lstrcmp(szExt, TEXT(".tga")))
 	{
-		__debugbreak();
-		MSGBOX("Not Available TGA File");
+		//__debugbreak();
+		//MSGBOX("Not Available TGA File");
+
+
+		wstring ChagedtoPngPath = szTextureFilePath;
+
+		auto stExt= ChagedtoPngPath.find(szExt, 0);    // 자를 문자열이 있는 곳 위치를 알아낸다.	//std::wstring::size_type stTmp;
+		ChagedtoPngPath.erase(stExt, lstrlen(szExt));						// 자르기 시작할 곳, 얼마만큼 자를 것인가?
+
+		ChagedtoPngPath += L".png";
+
+		if(FAILED(CreateWICTextureFromFile(m_pDevice, ChagedtoPngPath.c_str(), nullptr, &pSRV)))
+		{
+			IsNotExistPath = true;
+			wstring DebugString = L"\nNot Exist PNG File : " + wstring(szTextureFilePath)+ L"\n";
+			OutputDebugString(DebugString.c_str());
+		}
+
 		return E_FAIL;
 	}
 
 	else
 	{
-		FAILED_CHECK(CreateWICTextureFromFile(m_pDevice, szTextureFilePath, nullptr, &pSRV));
+		if (FAILED(CreateWICTextureFromFile(m_pDevice, szTextureFilePath, nullptr, &pSRV)))
+		{
+			IsNotExistPath = true;
+			wstring DebugString = L"Not Exist WIC File : " + wstring(szTextureFilePath) +L"\n";
+			OutputDebugString(DebugString.c_str());
+		}
 	}
 
-	m_vecTextures[iIndex] = pSRV;
+	if (!IsNotExistPath)
+		m_vecTextures[iIndex] = pSRV;
 
 
 

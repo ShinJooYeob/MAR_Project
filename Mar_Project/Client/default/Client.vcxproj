@@ -185,6 +185,7 @@
     <ClInclude Include="..\public\ImguiMgr.h" />
     <ClInclude Include="..\public\HiddenPad.h" />
     <ClInclude Include="..\public\RoseObj.h" />
+    <ClInclude Include="..\public\StaticMapObject.h" />
     <ClInclude Include="..\public\TeethObj.h" />
     <ClInclude Include="..\public\SteamPad.h" />
     <ClInclude Include="..\public\JumpPad.h" />
@@ -216,6 +217,7 @@
     <ClCompile Include="..\private\ImguiMgr.cpp" />
     <ClCompile Include="..\private\HiddenPad.cpp" />
     <ClCompile Include="..\private\RoseObj.cpp" />
+    <ClCompile Include="..\private\StaticMapObject.cpp" />
     <ClCompile Include="..\private\TeethObj.cpp" />
     <ClCompile Include="..\private\SteamPad.cpp" />
     <ClCompile Include="..\private\JumpPad.cpp" />

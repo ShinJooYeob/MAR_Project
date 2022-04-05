@@ -161,6 +161,7 @@ private:
 	class CCamera_Editor*				m_pEditorCam = nullptr;
 private:
 	HRESULT Ready_Layer_MainCamera(const _tchar* pLayerTag);
+	HRESULT Ready_Layer_Player(const _tchar* pLayerTag);
 
 
 public:

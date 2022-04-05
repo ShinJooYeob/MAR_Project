@@ -75,14 +75,27 @@ HRESULT CModel::Initialize_Clone(void * pArg)
 
 HRESULT CModel::Render(CShader * pShader, _uint iPassIndex)
 {
-	for (auto& pMeshContainer : m_vecMeshContainer)
+	//for (auto& pMeshContainer : m_vecMeshContainer)
+	//{
+	//	if (nullptr != pMeshContainer)
+	//	{	
+	//		m_MeshMaterialDesc.pTexture->Bind_OnShader(pShader,"g_DiffuseTexture", 1);
+	//		pMeshContainer->Render(pShader, iPassIndex);
+	//	}
+	//}
+
+	for (_uint i = 0 ; i < m_iNumMeshContainers; i ++)
 	{
-		if (nullptr != pMeshContainer)
-		{	
+
+		if (m_vecMeshContainer[i] != nullptr)
+		{
+
+			m_MeshMaterialDesc.pTexture->Change_TextureLayer(to_wstring(m_vecMeshContainer[i]->Get_MaterialIndex()).c_str());
 			m_MeshMaterialDesc.pTexture->Bind_OnShader(pShader,"g_DiffuseTexture", 1);
-			pMeshContainer->Render(pShader, iPassIndex);
+			m_vecMeshContainer[i]->Render(pShader, iPassIndex);
 		}
 	}
+
 	return S_OK;
 }
 
@@ -138,9 +151,18 @@ HRESULT CModel::Ready_Materials(const char * pModelFilePath)
 
 			_splitpath_s(TexturePath.data, nullptr, 0, nullptr, 0, szFileName, MAX_PATH, szExt, MAX_PATH);
 
+
+			if (!strcmp(szExt, ".tga"))
+			{
+				ZeroMemory(szExt, sizeof(char)*MAX_PATH);
+				strcpy_s(szExt, ".png");
+			}
+
+
 			strcpy_s(szFullPath, pModelFilePath);
 			strcat_s(szFullPath, szFileName);
 			strcat_s(szFullPath, szExt);
+
 
 			_tchar		szTextureFullPath[MAX_PATH] = TEXT("");
 			MultiByteToWideChar(CP_ACP, 0, szFullPath, (int)strlen(szFullPath), szTextureFullPath, MAX_PATH);

@@ -1,12 +1,12 @@
 #pragma once
 
-#include "GameInstance.h"
 
 #ifdef _DEBUG
-//#define USE_IMGUI
+	#define USE_IMGUI
 #endif // _DEBUG
 
 #ifndef USE_IMGUI
+#include "GameInstance.h"
 #ifdef _DEBUG
 
 #define _CRTDBG_MAP_ALLOC
@@ -40,5 +40,10 @@
 
 
 // TODO: 프로그램에 필요한 추가 헤더는 여기에서 참조합니다.
+
+#ifdef USE_IMGUI
+#include "GameInstance.h"
+#endif //USE_IMGUI
+
 
 #include "Client_Define.h"

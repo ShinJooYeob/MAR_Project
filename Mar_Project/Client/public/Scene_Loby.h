@@ -31,6 +31,9 @@ private:
 	HRESULT Ready_Layer_TeethObj(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_RoseObj(const _tchar* pLayerTag);
 
+	HRESULT Ready_Layer_StaticMapObj(const _tchar* pLayerTag);
+
+
 private:
 	class CCamera_Main*				m_pMainCam = nullptr;
 public:
