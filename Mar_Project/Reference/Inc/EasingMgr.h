@@ -14,6 +14,9 @@ private:
 public:
 	_float	Easing(_uint eEasingType, _float fStartPoint, _float fTargetPoint, _float fPassedTime, _float fTotalTime);
 	_float3	Easing_Vector(_uint eEasingType, _float3 fStartPoint, _float3 fTargetPoint, _float fPassedTime, _float fTotalTime);
+	_float	Easing_Return(_uint eGoEasingType, _uint eBackEasingType, _float fStartPoint, _float fTargetPoint, _float fPassedTime, _float fTotalTime);
+	_float3	Easing_Return_Vector(_uint eGoEasingType, _uint eBackEasingType, _float3 fStartPoint, _float3 fTargetPoint, _float fPassedTime, _float fTotalTime);
+
 
 
 private:

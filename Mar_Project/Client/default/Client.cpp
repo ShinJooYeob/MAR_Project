@@ -78,6 +78,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 
 	_double			fTimeAcc = 0.f;
+	_bool			bIsSlowMotion = false;
+	_float			m_bPassedTime = 0;
 
 	while (true)
 	{
@@ -98,8 +100,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		if (fTimeAcc > FPS)
 		{
 			fTimeAcc = 0.f;
+
+
 			if (pMainApp->Update(pGameInstance->Get_DeltaTime(TEXT("Timer_60fps"))) < 0)
 				MSGBOX("Failed to Update");
+
 
 			if (FAILED(pMainApp->Render()))
 				MSGBOX("Failed to Render");
@@ -152,6 +157,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
 	g_hInst = hInstance;
 	RECT rcWindow{ 0,0,g_iWinCX,g_iWinCY };
+
+	AdjustWindowRect(&rcWindow, WS_OVERLAPPEDWINDOW, FALSE);
 
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
 	   CW_USEDEFAULT, 0, rcWindow.right - rcWindow.left, rcWindow.bottom - rcWindow.top,

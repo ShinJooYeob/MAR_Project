@@ -46,7 +46,11 @@ HRESULT CTextureLayer::Add_Another_Texture(const _tchar * pTextureFilePath, _uin
 		}
 
 		else if (!lstrcmp(szExt, TEXT(".tga")))
+		{
+			__debugbreak();
+			MSGBOX("Not Available TGA File");
 			return E_FAIL;
+		}
 
 		else
 		{
@@ -55,6 +59,51 @@ HRESULT CTextureLayer::Add_Another_Texture(const _tchar * pTextureFilePath, _uin
 
 		m_vecTextures.push_back(pSRV);
 	}
+
+
+
+	return S_OK;
+}
+
+HRESULT CTextureLayer::Add_Model_Texture(_uint iIndex, const _tchar * pTextureFilePath)
+{
+	CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+
+	if (iIndex >= m_vecTextures.size())
+	{
+		OutputDebugString(TEXT("Already Exist Texture Map\n"));
+		__debugbreak();
+		return E_FAIL;
+	}
+
+	_tchar		szTextureFilePath[MAX_PATH] = TEXT("");
+	_tchar		szExt[MAX_PATH] = TEXT("");
+
+
+	wsprintf(szTextureFilePath, pTextureFilePath);
+
+	ID3D11ShaderResourceView*		pSRV = nullptr;
+
+	_wsplitpath_s(szTextureFilePath, nullptr, 0, nullptr, 0, nullptr, 0, szExt, MAX_PATH);
+
+	if (!lstrcmp(szExt, TEXT(".dds")))
+	{
+		FAILED_CHECK(CreateDDSTextureFromFile(m_pDevice, szTextureFilePath, nullptr, &pSRV));
+	}
+
+	else if (!lstrcmp(szExt, TEXT(".tga")))
+	{
+		__debugbreak();
+		MSGBOX("Not Available TGA File");
+		return E_FAIL;
+	}
+
+	else
+	{
+		FAILED_CHECK(CreateWICTextureFromFile(m_pDevice, szTextureFilePath, nullptr, &pSRV));
+	}
+
+	m_vecTextures[iIndex] = pSRV;
 
 
 
@@ -99,6 +148,15 @@ HRESULT CTextureLayer::Initialize_Prototype(const _tchar * pTextureFilePath, _ui
 	return S_OK;
 }
 
+HRESULT CTextureLayer::Initialize_Prototype()
+{
+	FAILED_CHECK(__super::Initialize_Prototype(nullptr));
+
+	m_vecTextures.resize(AI_TEXTURE_TYPE_MAX);
+
+	return S_OK;
+}
+
 HRESULT CTextureLayer::Initialize_Clone(void * pArg)
 {
 	FAILED_CHECK(__super::Initialize_Clone(pArg));
@@ -112,6 +170,19 @@ CTextureLayer * CTextureLayer::Create(ID3D11Device * pDevice, ID3D11DeviceContex
 	if (FAILED(pInstance->Initialize_Prototype(pTextureFilePath, iNumTextures)))
 	{
 		MSGBOX("Failed to Creating CTextureLayer");
+		Safe_Release(pInstance);
+	}
+
+	return pInstance;
+}
+
+CTextureLayer * CTextureLayer::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
+{
+	CTextureLayer*	pInstance = new CTextureLayer(pDevice, pDeviceContext);
+
+	if (FAILED(pInstance->Initialize_Prototype()))
+	{
+		MSGBOX("Failed to Creating 3D Model TextureLayer");
 		Safe_Release(pInstance);
 	}
 

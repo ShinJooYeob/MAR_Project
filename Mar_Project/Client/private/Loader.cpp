@@ -1,8 +1,15 @@
 #include "stdafx.h"
 #include "..\Public\Loader.h"
-#include "Terrain.h"
 #include "ESCursor.h"
 #include "Camera_Editor.h"
+
+//MapObject
+#include "Terrain.h"
+#include "JumpPad.h"
+#include "SteamPad.h"
+#include "HiddenPad.h"
+#include "TeethObj.h"
+#include "RoseObj.h"
 
 
 _uint CALLBACK LoadingThread(void* _Prameter)
@@ -86,6 +93,20 @@ HRESULT CLoader::Load_Scene_Loby(_bool * _IsClientQuit, CRITICAL_SECTION * _CriS
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_Terrain),
 		CTerrain::Create(m_pDevice, m_pDeviceContext)));
 
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_JumpPad),
+		CJumpPad::Create(m_pDevice, m_pDeviceContext)));
+
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_SteamPad),
+		CSteamPad::Create(m_pDevice, m_pDeviceContext)));
+
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_HiddenPad),
+		CHiddenPad::Create(m_pDevice, m_pDeviceContext)));
+
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_TeethObj),
+		CTeethObj::Create(m_pDevice, m_pDeviceContext)));
+
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_RoseObj),
+		CRoseObj::Create(m_pDevice, m_pDeviceContext)));
 
 #pragma endregion
 

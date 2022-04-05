@@ -6,4 +6,6 @@
 
 
 
+#define PlayerMaxDashPower 40.f 
 #define PlayerMaxJumpPower 10.f 
+#define PlayerSmallingSize 0.3f 

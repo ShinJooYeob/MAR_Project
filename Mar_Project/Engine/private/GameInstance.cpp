@@ -475,6 +475,20 @@ _float3 CGameInstance::Easing_Vector(_uint eEasingType, _float3 fStartPoint, _fl
 	return m_pEasingMgr->Easing_Vector(eEasingType, fStartPoint, fTargetPoint, fPassedTime, fTotalTime);
 }
 
+_float CGameInstance::Easing_Return(_uint eGoEasingType, _uint eBackEasingType, _float fStartPoint, _float fTargetPoint, _float fPassedTime, _float fTotalTime)
+{
+	NULL_CHECK_BREAK(m_pEasingMgr);
+
+	return m_pEasingMgr->Easing_Return(eGoEasingType, eBackEasingType, fStartPoint, fTargetPoint, fPassedTime, fTotalTime);
+}
+
+_float3 CGameInstance::Easing_Return_Vector(_uint eGoEasingType, _uint eBackEasingType, _float3 fStartPoint, _float3 fTargetPoint, _float fPassedTime, _float fTotalTime)
+{
+	NULL_CHECK_BREAK(m_pEasingMgr);
+
+	return m_pEasingMgr->Easing_Return_Vector(eGoEasingType, eBackEasingType, fStartPoint, fTargetPoint, fPassedTime, fTotalTime);
+}
+
 HRESULT CGameInstance::SetUp_WorldFrustumPlane()
 {
 	NULL_CHECK_BREAK(m_pFrustumMgr);

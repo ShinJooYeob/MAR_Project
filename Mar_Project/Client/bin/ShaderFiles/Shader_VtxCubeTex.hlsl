@@ -2,7 +2,10 @@
 #include "Shader_Define.hpp"
 textureCUBE			g_DiffuseTexture;
 
-
+cbuffer Hidden
+{
+	float	g_fVisualValue;
+};
 
 struct VS_IN
 {
@@ -51,6 +54,22 @@ PS_OUT PS_MAIN(PS_IN In)
 	return Out;
 }
 
+PS_OUT PS_Hidden_Cube(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	Out.vColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
+
+	if (Out.vColor.r > g_fVisualValue)
+		discard;
+	//Out.vColor *= saturate(g_fVisualValue);
+
+	return Out;
+}
+
+
+
+
 technique11		DefaultTechnique
 {
 	pass Cube
@@ -74,6 +93,17 @@ technique11		DefaultTechnique
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN();
 	}	
+
+	pass Hidden
+	{
+		SetBlendState(AlphaBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(ZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_ccw);
+
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_Hidden_Cube();
+	}
 
 
 }

@@ -3,10 +3,13 @@
 #include "VIBuffer_Terrain.h"
 #include "VIBuffer_Rect.h"
 #include "VIBuffer_Cube.h"
+#include "Model.h"
+
 #include "Transform.h"
 #include "Renderer.h"
 #include "Texture.h"
 #include "Shader.h"
+
 //#include "Collision.h"
 
 BEGIN(Engine)

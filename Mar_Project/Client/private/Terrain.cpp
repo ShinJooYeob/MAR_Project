@@ -72,7 +72,7 @@ _int CTerrain::Render()
 	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_CamLookDir", &pInstance->Get_TargetPostion_float4(PLV_CAMLOOK), sizeof(_float4)));
 
 
-	const LIGHTDESC* pLightDesc = pInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL,0);
+	const LIGHTDESC* pLightDesc = pInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0);
 	NULL_CHECK_RETURN(pLightDesc, -1);
 
 
@@ -101,7 +101,7 @@ _int CTerrain::LateRender()
 	return _int();
 }
 
-_float3 CTerrain::PutOnTerrain(_bool* pbIsObTerrain,_fVector ObjectWorldPos, _fVector ObjectOldWorldPos)
+_float3 CTerrain::PutOnTerrain(_bool* pbIsObTerrain,_fVector ObjectWorldPos, _fVector ObjectOldWorldPos, _float3* vOutPlaneNormalVec)
 {
 	if (XMVectorGetY(ObjectOldWorldPos) < XMVectorGetY(ObjectWorldPos))
 		return ObjectWorldPos;
@@ -109,11 +109,14 @@ _float3 CTerrain::PutOnTerrain(_bool* pbIsObTerrain,_fVector ObjectWorldPos, _fV
 	_Matrix InverMat = m_InverseWorldMat.XMatrix();
 
 	_float3 CaculatedFloat3 = m_pVIBufferCom->Caculate_TerrainY(pbIsObTerrain,
-		(XMVector3TransformCoord(ObjectWorldPos, InverMat)), (XMVector3TransformCoord(ObjectOldWorldPos, InverMat)));
+		(XMVector3TransformCoord(ObjectWorldPos, InverMat)), (XMVector3TransformCoord(ObjectOldWorldPos, InverMat)), vOutPlaneNormalVec);
 
 
 	if (*pbIsObTerrain)
 	{
+		if (vOutPlaneNormalVec != nullptr)
+			*vOutPlaneNormalVec = XMVector3TransformNormal(vOutPlaneNormalVec->XMVector(), m_pTransformCom->Get_WorldMatrix());
+
 		return CaculatedFloat3;
 	}
 

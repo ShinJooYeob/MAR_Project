@@ -2,6 +2,13 @@
 
 namespace Engine
 {
+	typedef struct tagMeshMaterialDesc
+	{
+		class CTexture*	pTexture;
+	}MESHMATERIALDESC;
+
+
+
 	typedef struct tagLightDesc
 	{
 		enum TYPE { TYPE_DIRECTIONAL, TYPE_POINT, TYPE_END };
@@ -14,6 +21,36 @@ namespace Engine
 		_float4		vVector;
 	}LIGHTDESC;
 
+	typedef struct tagVertex_Model
+	{
+		XMFLOAT3			vPosition;
+		XMFLOAT3			vNormal;
+		XMFLOAT2			vTexUV;
+		XMFLOAT3			vTangent;
+	}VTXMODEL;
+
+	typedef struct ENGINE_DLL tagVertex_Model_Declaration
+	{
+		static const unsigned int iNumElements = 4;
+		static const D3D11_INPUT_ELEMENT_DESC	Elements[iNumElements];
+	}VTXMODEL_DECLARATION;
+
+
+	typedef struct tagVertex_Animation_Model
+	{
+		XMFLOAT3			vPosition;
+		XMFLOAT3			vNormal;
+		XMFLOAT2			vTexUV;
+		XMFLOAT3			vTangent;
+		XMUINT4				vBlendIndex;
+		XMFLOAT4			vBlendWeight;
+	}VTXANIMMODEL;
+
+	typedef struct ENGINE_DLL tagVertex_AnimModel_Declaration
+	{
+		static const unsigned int iNumElements = 6;
+		static const D3D11_INPUT_ELEMENT_DESC	Elements[iNumElements];
+	}VTXANIMMODEL_DECLARATION;
 
 
 	typedef struct tagVertex_Texture

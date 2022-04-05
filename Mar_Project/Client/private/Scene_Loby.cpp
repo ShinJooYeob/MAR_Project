@@ -29,8 +29,16 @@ HRESULT CScene_Loby::Initialize()
 	FAILED_CHECK(Ready_Layer_Terrain(TAG_LAY(Layer_Terrain)));
 	
 	
-	FAILED_CHECK(Ready_Layer_TestObj(TAG_LAY(Layer_Player)));
+	FAILED_CHECK(Ready_Layer_Player(TAG_LAY(Layer_Player)));
 	FAILED_CHECK(Ready_Layer_UIImage(TAG_LAY(Layer_UI_IMG)));
+	
+
+	FAILED_CHECK(Ready_Layer_JumpPad(TAG_LAY(Layer_JumpPad)));
+	FAILED_CHECK(Ready_Layer_SteamPad(TAG_LAY(Layer_SteamPad)));
+	FAILED_CHECK(Ready_Layer_HiddenPad(TAG_LAY(Layer_HiddenPad)));
+	FAILED_CHECK(Ready_Layer_TeethObj(TAG_LAY(Layer_TeethObj)));
+	FAILED_CHECK(Ready_Layer_RoseObj(TAG_LAY(Layer_RoseObj)));
+	
 	
 	
 
@@ -106,6 +114,16 @@ HRESULT CScene_Loby::Ready_Light()
 
 	g_pGameInstance->Add_Light(LightDesc);
 
+
+
+	LightDesc.eLightType = tagLightDesc::TYPE_POINT;
+	LightDesc.vDiffuse = _float4(1);
+	LightDesc.vAmbient = _float4(1);
+	LightDesc.vSpecular = _float4(1);
+	LightDesc.vVector = _float4(5, 5, 5, 1);
+
+	g_pGameInstance->Add_Light(LightDesc);
+
 	return S_OK;
 }
 
@@ -143,10 +161,6 @@ HRESULT CScene_Loby::Ready_Layer_MainCamera(const _tchar * pLayerTag)
 	}
 	else 
 	{
-
-
-
-
 		m_pMainCam->Set_NowSceneNum(SCENE_LOBY);
 	}
 	
@@ -167,9 +181,9 @@ HRESULT CScene_Loby::Ready_Layer_Terrain(const _tchar * pLayerTag)
 	return S_OK;
 }
 
-HRESULT CScene_Loby::Ready_Layer_TestObj(const _tchar * pLayerTag)
+HRESULT CScene_Loby::Ready_Layer_Player(const _tchar * pLayerTag)
 {
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_Player)));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STATIC, pLayerTag, TAG_OP(Prototype_Player)));
 
 	return S_OK;
 }
@@ -177,6 +191,41 @@ HRESULT CScene_Loby::Ready_Layer_TestObj(const _tchar * pLayerTag)
 HRESULT CScene_Loby::Ready_Layer_UIImage(const _tchar * pLayerTag)
 {
 	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_UIImage)));
+	return S_OK;
+}
+
+HRESULT CScene_Loby::Ready_Layer_JumpPad(const _tchar * pLayerTag)
+{
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_JumpPad),&_float3(5,3,5) ));
+
+	return S_OK;
+}
+
+HRESULT CScene_Loby::Ready_Layer_SteamPad(const _tchar * pLayerTag)
+{
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_SteamPad), &_float3(7, 3, 5)));
+
+	return S_OK;
+}
+
+HRESULT CScene_Loby::Ready_Layer_HiddenPad(const _tchar * pLayerTag)
+{
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_HiddenPad), &_float3(9, 3, 5)));
+
+	return S_OK;
+}
+
+HRESULT CScene_Loby::Ready_Layer_TeethObj(const _tchar * pLayerTag)
+{
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_TeethObj), &_float3(11, 3, 5)));
+
+	return S_OK;
+}
+
+HRESULT CScene_Loby::Ready_Layer_RoseObj(const _tchar * pLayerTag)
+{
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_RoseObj), &_float3(12, 3, 5)));
+
 	return S_OK;
 }
 

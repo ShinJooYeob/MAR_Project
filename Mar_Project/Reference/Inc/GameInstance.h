@@ -101,7 +101,10 @@ public: /* For.Input_Device */
 public:
 	_float Easing(_uint eEasingType, _float fStartPoint, _float fTargetPoint, _float fPassedTime, _float fTotalTime = 1.0f);
 	_float3	Easing_Vector(_uint eEasingType, _float3 fStartPoint, _float3 fTargetPoint, _float fPassedTime, _float fTotalTime = 1.0f);
-	
+	_float	Easing_Return(_uint eGoEasingType, _uint eBackEasingType, _float fStartPoint, _float fTargetPoint, _float fPassedTime, _float fTotalTime = 1.f);
+	_float3	Easing_Return_Vector(_uint eGoEasingType, _uint eBackEasingType, _float3 fStartPoint, _float3 fTargetPoint, _float fPassedTime, _float fTotalTime = 1.f);
+
+
 	//FrustumMgr
 public:
 	HRESULT SetUp_WorldFrustumPlane();													//이 함수는 매 프레임 당 한번만 실행 어차피 매 프레임 같은 투영, 뷰 행렬일테니까 

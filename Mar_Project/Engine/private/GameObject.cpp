@@ -73,34 +73,84 @@ HRESULT CGameObject::Add_Component(_uint iScenenNum, const _tchar* tagPrototype,
 
 
 
-	 m_mapComponets.emplace(tagComponent, pCloneComponent);
-
 	 (*ppOut) = pCloneComponent;
 	 Safe_AddRef(pCloneComponent);
+	 m_mapComponets.emplace(tagComponent, ppOut);
+
 
 	return S_OK;
 }
 
-HRESULT CGameObject::Change_Component(_uint iScenenNum, const _tchar * tagPrototype, const _tchar * tagComponent, CComponent ** ppOut, void * pArg)
+HRESULT CGameObject::Change_Component_by_NewAssign(_uint iScenenNum, const _tchar * tagPrototype, const _tchar * tagComponent, void * pArg)
 {
-	// 같은 이름의 컴포넌트를 다른 자식의 컴포넌트로 교체
-	// EX) Rect -> Cube
-	if (Find_Components(tagComponent) != nullptr)
+
+	CComponent** ppSecValue = nullptr;
+
+	auto iter = find_if(m_mapComponets.begin(), m_mapComponets.end(), CTagFinder(tagComponent));
+
+	if (iter == m_mapComponets.end())
 	{
-		// 기존 컴포넌트 삭제
-		Safe_Release(*ppOut);
-		Safe_Release(m_mapComponets[tagComponent]);
-
-		CComponent* pCloneComponent = GetSingle(CGameInstance)->Clone_Component(iScenenNum, tagPrototype, pArg);
-		NULL_CHECK_BREAK(pCloneComponent);
-
-		// 키로 접근해 해당 컴포넌트 삭제 후에 다시 넣는다.
-		m_mapComponets[tagComponent] = pCloneComponent;
-		(*ppOut) = pCloneComponent;
-		Safe_AddRef(pCloneComponent);
+		ppSecValue = nullptr;
+		OutputDebugString(TEXT("Components Not Exist\n"));
+		NULL_CHECK_RETURN(ppSecValue, E_FAIL);
 	}
+
+
+	ppSecValue = iter->second;
+
+
+	// 기존 컴포넌트 삭제
+	CComponent* pObjMemberPointer = *ppSecValue;
+	Safe_Release(pObjMemberPointer);	
+	pObjMemberPointer = *ppSecValue;
+	Safe_Release(pObjMemberPointer);
+
+	CComponent* pCloneComponent = GetSingle(CGameInstance)->Clone_Component(iScenenNum, tagPrototype, pArg);
+	NULL_CHECK_BREAK(pCloneComponent);
+
+
+
+	*ppSecValue = pCloneComponent;
+	Safe_AddRef(pCloneComponent);
+
 	return S_OK;
 }
+
+HRESULT CGameObject::Change_Component_by_Parameter(CComponent * NewComponent, const _tchar * tagComponent,  void * pArg)
+{
+	CComponent** ppSecValue = nullptr;
+
+	NULL_CHECK_RETURN(NewComponent, E_FAIL);
+
+	auto iter = find_if(m_mapComponets.begin(), m_mapComponets.end(), CTagFinder(tagComponent));
+
+	if (iter == m_mapComponets.end())
+	{
+		ppSecValue = nullptr;
+		OutputDebugString(TEXT("Components Not Exist\n"));
+		NULL_CHECK_RETURN(ppSecValue, E_FAIL);
+	}
+
+
+	ppSecValue = iter->second;
+
+
+	// 기존 컴포넌트 삭제
+	CComponent* pObjMemberPointer = *ppSecValue;
+	Safe_Release(pObjMemberPointer);
+	pObjMemberPointer = *ppSecValue;
+	Safe_Release(pObjMemberPointer);
+
+
+
+
+	CComponent* pCloneComponent = NewComponent;
+
+	*ppSecValue = pCloneComponent;
+	Safe_AddRef(pCloneComponent);
+	return S_OK;
+}
+
 
 CComponent * CGameObject::Find_Components(const _tchar * tagComponent)
 {
@@ -109,7 +159,7 @@ CComponent * CGameObject::Find_Components(const _tchar * tagComponent)
 	if (iter == m_mapComponets.end())
 		return nullptr;
 
-	return iter->second;
+	return *(iter->second);
 }
 
 //void CGameObject::Set_LoadData(OUTPUT_OBJECTINFO * pInfo)
@@ -121,8 +171,13 @@ CComponent * CGameObject::Find_Components(const _tchar * tagComponent)
 
 void CGameObject::Free()
 {
+	CComponent* pForRelease;
 	for (auto& ComponentPair : m_mapComponets)
-		Safe_Release(ComponentPair.second);
+	{
+		pForRelease = *(ComponentPair.second);
+		Safe_Release(pForRelease);
+	}
+
 	m_mapComponets.clear();
 
 	Safe_Release(m_pDeviceContext);

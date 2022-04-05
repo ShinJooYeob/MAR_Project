@@ -61,9 +61,6 @@
     <Filter Include="01.Utility\01.ComponentMgr\01.Component\06.Collision">
       <UniqueIdentifier>{861e8344-00c9-4996-99d5-6e9f37e1b511}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Utility\01.ComponentMgr\01.Component\03.Model\01.Mesh">
-      <UniqueIdentifier>{b08a6273-e80a-4db1-893c-7db8b553aff0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.Utility\01.ComponentMgr\01.Component\03.Model\02.VIBuffer">
       <UniqueIdentifier>{c4fbe5dd-6bbb-4a1f-8084-ac5558607b0f}</UniqueIdentifier>
     </Filter>
@@ -114,6 +111,12 @@
     </Filter>
     <Filter Include="01.Utility\09.LightMgr\00.Manager">
       <UniqueIdentifier>{5ea3929d-2f63-4c5e-a16e-e06fc647a4fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\01.ComponentMgr\01.Component\03.Model\01.Model">
+      <UniqueIdentifier>{b08a6273-e80a-4db1-893c-7db8b553aff0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\01.ComponentMgr\01.Component\03.Model\01.Model\MeshContainer">
+      <UniqueIdentifier>{33fc6a9b-59b3-408b-86e7-1c1111bf2f44}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -228,6 +231,12 @@
     <ClInclude Include="..\public\LightMgr.h">
       <Filter>01.Utility\09.LightMgr\00.Manager</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Model.h">
+      <Filter>01.Utility\01.ComponentMgr\01.Component\03.Model\01.Model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\MeshContainer.h">
+      <Filter>01.Utility\01.ComponentMgr\01.Component\03.Model\01.Model\MeshContainer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">
@@ -322,6 +331,12 @@
     </ClCompile>
     <ClCompile Include="..\private\LightMgr.cpp">
       <Filter>01.Utility\09.LightMgr\00.Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Model.cpp">
+      <Filter>01.Utility\01.ComponentMgr\01.Component\03.Model\01.Model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\MeshContainer.cpp">
+      <Filter>01.Utility\01.ComponentMgr\01.Component\03.Model\01.Model\MeshContainer</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

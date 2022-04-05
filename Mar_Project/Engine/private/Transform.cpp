@@ -61,12 +61,12 @@ _Matrix CTransform::Get_MatrixScale_All()
 
 void CTransform::Set_MatrixState(TransformState eState, const _fVector & vVec)
 {
-	XMStoreFloat3((_float3*)&m_WorldMatrix.m[eState][0], vVec);
+	XMStoreFloat3((_float3*)(&m_WorldMatrix.m[eState][0]), vVec);
 }
 
 void CTransform::Set_MatrixState(TransformState eState, const _float3 & vVec)
 {
-	memcpy((_float3*)&m_WorldMatrix.m[eState][0], &vVec, sizeof(_float3));
+	memcpy((_float3*)(&m_WorldMatrix.m[eState][0]), &vVec, sizeof(_float3));
 
 }
 
@@ -173,7 +173,7 @@ void CTransform::LookAt(_fVector vTarget)
 		XMStoreFloat3((_float3*)(m_WorldMatrix.m[STATE_RIGHT]), vRight * matScale.r[STATE_RIGHT]);
 	}
 
-	XMStoreFloat3((_float3*)(m_WorldMatrix.m[STATE_UP]), XMVector3Normalize(XMVector3Cross(vRight, vLook)) * matScale.r[STATE_UP]);
+	XMStoreFloat3((_float3*)(m_WorldMatrix.m[STATE_UP]), XMVector3Normalize(XMVector3Cross(vLook, vRight)) * matScale.r[STATE_UP]);
 
 }
 
@@ -199,9 +199,8 @@ void CTransform::LookDir(_fVector vTargetLook)
 		vRight = XMVector3Normalize(XMVector3Cross(_float3(0, 1, 0).XMVector(), vLook));
 		XMStoreFloat3((_float3*)(m_WorldMatrix.m[STATE_RIGHT]), vRight * matScale.r[STATE_RIGHT]);
 	}
-
-	XMStoreFloat3((_float3*)(m_WorldMatrix.m[STATE_UP]), XMVector3Normalize(XMVector3Cross(vRight, vLook)) * matScale.r[STATE_UP]);
-
+	
+	XMStoreFloat3((_float3*)(m_WorldMatrix.m[STATE_UP]), XMVector3Normalize(XMVector3Cross(vLook, vRight)) * matScale.r[STATE_UP]);
 }
 
 void CTransform::Turn_CW(_fVector vAxis, _double fDeltaTime)

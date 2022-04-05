@@ -35,7 +35,6 @@ _int CSkyBox::Update(_double fDeltaTime)
 	if (__super::Update(fDeltaTime) < 0)
 		return -1;
 
-	m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, g_pGameInstance->Get_TargetPostion_float4(PLV_CAMERA));
 
 
 
@@ -59,16 +58,15 @@ _int CSkyBox::Render()
 		return -1;
 	NULL_CHECK_RETURN(m_pVIBufferCom, E_FAIL);
 
+	m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, g_pGameInstance->Get_TargetPostion_float4(PLV_CAMERA));
 
 	FAILED_CHECK(m_pTransformCom->Bind_OnShader(m_pShaderCom, "g_WorldMatrix"));
 
 	CGameInstance* pInstance = GetSingle(CGameInstance);
-	_float4x4		ViewFloat4x4 = pInstance->Get_Transform_Float4x4_TP(PLM_VIEW);
-	_float4x4		ProjFloat4x4 = pInstance->Get_Transform_Float4x4_TP(PLM_PROJ);;
 
 
-	m_pShaderCom->Set_RawValue("g_ViewMatrix", &ViewFloat4x4, sizeof(_float4x4));
-	m_pShaderCom->Set_RawValue("g_ProjMatrix", &ProjFloat4x4, sizeof(_float4x4));
+	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ViewMatrix", &pInstance->Get_Transform_Float4x4_TP(PLM_VIEW), sizeof(_float4x4)));
+	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ProjMatrix", &pInstance->Get_Transform_Float4x4_TP(PLM_PROJ), sizeof(_float4x4)));
 
 	//FAILED_CHECK(m_pTextureCom->Bind_OnShader_AutoFrame(m_pShaderCom, "g_DiffuseTexture", g_fDeltaTime));
 	FAILED_CHECK(m_pTextureCom->Bind_OnShader(m_pShaderCom, "g_DiffuseTexture"));

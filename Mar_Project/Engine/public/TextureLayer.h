@@ -19,10 +19,12 @@ public:
 	HRESULT Bind_OnShader(CShader* pShader, const char* pValueName , _uint iTextureIndex = 0);
 
 	HRESULT Add_Another_Texture(const _tchar* pTextureFilePath, _uint iNumTextures = 1);
+	HRESULT Add_Model_Texture(_uint iIndex, const _tchar* pTextureFilePath);
 
 	_uint Get_TextureListSize() { return (_uint)(m_vecTextures.size()); }
 private:
 	virtual HRESULT Initialize_Prototype(const _tchar* pTextureFilePath, _uint iNumTextures = 1);
+	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize_Clone(void * pArg)override;
 
 private:
@@ -31,7 +33,10 @@ private:
 
 
 public:
+	//일반 텍스처용
 	static CTextureLayer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, const _tchar* pTextureFilePath, _uint iNumTextures = 1);
+	//3d 모델용 텍스처
+	static CTextureLayer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	virtual CComponent* Clone(void* pArg = nullptr) override;
 	virtual void Free() override;
 };

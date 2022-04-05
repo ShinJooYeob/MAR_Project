@@ -53,6 +53,7 @@ _int CUIImage::Update(_double fDeltaTime)
 		switch (test)
 		{
 		case 0:
+
 			FAILED_CHECK(m_pTextureCom->Change_TextureLayer(L"lower"));
 			break;
 		case 1:
@@ -73,7 +74,7 @@ _int CUIImage::LateUpdate(_double fDeltaTime)
 {
 	if (__super::LateUpdate(fDeltaTime) < 0)
 		return -1;
-	FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_PRIORITY, this));
+	FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_BLEND, this));
 
 	return _int();
 }
@@ -93,6 +94,7 @@ _int CUIImage::Render()
 	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ProjMatrix", &m_ProjMatrix, sizeof(_float4x4)));
 
 	FAILED_CHECK(m_pTextureCom->Bind_OnShader_AutoFrame(m_pShaderCom, "g_DiffuseTexture", g_fDeltaTime));
+	//FAILED_CHECK(m_pTextureCom->Bind_OnShader(m_pShaderCom, "g_DiffuseTexture"));
 
 	FAILED_CHECK(m_pVIBufferCom->Render(m_pShaderCom, 0));
 

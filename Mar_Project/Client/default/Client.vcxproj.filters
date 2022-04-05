@@ -28,9 +28,6 @@
     <Filter Include="99.Define">
       <UniqueIdentifier>{1ee0750c-8ecd-4398-bb1b-0d397435881c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="04.Shader">
-      <UniqueIdentifier>{30453a1d-d790-418b-a46d-3d663ffac8a3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.Scene\00.Scene_Loby">
       <UniqueIdentifier>{7b131272-88f9-4afd-bdd2-382caad94551}</UniqueIdentifier>
     </Filter>
@@ -42,9 +39,6 @@
     </Filter>
     <Filter Include="01.GameObject\02.GroundObject">
       <UniqueIdentifier>{4234320f-adb5-41c4-a71e-d2160e5f2c5d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.GameObject\03.Enemy">
-      <UniqueIdentifier>{82b6eeb9-b6bd-402b-aee4-71e95a28309b}</UniqueIdentifier>
     </Filter>
     <Filter Include="01.GameObject\04.NPC">
       <UniqueIdentifier>{b5844b96-6a34-4bae-8369-2bc7f90fceea}</UniqueIdentifier>
@@ -105,6 +99,81 @@
     </Filter>
     <Filter Include="01.GameObject\06.Terrain">
       <UniqueIdentifier>{7abde202-f39a-4ddb-9e8e-c76b98577665}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="04.Shader">
+      <UniqueIdentifier>{30453a1d-d790-418b-a46d-3d663ffac8a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.Manager\01.UtilityMgr">
+      <UniqueIdentifier>{120981d5-1b2d-4a4a-840f-d02015318e2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\07.MapObject">
+      <UniqueIdentifier>{9a679908-50c9-4d4c-9537-ee69ebb04892}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\08.Weapon">
+      <UniqueIdentifier>{3767e3e5-3a4a-4961-b429-fe8584ce414d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\03.Monster">
+      <UniqueIdentifier>{82b6eeb9-b6bd-402b-aee4-71e95a28309b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\07.MapObject\01.DynamicObj">
+      <UniqueIdentifier>{393e3242-c77b-435b-a2c7-9dfe77ca8bfb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\07.MapObject\00.StaticObj">
+      <UniqueIdentifier>{7c22a4d8-9aaa-4e97-9dc8-58b7fcbdebf4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\07.MapObject\01.DynamicObj\01.JumpPad">
+      <UniqueIdentifier>{4341ef3b-462b-4533-a37d-fa13811e7622}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\07.MapObject\01.DynamicObj\02.SteamPad">
+      <UniqueIdentifier>{5efe88b8-0146-40ed-8cf7-c720fb15f356}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\07.MapObject\01.DynamicObj\03.SlidePad">
+      <UniqueIdentifier>{d43b69a1-0897-4939-9de1-8ee47735568b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\07.MapObject\01.DynamicObj\04.HiddenPad">
+      <UniqueIdentifier>{f8f715e7-4484-4ef6-b6a8-793e33c2faf1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\07.MapObject\01.DynamicObj\05.BreakableObj">
+      <UniqueIdentifier>{f7293ca7-8432-4f5f-b1ac-48b08f280145}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\07.MapObject\01.DynamicObj\06.TeethObj">
+      <UniqueIdentifier>{14ba35e0-fb15-4b7c-9e23-96ca9e948220}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\07.MapObject\01.DynamicObj\07.RoseObj">
+      <UniqueIdentifier>{6b741f97-83ef-4237-8abe-22c7bbfc5990}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\03.Monster\01.Grunt">
+      <UniqueIdentifier>{abe75de4-877b-40b6-91eb-f6c0a3fd2224}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\03.Monster\02.WaspArrow">
+      <UniqueIdentifier>{2d9be4a8-f3c2-4e0b-9e76-75679b6ec23e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\03.Monster\03.WaspInk">
+      <UniqueIdentifier>{74118a03-da46-4ebd-a1ab-11a30b11aad9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\03.Monster\04.Eyepot">
+      <UniqueIdentifier>{065dfdea-71df-4379-af5d-cbf584f16f50}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\03.Monster\05.Executor">
+      <UniqueIdentifier>{c5ca52bd-a43c-4ede-9e7b-27e1b21645d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\08.Weapon\01.Knife">
+      <UniqueIdentifier>{c0c4d1ed-5cfd-4542-ab4e-aae5f5e1ccb6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\08.Weapon\02.ClockBomb">
+      <UniqueIdentifier>{57d5bc02-4b25-40eb-915f-914e49505361}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\08.Weapon\03.PepperGrinder">
+      <UniqueIdentifier>{1c5d1601-0222-4958-9b0c-4f3522b0909f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\08.Weapon\06.Umbrella">
+      <UniqueIdentifier>{49d925c7-929f-43e1-aa76-867fc1297479}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\08.Weapon\04.Teapot">
+      <UniqueIdentifier>{4ed92d57-7cdd-4539-8da9-ec50406f738e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\08.Weapon\05.Chess">
+      <UniqueIdentifier>{694ccd0e-563a-44b5-9639-89a8b09e0e58}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -204,6 +273,36 @@
     <ClInclude Include="..\public\Client_Macro.h">
       <Filter>99.Define</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\UtilityMgr.h">
+      <Filter>03.Manager\01.UtilityMgr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\MapObject.h">
+      <Filter>01.GameObject\07.MapObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Weapon.h">
+      <Filter>01.GameObject\08.Weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Monster.h">
+      <Filter>01.GameObject\03.Monster</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Npc.h">
+      <Filter>01.GameObject\04.NPC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\JumpPad.h">
+      <Filter>01.GameObject\07.MapObject\01.DynamicObj\01.JumpPad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\SteamPad.h">
+      <Filter>01.GameObject\07.MapObject\01.DynamicObj\02.SteamPad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\HiddenPad.h">
+      <Filter>01.GameObject\07.MapObject\01.DynamicObj\04.HiddenPad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\TeethObj.h">
+      <Filter>01.GameObject\07.MapObject\01.DynamicObj\06.TeethObj</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\RoseObj.h">
+      <Filter>01.GameObject\07.MapObject\01.DynamicObj\07.RoseObj</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -278,6 +377,36 @@
     <ClCompile Include="..\private\Terrain.cpp">
       <Filter>01.GameObject\06.Terrain</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\UtilityMgr.cpp">
+      <Filter>03.Manager\01.UtilityMgr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\MapObject.cpp">
+      <Filter>01.GameObject\07.MapObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Weapon.cpp">
+      <Filter>01.GameObject\08.Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Monster.cpp">
+      <Filter>01.GameObject\03.Monster</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Npc.cpp">
+      <Filter>01.GameObject\04.NPC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\JumpPad.cpp">
+      <Filter>01.GameObject\07.MapObject\01.DynamicObj\01.JumpPad</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\SteamPad.cpp">
+      <Filter>01.GameObject\07.MapObject\01.DynamicObj\02.SteamPad</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\HiddenPad.cpp">
+      <Filter>01.GameObject\07.MapObject\01.DynamicObj\04.HiddenPad</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\TeethObj.cpp">
+      <Filter>01.GameObject\07.MapObject\01.DynamicObj\06.TeethObj</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\RoseObj.cpp">
+      <Filter>01.GameObject\07.MapObject\01.DynamicObj\07.RoseObj</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -310,6 +439,9 @@
       <Filter>04.Shader</Filter>
     </FxCompile>
     <FxCompile Include="..\bin\ShaderFiles\Shader_VtxNorTex.hlsl">
+      <Filter>04.Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\bin\ShaderFiles\Shader_NonAnimModel.hlsl">
       <Filter>04.Shader</Filter>
     </FxCompile>
   </ItemGroup>

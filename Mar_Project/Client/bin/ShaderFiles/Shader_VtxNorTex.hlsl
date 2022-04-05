@@ -79,7 +79,7 @@ struct PS_OUT
 	vector		vColor : SV_TARGET0;
 };
 
-PS_OUT PS_MAIN_TERRAIN(PS_IN In)
+PS_OUT PS_MAIN_TERRAIN_DIRECTIONAL(PS_IN In)
 {
 	PS_OUT		Out = (PS_OUT)0;
 
@@ -108,9 +108,53 @@ PS_OUT PS_MAIN_TERRAIN(PS_IN In)
 //(L.Diffus *  M.Diffuse) * (Shade (0 ~ 1) + (L.Ambient * M.Ambient)) + 
 //(L.Specular * M.Specular) * 스펙큘러의 세기(0 ~ 1 사이의 실수)
 
+
+PS_OUT PS_MAIN_TERRAIN_POINT(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	if (In.bIsNotDraw)
+	{
+		discard;
+	}
+	else {
+
+		vector	vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV * 30.f);
+
+		vector	vLightDir = In.vWorldPos - g_vLightVector;
+		float  fLength = length(vLightDir);
+
+		float	fShade = max(dot(normalize(vLightDir) * -1.f, In.vWorldNormal), 0.f);
+
+		vector	vReflect = reflect(normalize(vLightDir), In.vWorldNormal);
+		vector	vLook = normalize(In.vWorldPos - g_CamPosition);
+
+		float	fSpecular = pow(max(dot(normalize(vReflect) * -1.f, vLook), 0.f), 30.f);
+
+		Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient))
+			+ (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
+
+		Out.vColor *= saturate((10.f - fLength) / 10.f);
+		
+	}
+
+	return Out;
+}
+
 technique11		DefaultTechnique
 {
-	pass Terrain
+	pass Terrain_DirectionalLight
+	{
+		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff); 
+			SetDepthStencilState(ZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_ccw);
+
+		VertexShader = compile vs_5_0 VS_MAIN_TERRAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_TERRAIN_DIRECTIONAL();
+	}	
+
+	pass Terrain_PointLight
 	{
 		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 		SetDepthStencilState(ZTestAndWriteState, 0);
@@ -118,6 +162,6 @@ technique11		DefaultTechnique
 
 		VertexShader = compile vs_5_0 VS_MAIN_TERRAIN();
 		GeometryShader = NULL;
-		PixelShader = compile ps_5_0 PS_MAIN_TERRAIN();
-	}	
+		PixelShader = compile ps_5_0 PS_MAIN_TERRAIN_POINT();
+	}
 }

@@ -14,13 +14,13 @@ HRESULT CScene_Edit::Initialize()
 	if (FAILED(__super::Initialize()))
 		return E_FAIL;
 
+#ifdef USE_IMGUI
 	m_pGameInstance = GetSingle(CGameInstance);
 	Safe_AddRef(m_pGameInstance);
 
 	FAILED_CHECK(Ready_Layer_MainCamera(TAG_LAY(Layer_Camera_Main)));
 
 
-#ifdef USE_IMGUI
 
 
 	//터짐 방지용 빈 오브젝트
@@ -74,6 +74,7 @@ _int CScene_Edit::Update(_double fDeltaTime)
 	if (m_bIsNeedToSceneChange)
 		return Change_to_NextScene();
 
+#ifdef USE_IMGUI
 	if (m_iNowTab == 0)
 	{
 		for (auto& Element : m_vecBatchedObject)
@@ -86,7 +87,6 @@ _int CScene_Edit::Update(_double fDeltaTime)
 		}
 	}
 
-#ifdef USE_IMGUI
 
 	FAILED_CHECK(Input_KeyBoard(fDeltaTime));
 
@@ -114,6 +114,7 @@ _int CScene_Edit::LateUpdate(_double fDeltaTime)
 		return Change_to_NextScene();
 
 
+#ifdef USE_IMGUI
 	if (m_iNowTab == 0)
 	{
 		for (auto& Element : m_vecBatchedObject)
@@ -126,6 +127,7 @@ _int CScene_Edit::LateUpdate(_double fDeltaTime)
 		}
 	}
 
+#endif // USE_IMGUI
 	return 0;
 }
 
@@ -1564,6 +1566,7 @@ void CScene_Edit::Free()
 {
 	__super::Free();
 
+#ifdef USE_IMGUI
 	for (auto& iter : m_vecBatchedObject)
 	{
 		//객채 없애기 죽이기 비워주기
@@ -1573,4 +1576,5 @@ void CScene_Edit::Free()
 
 
 	Safe_Release(m_pGameInstance);
+#endif
 }

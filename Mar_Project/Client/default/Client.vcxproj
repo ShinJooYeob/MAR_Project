@@ -183,9 +183,18 @@
     <ClInclude Include="..\public\Client_Macro.h" />
     <ClInclude Include="..\public\Client_Struct.h" />
     <ClInclude Include="..\public\ImguiMgr.h" />
+    <ClInclude Include="..\public\HiddenPad.h" />
+    <ClInclude Include="..\public\RoseObj.h" />
+    <ClInclude Include="..\public\TeethObj.h" />
+    <ClInclude Include="..\public\SteamPad.h" />
+    <ClInclude Include="..\public\JumpPad.h" />
     <ClInclude Include="..\public\Loader.h" />
     <ClInclude Include="..\public\MainApp.h" />
     <ClInclude Include="..\public\ESCursor.h" />
+    <ClInclude Include="..\public\Npc.h" />
+    <ClInclude Include="..\public\Monster.h" />
+    <ClInclude Include="..\public\Weapon.h" />
+    <ClInclude Include="..\public\MapObject.h" />
     <ClInclude Include="..\public\Terrain.h" />
     <ClInclude Include="..\public\SkyBox.h" />
     <ClInclude Include="..\public\Player.h" />
@@ -195,6 +204,7 @@
     <ClInclude Include="..\public\Scene_StageSelect.h" />
     <ClInclude Include="..\public\UIImage.h" />
     <ClInclude Include="..\public\UI.h" />
+    <ClInclude Include="..\public\UtilityMgr.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
@@ -204,9 +214,18 @@
     <ClCompile Include="..\private\Camera_Editor.cpp" />
     <ClCompile Include="..\private\Camera_Main.cpp" />
     <ClCompile Include="..\private\ImguiMgr.cpp" />
+    <ClCompile Include="..\private\HiddenPad.cpp" />
+    <ClCompile Include="..\private\RoseObj.cpp" />
+    <ClCompile Include="..\private\TeethObj.cpp" />
+    <ClCompile Include="..\private\SteamPad.cpp" />
+    <ClCompile Include="..\private\JumpPad.cpp" />
     <ClCompile Include="..\private\Loader.cpp" />
     <ClCompile Include="..\private\MainApp.cpp" />
     <ClCompile Include="..\private\ESCursor.cpp" />
+    <ClCompile Include="..\private\Npc.cpp" />
+    <ClCompile Include="..\private\Monster.cpp" />
+    <ClCompile Include="..\private\Weapon.cpp" />
+    <ClCompile Include="..\private\MapObject.cpp" />
     <ClCompile Include="..\private\Terrain.cpp" />
     <ClCompile Include="..\private\SkyBox.cpp" />
     <ClCompile Include="..\private\Player.cpp" />
@@ -216,6 +235,7 @@
     <ClCompile Include="..\private\Scene_StageSelect.cpp" />
     <ClCompile Include="..\private\UIImage.cpp" />
     <ClCompile Include="..\private\UI.cpp" />
+    <ClCompile Include="..\private\UtilityMgr.cpp" />
     <ClCompile Include="..\public\Imgui\imgui.cpp" />
     <ClCompile Include="..\public\Imgui\imgui_demo.cpp" />
     <ClCompile Include="..\public\Imgui\imgui_draw.cpp" />
@@ -242,6 +262,7 @@
     <Natvis Include="..\public\Imgui\imgui.natvis" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="..\bin\ShaderFiles\Shader_NonAnimModel.hlsl" />
     <FxCompile Include="..\bin\ShaderFiles\Shader_VtxCubeTex.hlsl" />
     <FxCompile Include="..\bin\ShaderFiles\Shader_VtxNorTex.hlsl" />
     <FxCompile Include="..\bin\ShaderFiles\Shader_VtxTex.hlsl" />

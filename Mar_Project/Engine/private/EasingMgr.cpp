@@ -127,6 +127,40 @@ _float3 CEasingMgr::Easing_Vector(_uint eEasingType, _float3 fStartPoint, _float
 	return vResult;
 }
 
+_float CEasingMgr::Easing_Return(_uint eGoEasingType, _uint eBackEasingType, _float fStartPoint, _float fTargetPoint, _float fPassedTime, _float fTotalTime)
+{
+
+	if (eGoEasingType >= TYPE_End || eBackEasingType >= TYPE_End)
+	{
+		MSGBOX("Failed to Easing");
+		__debugbreak();
+		return -FLT_MAX;
+	}
+
+	if(fPassedTime < fTotalTime * 0.5f)
+		return Easing(eGoEasingType, fStartPoint, fTargetPoint, fPassedTime, fTotalTime*0.5f);
+	else
+		return Easing(eBackEasingType, fTargetPoint, fStartPoint, fPassedTime - fTotalTime*0.5f, fTotalTime*0.5f);
+
+}
+
+_float3 CEasingMgr::Easing_Return_Vector(_uint eGoEasingType, _uint eBackEasingType, _float3 fStartPoint, _float3 fTargetPoint, _float fPassedTime, _float fTotalTime)
+{
+	_float3 vResult = NOT_EXIST_VECTOR;
+
+	if (eGoEasingType >= TYPE_End || eBackEasingType >= TYPE_End)
+	{
+		MSGBOX("Failed to Easing");
+		__debugbreak();
+		return vResult;
+	}
+	vResult.x = Easing_Return(eGoEasingType,eBackEasingType, fStartPoint.x, fTargetPoint.x, fPassedTime, fTotalTime);
+	vResult.y = Easing_Return(eGoEasingType,eBackEasingType, fStartPoint.y, fTargetPoint.y, fPassedTime, fTotalTime);
+	vResult.z = Easing_Return(eGoEasingType,eBackEasingType, fStartPoint.z, fTargetPoint.z, fPassedTime, fTotalTime);
+
+	return _float3();
+}
+
 
 _float CEasingMgr::Linear(_float fStartPoint, _float fTargetPoint, _float fPassedTime, _float fTotalTime)
 {

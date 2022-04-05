@@ -35,6 +35,14 @@ HRESULT CTexture::Initialize_Prototype(const _tchar * pTextureFilePath)
 	return S_OK;
 }
 
+HRESULT CTexture::Initialize_Prototype()
+{
+	FAILED_CHECK(__super::Initialize_Prototype(nullptr));
+
+
+	return S_OK;
+}
+
 HRESULT CTexture::Initialize_Clone(void * pArg)
 {
 	FAILED_CHECK(__super::Initialize_Clone(nullptr));
@@ -90,6 +98,36 @@ HRESULT CTexture::Change_TextureLayer(const _tchar * tagTexureLayer, _double fFr
 
 
 	return S_OK;
+}
+
+HRESULT CTexture::Insert_Empty_TextureLayer(_tchar * szStateKey)
+{
+	auto iter = find_if(m_mapTextureLayers.begin(), m_mapTextureLayers.end(), CTagStringFinder(szStateKey));
+
+
+	if (iter != m_mapTextureLayers.end())
+	{
+		OutputDebugString(TEXT("Already Exist Texture Layer\n"));
+		__debugbreak();
+		return E_FAIL;
+	}
+
+	CTextureLayer* pTextureLayer = CTextureLayer::Create(m_pDevice, m_pDeviceContext);
+
+	NULL_CHECK_RETURN(pTextureLayer, E_FAIL);
+
+	m_mapTextureLayers.emplace(szStateKey, pTextureLayer);
+
+	Change_TextureLayer(szStateKey);
+
+	return S_OK;
+}
+
+HRESULT CTexture::Insert_Texture_On_BindedLayer(_uint iIndex,  _tchar * szFilePath)
+{
+	NULL_CHECK_RETURN(m_pBindedTextureLayer, E_FAIL);
+
+	return m_pBindedTextureLayer->Add_Model_Texture(iIndex,szFilePath);
 }
 
 
@@ -185,6 +223,19 @@ CTexture * CTexture::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDevic
 	if (FAILED(pInstance->Initialize_Prototype(pTextureFilePath)))
 	{
 		MSGBOX("Failed to Creating CTexture");
+		Safe_Release(pInstance);
+	}
+
+	return pInstance;
+}
+
+CTexture * CTexture::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
+{
+	CTexture*	pInstance = new CTexture(pDevice, pDeviceContext);
+
+	if (FAILED(pInstance->Initialize_Prototype()))
+	{
+		MSGBOX("Failed to Creating 3D Model Texture");
 		Safe_Release(pInstance);
 	}
 

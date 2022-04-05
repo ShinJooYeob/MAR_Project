@@ -55,13 +55,9 @@ PS_OUT PS_MAIN_RECT(PS_IN In)
 
 	if (Out.vColor.a < 0.1f)
 	{
-		
-
 		Out.vColor = vector(1,0,1,0);
 	}
 	else {
-
-
 		Out.vColor = vector(0, 0, 1, 1) * (In.vTexUV.x * In.vTexUV.y);
 	}
 

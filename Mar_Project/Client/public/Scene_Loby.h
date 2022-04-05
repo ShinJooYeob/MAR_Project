@@ -23,8 +23,13 @@ private:
 	HRESULT Ready_Layer_MainCamera(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_SkyBox(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_Terrain(const _tchar* pLayerTag);
-	HRESULT Ready_Layer_TestObj(const _tchar* pLayerTag);
+	HRESULT Ready_Layer_Player(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_UIImage(const _tchar* pLayerTag);
+	HRESULT Ready_Layer_JumpPad(const _tchar* pLayerTag);
+	HRESULT Ready_Layer_SteamPad(const _tchar* pLayerTag);
+	HRESULT Ready_Layer_HiddenPad(const _tchar* pLayerTag);
+	HRESULT Ready_Layer_TeethObj(const _tchar* pLayerTag);
+	HRESULT Ready_Layer_RoseObj(const _tchar* pLayerTag);
 
 private:
 	class CCamera_Main*				m_pMainCam = nullptr;

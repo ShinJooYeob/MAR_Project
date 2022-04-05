@@ -34,11 +34,13 @@ public:
 
 	class CComponent* Get_Component(const _tchar* tagComponent);
 	class CComponent* Find_Components(const _tchar* tagComponent);
+	HRESULT Change_Component_by_NewAssign(_uint iScenenNum, const _tchar* tagPrototype, const _tchar* tagComponent, void* pArg = nullptr);
+	HRESULT Change_Component_by_Parameter(CComponent* NewComponent, const _tchar* tagComponent, void* pArg = nullptr);
 
 
 protected:
-	map<const _tchar*, class CComponent*>	m_mapComponets;
-	typedef map<const _tchar*, class CComponent*>	COMPONENTS;
+	map<const _tchar*, class CComponent**>	m_mapComponets;
+	typedef map<const _tchar*, class CComponent**>	COMPONENTS;
 
 protected:
 	ID3D11Device*				m_pDevice = nullptr;
@@ -52,8 +54,7 @@ protected:
 
 protected:
 	HRESULT Add_Component(_uint iScenenNum, const _tchar* tagPrototype,const _tchar* tagComponent, CComponent** ppOut , void* pArg =nullptr);
-	HRESULT Change_Component(_uint iScenenNum, const _tchar* tagPrototype, const _tchar* tagComponent, CComponent** ppOut, void* pArg = nullptr);
-
+	
 public:
 	virtual CGameObject* Clone(void* pArg = nullptr)PURE;
 	virtual void Free() override;

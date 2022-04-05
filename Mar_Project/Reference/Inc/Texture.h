@@ -18,6 +18,7 @@ private:
 
 private:
 	virtual HRESULT Initialize_Prototype(const _tchar* pTextureFilePath);
+	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize_Clone(void * pArg)override;
 
 public:
@@ -28,6 +29,10 @@ public:
 
 	//체인지 관련
 	HRESULT Change_TextureLayer(const _tchar* tagTexureLayer, _double fFramePerSec = 6.f);
+
+	//3D 모델 레이어 추가용
+	HRESULT Insert_Empty_TextureLayer(_tchar* szStateKey);
+	HRESULT Insert_Texture_On_BindedLayer(_uint iIndex, _tchar* szFilePath);
 
 private:
 	map<wstring, CTextureLayer*>				m_mapTextureLayers;
@@ -48,7 +53,10 @@ private:
 
 
 public:
-	static CTexture* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, const _tchar* pTextureFilePath );
+	//일반 텍스처용
+	static CTexture* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, const _tchar* pTextureFilePath);
+	//3D 모델용 빈 텍스처
+	static CTexture* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	virtual CComponent* Clone(void* pArg = nullptr) override;
 	virtual void Free() override;
 };

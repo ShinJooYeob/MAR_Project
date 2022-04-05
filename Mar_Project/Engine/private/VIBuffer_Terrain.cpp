@@ -176,7 +176,7 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(const _tchar* pHeightMap)
 	if (FAILED(Create_VertexBuffer()))
 		return E_FAIL;
 
-
+	Safe_Delete_Array(pVertices);
 
 #pragma endregion
 
@@ -201,7 +201,7 @@ HRESULT CVIBuffer_Terrain::Initialize_Clone(void * pArg)
 	return S_OK;
 }
 
-_float3 CVIBuffer_Terrain::Caculate_TerrainY(_bool* pbIsOnTerrain ,_float3 PosOnTerrainLocal, _float3 OldPosOnTerrainLocal)
+_float3 CVIBuffer_Terrain::Caculate_TerrainY(_bool* pbIsOnTerrain ,_float3 PosOnTerrainLocal, _float3 OldPosOnTerrainLocal, _float3* vLocalPlaneNormVector)
 {
 	
 
@@ -213,7 +213,7 @@ _float3 CVIBuffer_Terrain::Caculate_TerrainY(_bool* pbIsOnTerrain ,_float3 PosOn
 	//}
 
 	_float CaculatedY = 0;
-	_float CacluatedNow = EquationPlane(pbIsOnTerrain, PosOnTerrainLocal, &CaculatedY);
+	_float CacluatedNow = EquationPlane(pbIsOnTerrain, PosOnTerrainLocal, &CaculatedY, vLocalPlaneNormVector);
 
 	if (*pbIsOnTerrain == false ) {
 		*pbIsOnTerrain = false;
@@ -233,7 +233,7 @@ _float3 CVIBuffer_Terrain::Caculate_TerrainY(_bool* pbIsOnTerrain ,_float3 PosOn
 }
 
 
-_float CVIBuffer_Terrain::EquationPlane(_bool * pbIsOnTerrain, _float3 PosOnTerrainLocal, _float* pCaculateY)
+_float CVIBuffer_Terrain::EquationPlane(_bool * pbIsOnTerrain, _float3 PosOnTerrainLocal, _float* pCaculateY, _float3* vNormVector)
 {
 	if (PosOnTerrainLocal.x < 0 || PosOnTerrainLocal.x >= m_iNumVerticesX ||
 		PosOnTerrainLocal.z < 0 || PosOnTerrainLocal.z >= m_iNumVerticesZ)
@@ -268,6 +268,14 @@ _float CVIBuffer_Terrain::EquationPlane(_bool * pbIsOnTerrain, _float3 PosOnTerr
 
 		Plane = XMPlaneFromPoints(XMLoadFloat3(&m_pVertices[iIndices[0]]),
 			XMLoadFloat3(&m_pVertices[iIndices[2]]), XMLoadFloat3(&m_pVertices[iIndices[3]]));
+
+
+		if (vNormVector != nullptr)
+		{
+			*vNormVector = XMVector3Normalize(XMVector3Cross(
+				(m_pVertices[iIndices[2]].XMVector()) - (m_pVertices[iIndices[0]].XMVector()),
+				(m_pVertices[iIndices[3]].XMVector()) - (m_pVertices[iIndices[0]].XMVector())));
+		}
 	}
 	else
 	{//À§ 012
@@ -279,10 +287,19 @@ _float CVIBuffer_Terrain::EquationPlane(_bool * pbIsOnTerrain, _float3 PosOnTerr
 
 		Plane = XMPlaneFromPoints(XMLoadFloat3(&m_pVertices[iIndices[0]]),
 			XMLoadFloat3(&m_pVertices[iIndices[1]]), XMLoadFloat3(&m_pVertices[iIndices[2]]));
+
+		if (vNormVector != nullptr)
+		{
+			*vNormVector = XMVector3Normalize(XMVector3Cross(
+				(m_pVertices[iIndices[1]].XMVector()) - (m_pVertices[iIndices[0]].XMVector()),
+				(m_pVertices[iIndices[2]].XMVector()) - (m_pVertices[iIndices[0]].XMVector())));
+		}
+
 	}
 
 	if (pCaculateY != nullptr)
 		*pCaculateY = ((Plane.x * PosOnTerrainLocal.x + Plane.z * PosOnTerrainLocal.z + Plane.w) / -Plane.y);
+
 
 	*pbIsOnTerrain = true;
 	return (Plane.x * PosOnTerrainLocal.x + Plane.y * PosOnTerrainLocal.y + Plane.z * PosOnTerrainLocal.z + Plane.w);

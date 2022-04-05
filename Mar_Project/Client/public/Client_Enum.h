@@ -32,6 +32,11 @@ enum OBJECTPROTOTYPEID
 
 	Prototype_Player,
 
+	Prototype_JumpPad,
+	Prototype_SteamPad,
+	Prototype_HiddenPad,
+	Prototype_TeethObj,
+	Prototype_RoseObj,
 
 
 
@@ -79,6 +84,25 @@ static const _tchar* Tag_Object_Prototype(OBJECTPROTOTYPEID eTag)
 		return TEXT("Player");
 		break;
 
+	case Prototype_JumpPad:
+		return TEXT("JumpPad");
+		break;
+	case Prototype_SteamPad:
+		return TEXT("SteamPad");
+		break;
+
+	case Prototype_HiddenPad:
+		return TEXT("HiddenPad");
+		break;
+	case Prototype_TeethObj:
+		return TEXT("TeethObj");
+		break;
+	case Prototype_RoseObj:
+		return TEXT("RoseObj");
+		break;
+		
+		
+		
 
 	case Prototype_UIImage:
 		return TEXT("UI_Image");
@@ -171,6 +195,13 @@ enum LAYERID
 	Layer_Player,
 	Layer_Terrain,
 
+
+	Layer_JumpPad,
+	Layer_SteamPad,
+	Layer_HiddenPad,
+	Layer_TeethObj,
+	Layer_RoseObj,
+
 	Layer_UI_IMG,
 	Layer_UI_BTN,
 	Layer_UI_SLIDE,
@@ -199,7 +230,23 @@ static const _tchar* Tag_Layer(LAYERID eTag)
 	case Layer_Terrain:
 		return TEXT("Layer_Terrain");
 		break;
-
+	case Layer_JumpPad:
+		return TEXT("Layer_JumpPad");
+		break;
+	case Layer_SteamPad:
+		return TEXT("Layer_SteamPad");
+		break;
+	case Layer_HiddenPad:
+		return TEXT("Layer_HiddenPad");
+		break;
+	case Layer_TeethObj:
+		return TEXT("Layer_TeethObj");
+		break;
+	case Layer_RoseObj:
+		return TEXT("Layer_RoseObj");
+		break;
+		
+		
 	case Layer_UI_IMG:
 		return TEXT("Layer_UI_IMG");
 		break;
@@ -233,6 +280,8 @@ enum COMPONENTPROTOTYPEID
 	Prototype_Shader_VCT,
 	Prototype_Shader_VNT,
 	Prototype_Shader_VNCT,
+	Prototype_Shader_VAM,
+	Prototype_Shader_VNAM,
 	//////////////////////////////////////////////////////////////////////////
 	Prototype_VIBuffer_Rect,
 	Prototype_VIBuffer_Cube,
@@ -240,6 +289,9 @@ enum COMPONENTPROTOTYPEID
 	Prototype_VIBuffer_Terrain_2,
 	Prototype_VIBuffer_Terrain_3,
 	Prototype_VIBuffer_Terrain_4,
+	//////////////////////////////////////////////////////////////////////////
+	Prototype_Mesh_Player,
+
 	//////////////////////////////////////////////////////////////////////////
 	Prototype_Texture_Player,
 	Prototype_Texture_SkyBox,
@@ -276,7 +328,12 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 	case Prototype_Shader_VNCT:
 		return TEXT("Prototype_Component_Shader_VTXNORMCUBETEX");
 		break;
-
+	case Prototype_Shader_VAM:
+		return TEXT("Prototype_Component_Shader_VTXANIMMODEL");
+		break;
+	case Prototype_Shader_VNAM:
+		return TEXT("Prototype_Component_Shader_VTXNONANIMMODEL");
+		break;
 
 
 
@@ -288,7 +345,11 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 		return TEXT("Prototype_Component_VIBuffer_Cube");
 		break;
 
+	case Prototype_Mesh_Player:
+		return TEXT("Prototype_Component_Mesh_Player");
+		break;
 
+		
 
 
 	case Prototype_Texture_Player:
@@ -338,6 +399,7 @@ enum COMPONENTID
 	Com_Collision,
 	Com_Inventory,
 	Com_Shader,
+	Com_Model,
 
 };
 static const _tchar* Tag_Component(COMPONENTID eTag)
@@ -364,6 +426,9 @@ static const _tchar* Tag_Component(COMPONENTID eTag)
 		break;
 	case Com_Shader:
 		return TEXT("Com_Shader");
+		break;
+	case Com_Model:
+		return TEXT("Com_Model");
 		break;
 
 		//////////////////////////////////////////////////////////////////////////

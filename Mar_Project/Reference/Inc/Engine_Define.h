@@ -1,13 +1,17 @@
 #pragma once
-#pragma warning(disable : 4251)
-
 #ifdef _DEBUG
 #pragma comment (lib,"Effects11d.lib")
 #pragma comment (lib,"DirectXTKd.lib")
+#pragma comment (lib,"assimp-vc140-mtd.lib")
 #else
 #pragma comment (lib,"Effects11.lib")
 #pragma comment (lib,"DirectXTK.lib")
+#pragma comment (lib,"assimp-vc140-mt.lib")
 #endif // DEBUG
+#pragma warning(disable : 4251)
+
+
+
 
 #include <d3d11.h>
 
@@ -18,11 +22,22 @@
 #include <d3dcompiler.h>
 #include <d3dx11effect.h>
 
+#include <DirectXCollision.h>
+
 #include <DirectXTK/DDSTextureLoader.h>
 #include <DirectXTK/WICTextureLoader.h>
+#include <DirectXTK/ScreenGrab.h>
+#include <wincodec.h>
+
+#include <assimp/scene.h>
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
 
 
 using namespace DirectX;
+using namespace Assimp;
+//using namespace DX;
+
 
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>

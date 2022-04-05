@@ -5,10 +5,12 @@
 #include "Player.h"
 #include "UIImage.h"
 #include "SkyBox.h"
+#include "Model.h"
 
 #ifdef USE_IMGUI
 #include "ImguiMgr.h"
 #endif // USE_IMGUI
+#include "UtilityMgr.h"
 
 CMainApp::CMainApp()
 	:m_pGameInstance(GetSingle(CGameInstance))
@@ -53,9 +55,13 @@ _int CMainApp::Update(_double fDeltaTime)
 	if (m_pGameInstance == nullptr)
 		return -1;
 
-	g_fDeltaTime = fDeltaTime;
+	if (m_bIsSlowed)
+		Update_SlowMotion(fDeltaTime);
 
-	if (FAILED(m_pGameInstance->Update_Engine(fDeltaTime)))
+
+	g_fDeltaTime = fDeltaTime * m_SlowTimes;
+
+	if (FAILED(m_pGameInstance->Update_Engine(fDeltaTime * m_SlowTimes)))
 	{
 		MSGBOX("Failed to Update_Engine ");
 		return E_FAIL;
@@ -64,7 +70,7 @@ _int CMainApp::Update(_double fDeltaTime)
 	//콜리전 내부 탐색중
 	//m_pCollision->Collision_Obsever(fDeltaTime);
 
-	if (FAILED(m_pGameInstance->LateUpdate_Engine(fDeltaTime)))
+	if (FAILED(m_pGameInstance->LateUpdate_Engine(fDeltaTime * m_SlowTimes)))
 	{
 		MSGBOX("Failed to LateUpdate_Engine ");
 		return E_FAIL;
@@ -75,6 +81,24 @@ _int CMainApp::Update(_double fDeltaTime)
 
 	
 	return 0;
+}
+
+_double CMainApp::Update_SlowMotion(_double fDeltaTime)
+{
+	m_fPassedTime += _float(fDeltaTime);
+
+	if (m_fPassedTime < m_fTargetTime * 0.5f)
+		 m_SlowTimes = m_pGameInstance->Easing(TYPE_QuarticOut, 1, m_fTargetSpeed, m_fPassedTime, m_fTargetTime *0.5f);
+	else
+		m_SlowTimes = m_pGameInstance->Easing(TYPE_QuarticIn, m_fTargetSpeed, 1, m_fPassedTime - m_fTargetTime *0.5f, m_fTargetTime *0.5f);
+
+	if (m_fPassedTime > m_fTargetTime)
+	{
+		m_bIsSlowed = false;
+		m_SlowTimes = 1;
+	}
+
+	return m_SlowTimes;
 }
 
 HRESULT CMainApp::Render()
@@ -103,6 +127,20 @@ HRESULT CMainApp::Render()
 
 
 	return S_OK;
+
+}
+
+void CMainApp::SlowMotionStart(_float fTargetTime , _float TargetSpeed )
+{
+	if (m_bIsSlowed)
+		return;
+
+	m_fTargetSpeed = TargetSpeed;
+	m_fTargetTime = fTargetTime;
+	m_fPassedTime = 0;
+
+	m_bIsSlowed = true;
+
 
 }
 
@@ -168,7 +206,7 @@ HRESULT CMainApp::Ready_SingletonMgr()
 	FAILED_CHECK(GETIMGUI->Initialize_ImguiMgr(m_pDevice, m_pDeviceContext, m_pBackBufferRTV, m_pDepthStencilView, m_pSwapChain));
 #endif // USE_IMGUI
 
-
+	FAILED_CHECK(GetSingle(CUtilityMgr)->Initialize_UtilityMgr(m_pDevice, m_pDeviceContext, this));
 
 	return S_OK;
 }
@@ -177,7 +215,6 @@ HRESULT CMainApp::Free_SingletonMgr()
 {
 
 #ifdef USE_IMGUI
-
 	if (0 != GetSingle(CImguiMgr)->DestroyInstance())
 	{
 		MSGBOX("Failed to Release CImguiMgr");
@@ -185,6 +222,11 @@ HRESULT CMainApp::Free_SingletonMgr()
 	}
 
 #endif // USE_IMGUI
+	if (0 != GetSingle(CUtilityMgr)->DestroyInstance())
+	{
+		MSGBOX("Failed to Release CUtilityMgr");
+		return E_FAIL;
+	}
 
 	return S_OK;
 }
@@ -221,6 +263,9 @@ HRESULT CMainApp::Ready_Static_Component_Prototype()
 	FAILED_CHECK(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Shader_VNT),
 		CShader::Create(m_pDevice, m_pDeviceContext, TEXT("Shader_VtxNorTex.hlsl"), VTXNORMTEX_DECLARATION::Elements, VTXNORMTEX_DECLARATION::iNumElements)));
 
+	FAILED_CHECK(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Shader_VNAM),
+		CShader::Create(m_pDevice, m_pDeviceContext, TEXT("Shader_NonAnimModel.hlsl"), VTXMODEL_DECLARATION::Elements, VTXMODEL_DECLARATION::iNumElements)));
+
 
 	////텍스처 프로토타입 생성
 	FAILED_CHECK(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Texture_Player),
@@ -230,6 +275,14 @@ HRESULT CMainApp::Ready_Static_Component_Prototype()
 		CTexture::Create(m_pDevice, m_pDeviceContext, L"SkyBox.txt")));
 
 
+
+	_Matrix			TransformMatrix;
+	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
+
+	//모델 프로토타입
+	FAILED_CHECK(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Player),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "ForkLift", "ForkLift.FBX", TransformMatrix)));
+	
 
 
 	return S_OK;
