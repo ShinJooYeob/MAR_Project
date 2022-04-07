@@ -208,13 +208,18 @@ void CGraphic_Device::Free()
 	RefChecker += Safe_Release(m_pDepthStencilView);
 	RefChecker += Safe_Release(m_pBackBufferRTV);
 	RefChecker += Safe_Release(m_pDeviceContext);
-	RefChecker += Safe_Release(m_pDevice);
+	ID3D11Device* ForCheckDevice = m_pDevice;
+	RefChecker += Safe_Release(ForCheckDevice);
+
+//#define USE_DEBUG_STRING
 
 	if (RefChecker > 0)
 	{
-		MSGBOX("Device isn't Deleted");
+		OutputDebugStringW(L"Device isn't Deleted");
+#if defined USE_DEBUG_STRING
 
-#if defined(DEBUG) || defined(_DEBUG)
+
+
 		ID3D11Debug* d3dDebug;
 		HRESULT hr = m_pDevice->QueryInterface(__uuidof(ID3D11Debug), reinterpret_cast<void**>(&d3dDebug));
 		if (SUCCEEDED(hr))
@@ -230,9 +235,12 @@ void CGraphic_Device::Free()
 			OutputDebugStringW(L"----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- \r\n");
 		}
 		if (d3dDebug != nullptr)            d3dDebug->Release();
+		__debugbreak();
+#else
+
+
 #endif
 
-		__debugbreak();
 	}
 
 

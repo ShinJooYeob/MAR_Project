@@ -11,13 +11,17 @@ CModel::CModel(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
 
 CModel::CModel(const CModel & rhs)
 	: CComponent(rhs),
-	m_vecMeshContainer(rhs.m_vecMeshContainer),
+	m_vecMeshContainerArr(rhs.m_vecMeshContainerArr),
 	m_MeshMaterialDesc(rhs.m_MeshMaterialDesc),
 	m_eModelType(rhs.m_eModelType),
-	m_iNumMeshContainers(rhs.m_iNumMeshContainers)
+	m_iNumMeshContainers(rhs.m_iNumMeshContainers),
+	m_iNumMaterials(rhs.m_iNumMaterials)
 {
-	for (auto& pMeshContainer : m_vecMeshContainer)
-		Safe_AddRef(pMeshContainer);
+	for (_uint i = 0; i < m_iNumMaterials; i++)
+	{
+		for (auto& pMeshcontainer : m_vecMeshContainerArr[i])
+			Safe_AddRef(pMeshcontainer);
+	}
 
 	Safe_AddRef(m_MeshMaterialDesc.pTexture);
 }
@@ -73,28 +77,44 @@ HRESULT CModel::Initialize_Clone(void * pArg)
 	return S_OK;
 }
 
-HRESULT CModel::Render(CShader * pShader, _uint iPassIndex)
+HRESULT CModel::Bind_OnShader(CShader * pShader, _uint iMaterialIndex, _uint eTextureType, const char * pHlslConstValueName)
 {
-	//for (auto& pMeshContainer : m_vecMeshContainer)
-	//{
-	//	if (nullptr != pMeshContainer)
-	//	{	
-	//		m_MeshMaterialDesc.pTexture->Bind_OnShader(pShader,"g_DiffuseTexture", 1);
-	//		pMeshContainer->Render(pShader, iPassIndex);
-	//	}
-	//}
+	if (iMaterialIndex  >= m_iNumMaterials|| pShader == nullptr || m_MeshMaterialDesc.pTexture == nullptr)
+		return E_FAIL;
 
-	for (_uint i = 0 ; i < m_iNumMeshContainers; i ++)
+	FAILED_CHECK(m_MeshMaterialDesc.pTexture->Change_TextureLayer(to_wstring(iMaterialIndex).c_str()));
+
+	if (FAILED(m_MeshMaterialDesc.pTexture->NullCheckTexture(eTextureType)))
+		return S_FALSE;
+
+	if (FAILED(m_MeshMaterialDesc.pTexture->Bind_OnShader(pShader, pHlslConstValueName, eTextureType)))
 	{
-
-		if (m_vecMeshContainer[i] != nullptr)
-		{
-
-			m_MeshMaterialDesc.pTexture->Change_TextureLayer(to_wstring(m_vecMeshContainer[i]->Get_MaterialIndex()).c_str());
-			m_MeshMaterialDesc.pTexture->Bind_OnShader(pShader,"g_DiffuseTexture", 1);
-			m_vecMeshContainer[i]->Render(pShader, iPassIndex);
-		}
+#ifdef  _DEBUG
+		OutputDebugStringW(L"Failed to Bind 3D Model Texture on Shader\n");
+#endif //  _DEBUG
+		return S_FALSE;
 	}
+
+
+	return S_OK;
+}
+
+HRESULT CModel::Render(CShader * pShader, _uint iPassIndex,_uint iMaterialIndex)
+{
+
+
+	for (auto& pMeshContainer : m_vecMeshContainerArr[iMaterialIndex])
+	{
+		m_MeshMaterialDesc.pTexture->Change_TextureLayer(to_wstring(iMaterialIndex).c_str());
+
+		FAILED_CHECK(m_MeshMaterialDesc.pTexture->NullCheckBinedTextureLayer());
+
+		m_MeshMaterialDesc.pTexture->Bind_OnShader(pShader, "g_DiffuseTexture", 1);
+
+		pMeshContainer->Render(pShader, iPassIndex);
+	}
+
+
 
 	return S_OK;
 }
@@ -105,16 +125,15 @@ HRESULT CModel::Ready_MeshContainers(_fMatrix TransformMatrix)
 	NULL_CHECK_RETURN(m_pScene, E_FAIL);
 
 	m_iNumMeshContainers = m_pScene->mNumMeshes;
+	m_iNumMaterials = m_pScene->mNumMaterials;
 
-	m_vecMeshContainer.reserve(m_iNumMeshContainers);
+	m_vecMeshContainerArr = new MESHCONTAINERS[m_iNumMaterials];
 
 	for (_uint i = 0; i < m_iNumMeshContainers; ++i)
 	{
 		CMeshContainer*		pMeshContainer = CMeshContainer::Create(m_pDevice, m_pDeviceContext, m_eModelType, m_pScene->mMeshes[i], TransformMatrix);
-	
 		NULL_CHECK_RETURN(pMeshContainer, E_FAIL);
-
-		m_vecMeshContainer.push_back(pMeshContainer);
+		m_vecMeshContainerArr[m_pScene->mMeshes[i]->mMaterialIndex].push_back(pMeshContainer);
 	}
 
 	return S_OK;
@@ -124,10 +143,8 @@ HRESULT CModel::Ready_Materials(const char * pModelFilePath)
 {
 	NULL_CHECK_RETURN(m_pScene, E_FAIL);
 
-	m_iNumMaterials = m_pScene->mNumMaterials;
 
-	//MESHMATERIALDESC		pMeshMaterialDesc;
-	//ZeroMemory(&pMeshMaterialDesc, sizeof(MESHMATERIALDESC));
+	ZeroMemory(&m_MeshMaterialDesc, sizeof(MESHMATERIALDESC));
 
 	m_MeshMaterialDesc.pTexture = CTexture::Create(m_pDevice, m_pDeviceContext);
 
@@ -167,7 +184,7 @@ HRESULT CModel::Ready_Materials(const char * pModelFilePath)
 			_tchar		szTextureFullPath[MAX_PATH] = TEXT("");
 			MultiByteToWideChar(CP_ACP, 0, szFullPath, (int)strlen(szFullPath), szTextureFullPath, MAX_PATH);
 
-			FAILED_CHECK(m_MeshMaterialDesc.pTexture->Insert_Texture_On_BindedLayer(j,szTextureFullPath));
+			FAILED_CHECK(m_MeshMaterialDesc.pTexture->Insert_Texture_On_BindedLayer(j, szTextureFullPath));
 		
 		}
 
@@ -204,10 +221,19 @@ void CModel::Free()
 {
 	__super::Free();
 
-	for (auto& pMeshcontainer : m_vecMeshContainer)
-		Safe_Release(pMeshcontainer);
+	for (_uint i = 0; i < m_iNumMaterials; i++)
+	{
+		for (auto& pMeshcontainer : m_vecMeshContainerArr[i])
+		{
+			CMeshContainer* TempForRelease = pMeshcontainer;
+			Safe_Release(TempForRelease);
+		}
+		if (!m_bIsClone)
+			m_vecMeshContainerArr[i].clear();
+	}
+	if (!m_bIsClone)
+		Safe_Delete_Array(m_vecMeshContainerArr);
 
-	m_vecMeshContainer.clear();
 
 	Safe_Release(m_MeshMaterialDesc.pTexture);
 

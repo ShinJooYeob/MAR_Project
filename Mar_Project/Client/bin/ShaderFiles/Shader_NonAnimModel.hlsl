@@ -2,6 +2,23 @@
 #include "Shader_Define.hpp" 
 
 texture2D			g_DiffuseTexture;
+texture2D			g_SpecularTexture;
+//texture2D			g_AmbientTexture;
+//texture2D			g_EmissiveTexture;
+//texture2D			g_HeightTexture;
+texture2D			g_NormalTexture;
+//texture2D			g_ShininessTexture;
+texture2D			g_OpacityTexture;
+//texture2D			g_DisplaceTexture;
+//texture2D			g_LightMapTexture;
+//texture2D			g_ReflectTexture;
+//texture2D			g_BaseColorTexture;
+//texture2D			g_NormalCamTexture;
+//texture2D			g_EmissionColorTexture;
+//texture2D			g_MetalTexture;
+//texture2D			g_DiffuseRoughTexture;
+//texture2D			g_AmbientOcculusionTexture;
+
 
 struct VS_IN
 {
@@ -53,10 +70,33 @@ PS_OUT PS_MAIN_DEFAULT(PS_IN In)
 
 	return Out;
 }
+PS_OUT PS_MAIN_ZTESTALLMOST(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	Out.vColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
+
+	if (Out.vColor.a < 1)
+		discard;
+
+	return Out;
+}
+PS_OUT PS_MAIN_TESTPLAYER(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	Out.vColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
+
+	if (Out.vColor.r > 0.99 && Out.vColor.g > 0.99 && Out.vColor.b > 0.99)
+		discard;
+
+	return Out;
+}
+
 
 technique11		DefaultTechnique
 {
-	pass Rect
+	pass Default
 	{
 		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 		SetDepthStencilState(ZTestAndWriteState, 0);
@@ -66,4 +106,24 @@ technique11		DefaultTechnique
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN_DEFAULT();
 	}	
+	pass UnderAllDiscard
+	{
+		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(ZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_ccw);
+
+		VertexShader = compile vs_5_0 VS_MAIN_DEFAULT();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_ZTESTALLMOST();
+	}
+	pass TestPlayer
+	{
+		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(ZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_ccw);
+
+		VertexShader = compile vs_5_0 VS_MAIN_DEFAULT();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_TESTPLAYER();
+	}
 }

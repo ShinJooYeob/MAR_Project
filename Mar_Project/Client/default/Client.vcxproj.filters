@@ -175,6 +175,15 @@
     <Filter Include="01.GameObject\08.Weapon\05.Chess">
       <UniqueIdentifier>{694ccd0e-563a-44b5-9639-89a8b09e0e58}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.GameObject\08.Weapon\99.Bullet">
+      <UniqueIdentifier>{248bdb4a-1299-401c-adae-6958d65e1266}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\08.Weapon\99.Bullet\NormalBullet">
+      <UniqueIdentifier>{3177b79f-00f0-427f-9479-b4eabae2eed2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\08.Weapon\99.Bullet\GrenadeBullet">
+      <UniqueIdentifier>{3680e6bd-38bc-4566-8cbb-ead603f94126}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -306,6 +315,18 @@
     <ClInclude Include="..\public\StaticMapObject.h">
       <Filter>01.GameObject\07.MapObject\00.StaticObj</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\WireTerrain.h">
+      <Filter>01.GameObject\06.Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Bullet.h">
+      <Filter>01.GameObject\08.Weapon\99.Bullet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\NormalBullet.h">
+      <Filter>01.GameObject\08.Weapon\99.Bullet\NormalBullet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\GrenadeBullet.h">
+      <Filter>01.GameObject\08.Weapon\99.Bullet\GrenadeBullet</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -412,6 +433,18 @@
     </ClCompile>
     <ClCompile Include="..\private\StaticMapObject.cpp">
       <Filter>01.GameObject\07.MapObject\00.StaticObj</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\WireTerrain.cpp">
+      <Filter>01.GameObject\06.Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Bullet.cpp">
+      <Filter>01.GameObject\08.Weapon\99.Bullet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\NormalBullet.cpp">
+      <Filter>01.GameObject\08.Weapon\99.Bullet\NormalBullet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\GrenadeBullet.cpp">
+      <Filter>01.GameObject\08.Weapon\99.Bullet\GrenadeBullet</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

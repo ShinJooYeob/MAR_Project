@@ -15,21 +15,29 @@ CWeapon::CWeapon(const CWeapon & rhs)
 
 HRESULT CWeapon::Initialize_Prototype(void * pArg)
 {
+	__super::Initialize_Prototype(pArg);
 	return S_OK;
 }
 
 HRESULT CWeapon::Initialize_Clone(void * pArg)
 {
+	FAILED_CHECK(__super::Initialize_Clone(pArg));
+
+
 	return S_OK;
 }
 
 _int CWeapon::Update(_double fDeltaTime)
 {
+	if (__super::Update(fDeltaTime) < 0)
+		return -1;
 	return _int();
 }
 
 _int CWeapon::LateUpdate(_double fDeltaTime)
 {
+	if (__super::LateUpdate(fDeltaTime) < 0)
+		return -1;
 	return _int();
 }
 

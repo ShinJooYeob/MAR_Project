@@ -22,6 +22,7 @@ public:
 	HRESULT Add_Model_Texture(_uint iIndex, const _tchar* pTextureFilePath);
 
 	_uint Get_TextureListSize() { return (_uint)(m_vecTextures.size()); }
+	HRESULT NullCheckTexture(_uint iIndex);
 private:
 	virtual HRESULT Initialize_Prototype(const _tchar* pTextureFilePath, _uint iNumTextures = 1);
 	virtual HRESULT Initialize_Prototype();

@@ -141,9 +141,20 @@ PS_OUT PS_MAIN_TERRAIN_POINT(PS_IN In)
 	return Out;
 }
 
+PS_OUT PS_MAIN_TERRAIN_WIRE(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+
+	Out.vColor = vector(0,0.5,0,1);
+
+
+	return Out;
+}
+
 technique11		DefaultTechnique
 {
-	pass Terrain_DirectionalLight
+	pass Terrain_DirectionalLight // 0
 	{
 		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff); 
 			SetDepthStencilState(ZTestAndWriteState, 0);
@@ -154,7 +165,7 @@ technique11		DefaultTechnique
 		PixelShader = compile ps_5_0 PS_MAIN_TERRAIN_DIRECTIONAL();
 	}	
 
-	pass Terrain_PointLight
+	pass Terrain_PointLight // 1
 	{
 		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 		SetDepthStencilState(ZTestAndWriteState, 0);
@@ -163,5 +174,15 @@ technique11		DefaultTechnique
 		VertexShader = compile vs_5_0 VS_MAIN_TERRAIN();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN_TERRAIN_POINT();
+	}
+	pass Terrain_Wire // 2
+	{
+		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(ZTestAndWriteState, 0);
+		SetRasterizerState(FillMode_Wireframe);
+
+		VertexShader = compile vs_5_0 VS_MAIN_TERRAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_TERRAIN_WIRE();
 	}
 }

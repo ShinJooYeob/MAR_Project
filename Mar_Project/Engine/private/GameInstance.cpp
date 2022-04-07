@@ -92,11 +92,6 @@ _int CGameInstance::Update_Engine(_double fDeltaTime)
 
 	FAILED_CHECK(m_pSoundMgr->Update_FMOD(fDeltaTime));
 
-	if (m_pSceneMgr->Update(fDeltaTime) < 0)
-	{
-		__debugbreak();
-		return -1;
-	}
 
 	if (m_pObjectMgr->Update(fDeltaTime) < 0)
 	{
@@ -104,6 +99,11 @@ _int CGameInstance::Update_Engine(_double fDeltaTime)
 		return -1;
 	}
 
+	if (m_pSceneMgr->Update(fDeltaTime) < 0)
+	{
+		__debugbreak();
+		return -1;
+	}
 	FAILED_CHECK(SetUp_WorldFrustumPlane());
 
 
@@ -349,6 +349,7 @@ HRESULT CGameInstance::Scene_Change(CScene * pScene, _int iNextSceneIdx)
 		__debugbreak();
 		return E_FAIL;
 	}
+
 
 	if(FAILED(m_pSceneMgr->Scene_Chage(pScene, iNextSceneIdx)))
 		return E_FAIL;

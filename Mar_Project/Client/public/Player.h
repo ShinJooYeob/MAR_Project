@@ -61,6 +61,10 @@ private:
 	_bool				m_bIsRockOn = false;
 	CGameObject*		m_pRockOnMonster = nullptr;
 
+
+	/*For Bullet*/
+	_double				m_BulletNormalInterver = 0;
+
 private:
 	HRESULT SetUp_Components();
 	
@@ -70,6 +74,10 @@ private:
 	HRESULT Jump_Update(_double fDeltaTime, CGameInstance* pInstance);
 	HRESULT Dash_Update(_double fDeltaTime, CGameInstance* pInstance, _float TotalDashTime = 0.5f);
 	HRESULT RockOn_Update(_double fDeltaTime, CGameInstance* pInstance);
+	
+	HRESULT Lunch_Bullet(_double fDeltaTime, CGameInstance* pInstance);
+	HRESULT Lunch_Grenade(_double fDeltaTime, CGameInstance* pInstance);
+
 
 	HRESULT Set_Player_On_Terrain();
 	HRESULT Set_Player_On_Slieder(_double fDeltatime);

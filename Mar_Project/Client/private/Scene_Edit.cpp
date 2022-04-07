@@ -20,7 +20,8 @@ HRESULT CScene_Edit::Initialize()
 
 	FAILED_CHECK(Ready_Layer_Player(TAG_LAY(Layer_Player)));
 	FAILED_CHECK(Ready_Layer_MainCamera(TAG_LAY(Layer_Camera_Main)));
-
+	FAILED_CHECK(Ready_Layer_WireTerrain(TAG_LAY(Layer_WireTerrain)));
+	
 	
 
 
@@ -52,6 +53,8 @@ HRESULT CScene_Edit::Initialize()
 	ZeroMemory(m_ArrBuffer, sizeof(_float) * 4);
 	ZeroMemory(bArrWindowFlag, sizeof(_bool) * 10);
 	ZeroMemory(m_iSelectedObjectNMesh, sizeof(_uint) * 2);
+	m_iSelectedObjectNMesh[0] = Prototype_StaticMapObject;
+	m_iSelectedObjectNMesh[1] = Prototype_Mesh_None;
 
 
 
@@ -395,6 +398,8 @@ HRESULT CScene_Edit::Load_Data(const char * szFileName, eDATATYPE iKinds)
 			ZeroMemory(m_ArrBuffer, sizeof(_float) * 4);
 			m_ArrBuffer[3] = 0.1f;
 			ZeroMemory(m_iSelectedObjectNMesh, sizeof(_uint) * 2);
+						m_iSelectedObjectNMesh[0] = Prototype_StaticMapObject;
+			m_iSelectedObjectNMesh[1] = Prototype_Mesh_None;
 
 			m_bIsModelMove = 0;
 			m_iKindsOfMoving = 0;
@@ -581,6 +586,19 @@ HRESULT CScene_Edit::Input_KeyBoard(_double fDeltaTime)
 			}
 			
 		}
+		if (pInstance->Get_DIKeyState(DIK_LSHIFT)&DIS_Press)
+		{
+			_long fWheelMove = pInstance->Get_DIMouseMoveState(CInput_Device::MMS_WHEEL);
+			if (fWheelMove)
+			{
+				CTransform* CamTransform = m_pEditorCam->Get_Camera_Transform();
+
+				CamTransform->MovetoDir_bySpeed(
+					CamTransform->Get_MatrixState(CTransform::STATE_LOOK), (_float)fWheelMove, fDeltaTime);
+			}
+
+		}
+
 	}
 
 	if (m_bIsModelMove)
@@ -615,6 +633,48 @@ HRESULT CScene_Edit::Input_KeyBoard(_double fDeltaTime)
 			memcpy(((_float*)(&(m_SelectedObjectSRT->m[2 - m_iKindsOfMoving])) + m_iSelectedXYZ), &tempValue, sizeof(_float));
 
 			int t = 0;
+		}
+
+	}
+	else 
+	{
+		if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_LBUTTON) & DIS_DoubleDown)
+		{
+			POINT ptMouse;
+			GetCursorPos(&ptMouse);
+			ScreenToClient(g_hWnd, &ptMouse);
+
+
+
+			_Vector vCursorPos = XMVectorSet(
+				(_float(ptMouse.x) / (g_iWinCX * 0.5f)) - 1.f, 
+				(_float(ptMouse.y) / -(g_iWinCY * 0.5f)) + 1.f,
+				0, 1.f);
+			//_Vector vCursorPos = XMVectorSet(	(_float(ptMouse.x) / g_iWinCX * 0.5f) - 1.f, 	(_float(ptMouse.y) / g_iWinCY * 0.5f) + 1.f ,		0, 1.f);
+
+			_Matrix InvProjMat = XMMatrixInverse(nullptr, pInstance->Get_Transform_Matrix(PLM_PROJ));
+
+			_Vector vRayDir = XMVector4Transform(vCursorPos, InvProjMat) - XMVectorSet(0,0,0,1);
+
+			_Matrix InvViewMat = XMMatrixInverse(nullptr, pInstance->Get_Transform_Matrix(PLM_VIEW));
+			vRayDir = XMVector3TransformNormal(vRayDir, InvViewMat);
+
+
+
+			_Vector vCamPos = m_pEditorCam->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_POS);
+
+			if (XMVectorGetY(vCamPos) * XMVectorGetY(vRayDir) < 0)
+			{
+				_float Scale = XMVectorGetY(vCamPos) / -XMVectorGetY(vRayDir);
+
+				_float3 vTargetPos = vCamPos + Scale * vRayDir;
+
+				memcpy( m_vecBatchedObject[0].matSRT.m[2],&vTargetPos,sizeof(_float3));
+
+				RenewElenmetTransform(&m_vecBatchedObject[0]);
+
+			}
+
 		}
 
 	}
@@ -1007,8 +1067,9 @@ HRESULT CScene_Edit::Widget_CreateDeleteObject(_double fDeltatime)
 
 				if (ImGui::BeginTable("split", 1, ImGuiTableFlags_Resizable | ImGuiTableFlags_NoSavedSettings))
 				{
-					for (int i = Prototype_EditorCursor; i <= Prototype_StaticMapObject; i++)
+					for (int i = Prototype_StaticMapObject; i >= Prototype_EditorCursor; i--)
 					{
+						
 						char buf[MAX_PATH];
 						sprintf_s(buf, "%ws", TAG_OP(OBJECTPROTOTYPEID(i)));
 						ImGui::TableNextColumn();
@@ -1022,6 +1083,9 @@ HRESULT CScene_Edit::Widget_CreateDeleteObject(_double fDeltatime)
 							m_bIsModelMove = 0;
 							m_SelectedObjectSRT = &(m_vecBatchedObject[m_iBatchedVecIndex].matSRT);
 							ZeroMemory(m_iSelectedObjectNMesh, sizeof(_uint) * 2);
+							m_iSelectedObjectNMesh[0] = Prototype_StaticMapObject;
+							m_iSelectedObjectNMesh[1] = Prototype_Mesh_None;
+
 						}
 					}
 					ImGui::EndTable();
@@ -1053,8 +1117,6 @@ HRESULT CScene_Edit::Widget_CreateDeleteObject(_double fDeltatime)
 				if (ImGui::BeginTable("split", 1, ImGuiTableFlags_Resizable | ImGuiTableFlags_NoSavedSettings))
 				{
 
-
-
 					for (int i = Prototype_Mesh_None; i <= Prototype_Mesh_Player; i++)
 					{
 						char buf[MAX_PATH];
@@ -1068,6 +1130,9 @@ HRESULT CScene_Edit::Widget_CreateDeleteObject(_double fDeltatime)
 							m_iBatchedVecIndex = 0; m_bIsModelMove = 0;
 							m_SelectedObjectSRT = &(m_vecBatchedObject[m_iBatchedVecIndex].matSRT);
 							ZeroMemory(m_iSelectedObjectNMesh, sizeof(_uint) * 2);
+							m_iSelectedObjectNMesh[0] = Prototype_StaticMapObject;
+							m_iSelectedObjectNMesh[1] = Prototype_Mesh_None;
+
 						}
 					}
 					ImGui::EndTable();
@@ -1194,6 +1259,10 @@ HRESULT CScene_Edit::Widget_SaveLoadMapData(_double fDeltatime)
 			ZeroMemory(m_ArrBuffer, sizeof(_float) * 4);
 			m_ArrBuffer[3] = 0.1f;
 			ZeroMemory(m_iSelectedObjectNMesh, sizeof(_uint) * 2);
+			m_iSelectedObjectNMesh[0] = Prototype_StaticMapObject;
+			m_iSelectedObjectNMesh[1] = Prototype_Mesh_None;
+
+
 
 			m_bIsModelMove = 0;
 			m_iKindsOfMoving = 0;
@@ -1543,7 +1612,7 @@ HRESULT CScene_Edit::Ready_Layer_MainCamera(const _tchar * pLayerTag)
 	CameraDesc.iWinCY = g_iWinCY;
 
 	CameraDesc.TransformDesc.fMovePerSec = 5.f;
-	CameraDesc.TransformDesc.fRotationPerSec = XMConvertToRadians(2.0f);
+	CameraDesc.TransformDesc.fRotationPerSec = XMConvertToRadians(4.0f);
 	CameraDesc.TransformDesc.fScalingPerSec = 1.f;
 
 
@@ -1607,6 +1676,17 @@ HRESULT CScene_Edit::Ready_Layer_Player(const _tchar * pLayerTag)
 		}
 		PlayerList->clear();
 	}
+
+	return S_OK;
+}
+
+HRESULT CScene_Edit::Ready_Layer_WireTerrain(const _tchar * pLayerTag)
+{
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENEID::SCENE_EDIT, pLayerTag, TAG_OP(Prototype_WireTerrain)));
+
+	m_pWireTerrain = (CWireTerrain*)(g_pGameInstance->Get_GameObject_By_LayerIndex(SCENE_EDIT, pLayerTag));
+
+	NULL_CHECK_RETURN(m_pWireTerrain, E_FAIL);
 
 	return S_OK;
 }

@@ -1,15 +1,14 @@
 #pragma once
-
-#include "GameObject.h"
+#include "Bullet.h"
 
 BEGIN(Client)
-class CWeapon abstract : public CGameObject
-{
 
-protected:
-	CWeapon(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
-	CWeapon(const CWeapon& rhs);
-	virtual ~CWeapon() = default;
+class CNormalBullet final : public CBullet
+{
+private:
+	CNormalBullet(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
+	CNormalBullet(const CNormalBullet& rhs);
+	virtual ~CNormalBullet() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype(void* pArg)override;
@@ -22,9 +21,11 @@ public:
 	virtual _int LateRender()override;
 
 
+
 public:
+	static CNormalBullet* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
+	virtual CGameObject* Clone(void* pArg);
 	virtual void Free() override;
 };
 
-
-END
+END	

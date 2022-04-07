@@ -176,6 +176,7 @@
     <ClInclude Include="..\..\Reference\Inc\imstb_textedit.h" />
     <ClInclude Include="..\..\Reference\Inc\imstb_truetype.h" />
     <ClInclude Include="..\bin\ShaderFiles\Shader_Define.hpp" />
+    <ClInclude Include="..\public\Bullet.h" />
     <ClInclude Include="..\public\Camera_Editor.h" />
     <ClInclude Include="..\public\Camera_Main.h" />
     <ClInclude Include="..\public\Client_Define.h" />
@@ -184,6 +185,8 @@
     <ClInclude Include="..\public\Client_Struct.h" />
     <ClInclude Include="..\public\ImguiMgr.h" />
     <ClInclude Include="..\public\HiddenPad.h" />
+    <ClInclude Include="..\public\GrenadeBullet.h" />
+    <ClInclude Include="..\public\NormalBullet.h" />
     <ClInclude Include="..\public\RoseObj.h" />
     <ClInclude Include="..\public\StaticMapObject.h" />
     <ClInclude Include="..\public\TeethObj.h" />
@@ -194,6 +197,7 @@
     <ClInclude Include="..\public\ESCursor.h" />
     <ClInclude Include="..\public\Npc.h" />
     <ClInclude Include="..\public\Monster.h" />
+    <ClInclude Include="..\public\WireTerrain.h" />
     <ClInclude Include="..\public\Weapon.h" />
     <ClInclude Include="..\public\MapObject.h" />
     <ClInclude Include="..\public\Terrain.h" />
@@ -212,10 +216,13 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\private\Bullet.cpp" />
     <ClCompile Include="..\private\Camera_Editor.cpp" />
     <ClCompile Include="..\private\Camera_Main.cpp" />
     <ClCompile Include="..\private\ImguiMgr.cpp" />
     <ClCompile Include="..\private\HiddenPad.cpp" />
+    <ClCompile Include="..\private\GrenadeBullet.cpp" />
+    <ClCompile Include="..\private\NormalBullet.cpp" />
     <ClCompile Include="..\private\RoseObj.cpp" />
     <ClCompile Include="..\private\StaticMapObject.cpp" />
     <ClCompile Include="..\private\TeethObj.cpp" />
@@ -226,6 +233,7 @@
     <ClCompile Include="..\private\ESCursor.cpp" />
     <ClCompile Include="..\private\Npc.cpp" />
     <ClCompile Include="..\private\Monster.cpp" />
+    <ClCompile Include="..\private\WireTerrain.cpp" />
     <ClCompile Include="..\private\Weapon.cpp" />
     <ClCompile Include="..\private\MapObject.cpp" />
     <ClCompile Include="..\private\Terrain.cpp" />

@@ -83,7 +83,11 @@ HRESULT CGameObject::Add_Component(_uint iScenenNum, const _tchar* tagPrototype,
 
 	 CComponent* pCloneComponent = GetSingle(CGameInstance)->Clone_Component(iScenenNum, tagPrototype, pArg);
 
-	 NULL_CHECK_BREAK(pCloneComponent);
+	 if (pCloneComponent == nullptr)
+	 {
+		 CComponent* pCloneComponent = GetSingle(CGameInstance)->Clone_Component(0, tagPrototype, pArg);
+		 NULL_CHECK_BREAK(pCloneComponent);
+	 }
 
 
 
@@ -109,8 +113,16 @@ HRESULT CGameObject::Change_Component_by_NewAssign(_uint iScenenNum, const _tcha
 		NULL_CHECK_RETURN(ppSecValue, E_FAIL);
 	}
 
-
 	ppSecValue = iter->second;
+
+
+	CComponent* pCloneComponent = GetSingle(CGameInstance)->Clone_Component(iScenenNum, tagPrototype, pArg);
+	if (pCloneComponent == nullptr)
+	{
+		pCloneComponent = GetSingle(CGameInstance)->Clone_Component(0, tagPrototype, pArg);
+		NULL_CHECK_RETURN(pCloneComponent,E_FAIL);
+	}
+
 
 
 	// 기존 컴포넌트 삭제
@@ -119,12 +131,6 @@ HRESULT CGameObject::Change_Component_by_NewAssign(_uint iScenenNum, const _tcha
 	pObjMemberPointer = *ppSecValue;
 	Safe_Release(pObjMemberPointer);
 
-	CComponent* pCloneComponent = GetSingle(CGameInstance)->Clone_Component(iScenenNum, tagPrototype, pArg);
-	if (pCloneComponent == nullptr)
-	{
-		pCloneComponent = GetSingle(CGameInstance)->Clone_Component(0, tagPrototype, pArg);
-		NULL_CHECK_BREAK(pCloneComponent);
-	}
 
 
 

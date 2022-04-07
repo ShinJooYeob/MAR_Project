@@ -33,6 +33,9 @@ HRESULT CPlayer::Initialize_Clone(void * pArg)
 
 _int CPlayer::Update(_double fDeltaTime)
 {
+	if (m_eNowSceneNum == SCENE_LOADING)
+		return 0;
+
 	if (__super::Update(fDeltaTime) < 0)
 		return -1;
 
@@ -45,6 +48,9 @@ _int CPlayer::Update(_double fDeltaTime)
 
 _int CPlayer::LateUpdate(_double fDeltaTime)
 {
+	if (m_eNowSceneNum == SCENE_LOADING)
+		return 0;
+
 	if (__super::LateUpdate(fDeltaTime) < 0)
 		return -1;
 
@@ -90,7 +96,16 @@ _int CPlayer::Render()
 	//FAILED_CHECK(m_pTextureCom->Bind_OnShader_AutoFrame(m_pShaderCom, "g_DiffuseTexture", g_fDeltaTime));
 
 
-	FAILED_CHECK(m_pModel->Render(m_pShaderCom, 0));
+	_uint NumMaterial = m_pModel->Get_NumMaterial();
+
+
+	for (_uint i = 0; i < NumMaterial; i++)
+	{
+		for (_uint j = 0; j < AI_TEXTURE_TYPE_MAX; j++)
+			FAILED_CHECK(m_pModel->Bind_OnShader(m_pShaderCom, i, j, MODLETEXTYPE(j)));
+
+		FAILED_CHECK(m_pModel->Render(m_pShaderCom, 2, i));
+	}
 	//FAILED_CHECK(m_pVIBufferCom->Render(m_pShaderCom, 0));
 
 	return _int();
@@ -152,7 +167,7 @@ HRESULT CPlayer::Input_Keyboard(_double fDeltaTime)
 	CGameInstance* pInstance = GetSingle(CGameInstance);
 
 
-	if (pInstance->Get_DIKeyState(DIK_LALT)&DIS_Down)
+	if (pInstance->Get_DIKeyState(DIK_Z)&DIS_Down)
 		GetSingle(CUtilityMgr)->SlowMotionStart();
 
 
@@ -162,6 +177,11 @@ HRESULT CPlayer::Input_Keyboard(_double fDeltaTime)
 		FAILED_CHECK(Move_Update(fDeltaTime, pInstance));
 	FAILED_CHECK(Jump_Update(fDeltaTime, pInstance));
 	FAILED_CHECK(RockOn_Update(fDeltaTime, pInstance));
+
+	FAILED_CHECK(Lunch_Bullet(fDeltaTime, pInstance));
+	FAILED_CHECK(Lunch_Grenade(fDeltaTime, pInstance));
+
+	
 
 	
 	return S_OK;
@@ -402,6 +422,54 @@ HRESULT CPlayer::RockOn_Update(_double fDeltaTime, CGameInstance * pInstance)
 
 
 
+
+	return S_OK;
+}
+
+HRESULT CPlayer::Lunch_Bullet(_double fDeltaTime, CGameInstance * pInstance)
+{
+
+
+	
+	if (pInstance->Get_DIKeyState(DIK_E) & DIS_Press)
+	{
+		m_BulletNormalInterver -=fDeltaTime;
+		if (pInstance->Get_DIKeyState(DIK_E) & DIS_Up)
+			m_BulletNormalInterver = 0;
+
+		if (m_BulletNormalInterver < 0)
+		{
+
+			_Vector vPlayerPos = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+			_Vector vCamPos = m_pMainCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_POS);
+			_float3 vBulletDir = XMVector3Normalize(vPlayerPos - vCamPos + XMVectorSet(0, -m_CamDegreeAngle.z * m_fSmallScale * 0.34f, 0, 0));
+
+			pInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Bullet), TAG_OP(Prototype_Bullet_Normal),
+				&vBulletDir);
+
+			m_BulletNormalInterver = GetSingle(CUtilityMgr)->RandomFloat(0.15f, 0.2f);
+		}
+	}
+
+	return S_OK;
+}
+
+HRESULT CPlayer::Lunch_Grenade(_double fDeltaTime, CGameInstance * pInstance)
+{
+	if (pInstance->Get_DIKeyState(DIK_Q) & DIS_Down)
+	{
+
+		_Vector vPlayerPos = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+		_Vector vCamPos = m_pMainCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_POS);
+
+		_float3 vBulletDir = (vPlayerPos - vCamPos + XMVectorSet(0, -m_CamDegreeAngle.z * m_fSmallScale * 0.34f, 0, 0));
+
+
+		pInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Bullet), TAG_OP(Prototype_Bullet_Grenade),
+			&vBulletDir);
+
+
+	}
 
 	return S_OK;
 }

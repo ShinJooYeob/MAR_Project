@@ -2,6 +2,7 @@
 #include "..\Public\Loader.h"
 #include "ESCursor.h"
 #include "Camera_Editor.h"
+#include "WireTerrain.h"
 
 //MapObject
 #include "Terrain.h"
@@ -217,6 +218,10 @@ HRESULT CLoader::Load_Scene_Edit(_bool * _IsClientQuit, CRITICAL_SECTION * _CriS
 #pragma region PROTOTYPE_COMPONENT
 #pragma endregion
 
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_EDIT, TAG_CP(Prototype_VIBuffer_Terrain_Edit),
+		CVIBuffer_Terrain::Create(m_pDevice, m_pDeviceContext, 257)));
+	//FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_EDIT, TAG_CP(Prototype_Texture_Terrain),
+	//	CTexture::Create(m_pDevice, m_pDeviceContext, L"Terrain.txt")));
 
 
 
@@ -231,6 +236,7 @@ HRESULT CLoader::Load_Scene_Edit(_bool * _IsClientQuit, CRITICAL_SECTION * _CriS
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_EditorCursor), CESCursor::Create(m_pDevice, m_pDeviceContext)));
 
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_Camera_Editor), CCamera_Editor::Create(m_pDevice, m_pDeviceContext)));
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_WireTerrain), CWireTerrain::Create(m_pDevice, m_pDeviceContext)));
 
 
 	RELEASE_INSTANCE(CGameInstance);

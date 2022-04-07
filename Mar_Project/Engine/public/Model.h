@@ -20,7 +20,9 @@ public:
 
 
 public:
-	HRESULT Render(class CShader* pShader, _uint iPassIndex);
+	_uint	Get_NumMaterial() { return m_iNumMaterials; };
+	HRESULT Bind_OnShader(class CShader* pShader, _uint iMaterialIndex , _uint eTextureType, const char* pHlslConstValueName );
+	HRESULT Render(class CShader* pShader, _uint iPassIndex, _uint iMaterialIndex);
 
 
 private:
@@ -29,19 +31,16 @@ private:
 
 private:
 	_uint									m_iNumMeshContainers = 0;
-	vector<class CMeshContainer*>			m_vecMeshContainer;
+	vector<class CMeshContainer*>*			m_vecMeshContainerArr;
 	typedef vector<class CMeshContainer*>	MESHCONTAINERS;
 
 private:
 	_uint									m_iNumMaterials = 0;
-	//vector<MESHMATERIALDESC*>				m_vecMaterials;
-	//typedef vector<MESHMATERIALDESC*>		MATERIALS;
-
 	MESHMATERIALDESC						m_MeshMaterialDesc;
 
 
 private:
-	MODELTYPE				m_eModelType = TYPE_END;
+	MODELTYPE								m_eModelType = TYPE_END;
 	_float4x4								m_TransformMatrix;
 
 private:

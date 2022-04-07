@@ -22,6 +22,10 @@ private:
 	virtual HRESULT Initialize_Clone(void * pArg)override;
 
 public:
+	HRESULT NullCheckBinedTextureLayer() { if (m_pBindedTextureLayer == nullptr)return E_FAIL; return S_OK; };
+	HRESULT NullCheckTexture(_uint iIndex);
+
+
 	//바인드 관련
 	HRESULT Bind_OnShader(class CShader* pShader, const char* pValueName, _uint iTextureIndex = 0);
 	HRESULT Bind_OnShader_AutoFrame(class CShader* pShader, const char* pValueName, _double fTimeDelta, _double* pOutFrameCount = nullptr);

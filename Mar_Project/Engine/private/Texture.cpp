@@ -39,6 +39,12 @@ HRESULT CTexture::Initialize_Prototype()
 {
 	FAILED_CHECK(__super::Initialize_Prototype(nullptr));
 
+	m_pBindedTextureLayer = nullptr;
+	m_TagNowTexture = nullptr;
+
+	m_fFrameTime = 0;
+	m_fFramePerSec = 6.;
+	m_iNumMaxTexture = 0;
 
 	return S_OK;
 }
@@ -48,6 +54,14 @@ HRESULT CTexture::Initialize_Clone(void * pArg)
 	FAILED_CHECK(__super::Initialize_Clone(nullptr));
 
 	return S_OK;
+}
+
+HRESULT CTexture::NullCheckTexture(_uint iIndex)
+{
+	if (m_pBindedTextureLayer == nullptr)
+		return E_FAIL;
+
+	return m_pBindedTextureLayer->NullCheckTexture(iIndex);
 }
 
 HRESULT CTexture::Bind_OnShader(CShader * pShader, const char * pValueName, _uint iTextureIndex)
@@ -93,7 +107,7 @@ HRESULT CTexture::Change_TextureLayer(const _tchar * tagTexureLayer, _double fFr
 	Safe_AddRef(m_pBindedTextureLayer);
 
 	m_fFrameTime = 0;
-	m_TagNowTexture = tagTexureLayer;
+	m_TagNowTexture = (iter->first).c_str();
 	m_iNumMaxTexture = m_pBindedTextureLayer->Get_TextureListSize();
 
 
@@ -116,9 +130,9 @@ HRESULT CTexture::Insert_Empty_TextureLayer(_tchar * szStateKey)
 
 	NULL_CHECK_RETURN(pTextureLayer, E_FAIL);
 
-	m_mapTextureLayers.emplace(szStateKey, pTextureLayer);
+	m_mapTextureLayers.emplace(wstring(szStateKey), pTextureLayer);
 
-	Change_TextureLayer(szStateKey);
+	FAILED_CHECK( Change_TextureLayer(szStateKey));
 
 	return S_OK;
 }

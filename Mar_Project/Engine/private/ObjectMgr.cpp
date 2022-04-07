@@ -232,16 +232,13 @@ _int CObjectMgr::Update(_double fDeltaTime)
 {
 	for (_uint eSceneNym = 0 ; eSceneNym < m_iMaxSceneNum; eSceneNym++)
 	{
-
 		for (auto& pair : m_mapLayer[eSceneNym]) 
 		{
-
 			if (pair.second->Update(fDeltaTime) < 0)
 			{
 				__debugbreak();
 				return -1;
 			}
-
 		}
 	}
 

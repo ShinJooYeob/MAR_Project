@@ -17,6 +17,9 @@ enum SCENEID
 
 enum OBJECTPROTOTYPEID
 {
+	Prototype_Bullet_Normal,
+	Prototype_Bullet_Grenade,
+
 	Prototype_UIImage,
 	Prototype_SkyBox,
 	Prototype_Player,
@@ -24,6 +27,7 @@ enum OBJECTPROTOTYPEID
 
 	Prototype_Camera_Main,
 	Prototype_Camera_Editor,
+	Prototype_WireTerrain,
 
 	Prototype_EditorCursor,
 	Prototype_Rect,
@@ -52,6 +56,13 @@ static const _tchar* Tag_Object_Prototype(OBJECTPROTOTYPEID eTag)
 {
 	switch (eTag)
 	{
+	case Prototype_Bullet_Normal:
+		return TEXT("Bullet_Normal");
+		break;
+	case Prototype_Bullet_Grenade:
+		return TEXT("Bullet_Grenade");
+		break;
+
 	case Prototype_Camera_Editor:
 		return TEXT("Camera_Editor");
 		break;
@@ -77,7 +88,10 @@ static const _tchar* Tag_Object_Prototype(OBJECTPROTOTYPEID eTag)
 	case Prototype_Terrain:
 		return TEXT("Terrain");
 		break;
-
+	case Prototype_WireTerrain:
+		return TEXT("WireTerrain");
+		break;
+		
 	case Prototype_Ball:
 		return TEXT("Ball");
 		break;
@@ -194,7 +208,10 @@ enum LAYERID
 	Layer_Camera_Editor,
 	Layer_SkyBox,
 	Layer_Player,
+	Layer_Bullet,
+
 	Layer_Terrain,
+	Layer_WireTerrain,
 
 
 	Layer_JumpPad,
@@ -224,15 +241,22 @@ static const _tchar* Tag_Layer(LAYERID eTag)
 		return TEXT("Layer_Camera_Editor");
 		break;
 		
+	case Layer_Bullet:
+		return TEXT("Layer_Bullet");
+		break;
 	case Layer_SkyBox:
 		return TEXT("Layer_SkyBox");
 		break;
+	case Layer_Terrain:
+		return TEXT("Layer_Terrain");
+		break;
+	case Layer_WireTerrain:
+		return TEXT("Layer_WireTerrain");
+		break;
+
 		
 	case Layer_Player:
 		return TEXT("Layer_Player");
-		break;
-	case Layer_Terrain:
-		return TEXT("Layer_Terrain");
 		break;
 	case Layer_JumpPad:
 		return TEXT("Layer_JumpPad");
@@ -296,12 +320,25 @@ enum COMPONENTPROTOTYPEID
 	Prototype_VIBuffer_Terrain_1,
 	Prototype_VIBuffer_Terrain_2,
 	Prototype_VIBuffer_Terrain_3,
-	Prototype_VIBuffer_Terrain_4,
+	Prototype_VIBuffer_Terrain_Edit,
 	//////////////////////////////////////////////////////////////////////////
 	Prototype_Mesh_None,
 	Prototype_Mesh_AlgaeRock_Ledge,
 	Prototype_Mesh_AlgaeRock_Pillar,
 	Prototype_Mesh_AlgaeRock_Wall,
+
+	Prototype_Mesh_GloryGrowthA,
+	Prototype_Mesh_GloryGrowthB,
+	Prototype_Mesh_GloryGrowthC,
+	Prototype_Mesh_GloryGrowthD,
+	Prototype_Mesh_GloryTree_Base,
+	Prototype_Mesh_GloryTree_Main,
+	Prototype_Mesh_GloryTree_MainB,
+	Prototype_Mesh_GloryTree_Shell,
+	Prototype_Mesh_Kelp_Single,
+	Prototype_Mesh_Kelp_Wall,
+	Prototype_Mesh_Kelp_WallFar,
+	Prototype_Mesh_KelpWallBack,
 
 	Prototype_Mesh_Player,
 	//////////////////////////////////////////////////////////////////////////
@@ -374,6 +411,45 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 		return TEXT("Mesh_AlgaeRock_Wall");
 		break;
 
+	case Prototype_Mesh_GloryGrowthA:
+		return TEXT("Mesh_GloryGrowthA");
+		break;
+	case Prototype_Mesh_GloryGrowthB:
+		return TEXT("Mesh_GloryGrowthB");
+		break;
+	case Prototype_Mesh_GloryGrowthC:
+		return TEXT("Mesh_GloryGrowthC");
+		break;
+	case Prototype_Mesh_GloryGrowthD:
+		return TEXT("Mesh_GloryGrowthD");
+		break;
+	case Prototype_Mesh_GloryTree_Base:
+		return TEXT("Mesh_GloryTree_Base");
+		break;
+	case Prototype_Mesh_GloryTree_Main:
+		return TEXT("Mesh_GloryTree_Main");
+		break;
+	case Prototype_Mesh_GloryTree_MainB:
+		return TEXT("Mesh_GloryTree_MainB");
+		break;
+	case Prototype_Mesh_GloryTree_Shell:
+		return TEXT("Mesh_GloryTree_Shell");
+		break;
+	case Prototype_Mesh_Kelp_Single:
+		return TEXT("Mesh_Kelp_Single");
+		break;
+	case Prototype_Mesh_Kelp_Wall:
+		return TEXT("Mesh_Kelp_Wall");
+		break;
+	case Prototype_Mesh_Kelp_WallFar:
+		return TEXT("Mesh_Kelp_WallFar");
+		break;
+	case Prototype_Mesh_KelpWallBack:
+		return TEXT("Mesh_KelpWallBack");
+		break;
+
+
+
 	case Prototype_Mesh_Player:
 		return TEXT("Mesh_Player");
 		break;
@@ -402,8 +478,8 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 	case 	Prototype_VIBuffer_Terrain_3:
 		return TEXT("Prototype_Component_VIBuffer_Terrain_3");
 		break;
-	case 	Prototype_VIBuffer_Terrain_4:
-		return TEXT("Prototype_Component_VIBuffer_Terrain_4");
+	case 	Prototype_VIBuffer_Terrain_Edit:
+		return TEXT("Prototype_Component_VIBuffer_Terrain_Edit");
 		break;
 
 		//////////////////////////////////////////////////////////////////////////
@@ -469,6 +545,77 @@ static const _tchar* Tag_Component(COMPONENTID eTag)
 
 }
 #define  TAG_COM Tag_Component
+
+
+
+static const char* Tag_ModelTextureType(_uint eTag)
+{
+	switch (eTag)
+	{
+	case aiTextureType_NONE:		return "None";
+		break;
+	case aiTextureType_DIFFUSE:	return "g_DiffuseTexture";
+		break;
+	case aiTextureType_SPECULAR:return "g_SpecularTexture";
+		break;
+	case aiTextureType_AMBIENT:return "g_AmbientTexture";
+		break;
+	case aiTextureType_EMISSIVE:return "g_EmissiveTexture";
+		break;
+	case aiTextureType_HEIGHT:return "g_HeightTexture";
+		break;
+	case aiTextureType_NORMALS:return "g_NormalTexture";
+		break;
+	case aiTextureType_SHININESS:return "g_ShininessTexture";
+		break;
+	case aiTextureType_OPACITY:return "g_OpacityTexture";
+		break;
+	case aiTextureType_DISPLACEMENT:return "g_DisplaceTexture";
+		break;
+	case aiTextureType_LIGHTMAP:return "g_LightMapTexture";
+		break;
+	case aiTextureType_REFLECTION:return "g_ReflectTexture";
+		break;
+	case aiTextureType_BASE_COLOR:return "g_BaseColorTexture";
+		break;
+	case aiTextureType_NORMAL_CAMERA:return "g_NormalCamTexture";
+		break;
+	case aiTextureType_EMISSION_COLOR:return "g_EmissionColorTexture";
+		break;
+	case aiTextureType_METALNESS:return "g_MetalTexture";
+		break;
+	case aiTextureType_DIFFUSE_ROUGHNESS:return "g_DiffuseRoughTexture";
+		break;
+	case aiTextureType_AMBIENT_OCCLUSION:return "g_AmbientOcculusionTexture";
+		break;
+	case aiTextureType_UNKNOWN:return "";
+		break;
+	case _aiTextureType_Force32Bit:return "";
+		break;
+	default:
+		OutputDebugStringW(L"Wrong Type Texture");
+		__debugbreak();
+		return nullptr;
+		break;
+	}
+}
+
+#define  MODLETEXTYPE Tag_ModelTextureType
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //
 //
 //enum EasingTypeID

@@ -7,6 +7,7 @@ cbuffer	RenderingPipeLine
 };
 
 
+
 sampler DefaultSampler = sampler_state
 {
 	// D3D11_SAMPLER_DESC
@@ -69,7 +70,7 @@ BOOL AntialiasedLineEnable;
 RasterizerState FillMode_Wireframe
 {
 	FillMode = wireframe;
-	CullMode = back;
+	CullMode = none;
 	FrontCounterClockwise = false;
 };
 RasterizerState FillMode_Solid

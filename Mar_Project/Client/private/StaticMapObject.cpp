@@ -93,7 +93,17 @@ _int CStaticMapObject::Render()
 	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ProjMatrix", &pInstance->Get_Transform_Float4x4_TP(PLM_PROJ), sizeof(_float4x4)));
 
 
-	FAILED_CHECK(m_pModel->Render(m_pShaderCom, 0));
+	_uint NumMaterial = m_pModel->Get_NumMaterial();
+
+	for (_uint i= 0 ; i < NumMaterial ; i ++)
+	{
+
+		for (_uint j = 0; j < AI_TEXTURE_TYPE_MAX; j++)
+			FAILED_CHECK(m_pModel->Bind_OnShader(m_pShaderCom, i, j, MODLETEXTYPE(j)));
+
+		FAILED_CHECK(m_pModel->Render(m_pShaderCom, 1,i));
+	}
+
 	return 0;
 }
 

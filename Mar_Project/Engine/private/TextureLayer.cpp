@@ -71,9 +71,16 @@ HRESULT CTextureLayer::Add_Model_Texture(_uint iIndex, const _tchar * pTextureFi
 
 	if (iIndex >= m_vecTextures.size())
 	{
-		OutputDebugString(TEXT("Already Exist Texture Map\n"));
+		OutputDebugString(TEXT("\nAlready Exist Texture Map\n"));
 		__debugbreak();
 		return E_FAIL;
+	}
+
+	if (m_vecTextures[iIndex] != nullptr)
+	{
+		OutputDebugString(TEXT("\nAlready Exist Texture Map\n"));
+		
+		return S_FALSE;
 	}
 
 	_tchar		szTextureFilePath[MAX_PATH] = TEXT("");
@@ -83,15 +90,19 @@ HRESULT CTextureLayer::Add_Model_Texture(_uint iIndex, const _tchar * pTextureFi
 	wsprintf(szTextureFilePath, pTextureFilePath);
 
 	ID3D11ShaderResourceView*		pSRV = nullptr;
+	ID3D11Resource*					TexturForRelease = nullptr;
+	ID3D11Resource*					TexturForRelease2 = nullptr;
+
 
 	_wsplitpath_s(szTextureFilePath, nullptr, 0, nullptr, 0, nullptr, 0, szExt, MAX_PATH);
 
 	if (!lstrcmp(szExt, TEXT(".dds")))
 	{
-		if(FAILED(CreateDDSTextureFromFile(m_pDevice, szTextureFilePath, nullptr, &pSRV)))
+		if(FAILED(CreateDDSTextureFromFile(m_pDevice, szTextureFilePath, &TexturForRelease, &pSRV)))
 		{
 			IsNotExistPath = true;
 			wstring DebugString = L"\nNot Exist DDS File : " + wstring(szTextureFilePath)+ L"\n";
+			Safe_Release(pSRV);
 			OutputDebugString(DebugString.c_str());
 		}
 	}
@@ -109,10 +120,11 @@ HRESULT CTextureLayer::Add_Model_Texture(_uint iIndex, const _tchar * pTextureFi
 
 		ChagedtoPngPath += L".png";
 
-		if(FAILED(CreateWICTextureFromFile(m_pDevice, ChagedtoPngPath.c_str(), nullptr, &pSRV)))
+		if(FAILED(CreateWICTextureFromFile(m_pDevice, ChagedtoPngPath.c_str(), &TexturForRelease, &pSRV)))
 		{
 			IsNotExistPath = true;
 			wstring DebugString = L"\nNot Exist PNG File : " + wstring(szTextureFilePath)+ L"\n";
+			Safe_Release(pSRV);
 			OutputDebugString(DebugString.c_str());
 		}
 
@@ -121,19 +133,39 @@ HRESULT CTextureLayer::Add_Model_Texture(_uint iIndex, const _tchar * pTextureFi
 
 	else
 	{
-		if (FAILED(CreateWICTextureFromFile(m_pDevice, szTextureFilePath, nullptr, &pSRV)))
+		if (FAILED(CreateWICTextureFromFile(m_pDevice, szTextureFilePath, &TexturForRelease, &pSRV)))
 		{
 			IsNotExistPath = true;
 			wstring DebugString = L"Not Exist WIC File : " + wstring(szTextureFilePath) +L"\n";
+			Safe_Release(pSRV);
 			OutputDebugString(DebugString.c_str());
 		}
+
 	}
+
+	TexturForRelease2 = TexturForRelease;
+	_ulong hr = Safe_Release(TexturForRelease2);
+
+	while (hr)
+	{
+		TexturForRelease2 = TexturForRelease;
+		hr = Safe_Release(TexturForRelease2);
+	}
+
+
 
 	if (!IsNotExistPath)
 		m_vecTextures[iIndex] = pSRV;
 
 
 
+	return S_OK;
+}
+
+HRESULT CTextureLayer::NullCheckTexture(_uint iIndex)
+{
+	if (iIndex >= m_vecTextures.size() || m_vecTextures[iIndex] == nullptr)
+		return E_FAIL;
 	return S_OK;
 }
 
@@ -153,12 +185,14 @@ HRESULT CTextureLayer::Initialize_Prototype(const _tchar * pTextureFilePath, _ui
 		wsprintf(szTextureFilePath, pTextureFilePath, i);
 
 		ID3D11ShaderResourceView*		pSRV = nullptr;
+		ID3D11Resource*					TexturForRelease = nullptr;
+		ID3D11Resource*					TexturForRelease2 = nullptr;
 
 		_wsplitpath_s(szTextureFilePath, nullptr, 0, nullptr, 0, nullptr, 0, szExt, MAX_PATH);
 
 		if (!lstrcmp(szExt, TEXT(".dds")))
 		{
-			FAILED_CHECK(CreateDDSTextureFromFile(m_pDevice, szTextureFilePath, nullptr, &pSRV));
+			FAILED_CHECK(CreateDDSTextureFromFile(m_pDevice, szTextureFilePath, &TexturForRelease, &pSRV));
 		}
 
 		else if (!lstrcmp(szExt, TEXT(".tga")))
@@ -166,7 +200,16 @@ HRESULT CTextureLayer::Initialize_Prototype(const _tchar * pTextureFilePath, _ui
 
 		else
 		{
-			FAILED_CHECK(CreateWICTextureFromFile(m_pDevice, szTextureFilePath, nullptr, &pSRV));
+			FAILED_CHECK(CreateWICTextureFromFile(m_pDevice, szTextureFilePath, &TexturForRelease, &pSRV));
+		}
+
+		TexturForRelease2 = TexturForRelease;
+		_ulong hr = Safe_Release(TexturForRelease2);
+
+		while (hr)
+		{
+			TexturForRelease2 = TexturForRelease;
+			hr = Safe_Release(TexturForRelease2);
 		}
 
 		m_vecTextures.push_back(pSRV);
@@ -233,8 +276,25 @@ void CTextureLayer::Free()
 {
 	__super::Free();
 
-	for (auto& pTexture : m_vecTextures)
-		Safe_Release(pTexture);
+	if (!m_bIsClone)
+	{
+		for (auto& pTexture : m_vecTextures)
+		{
+			ID3D11ShaderResourceView*		pSRV = pTexture;
+			_ulong hr = Safe_Release(pSRV);
+			while (hr != 0)
+			{
+				pSRV = pTexture;
+				hr = Safe_Release(pSRV);
+			}
+		}
+	}
+	else
+	{
+		for (auto& pTexture : m_vecTextures)
+			Safe_Release(pTexture);
+
+	}
 
 	m_vecTextures.clear();
 
