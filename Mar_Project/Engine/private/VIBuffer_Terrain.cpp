@@ -445,7 +445,7 @@ _Vector CVIBuffer_Terrain::Caculate_Terrain_Pick_byRay(_bool* pbIsOnTerrain, _fl
 		vector<_float2> vecAvailIndex;
 		vecAvailIndex.reserve(20);
 
-		for (_uint i = IndexRange.left; _int(i) <= IndexRange.bottom; i++)
+		for (_uint i = IndexRange.left; _int(i) <= IndexRange.right; i++)
 		{
 			for (_uint j = IndexRange.bottom; _int(j) <= IndexRange.top; j++)
 			{
@@ -457,13 +457,13 @@ _Vector CVIBuffer_Terrain::Caculate_Terrain_Pick_byRay(_bool* pbIsOnTerrain, _fl
 		_Vector CalculatedLocalPos;
 
 
-		_Vector vNewPos = PosOnTerrainLocal.XMVector();
-		_Vector vOldPos = OldPosOnTerrainLocal.XMVector();
+		_Vector vRayPos = OldPosOnTerrainLocal.XMVector();
+		_Vector vRayDir = XMVector3Normalize(PosOnTerrainLocal.XMVector() - vRayPos);
 
 
 		for (auto& AvailIndex : vecAvailIndex)
 		{
-			CalculatedLocalPos = Pick_ByRay(vNewPos, vOldPos, AvailIndex,&IsPiecked);
+			CalculatedLocalPos = Pick_ByRay(vRayPos, vRayDir, AvailIndex,&IsPiecked);
 
 			if (IsPiecked)
 			{
@@ -556,7 +556,7 @@ _float CVIBuffer_Terrain::EquationPlane(_bool * pbIsOnTerrain, _float3 PosOnTerr
 	return (Plane.x * PosOnTerrainLocal.x + Plane.y * PosOnTerrainLocal.y + Plane.z * PosOnTerrainLocal.z + Plane.w);
 }
 
-_Vector CVIBuffer_Terrain::Pick_ByRay(_fVector vRayNew, _fVector vRayOld, _float2 vIndex, _bool * bIsPieck)
+_Vector CVIBuffer_Terrain::Pick_ByRay(_fVector vRayPos, _fVector vRayDir, _float2 vIndex, _bool * bIsPieck)
 {
 	if (vIndex.x < 0 || vIndex.x >= m_iNumVerticesX ||
 		vIndex.y < 0 || vIndex.y >= m_iNumVerticesZ)
@@ -572,31 +572,38 @@ _Vector CVIBuffer_Terrain::Pick_ByRay(_fVector vRayNew, _fVector vRayOld, _float
 		iIndex + m_iNumVerticesX + 1,
 		iIndex + 1,	iIndex };
 
-	_Vector Plane;
-
-	if (vIndex.x - m_pVertices[iIndices[0]].x < m_pVertices[iIndices[0]].z - vIndex.y)
-	{//¾Æ·¡ 023
-		Plane = XMPlaneFromPoints(XMLoadFloat3(&m_pVertices[iIndices[0]]),
-			XMLoadFloat3(&m_pVertices[iIndices[2]]), XMLoadFloat3(&m_pVertices[iIndices[3]]));
-	}
-	else
-	{//À§ 012
-
-		Plane = XMPlaneFromPoints(XMLoadFloat3(&m_pVertices[iIndices[0]]),
-			XMLoadFloat3(&m_pVertices[iIndices[1]]), XMLoadFloat3(&m_pVertices[iIndices[2]]));
-	}
+	_Vector vVertex1, vVertex2, vVertex3;
 
 
-	_Vector Result = XMPlaneIntersectLine(Plane, vRayOld, vRayNew);
-	
-	if (XMVectorGetX(XMVectorIsNaN(Result)))
+		vVertex1 = XMLoadFloat3(&m_pVertices[iIndices[0]]);
+		vVertex2 = XMLoadFloat3(&m_pVertices[iIndices[2]]);
+		vVertex3  = XMLoadFloat3(&m_pVertices[iIndices[3]]);
+
+
+
+	_float Dist;
+	if (TriangleTests::Intersects(vRayPos, vRayDir, vVertex1, vVertex2, vVertex3, Dist))
 	{
-		*bIsPieck = false;
-		return _Vector();
+
+		*bIsPieck = true;
+		return vRayPos + (vRayDir * Dist) + XMVectorSet(0,0.00001f,0,0);
 	}
 
-	*bIsPieck = true;
-	return Result;
+
+ 	vVertex1 = XMLoadFloat3(&m_pVertices[iIndices[0]]);
+	vVertex2 = XMLoadFloat3(&m_pVertices[iIndices[1]]);
+	vVertex3 = XMLoadFloat3(&m_pVertices[iIndices[2]]);
+
+	if (TriangleTests::Intersects(vRayPos, vRayDir, vVertex1, vVertex2, vVertex3, Dist))
+	{
+
+		*bIsPieck = true;
+		return vRayPos + (vRayDir * Dist) + XMVectorSet(0, 0.00001f, 0, 0);
+	}
+
+	*bIsPieck = false;
+	return _Vector();
+
 }
 
 CVIBuffer_Terrain * CVIBuffer_Terrain::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, const _tchar* pHeightMap)

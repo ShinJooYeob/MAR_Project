@@ -111,6 +111,8 @@ _float3 CTerrain::PutOnTerrain(_bool* pbIsObTerrain,_fVector ObjectWorldPos, _fV
 	_Vector CaculatedFloat3 = m_pVIBufferCom->Caculate_TerrainY(pbIsObTerrain,
 		(XMVector3TransformCoord(ObjectWorldPos, InverMat)), (XMVector3TransformCoord(ObjectOldWorldPos, InverMat)), vOutPlaneNormalVec);
 
+	//_Vector CaculatedFloat3 = m_pVIBufferCom->Caculate_Terrain_Pick_byRay(pbIsObTerrain,
+	//	(XMVector3TransformCoord(ObjectWorldPos, InverMat)), (XMVector3TransformCoord(ObjectOldWorldPos, InverMat)), vOutPlaneNormalVec);
 
 	if (*pbIsObTerrain)
 	{
