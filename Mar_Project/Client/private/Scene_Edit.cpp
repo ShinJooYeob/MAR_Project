@@ -2,6 +2,7 @@
 #include "..\Public\Scene_Edit.h"
 #include "Scene_Loading.h"
 #include "Camera_Editor.h"
+#include "Terrain.h"
 
 
 CScene_Edit::CScene_Edit(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
@@ -20,7 +21,7 @@ HRESULT CScene_Edit::Initialize()
 
 	FAILED_CHECK(Ready_Layer_Player(TAG_LAY(Layer_Player)));
 	FAILED_CHECK(Ready_Layer_MainCamera(TAG_LAY(Layer_Camera_Main)));
-	FAILED_CHECK(Ready_Layer_WireTerrain(TAG_LAY(Layer_WireTerrain)));
+	//FAILED_CHECK(Ready_Layer_WireTerrain(TAG_LAY(Layer_WireTerrain)));
 	
 	
 
@@ -79,8 +80,12 @@ _int CScene_Edit::Update(_double fDeltaTime)
 		return Change_to_NextScene();
 
 #ifdef USE_IMGUI
-	if (m_iNowTab == 0)
+
+
+	switch (m_iNowTab)
 	{
+
+	case 0:
 		for (auto& Element : m_vecBatchedObject)
 		{
 			if (Element.pObject->Update(fDeltaTime) < 0)
@@ -89,19 +94,28 @@ _int CScene_Edit::Update(_double fDeltaTime)
 				return -1;
 			}
 		}
+		break;
+	case 1:
+		break;
+	case 2:
+		break;
+	case 3:
+		break;
+	case 4:
+		if (m_pCreatedTerrain != nullptr)
+			m_pCreatedTerrain->Update(fDeltaTime);
+		break;
+	default:
+		break;
 	}
+
 
 
 	FAILED_CHECK(Input_KeyBoard(fDeltaTime));
 
 	if (GETIMGUI->Update_ImguiMgr(fDeltaTime) >= 0)
 	{
-
-
-
 		FAILED_CHECK(Update_First_Frame(fDeltaTime, "Editor"));
-
-
 		Prevent_Order = true;
 	}
 
@@ -119,8 +133,12 @@ _int CScene_Edit::LateUpdate(_double fDeltaTime)
 
 
 #ifdef USE_IMGUI
-	if (m_iNowTab == 0)
+
+
+	switch (m_iNowTab)
 	{
+
+	case 0:
 		for (auto& Element : m_vecBatchedObject)
 		{
 			if (Element.pObject->LateUpdate(fDeltaTime) < 0)
@@ -129,7 +147,22 @@ _int CScene_Edit::LateUpdate(_double fDeltaTime)
 				return -1;
 			}
 		}
+		break;
+	case 1:
+		break;
+	case 2:
+		break;
+	case 3:
+		break;
+	case 4:
+		if (m_pCreatedTerrain != nullptr)
+			m_pCreatedTerrain->LateUpdate(fDeltaTime);
+		break;
+	default:
+		break;
 	}
+
+
 
 #endif // USE_IMGUI
 	return 0;
@@ -227,28 +260,34 @@ HRESULT CScene_Edit::Update_First_Frame(_double fDeltatime, const char * szFrame
 	ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
 	if (ImGui::BeginTabBar("MyTabBar", tab_bar_flags))
 	{
-		if (ImGui::BeginTabItem("Map Editor"))
+		if (ImGui::BeginTabItem("Map"))
 		{
 			m_iNowTab = 0;
 			FAILED_CHECK(Update_MapTab(fDeltatime));
 			ImGui::EndTabItem();
 		}
-		if (ImGui::BeginTabItem("UI Editor"))
+		if (ImGui::BeginTabItem("UI"))
 		{
 			m_iNowTab = 1;
 			FAILED_CHECK(Update_UITab(fDeltatime));
 			ImGui::EndTabItem();
 		}
-		if (ImGui::BeginTabItem("Particle Editor"))
+		if (ImGui::BeginTabItem("Particle"))
 		{
 			m_iNowTab = 2;
 			FAILED_CHECK(Update_ParticleTab(fDeltatime));
 			ImGui::EndTabItem();
 		}
-		if (ImGui::BeginTabItem("CameraAction"))
+		if (ImGui::BeginTabItem("CamAction"))
 		{
 			m_iNowTab = 3;
 			FAILED_CHECK(Update_CameraActionTab(fDeltatime));
+			ImGui::EndTabItem();
+		}
+		if (ImGui::BeginTabItem("HeightMap"))
+		{
+			m_iNowTab = 4;
+			FAILED_CHECK(Update_HeightMap(fDeltatime));
 			ImGui::EndTabItem();
 		}
 		ImGui::EndTabBar();
@@ -525,22 +564,7 @@ HRESULT CScene_Edit::Input_KeyBoard(_double fDeltaTime)
 
 	CGameInstance* pInstance = GetSingle(CGameInstance);
 
-	if (pInstance->Get_DIKeyState(DIK_SPACE) & DIS_Down)
-	{
-		if (m_bIsModelMove) m_bIsModelMove = 0;
-		else
-		{
-
-			// 해당 오브젝트의 메트릭스 받아오기
-			m_SelectedObjectSRT = &(m_vecBatchedObject[m_iBatchedVecIndex].matSRT);
-			ZeroMemory(m_ArrBuffer, sizeof(_float) * 4);
-			m_ArrBuffer[3] = 0.1f;
-
-			m_bIsModelMove = 1;
-
-		}
-
-	}
+#pragma region Total
 
 	{
 		static _bool IsWheelClicked = false;
@@ -577,14 +601,14 @@ HRESULT CScene_Edit::Input_KeyBoard(_double fDeltaTime)
 					fWheelMove = pInstance->Get_DIMouseMoveState(CInput_Device::MMS_X);
 
 					CamTransform->MovetoDir_bySpeed(
-						CamTransform->Get_MatrixState(CTransform::STATE_RIGHT) , (_float)-fWheelMove,  fDeltaTime);
+						CamTransform->Get_MatrixState(CTransform::STATE_RIGHT), (_float)-fWheelMove, fDeltaTime);
 
 
 				}
 
-				
+
 			}
-			
+
 		}
 		if (pInstance->Get_DIKeyState(DIK_LSHIFT)&DIS_Press)
 		{
@@ -600,86 +624,206 @@ HRESULT CScene_Edit::Input_KeyBoard(_double fDeltaTime)
 		}
 
 	}
+#pragma endregion Total
 
-	if (m_bIsModelMove)
+	if (m_iNowTab == 0) 
 	{
-		if (pInstance->Get_DIKeyState(DIK_1) & DIS_Down)		m_iKindsOfMoving = 0;
-		else if (pInstance->Get_DIKeyState(DIK_2) & DIS_Down)	m_iKindsOfMoving = 1;
-		else if (pInstance->Get_DIKeyState(DIK_3) & DIS_Down)	m_iKindsOfMoving = 2;
+#pragma region MapTab
 
-
-
-		if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_RBUTTON) & DIS_Down)
+		if (pInstance->Get_DIKeyState(DIK_SPACE) & DIS_Down)
 		{
-			m_iSelectedXYZ++;
-			if (m_iSelectedXYZ > 2)
-				m_iSelectedXYZ = 0;
-		}
-
-		_long fWheelMove = pInstance->Get_DIMouseMoveState(CInput_Device::MMS_WHEEL);
-		if (fWheelMove)
-		{
-			_float tempValue;
-			memcpy(&tempValue, ((_float*)(&(m_SelectedObjectSRT->m[2 - m_iKindsOfMoving])) + m_iSelectedXYZ), sizeof(_float));
-
-			if (fWheelMove > 0)
-				tempValue += _float(m_ArrBuffer[3]);
+			if (m_bIsModelMove) m_bIsModelMove = 0;
 			else
-				tempValue += _float(-m_ArrBuffer[3]);
-			//tempValue += _float(fWheelMove * m_ArrBuffer[3] * fDeltaTime);
-
-
-			FAILED_CHECK(RenewElenmetTransform(&(m_vecBatchedObject[m_iBatchedVecIndex])));
-			memcpy(((_float*)(&(m_SelectedObjectSRT->m[2 - m_iKindsOfMoving])) + m_iSelectedXYZ), &tempValue, sizeof(_float));
-
-			int t = 0;
-		}
-
-	}
-	else 
-	{
-		if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_LBUTTON) & DIS_DoubleDown)
-		{
-			POINT ptMouse;
-			GetCursorPos(&ptMouse);
-			ScreenToClient(g_hWnd, &ptMouse);
-
-
-
-			_Vector vCursorPos = XMVectorSet(
-				(_float(ptMouse.x) / (g_iWinCX * 0.5f)) - 1.f, 
-				(_float(ptMouse.y) / -(g_iWinCY * 0.5f)) + 1.f,
-				0, 1.f);
-			//_Vector vCursorPos = XMVectorSet(	(_float(ptMouse.x) / g_iWinCX * 0.5f) - 1.f, 	(_float(ptMouse.y) / g_iWinCY * 0.5f) + 1.f ,		0, 1.f);
-
-			_Matrix InvProjMat = XMMatrixInverse(nullptr, pInstance->Get_Transform_Matrix(PLM_PROJ));
-
-			_Vector vRayDir = XMVector4Transform(vCursorPos, InvProjMat) - XMVectorSet(0,0,0,1);
-
-			_Matrix InvViewMat = XMMatrixInverse(nullptr, pInstance->Get_Transform_Matrix(PLM_VIEW));
-			vRayDir = XMVector3TransformNormal(vRayDir, InvViewMat);
-
-
-
-			_Vector vCamPos = m_pEditorCam->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_POS);
-
-			if (XMVectorGetY(vCamPos) * XMVectorGetY(vRayDir) < 0)
 			{
-				_float Scale = XMVectorGetY(vCamPos) / -XMVectorGetY(vRayDir);
 
-				_float3 vTargetPos = vCamPos + Scale * vRayDir;
+				// 해당 오브젝트의 메트릭스 받아오기
+				m_SelectedObjectSRT = &(m_vecBatchedObject[m_iBatchedVecIndex].matSRT);
+				ZeroMemory(m_ArrBuffer, sizeof(_float) * 4);
+				m_ArrBuffer[3] = 0.1f;
 
-				memcpy( m_vecBatchedObject[0].matSRT.m[2],&vTargetPos,sizeof(_float3));
-
-				RenewElenmetTransform(&m_vecBatchedObject[0]);
+				m_bIsModelMove = 1;
 
 			}
 
 		}
 
-	}
-	
 
+		if (m_bIsModelMove)
+		{
+			if (pInstance->Get_DIKeyState(DIK_1) & DIS_Down)		m_iKindsOfMoving = 0;
+			else if (pInstance->Get_DIKeyState(DIK_2) & DIS_Down)	m_iKindsOfMoving = 1;
+			else if (pInstance->Get_DIKeyState(DIK_3) & DIS_Down)	m_iKindsOfMoving = 2;
+
+
+
+			if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_RBUTTON) & DIS_Down)
+			{
+				m_iSelectedXYZ++;
+				if (m_iSelectedXYZ > 2)
+					m_iSelectedXYZ = 0;
+			}
+
+			_long fWheelMove = pInstance->Get_DIMouseMoveState(CInput_Device::MMS_WHEEL);
+			if (fWheelMove)
+			{
+				_float tempValue;
+				memcpy(&tempValue, ((_float*)(&(m_SelectedObjectSRT->m[2 - m_iKindsOfMoving])) + m_iSelectedXYZ), sizeof(_float));
+
+				if (fWheelMove > 0)
+					tempValue += _float(m_ArrBuffer[3]);
+				else
+					tempValue += _float(-m_ArrBuffer[3]);
+				//tempValue += _float(fWheelMove * m_ArrBuffer[3] * fDeltaTime);
+
+
+				FAILED_CHECK(RenewElenmetTransform(&(m_vecBatchedObject[m_iBatchedVecIndex])));
+				memcpy(((_float*)(&(m_SelectedObjectSRT->m[2 - m_iKindsOfMoving])) + m_iSelectedXYZ), &tempValue, sizeof(_float));
+
+				int t = 0;
+			}
+
+		}
+		else
+		{
+			if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_LBUTTON) & DIS_DoubleDown)
+			{
+				POINT ptMouse;
+				GetCursorPos(&ptMouse);
+				ScreenToClient(g_hWnd, &ptMouse);
+
+
+
+				_Vector vCursorPos = XMVectorSet(
+					(_float(ptMouse.x) / (g_iWinCX * 0.5f)) - 1.f,
+					(_float(ptMouse.y) / -(g_iWinCY * 0.5f)) + 1.f,
+					0, 1.f);
+				//_Vector vCursorPos = XMVectorSet(	(_float(ptMouse.x) / g_iWinCX * 0.5f) - 1.f, 	(_float(ptMouse.y) / g_iWinCY * 0.5f) + 1.f ,		0, 1.f);
+
+				_Matrix InvProjMat = XMMatrixInverse(nullptr, pInstance->Get_Transform_Matrix(PLM_PROJ));
+
+				_Vector vRayDir = XMVector4Transform(vCursorPos, InvProjMat) - XMVectorSet(0, 0, 0, 1);
+
+				_Matrix InvViewMat = XMMatrixInverse(nullptr, pInstance->Get_Transform_Matrix(PLM_VIEW));
+				vRayDir = XMVector3TransformNormal(vRayDir, InvViewMat);
+
+
+
+				_Vector vCamPos = m_pEditorCam->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_POS);
+
+				if (XMVectorGetY(vCamPos) * XMVectorGetY(vRayDir) < 0)
+				{
+					_float Scale = XMVectorGetY(vCamPos) / -XMVectorGetY(vRayDir);
+
+					_float3 vTargetPos = vCamPos + Scale * vRayDir;
+
+					memcpy(m_vecBatchedObject[0].matSRT.m[2], &vTargetPos, sizeof(_float3));
+
+					RenewElenmetTransform(&m_vecBatchedObject[0]);
+
+				}
+
+			}
+
+		}
+
+
+
+#pragma endregion MapTab
+	}
+
+	if (m_iNowTab == 4)
+	{
+#pragma region HeightMap
+
+		if (m_pCreatedTerrain != nullptr)
+		{
+			////마우스 터레인 피킹
+			if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_LBUTTON) & DIS_Down)
+			{
+				POINT ptMouse;
+				GetCursorPos(&ptMouse);
+				ScreenToClient(g_hWnd, &ptMouse);
+
+				_Vector vCursorPos = XMVectorSet(
+					(_float(ptMouse.x) / (g_iWinCX * 0.5f)) - 1.f,
+					(_float(ptMouse.y) / -(g_iWinCY * 0.5f)) + 1.f,
+					0, 1.f);
+
+				_Matrix InvProjMat = XMMatrixInverse(nullptr, pInstance->Get_Transform_Matrix(PLM_PROJ));
+				_Vector vRayDir = XMVector4Transform(vCursorPos, InvProjMat) - XMVectorSet(0, 0, 0, 1);
+				_Matrix InvViewMat = XMMatrixInverse(nullptr, pInstance->Get_Transform_Matrix(PLM_VIEW));
+				vRayDir = XMVector3TransformNormal(vRayDir, InvViewMat);
+
+				_Vector vCamPos = m_pEditorCam->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_POS);
+
+				_Vector vOldPos = vCamPos;
+				_Vector vNewPos;
+				_float3 vResult;
+				_bool IsPicked = false;
+
+
+				for (_uint i = 0; i < 200; i ++)
+				{
+					vNewPos = vOldPos + vRayDir;
+
+					vResult = m_pCreatedTerrain->PutOnTerrain(&IsPicked, vNewPos, vOldPos);
+
+					if (IsPicked)
+					{
+						wstring ResultString = L"X : " + to_wstring(vResult.x) + L"	Y : " + to_wstring(vResult.y) + L"	Z : " + to_wstring(vResult.z) + L"\n";
+						OutputDebugStringW(ResultString.c_str());
+						break;
+					}
+
+					vOldPos = vNewPos;
+					if(i >= 199)
+						OutputDebugStringW(L"Fail to Pick\n");
+				}
+
+				if (IsPicked)
+				{
+					vCamPos;
+					vRayDir;
+
+					RECT PickRange = { 0 };
+
+					if (XMVectorGetX(vOldPos) < XMVectorGetX(vNewPos))
+					{
+
+
+					}
+
+					vOldPos;
+					vNewPos;
+
+
+
+				}
+
+
+
+
+
+			}
+
+
+
+
+
+
+
+		}
+
+#pragma endregion HeightMap
+	}
+#pragma region HeightMap
+#pragma endregion HeightMap
+
+#pragma region HeightMap
+#pragma endregion HeightMap
+
+#pragma region HeightMap
+#pragma endregion HeightMap
 
 	return S_OK;
 }
@@ -1589,6 +1733,60 @@ HRESULT CScene_Edit::Update_CameraActionTab(_double fDeltatime)
 	return S_OK;
 }
 
+HRESULT CScene_Edit::Update_HeightMap(_double fDeltatime)
+{
+
+	FAILED_CHECK(Widget_CreateDeleteHeightMap(fDeltatime));
+
+
+
+	return S_OK;
+}
+
+HRESULT CScene_Edit::Widget_CreateDeleteHeightMap(_double fDeltatime)
+{
+	if (m_pCreatedTerrain == nullptr)
+	{
+		if (ImGui::TreeNode("Create HeightMap"))
+		{
+
+			ImGui::InputInt("Input X Size", &(m_iMapSize[0]));
+			ImGui::InputInt("Input Z Size", &(m_iMapSize[1]));
+
+			if (m_iMapSize[0] < 1) m_iMapSize[0] = 1;
+			if (m_iMapSize[1] < 1) m_iMapSize[1] = 1;
+
+
+			char buf[MAX_PATH];
+			sprintf_s(buf, "X Size : %d\nZ Size : %d", _int(pow(2, m_iMapSize[0])) + 1, _int(pow(2, m_iMapSize[1])) + 1);
+			ImGui::Text(buf);
+
+			if (ImGui::Button("Create Height Map", ImVec2(-FLT_MIN, 0.0f)))
+			{
+				FAILED_CHECK(m_pGameInstance->Add_GameObject_Out_of_Manager((CGameObject**)(&m_pCreatedTerrain), SCENE_EDIT, TAG_OP(Prototype_Terrain)));
+
+
+				m_pCreatedTerrain->Change_Component_by_Parameter(CVIBuffer_Terrain::Create(m_pDevice, m_pDeviceContext, _int(pow(2, m_iMapSize[0])) + 1, _int(pow(2, m_iMapSize[1])) + 1), TAG_COM(Com_VIBuffer));
+			}
+
+
+			ImGui::TreePop();
+		}
+	}
+	else {
+		if (ImGui::TreeNode("Delete HeightMap"))
+		{
+			if (ImGui::Button("Delete HeightMap", ImVec2(-FLT_MIN, 0.0f)))
+			{
+				Safe_Release(m_pCreatedTerrain);
+			}
+			ImGui::TreePop();
+		}
+	}
+
+	return S_OK;
+}
+
 #pragma endregion CamTab
 
 
@@ -1718,7 +1916,7 @@ void CScene_Edit::Free()
 	}
 	m_vecBatchedObject.clear();
 
-
+	Safe_Release(m_pCreatedTerrain);
 	Safe_Release(m_pGameInstance);
 #endif
 }

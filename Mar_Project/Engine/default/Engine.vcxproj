@@ -151,6 +151,7 @@
     <ClInclude Include="..\public\Engine_Macro.h" />
     <ClInclude Include="..\public\Engine_Struct.h" />
     <ClInclude Include="..\public\Engine_Typedef.h" />
+    <ClInclude Include="..\public\HierarchyNode.h" />
     <ClInclude Include="..\public\Light.h" />
     <ClInclude Include="..\public\LightMgr.h" />
     <ClInclude Include="..\public\MeshContainer.h" />
@@ -186,6 +187,7 @@
     <ClCompile Include="..\private\ComponentMgr.cpp" />
     <ClCompile Include="..\private\EasingMgr.cpp" />
     <ClCompile Include="..\private\Engine_Struct.cpp" />
+    <ClCompile Include="..\private\HierarchyNode.cpp" />
     <ClCompile Include="..\private\Light.cpp" />
     <ClCompile Include="..\private\LightMgr.cpp" />
     <ClCompile Include="..\private\MeshContainer.cpp" />

@@ -74,6 +74,14 @@ private:
 	HRESULT Load_Data(const char* szFileName, eDATATYPE iKinds);
 	HRESULT Input_KeyBoard(_double fDeltaTime);
 
+
+private:
+	CGameInstance* m_pGameInstance = nullptr;
+	_uint m_iNowTab = 0;
+	_bool	Prevent_Order = false;
+	_bool bArrWindowFlag[10];
+	_uint ibClickChecker = 0;
+	list<string>		m_FilePathList;
 #pragma endregion Total
 
 #pragma region MapTab
@@ -85,7 +93,19 @@ private:
 	HRESULT Widget_SaveLoadMapData(_double fDeltatime);
 
 	HRESULT	RenewElenmetTransform(OBJELEMENT* pObjElement);
-	
+
+private:
+	_int m_bIsModelMove = 0;
+	_int m_iKindsOfMoving = 0;
+	_int m_iSelectedXYZ = 0;
+	_int m_iPassIndex = 0;
+	_float m_ArrBuffer[4];
+	_float4x4* m_SelectedObjectSRT = nullptr;
+
+	_uint m_iBatchedVecIndex = 0;
+	vector<OBJELEMENT>		m_vecBatchedObject;
+
+	_uint m_iSelectedObjectNMesh[2];
 #pragma endregion MapTab
 
 #pragma region UITab
@@ -110,48 +130,20 @@ private:
 #pragma endregion CamTab
 
 
+#pragma region HeightMap
 
+
+	HRESULT Update_HeightMap(_double fDeltatime);
+	HRESULT Widget_CreateDeleteHeightMap(_double fDeltatime);
 
 private:
+	_int		m_iMapSize[2];
+	class CTerrain* m_pCreatedTerrain = nullptr;
 
-#pragma region Total
-
-	CGameInstance* m_pGameInstance = nullptr;
-	
-	_uint m_iNowTab = 0;
-
-	_bool	Prevent_Order = false;
-	_bool bArrWindowFlag[10];
-	_uint ibClickChecker = 0;
+#pragma endregion HeightMap
 
 
-	list<string>		m_FilePathList;
-#pragma endregion Total
 
-#pragma region MapTab
-
-	_int m_bIsModelMove = 0;
-	_int m_iKindsOfMoving = 0;
-	_int m_iSelectedXYZ = 0;
-	_int m_iPassIndex = 0;
-	_float m_ArrBuffer[4];
-	_float4x4* m_SelectedObjectSRT = nullptr;
-
-	_uint m_iBatchedVecIndex = 0;
-	vector<OBJELEMENT>		m_vecBatchedObject;
-
-	_uint m_iSelectedObjectNMesh[2];
-
-#pragma endregion MapTab
-
-#pragma region UITab
-#pragma endregion UITab
-
-#pragma region ParticleTab
-#pragma endregion ParticleTab
-
-#pragma region CamTab
-#pragma endregion CamTab
 
 
 #endif // USE_IMGUI

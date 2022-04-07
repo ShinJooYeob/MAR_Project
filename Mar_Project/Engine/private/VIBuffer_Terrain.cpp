@@ -64,10 +64,11 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(const _tchar* pHeightMap)
 		{
 			_uint		iIndex = i * m_iNumVerticesX + j;
 			_float ValueY = (pPixel[iIndex] & 0x000000ff) / 10.f;
-			if (ValueY <= 0.5f)
-				pVertices[iIndex].vPosition = m_pVertices[iIndex] =  _float3(_float(j), -FLT_MAX, _float(i));
-			else
-				pVertices[iIndex].vPosition = m_pVertices[iIndex] = _float3(_float(j), (pPixel[iIndex] & 0x000000ff) / 10.f, _float(i));
+			//if (ValueY <= 0.5f)
+			//	pVertices[iIndex].vPosition = m_pVertices[iIndex] =  _float3(_float(j), -FLT_MAX, _float(i));
+			//else
+			//	pVertices[iIndex].vPosition = m_pVertices[iIndex] = _float3(_float(j), (pPixel[iIndex] & 0x000000ff) / 10.f, _float(i));
+			pVertices[iIndex].vPosition = m_pVertices[iIndex] = _float3(_float(j), (pPixel[iIndex] & 0x000000ff) / 10.f, _float(i));
 
 			pVertices[iIndex].vNormal = _float3(0.f, 0.f, 0.f);
 			pVertices[iIndex].vTexUV = _float2(j / (m_iNumVerticesX - 1.f), i / (m_iNumVerticesZ - 1.f));
@@ -194,7 +195,7 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(const _tchar* pHeightMap)
 	return S_OK;
 }
 
-HRESULT CVIBuffer_Terrain::Initialize_Prototype(_uint iNumWidthPixel)
+HRESULT CVIBuffer_Terrain::Initialize_Prototype(_uint iNumWidthPixelX, _uint iNumWidthPixelY)
 {
 	FAILED_CHECK(__super::Initialize_Prototype(nullptr));
 
@@ -203,7 +204,14 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(_uint iNumWidthPixel)
 #pragma  region READY_VERTEX_BUFFER
 
 	ZeroMemory(&m_VBDesc, sizeof(D3D11_BUFFER_DESC));
-	m_iNumVerticesX = m_iNumVerticesZ = iNumWidthPixel;
+	if (iNumWidthPixelY == 0)
+	{
+		m_iNumVerticesX = m_iNumVerticesZ = iNumWidthPixelX;
+	}
+	else {
+		m_iNumVerticesX = iNumWidthPixelX;
+		m_iNumVerticesZ = iNumWidthPixelY;
+	}
 
 	m_iNumVertices = m_iNumVerticesX * m_iNumVerticesZ;
 	m_iNumVertexBuffers = 1;
@@ -347,7 +355,7 @@ HRESULT CVIBuffer_Terrain::Initialize_Clone(void * pArg)
 	return S_OK;
 }
 
-_float3 CVIBuffer_Terrain::Caculate_TerrainY(_bool* pbIsOnTerrain ,_float3 PosOnTerrainLocal, _float3 OldPosOnTerrainLocal, _float3* vLocalPlaneNormVector)
+_Vector CVIBuffer_Terrain::Caculate_TerrainY(_bool* pbIsOnTerrain ,_float3 PosOnTerrainLocal, _float3 OldPosOnTerrainLocal, _float3* vLocalPlaneNormVector)
 {
 	
 
@@ -363,18 +371,115 @@ _float3 CVIBuffer_Terrain::Caculate_TerrainY(_bool* pbIsOnTerrain ,_float3 PosOn
 
 	if (*pbIsOnTerrain == false ) {
 		*pbIsOnTerrain = false;
-		return PosOnTerrainLocal;
+		return PosOnTerrainLocal.XMVector();
 	}
 
 	if (PosOnTerrainLocal.y <= CaculatedY && CacluatedOld >= -0.2f)
 	{
 		*pbIsOnTerrain = true;
-		return _float3(PosOnTerrainLocal.x, CaculatedY, PosOnTerrainLocal.z);
+		return _float3(PosOnTerrainLocal.x, CaculatedY, PosOnTerrainLocal.z).XMVector();
 
 	}
 	else {
 		*pbIsOnTerrain = false;
-		return PosOnTerrainLocal;
+		return PosOnTerrainLocal.XMVector();
+	}
+}
+
+
+_Vector CVIBuffer_Terrain::Caculate_Terrain_Pick_byRay(_bool* pbIsOnTerrain, _float3 PosOnTerrainLocal, _float3 OldPosOnTerrainLocal, _float3* vLocalPlaneNormVector)
+{
+
+
+	_float CacluatedOld = EquationPlane(pbIsOnTerrain, OldPosOnTerrainLocal);
+	//if (*pbIsOnTerrain == false || CacluatedOld < 0)
+	//{
+	//	*pbIsOnTerrain = false;
+	//	return _float3(PosOnTerrainLocal.x, -FLT_MAX, PosOnTerrainLocal.z);
+	//}
+
+	_float CaculatedY = 0;
+	_float CacluatedNow = EquationPlane(pbIsOnTerrain, PosOnTerrainLocal, &CaculatedY, vLocalPlaneNormVector);
+
+	if (*pbIsOnTerrain == false) {
+		*pbIsOnTerrain = false;
+		return PosOnTerrainLocal.XMVector();
+	}
+
+	if (PosOnTerrainLocal.y <= CaculatedY && CacluatedOld >= -0.2f)
+	{
+
+		RECT IndexRange = { 0 };
+
+		if (OldPosOnTerrainLocal.x < PosOnTerrainLocal.x)
+		{
+			IndexRange.left = LONG(OldPosOnTerrainLocal.x);
+			IndexRange.right = LONG(PosOnTerrainLocal.x);
+		}
+		else {
+			IndexRange.left = LONG(PosOnTerrainLocal.x);
+			IndexRange.right = LONG(OldPosOnTerrainLocal.x);
+		}
+
+		if (OldPosOnTerrainLocal.z < PosOnTerrainLocal.z)
+		{
+			IndexRange.bottom = LONG(OldPosOnTerrainLocal.z);
+			IndexRange.top = LONG(PosOnTerrainLocal.z);
+		}
+		else
+		{
+			IndexRange.bottom = LONG(PosOnTerrainLocal.z);
+			IndexRange.top = LONG(OldPosOnTerrainLocal.z);
+		}
+
+		IndexRange.left -= 1;
+		IndexRange.bottom -= 1;
+		IndexRange.right += 1;
+		IndexRange.top += 1;
+
+		if (IndexRange.left < 0)IndexRange.left = 0;
+		if (IndexRange.bottom < 0)IndexRange.bottom = 0;
+		if (IndexRange.right > _int(m_iNumVerticesX))IndexRange.right = m_iNumVerticesX;
+		if (IndexRange.top > _int(m_iNumVerticesZ))IndexRange.top = m_iNumVerticesZ;
+
+		vector<_float2> vecAvailIndex;
+		vecAvailIndex.reserve(20);
+
+		for (_uint i = IndexRange.left; _int(i) <= IndexRange.bottom; i++)
+		{
+			for (_uint j = IndexRange.bottom; _int(j) <= IndexRange.top; j++)
+			{
+				vecAvailIndex.push_back(_float2(_float(i), _float(j)));
+			}
+		}
+
+		_bool IsPiecked = false;
+		_Vector CalculatedLocalPos;
+
+
+		_Vector vNewPos = PosOnTerrainLocal.XMVector();
+		_Vector vOldPos = OldPosOnTerrainLocal.XMVector();
+
+
+		for (auto& AvailIndex : vecAvailIndex)
+		{
+			CalculatedLocalPos = Pick_ByRay(vNewPos, vOldPos, AvailIndex,&IsPiecked);
+
+			if (IsPiecked)
+			{
+				*pbIsOnTerrain = true;
+				return CalculatedLocalPos;
+			}
+		}
+
+
+		*pbIsOnTerrain = false;
+		return PosOnTerrainLocal.XMVector();
+
+	}
+	else {
+		*pbIsOnTerrain = false;
+		return PosOnTerrainLocal.XMVector();
 	}
 }
 
@@ -451,6 +556,49 @@ _float CVIBuffer_Terrain::EquationPlane(_bool * pbIsOnTerrain, _float3 PosOnTerr
 	return (Plane.x * PosOnTerrainLocal.x + Plane.y * PosOnTerrainLocal.y + Plane.z * PosOnTerrainLocal.z + Plane.w);
 }
 
+_Vector CVIBuffer_Terrain::Pick_ByRay(_fVector vRayNew, _fVector vRayOld, _float2 vIndex, _bool * bIsPieck)
+{
+	if (vIndex.x < 0 || vIndex.x >= m_iNumVerticesX ||
+		vIndex.y < 0 || vIndex.y >= m_iNumVerticesZ)
+	{
+		*bIsPieck = false;
+		return _Vector();
+	}
+
+	_uint iIndex = _uint(_uint(vIndex.y) * m_iNumVerticesX + vIndex.x);
+
+	_uint		iIndices[4] = {
+		iIndex + m_iNumVerticesX,
+		iIndex + m_iNumVerticesX + 1,
+		iIndex + 1,	iIndex };
+
+	_Vector Plane;
+
+	if (vIndex.x - m_pVertices[iIndices[0]].x < m_pVertices[iIndices[0]].z - vIndex.y)
+	{//¾Æ·¡ 023
+		Plane = XMPlaneFromPoints(XMLoadFloat3(&m_pVertices[iIndices[0]]),
+			XMLoadFloat3(&m_pVertices[iIndices[2]]), XMLoadFloat3(&m_pVertices[iIndices[3]]));
+	}
+	else
+	{//À§ 012
+
+		Plane = XMPlaneFromPoints(XMLoadFloat3(&m_pVertices[iIndices[0]]),
+			XMLoadFloat3(&m_pVertices[iIndices[1]]), XMLoadFloat3(&m_pVertices[iIndices[2]]));
+	}
+
+
+	_Vector Result = XMPlaneIntersectLine(Plane, vRayOld, vRayNew);
+	
+	if (XMVectorGetX(XMVectorIsNaN(Result)))
+	{
+		*bIsPieck = false;
+		return _Vector();
+	}
+
+	*bIsPieck = true;
+	return Result;
+}
+
 CVIBuffer_Terrain * CVIBuffer_Terrain::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, const _tchar* pHeightMap)
 {
 	CVIBuffer_Terrain*	pInstance = new CVIBuffer_Terrain(pDevice, pDeviceContext);
@@ -463,11 +611,11 @@ CVIBuffer_Terrain * CVIBuffer_Terrain::Create(ID3D11Device * pDevice, ID3D11Devi
 	return pInstance;
 }
 
-CVIBuffer_Terrain * CVIBuffer_Terrain::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, _uint iNumWidthPixel)
+CVIBuffer_Terrain * CVIBuffer_Terrain::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, _uint iNumWidthPixelX, _uint iNumWidthPixelY)
 {
 	CVIBuffer_Terrain*	pInstance = new CVIBuffer_Terrain(pDevice, pDeviceContext);
 
-	if (FAILED(pInstance->Initialize_Prototype(iNumWidthPixel)))
+	if (FAILED(pInstance->Initialize_Prototype(iNumWidthPixelX, iNumWidthPixelY)))
 	{
 		MSGBOX("Failed to Created CVIBuffer_Terrain");
 		Safe_Release(pInstance);

@@ -115,7 +115,85 @@ HRESULT CMeshContainer::Ready_NonAnimMeshContainer(aiMesh * pAIMesh, _fMatrix Tr
 
 HRESULT CMeshContainer::Ready_AnimMeshContainer(aiMesh * pAIMesh)
 {
-	return E_NOTIMPL;
+	ZeroMemory(&m_VBDesc, sizeof(D3D11_BUFFER_DESC));
+
+	m_VBDesc.ByteWidth = sizeof(VTXANIMMODEL) * m_iNumVertices;
+	m_VBDesc.StructureByteStride = sizeof(VTXANIMMODEL);
+	m_VBDesc.Usage = D3D11_USAGE_IMMUTABLE;
+	m_VBDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+
+	VTXANIMMODEL*	pVertices = new VTXANIMMODEL[m_iNumVertices];
+	ZeroMemory(pVertices, sizeof(VTXANIMMODEL) * m_iNumVertices);
+
+	for (_uint i = 0; i < m_iNumVertices; ++i)
+	{
+		memcpy(&pVertices[i].vPosition, &pAIMesh->mVertices[i], sizeof(_float3));
+		memcpy(&pVertices[i].vNormal, &pAIMesh->mNormals[i], sizeof(_float3));
+		memcpy(&pVertices[i].vTexUV, &pAIMesh->mTextureCoords[0][i], sizeof(_float2));
+		memcpy(&pVertices[i].vTangent, &pAIMesh->mTangents[i], sizeof(_float3));
+	}
+
+	FAILED_CHECK(Ready_SkinnedInfo(pAIMesh, pVertices));
+
+
+	ZeroMemory(&m_VBSubResourceData, sizeof(D3D11_SUBRESOURCE_DATA));
+	m_VBSubResourceData.pSysMem = pVertices;
+
+	FAILED_CHECK(Create_VertexBuffer());
+
+	Safe_Delete_Array(pVertices);
+
+	return S_OK;
+}
+
+HRESULT CMeshContainer::Ready_SkinnedInfo(aiMesh* pAIMesh, VTXANIMMODEL * pVertices)
+{
+	NULL_CHECK_RETURN(pAIMesh, E_FAIL);
+
+	
+	m_iNumAffectingBones = pAIMesh->mNumBones;
+
+	//이 매쉬에 영향을 끼치는 모든 뼈들을 순차적으로 돌면서
+	for (_uint i = 0 ; i< m_iNumAffectingBones; i++)
+	{
+		aiBone*	 pAffectingBone = pAIMesh->mBones[i];
+
+		//해당 뼈 하나가 영향을 끼치는 모든 정점들을 순회하면서 값을 채워줌
+
+		for (_uint j = 0 ;  j < pAffectingBone->mNumWeights; j++)
+		{
+			//이 뼈가 영향을 끼치는 j 번째 정점에게 얼마만큼의 영향을 주는지  -> pAffectingBone->mWeights[j].mWeight;
+			// j  번째 뼈는 이 매쉬의 몇번째 정점인지							->pAffectingBone->mWeights[j].mVertexId
+			
+			if (0.0f == pVertices[pAffectingBone->mWeights[j].mVertexId].vBlendWeight.x)
+			{
+				pVertices[pAffectingBone->mWeights[j].mVertexId].vBlendIndex.x = i;
+				pVertices[pAffectingBone->mWeights[j].mVertexId].vBlendWeight.x = pAffectingBone->mWeights[j].mWeight;
+			}
+			else if (0.0f == pVertices[pAffectingBone->mWeights[j].mVertexId].vBlendWeight.y)
+			{
+				pVertices[pAffectingBone->mWeights[j].mVertexId].vBlendIndex.y = i;
+				pVertices[pAffectingBone->mWeights[j].mVertexId].vBlendWeight.y = pAffectingBone->mWeights[j].mWeight;
+			}
+			else if (0.0f == pVertices[pAffectingBone->mWeights[j].mVertexId].vBlendWeight.z)
+			{
+				pVertices[pAffectingBone->mWeights[j].mVertexId].vBlendIndex.z = i;
+				pVertices[pAffectingBone->mWeights[j].mVertexId].vBlendWeight.z = pAffectingBone->mWeights[j].mWeight;
+			}
+			else if (0.0f == pVertices[pAffectingBone->mWeights[j].mVertexId].vBlendWeight.w)
+			{
+				pVertices[pAffectingBone->mWeights[j].mVertexId].vBlendIndex.w = i;
+				pVertices[pAffectingBone->mWeights[j].mVertexId].vBlendWeight.w = pAffectingBone->mWeights[j].mWeight;
+			}
+
+
+		}
+
+	}
+
+
+
+	return S_OK;
 }
 
 CMeshContainer * CMeshContainer::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, 

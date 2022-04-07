@@ -108,7 +108,7 @@ _float3 CTerrain::PutOnTerrain(_bool* pbIsObTerrain,_fVector ObjectWorldPos, _fV
 
 	_Matrix InverMat = m_InverseWorldMat.XMatrix();
 
-	_float3 CaculatedFloat3 = m_pVIBufferCom->Caculate_TerrainY(pbIsObTerrain,
+	_Vector CaculatedFloat3 = m_pVIBufferCom->Caculate_TerrainY(pbIsObTerrain,
 		(XMVector3TransformCoord(ObjectWorldPos, InverMat)), (XMVector3TransformCoord(ObjectOldWorldPos, InverMat)), vOutPlaneNormalVec);
 
 
@@ -117,7 +117,7 @@ _float3 CTerrain::PutOnTerrain(_bool* pbIsObTerrain,_fVector ObjectWorldPos, _fV
 		if (vOutPlaneNormalVec != nullptr)
 			*vOutPlaneNormalVec = XMVector3TransformNormal(vOutPlaneNormalVec->XMVector(), m_pTransformCom->Get_WorldMatrix());
 
-		return CaculatedFloat3;
+		return XMVector3TransformCoord(CaculatedFloat3, m_pTransformCom->Get_WorldMatrix());
 	}
 
 	return ObjectWorldPos;

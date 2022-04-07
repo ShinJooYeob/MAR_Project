@@ -223,11 +223,15 @@ HRESULT CLoader::Load_Scene_Edit(_bool * _IsClientQuit, CRITICAL_SECTION * _CriS
 	//FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_EDIT, TAG_CP(Prototype_Texture_Terrain),
 	//	CTexture::Create(m_pDevice, m_pDeviceContext, L"Terrain.txt")));
 
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_EDIT, TAG_CP(Prototype_VIBuffer_Terrain_1),
+		CVIBuffer_Terrain::Create(m_pDevice, m_pDeviceContext,  4, 4)));
 
 
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_EDIT, TAG_CP(Prototype_Texture_EditScene),
 		CTexture::Create(m_pDevice, m_pDeviceContext, L"EditScene.txt")));
 
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_EDIT, TAG_CP(Prototype_Texture_Terrain),
+		CTexture::Create(m_pDevice, m_pDeviceContext, L"Terrain.txt")));
 
 
 #pragma  region PROTOTYPE_GAMEOBJECT
