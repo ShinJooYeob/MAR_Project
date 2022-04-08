@@ -27,6 +27,8 @@ HRESULT CWireTerrain::Initialize_Clone(void * pArg)
 
 	FAILED_CHECK(SetUp_Components());
 
+	m_vPickedPos = NOT_EXIST_VECTOR;
+
 	return S_OK;
 }
 
@@ -38,7 +40,12 @@ _int CWireTerrain::Update(_double fDeltaTime)
 	//m_InverseWorldMat = m_pTransformCom->Get_InverseWorldMatrix();
 
 
-
+	if (g_pGameInstance->Get_DIKeyState(DIK_C)&DIS_Down)
+	{
+		static _uint i = 0;
+		i++;
+		m_pVIBufferCom->Chage_VertexBuffer(_float2(1, 1), i);
+	}
 
 
 	return _int();
@@ -48,6 +55,8 @@ _int CWireTerrain::LateUpdate(_double fDeltaTime)
 {
 	if (__super::LateUpdate(fDeltaTime) < 0)
 		return -1;
+
+	FAILED_CHECK(m_pVIBufferCom->Renew_VertexBuffer());
 
 	FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_PRIORITY, this));
 
@@ -69,25 +78,38 @@ _int CWireTerrain::Render()
 	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ViewMatrix", &pInstance->Get_Transform_Float4x4_TP(PLM_VIEW), sizeof(_float4x4)));
 	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ProjMatrix", &pInstance->Get_Transform_Float4x4_TP(PLM_PROJ), sizeof(_float4x4)));
 
-	/*
-	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_CamPosition", &pInstance->Get_TargetPostion_float4(PLV_CAMERA), sizeof(_float4)));
-	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_CamLookDir", &pInstance->Get_TargetPostion_float4(PLV_CAMLOOK), sizeof(_float4)));
+	if (m_iPassIndex == 3)
+	{
+
+		FAILED_CHECK(m_pShaderCom->Set_RawValue("g_CamPosition", &pInstance->Get_TargetPostion_float4(PLV_CAMERA), sizeof(_float4)));
+		FAILED_CHECK(m_pShaderCom->Set_RawValue("g_CamLookDir", &pInstance->Get_TargetPostion_float4(PLV_CAMLOOK), sizeof(_float4)));
+
+		if(m_vPickedPos != NOT_EXIST_VECTOR)
+			FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vBrushPos", &(_float4(m_vPickedPos,1)), sizeof(_float4)));
 
 
 		const LIGHTDESC* pLightDesc = pInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0);
 		NULL_CHECK_RETURN(pLightDesc, -1);
 
 
+
 		FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vLightVector", &(pLightDesc->vVector), sizeof(_float4)));
 		FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4)));
 		FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4)));
 		FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4)));
-	*/
 
+		FAILED_CHECK(m_pTextureCom->Change_TextureLayer(L"Diffuse"));
+		FAILED_CHECK(m_pTextureCom->Bind_OnShader(m_pShaderCom, "g_SourDiffuseTexture", 0));
+		FAILED_CHECK(m_pTextureCom->Bind_OnShader(m_pShaderCom, "g_DestDiffuseTexture", 1));
 
-	//FAILED_CHECK(m_pTextureCom->Bind_OnShader_AutoFrame(m_pShaderCom, "g_DiffuseTexture", g_fDeltaTime));
+		FAILED_CHECK(m_pTextureCom->Change_TextureLayer(L"Brush"));
+		FAILED_CHECK(m_pTextureCom->Bind_OnShader(m_pShaderCom, "g_BrushTexture", 0));
 
-	FAILED_CHECK(m_pVIBufferCom->Render(m_pShaderCom, 2));
+		FAILED_CHECK(m_pTextureCom->Change_TextureLayer(L"Filter"));
+		FAILED_CHECK(m_pTextureCom->Bind_OnShader(m_pShaderCom, "g_FilterTexture", 0));
+
+	}
+	FAILED_CHECK(m_pVIBufferCom->Render(m_pShaderCom, m_iPassIndex));
 
 	return _int();
 }
@@ -103,14 +125,14 @@ _int CWireTerrain::LateRender()
 	return _int();
 }
 
-_float3 CWireTerrain::PutOnTerrain(_bool* pbIsObTerrain,_fVector ObjectWorldPos, _fVector ObjectOldWorldPos, _float3* vOutPlaneNormalVec)
+_float3 CWireTerrain::Pick_OnTerrain(_bool * pbIsObTerrain, _fVector ObjectWorldPos, _fVector ObjectOldWorldPos, _float3 * vOutPlaneNormalVec)
 {
 	if (XMVectorGetY(ObjectOldWorldPos) < XMVectorGetY(ObjectWorldPos))
 		return ObjectWorldPos;
 
 	_Matrix InverMat = m_InverseWorldMat.XMatrix();
 
-	_float3 CaculatedFloat3 = m_pVIBufferCom->Caculate_TerrainY(pbIsObTerrain,
+	_Vector CaculatedFloat3 = m_pVIBufferCom->Caculate_Terrain_Pick_byRay(pbIsObTerrain,
 		(XMVector3TransformCoord(ObjectWorldPos, InverMat)), (XMVector3TransformCoord(ObjectOldWorldPos, InverMat)), vOutPlaneNormalVec);
 
 
@@ -119,11 +141,13 @@ _float3 CWireTerrain::PutOnTerrain(_bool* pbIsObTerrain,_fVector ObjectWorldPos,
 		if (vOutPlaneNormalVec != nullptr)
 			*vOutPlaneNormalVec = XMVector3TransformNormal(vOutPlaneNormalVec->XMVector(), m_pTransformCom->Get_WorldMatrix());
 
-		return CaculatedFloat3;
+		return XMVector3TransformCoord(CaculatedFloat3, m_pTransformCom->Get_WorldMatrix());
 	}
 
 	return ObjectWorldPos;
 }
+
+
 
 HRESULT CWireTerrain::SetUp_Components()
 {
@@ -133,16 +157,15 @@ HRESULT CWireTerrain::SetUp_Components()
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Shader_VNT), TAG_COM(Com_Shader), (CComponent**)&m_pShaderCom));
 
-	FAILED_CHECK(Add_Component(SCENE_EDIT, TAG_CP(Prototype_VIBuffer_Terrain_Edit), TAG_COM(Com_VIBuffer), (CComponent**)&m_pVIBufferCom));
+	FAILED_CHECK(Add_Component(m_eNowSceneNum, TAG_CP(Prototype_VIBuffer_Terrain), TAG_COM(Com_VIBuffer), (CComponent**)&m_pVIBufferCom));
 
-	//FAILED_CHECK(Add_Component(m_eNowSceneNum, TAG_CP(Prototype_Texture_Terrain), TAG_COM(Com_Texture), (CComponent**)&m_pTextureCom));
+	FAILED_CHECK(Add_Component(m_eNowSceneNum, TAG_CP(Prototype_Texture_Edit_Terrain), TAG_COM(Com_Texture), (CComponent**)&m_pTextureCom));
 
-
+	m_pTextureCom->Change_TextureLayer(L"Diffuse");
+	
 	CTransform::TRANSFORMDESC tDesc = {};
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Transform), TAG_COM(Com_Transform), (CComponent**)&m_pTransformCom, &tDesc));
-
-
 	m_InverseWorldMat = m_pTransformCom->Get_InverseWorldMatrix();
 	
 
@@ -181,6 +204,6 @@ void CWireTerrain::Free()
 	Safe_Release(m_pRendererCom);
 	Safe_Release(m_pVIBufferCom);
 	Safe_Release(m_pShaderCom);
-	//Safe_Release(m_pTextureCom);
+	Safe_Release(m_pTextureCom);
 	
 }

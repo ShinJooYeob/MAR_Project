@@ -243,6 +243,9 @@
     <ClInclude Include="..\public\HierarchyNode.h">
       <Filter>01.Utility\01.ComponentMgr\01.Component\03.Model\01.Model\MeshContainer\HierarchyNode</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\VIBuffer_DynamicTerrain.h">
+      <Filter>01.Utility\01.ComponentMgr\01.Component\03.Model\02.VIBuffer\Terrain</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">
@@ -346,6 +349,9 @@
     </ClCompile>
     <ClCompile Include="..\private\HierarchyNode.cpp">
       <Filter>01.Utility\01.ComponentMgr\01.Component\03.Model\01.Model\MeshContainer\HierarchyNode</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\VIBuffer_DynamicTerrain.cpp">
+      <Filter>01.Utility\01.ComponentMgr\01.Component\03.Model\02.VIBuffer\Terrain</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

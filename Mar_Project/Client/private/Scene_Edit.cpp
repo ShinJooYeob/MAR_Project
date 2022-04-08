@@ -2,8 +2,7 @@
 #include "..\Public\Scene_Edit.h"
 #include "Scene_Loading.h"
 #include "Camera_Editor.h"
-#include "Terrain.h"
-
+#include "WireTerrain.h"
 
 CScene_Edit::CScene_Edit(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
 	:CScene(pDevice, pDeviceContext)
@@ -738,7 +737,7 @@ HRESULT CScene_Edit::Input_KeyBoard(_double fDeltaTime)
 		if (m_pCreatedTerrain != nullptr)
 		{
 			////마우스 터레인 피킹
-			if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_LBUTTON) & DIS_Down)
+			if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_LBUTTON) & DIS_Press)
 			{
 				POINT ptMouse;
 				GetCursorPos(&ptMouse);
@@ -766,49 +765,35 @@ HRESULT CScene_Edit::Input_KeyBoard(_double fDeltaTime)
 				{
 					vNewPos = vOldPos + vRayDir;
 
-					vResult = m_pCreatedTerrain->PutOnTerrain(&IsPicked, vNewPos, vOldPos);
+					vResult = m_pCreatedTerrain->Pick_OnTerrain(&IsPicked, vNewPos, vOldPos);
 
 					if (IsPicked)
 					{
-						wstring ResultString = L"X : " + to_wstring(vResult.x) + L"	Y : " + to_wstring(vResult.y) + L"	Z : " + to_wstring(vResult.z) + L"\n";
-						OutputDebugStringW(ResultString.c_str());
+						//wstring ResultString = L"X : " + to_wstring(vResult.x) + L"	Y : " + to_wstring(vResult.y) + L"	Z : " + to_wstring(vResult.z) + L"\n";
+						//OutputDebugStringW(ResultString.c_str());
 						break;
 					}
 
 					vOldPos = vNewPos;
-					if(i >= 199)
-						OutputDebugStringW(L"Fail to Pick\n");
 				}
 
 				if (IsPicked)
 				{
-					vCamPos;
-					vRayDir;
-
-					RECT PickRange = { 0 };
-
-					if (XMVectorGetX(vOldPos) < XMVectorGetX(vNewPos))
-					{
-
-
-					}
-
-					vOldPos;
-					vNewPos;
-
-
+					m_pCreatedTerrain->Set_PickedPos(&vResult);
 
 				}
 
 
 
-
-
+				
 			}
 
-
-
-
+			if (pInstance->Get_DIKeyState(DIK_TAB) & DIS_Down)
+			{
+				static bool IsWire = false;
+				IsWire = !IsWire;
+				m_pCreatedTerrain->Set_ShaderPass((IsWire) ? 3:2);
+			}
 
 
 
@@ -1763,10 +1748,10 @@ HRESULT CScene_Edit::Widget_CreateDeleteHeightMap(_double fDeltatime)
 
 			if (ImGui::Button("Create Height Map", ImVec2(-FLT_MIN, 0.0f)))
 			{
-				FAILED_CHECK(m_pGameInstance->Add_GameObject_Out_of_Manager((CGameObject**)(&m_pCreatedTerrain), SCENE_EDIT, TAG_OP(Prototype_Terrain)));
+				FAILED_CHECK(m_pGameInstance->Add_GameObject_Out_of_Manager((CGameObject**)(&m_pCreatedTerrain), SCENE_EDIT, TAG_OP(Prototype_WireTerrain)));
 
 
-				m_pCreatedTerrain->Change_Component_by_Parameter(CVIBuffer_Terrain::Create(m_pDevice, m_pDeviceContext, _int(pow(2, m_iMapSize[0])) + 1, _int(pow(2, m_iMapSize[1])) + 1), TAG_COM(Com_VIBuffer));
+				m_pCreatedTerrain->Change_Component_by_Parameter(CVIBuffer_DynamicTerrain::Create(m_pDevice, m_pDeviceContext, _int(pow(2, m_iMapSize[0])) + 1, _int(pow(2, m_iMapSize[1])) + 1), TAG_COM(Com_VIBuffer));
 			}
 
 

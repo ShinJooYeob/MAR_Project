@@ -82,7 +82,7 @@ HRESULT CLoader::Load_Scene_Loby(_bool * _IsClientQuit, CRITICAL_SECTION * _CriS
 #pragma region PROTOTYPE_COMPONENT
 
 	//////////Terrain
-	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_LOBY, TAG_CP(Prototype_VIBuffer_Terrain_1),
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_LOBY, TAG_CP(Prototype_VIBuffer_Terrain),
 		CVIBuffer_Terrain::Create(m_pDevice, m_pDeviceContext, L"Height.bmp")));
 
 
@@ -218,20 +218,20 @@ HRESULT CLoader::Load_Scene_Edit(_bool * _IsClientQuit, CRITICAL_SECTION * _CriS
 #pragma region PROTOTYPE_COMPONENT
 #pragma endregion
 
-	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_EDIT, TAG_CP(Prototype_VIBuffer_Terrain_Edit),
-		CVIBuffer_Terrain::Create(m_pDevice, m_pDeviceContext, 257)));
+	//FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_EDIT, TAG_CP(Prototype_VIBuffer_Terrain_Edit),
+	//	CVIBuffer_Terrain::Create(m_pDevice, m_pDeviceContext, 257)));
 	//FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_EDIT, TAG_CP(Prototype_Texture_Terrain),
 	//	CTexture::Create(m_pDevice, m_pDeviceContext, L"Terrain.txt")));
 
-	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_EDIT, TAG_CP(Prototype_VIBuffer_Terrain_1),
-		CVIBuffer_Terrain::Create(m_pDevice, m_pDeviceContext,  4, 4)));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_EDIT, TAG_CP(Prototype_VIBuffer_Terrain),
+		CVIBuffer_DynamicTerrain::Create(m_pDevice, m_pDeviceContext,  4, 4)));
 
 
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_EDIT, TAG_CP(Prototype_Texture_EditScene),
 		CTexture::Create(m_pDevice, m_pDeviceContext, L"EditScene.txt")));
 
-	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_EDIT, TAG_CP(Prototype_Texture_Terrain),
-		CTexture::Create(m_pDevice, m_pDeviceContext, L"Terrain.txt")));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_EDIT, TAG_CP(Prototype_Texture_Edit_Terrain),
+		CTexture::Create(m_pDevice, m_pDeviceContext, L"EditTerrain.txt")));
 
 
 #pragma  region PROTOTYPE_GAMEOBJECT

@@ -1,12 +1,12 @@
-#include "..\Public\VIBuffer_Terrain.h"
+#include "..\Public\VIBuffer_DynamicTerrain.h"
 
-CVIBuffer_Terrain::CVIBuffer_Terrain(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
+CVIBuffer_DynamicTerrain::CVIBuffer_DynamicTerrain(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
 	: CVIBuffer(pDevice, pDeviceContext)
 {
 
 }
 
-CVIBuffer_Terrain::CVIBuffer_Terrain(const CVIBuffer_Terrain & rhs)
+CVIBuffer_DynamicTerrain::CVIBuffer_DynamicTerrain(const CVIBuffer_DynamicTerrain & rhs)
 	: CVIBuffer(rhs)
 	, m_iNumVerticesX(rhs.m_iNumVerticesX)
 	, m_iNumVerticesZ(rhs.m_iNumVerticesZ)
@@ -14,7 +14,7 @@ CVIBuffer_Terrain::CVIBuffer_Terrain(const CVIBuffer_Terrain & rhs)
 
 }
 
-HRESULT CVIBuffer_Terrain::Initialize_Prototype(const _tchar* pHeightMap)
+HRESULT CVIBuffer_DynamicTerrain::Initialize_Prototype(const _tchar* pHeightMap)
 {
 	FAILED_CHECK(__super::Initialize_Prototype(nullptr));
 
@@ -49,12 +49,13 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(const _tchar* pHeightMap)
 	m_iNumVertexBuffers = 1;
 
 	m_VBDesc.ByteWidth = sizeof(VTXNORTEX) * m_iNumVertices;
-	m_VBDesc.Usage = D3D11_USAGE_IMMUTABLE;
+	m_VBDesc.Usage = D3D11_USAGE_DYNAMIC;
+	m_VBDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	m_VBDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	m_VBDesc.StructureByteStride = sizeof(VTXNORTEX);
 
-	VTXNORTEX* pVertices = new VTXNORTEX[m_iNumVertices];
-	ZeroMemory(pVertices, sizeof(VTXNORTEX) * m_iNumVertices);
+	m_pKeepVertices = new VTXNORTEX[m_iNumVertices];
+	ZeroMemory(m_pKeepVertices, sizeof(VTXNORTEX) * m_iNumVertices);
 	m_pVertices = new _float3[m_iNumVertices];
 
 
@@ -68,10 +69,10 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(const _tchar* pHeightMap)
 			//	pVertices[iIndex].vPosition = m_pVertices[iIndex] =  _float3(_float(j), -FLT_MAX, _float(i));
 			//else
 			//	pVertices[iIndex].vPosition = m_pVertices[iIndex] = _float3(_float(j), (pPixel[iIndex] & 0x000000ff) / 10.f, _float(i));
-			pVertices[iIndex].vPosition = m_pVertices[iIndex] = _float3(_float(j), (pPixel[iIndex] & 0x000000ff) / 10.f, _float(i));
+			m_pKeepVertices[iIndex].vPosition = m_pVertices[iIndex] = _float3(_float(j), (pPixel[iIndex] & 0x000000ff) / 10.f, _float(i));
 
-			pVertices[iIndex].vNormal = _float3(0.f, 0.f, 0.f);
-			pVertices[iIndex].vTexUV = _float2(j / (m_iNumVerticesX - 1.f), i / (m_iNumVerticesZ - 1.f));
+			m_pKeepVertices[iIndex].vNormal = _float3(0.f, 0.f, 0.f);
+			m_pKeepVertices[iIndex].vTexUV = _float2(j / (m_iNumVerticesX - 1.f), i / (m_iNumVerticesZ - 1.f));
 		}
 	}
 
@@ -80,7 +81,7 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(const _tchar* pHeightMap)
 	//락언락으로 값을 채워주는 것이 이제는 불가능하기 떄문에
 	//D3D11_SUBRESOURCE_DATA 구조체에 값을 던져서 해당 값을 복사해서 생성하도록 한다.
 	//이렇게 되면 우리는 해당 정점에 접근하고 싶다면?
-	m_VBSubResourceData.pSysMem = pVertices;
+	m_VBSubResourceData.pSysMem = m_pKeepVertices;
 
 	Safe_Delete_Array(pPixel);
 	CloseHandle(hFile);
@@ -129,14 +130,14 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(const _tchar* pHeightMap)
 				vDest = (m_pVertices[pIndices[iNumFace]._2].XMVector()) - (m_pVertices[pIndices[iNumFace]._0].XMVector());
 				vNorm = XMVector3Normalize(XMVector3Cross(vSrc, vDest));
 
-				XMStoreFloat3(&pVertices[pIndices[iNumFace]._0].vNormal,
-					(XMVector3Normalize(XMLoadFloat3(&pVertices[pIndices[iNumFace]._0].vNormal) + vNorm)));
+				XMStoreFloat3(&m_pKeepVertices[pIndices[iNumFace]._0].vNormal,
+					(XMVector3Normalize(XMLoadFloat3(&m_pKeepVertices[pIndices[iNumFace]._0].vNormal) + vNorm)));
 
-				XMStoreFloat3(&pVertices[pIndices[iNumFace]._1].vNormal,
-					(XMVector3Normalize(XMLoadFloat3(&pVertices[pIndices[iNumFace]._1].vNormal) + vNorm)));
+				XMStoreFloat3(&m_pKeepVertices[pIndices[iNumFace]._1].vNormal,
+					(XMVector3Normalize(XMLoadFloat3(&m_pKeepVertices[pIndices[iNumFace]._1].vNormal) + vNorm)));
 
-				XMStoreFloat3(&pVertices[pIndices[iNumFace]._2].vNormal,
-					(XMVector3Normalize(XMLoadFloat3(&pVertices[pIndices[iNumFace]._2].vNormal) + vNorm)));
+				XMStoreFloat3(&m_pKeepVertices[pIndices[iNumFace]._2].vNormal,
+					(XMVector3Normalize(XMLoadFloat3(&m_pKeepVertices[pIndices[iNumFace]._2].vNormal) + vNorm)));
 
 			}
 
@@ -152,14 +153,14 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(const _tchar* pHeightMap)
 				vDest = (m_pVertices[pIndices[iNumFace]._2].XMVector()) - (m_pVertices[pIndices[iNumFace]._0].XMVector());
 				vNorm = XMVector3Normalize(XMVector3Cross(vSrc, vDest));
 
-				XMStoreFloat3(&pVertices[pIndices[iNumFace]._0].vNormal,
-					(XMVector3Normalize(XMLoadFloat3(&pVertices[pIndices[iNumFace]._0].vNormal) + vNorm)));
+				XMStoreFloat3(&m_pKeepVertices[pIndices[iNumFace]._0].vNormal,
+					(XMVector3Normalize(XMLoadFloat3(&m_pKeepVertices[pIndices[iNumFace]._0].vNormal) + vNorm)));
 
-				XMStoreFloat3(&pVertices[pIndices[iNumFace]._1].vNormal,
-					(XMVector3Normalize(XMLoadFloat3(&pVertices[pIndices[iNumFace]._1].vNormal) + vNorm)));
+				XMStoreFloat3(&m_pKeepVertices[pIndices[iNumFace]._1].vNormal,
+					(XMVector3Normalize(XMLoadFloat3(&m_pKeepVertices[pIndices[iNumFace]._1].vNormal) + vNorm)));
 
-				XMStoreFloat3(&pVertices[pIndices[iNumFace]._2].vNormal,
-					(XMVector3Normalize(XMLoadFloat3(&pVertices[pIndices[iNumFace]._2].vNormal) + vNorm)));
+				XMStoreFloat3(&m_pKeepVertices[pIndices[iNumFace]._2].vNormal,
+					(XMVector3Normalize(XMLoadFloat3(&m_pKeepVertices[pIndices[iNumFace]._2].vNormal) + vNorm)));
 			}
 
 			++iNumFace;
@@ -173,22 +174,25 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(const _tchar* pHeightMap)
 
 #pragma region VERTEX_BUFFER
 
+
 	FAILED_CHECK(Create_VertexBuffer());
-	Safe_Delete_Array(pVertices);
+
+
+#pragma endregion
+
+
+#pragma region INDEX_BUFFER
 
 
 	FAILED_CHECK(Create_IndexBuffer());
 	Safe_Delete_Array(pIndices);
-
-
-
 
 #pragma endregion
 
 	return S_OK;
 }
 
-HRESULT CVIBuffer_Terrain::Initialize_Prototype(_uint iNumWidthPixelX, _uint iNumWidthPixelY)
+HRESULT CVIBuffer_DynamicTerrain::Initialize_Prototype(_uint iNumWidthPixelX, _uint iNumWidthPixelY)
 {
 	FAILED_CHECK(__super::Initialize_Prototype(nullptr));
 
@@ -210,12 +214,13 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(_uint iNumWidthPixelX, _uint iNu
 	m_iNumVertexBuffers = 1;
 
 	m_VBDesc.ByteWidth = sizeof(VTXNORTEX) * m_iNumVertices;
-	m_VBDesc.Usage = D3D11_USAGE_IMMUTABLE;
+	m_VBDesc.Usage = D3D11_USAGE_DYNAMIC;
+	m_VBDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	m_VBDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	m_VBDesc.StructureByteStride = sizeof(VTXNORTEX);
 
-	VTXNORTEX* pVertices = new VTXNORTEX[m_iNumVertices];
-	ZeroMemory(pVertices, sizeof(VTXNORTEX) * m_iNumVertices);
+	m_pKeepVertices = new VTXNORTEX[m_iNumVertices];
+	ZeroMemory(m_pKeepVertices, sizeof(VTXNORTEX) * m_iNumVertices);
 	m_pVertices = new _float3[m_iNumVertices];
 
 
@@ -225,9 +230,9 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(_uint iNumWidthPixelX, _uint iNu
 		{
 			_uint		iIndex = i * m_iNumVerticesX + j;
 
-			pVertices[iIndex].vPosition = m_pVertices[iIndex] = _float3(_float(j), 0, _float(i));
-			pVertices[iIndex].vNormal = _float3(0.f, 0.f, 0.f);
-			pVertices[iIndex].vTexUV = _float2(j / (m_iNumVerticesX - 1.f), i / (m_iNumVerticesZ - 1.f));
+			m_pKeepVertices[iIndex].vPosition = m_pVertices[iIndex] = _float3(_float(j), 0, _float(i));
+			m_pKeepVertices[iIndex].vNormal = _float3(0.f, 0.f, 0.f);
+			m_pKeepVertices[iIndex].vTexUV = _float2(j / (m_iNumVerticesX - 1.f), i / (m_iNumVerticesZ - 1.f));
 		}
 	}
 
@@ -236,7 +241,7 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(_uint iNumWidthPixelX, _uint iNu
 	//락언락으로 값을 채워주는 것이 이제는 불가능하기 떄문에
 	//D3D11_SUBRESOURCE_DATA 구조체에 값을 던져서 해당 값을 복사해서 생성하도록 한다.
 	//이렇게 되면 우리는 해당 정점에 접근하고 싶다면?
-	m_VBSubResourceData.pSysMem = pVertices;
+	m_VBSubResourceData.pSysMem = m_pKeepVertices;
 
 #pragma  endregion 
 
@@ -282,14 +287,14 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(_uint iNumWidthPixelX, _uint iNu
 				vDest = (m_pVertices[pIndices[iNumFace]._2].XMVector()) - (m_pVertices[pIndices[iNumFace]._0].XMVector());
 				vNorm = XMVector3Normalize(XMVector3Cross(vSrc, vDest));
 
-				XMStoreFloat3(&pVertices[pIndices[iNumFace]._0].vNormal,
-					(XMVector3Normalize(XMLoadFloat3(&pVertices[pIndices[iNumFace]._0].vNormal) + vNorm)));
+				XMStoreFloat3(&m_pKeepVertices[pIndices[iNumFace]._0].vNormal,
+					(XMVector3Normalize(XMLoadFloat3(&m_pKeepVertices[pIndices[iNumFace]._0].vNormal) + vNorm)));
 
-				XMStoreFloat3(&pVertices[pIndices[iNumFace]._1].vNormal,
-					(XMVector3Normalize(XMLoadFloat3(&pVertices[pIndices[iNumFace]._1].vNormal) + vNorm)));
+				XMStoreFloat3(&m_pKeepVertices[pIndices[iNumFace]._1].vNormal,
+					(XMVector3Normalize(XMLoadFloat3(&m_pKeepVertices[pIndices[iNumFace]._1].vNormal) + vNorm)));
 
-				XMStoreFloat3(&pVertices[pIndices[iNumFace]._2].vNormal,
-					(XMVector3Normalize(XMLoadFloat3(&pVertices[pIndices[iNumFace]._2].vNormal) + vNorm)));
+				XMStoreFloat3(&m_pKeepVertices[pIndices[iNumFace]._2].vNormal,
+					(XMVector3Normalize(XMLoadFloat3(&m_pKeepVertices[pIndices[iNumFace]._2].vNormal) + vNorm)));
 
 			}
 
@@ -305,14 +310,14 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(_uint iNumWidthPixelX, _uint iNu
 				vDest = (m_pVertices[pIndices[iNumFace]._2].XMVector()) - (m_pVertices[pIndices[iNumFace]._0].XMVector());
 				vNorm = XMVector3Normalize(XMVector3Cross(vSrc, vDest));
 
-				XMStoreFloat3(&pVertices[pIndices[iNumFace]._0].vNormal,
-					(XMVector3Normalize(XMLoadFloat3(&pVertices[pIndices[iNumFace]._0].vNormal) + vNorm)));
+				XMStoreFloat3(&m_pKeepVertices[pIndices[iNumFace]._0].vNormal,
+					(XMVector3Normalize(XMLoadFloat3(&m_pKeepVertices[pIndices[iNumFace]._0].vNormal) + vNorm)));
 
-				XMStoreFloat3(&pVertices[pIndices[iNumFace]._1].vNormal,
-					(XMVector3Normalize(XMLoadFloat3(&pVertices[pIndices[iNumFace]._1].vNormal) + vNorm)));
+				XMStoreFloat3(&m_pKeepVertices[pIndices[iNumFace]._1].vNormal,
+					(XMVector3Normalize(XMLoadFloat3(&m_pKeepVertices[pIndices[iNumFace]._1].vNormal) + vNorm)));
 
-				XMStoreFloat3(&pVertices[pIndices[iNumFace]._2].vNormal,
-					(XMVector3Normalize(XMLoadFloat3(&pVertices[pIndices[iNumFace]._2].vNormal) + vNorm)));
+				XMStoreFloat3(&m_pKeepVertices[pIndices[iNumFace]._2].vNormal,
+					(XMVector3Normalize(XMLoadFloat3(&m_pKeepVertices[pIndices[iNumFace]._2].vNormal) + vNorm)));
 			}
 
 			++iNumFace;
@@ -326,25 +331,26 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(_uint iNumWidthPixelX, _uint iNu
 
 #pragma region CREATE_BUFFER
 
+
 	FAILED_CHECK(Create_VertexBuffer());
-	Safe_Delete_Array(pVertices);
 
 
 	FAILED_CHECK(Create_IndexBuffer());
 	Safe_Delete_Array(pIndices);
+
 #pragma endregion
 
 	return S_OK;
 }
 
-HRESULT CVIBuffer_Terrain::Initialize_Clone(void * pArg)
+HRESULT CVIBuffer_DynamicTerrain::Initialize_Clone(void * pArg)
 {
 	FAILED_CHECK(__super::Initialize_Clone(pArg));
 
 	return S_OK;
 }
 
-_Vector CVIBuffer_Terrain::Caculate_TerrainY(_bool* pbIsOnTerrain ,_float3 PosOnTerrainLocal, _float3 OldPosOnTerrainLocal, _float3* vLocalPlaneNormVector)
+_Vector CVIBuffer_DynamicTerrain::Caculate_TerrainY(_bool* pbIsOnTerrain ,_float3 PosOnTerrainLocal, _float3 OldPosOnTerrainLocal, _float3* vLocalPlaneNormVector)
 {
 	
 
@@ -376,7 +382,7 @@ _Vector CVIBuffer_Terrain::Caculate_TerrainY(_bool* pbIsOnTerrain ,_float3 PosOn
 }
 
 
-_Vector CVIBuffer_Terrain::Caculate_Terrain_Pick_byRay(_bool* pbIsOnTerrain, _float3 PosOnTerrainLocal, _float3 OldPosOnTerrainLocal, _float3* vLocalPlaneNormVector)
+_Vector CVIBuffer_DynamicTerrain::Caculate_Terrain_Pick_byRay(_bool* pbIsOnTerrain, _float3 PosOnTerrainLocal, _float3 OldPosOnTerrainLocal, _float3* vLocalPlaneNormVector)
 {
 
 
@@ -473,7 +479,7 @@ _Vector CVIBuffer_Terrain::Caculate_Terrain_Pick_byRay(_bool* pbIsOnTerrain, _fl
 }
 
 
-_float CVIBuffer_Terrain::EquationPlane(_bool * pbIsOnTerrain, _float3 PosOnTerrainLocal, _float* pCaculateY, _float3* vNormVector)
+_float CVIBuffer_DynamicTerrain::EquationPlane(_bool * pbIsOnTerrain, _float3 PosOnTerrainLocal, _float* pCaculateY, _float3* vNormVector)
 {
 	if (PosOnTerrainLocal.x < 0 || PosOnTerrainLocal.x >= m_iNumVerticesX ||
 		PosOnTerrainLocal.z < 0 || PosOnTerrainLocal.z >= m_iNumVerticesZ)
@@ -545,7 +551,7 @@ _float CVIBuffer_Terrain::EquationPlane(_bool * pbIsOnTerrain, _float3 PosOnTerr
 	return (Plane.x * PosOnTerrainLocal.x + Plane.y * PosOnTerrainLocal.y + Plane.z * PosOnTerrainLocal.z + Plane.w);
 }
 
-_Vector CVIBuffer_Terrain::Pick_ByRay(_fVector vRayPos, _fVector vRayDir, _float2 vIndex, _bool * bIsPieck)
+_Vector CVIBuffer_DynamicTerrain::Pick_ByRay(_fVector vRayPos, _fVector vRayDir, _float2 vIndex, _bool * bIsPieck)
 {
 	if (vIndex.x < 0 || vIndex.x >= m_iNumVerticesX ||
 		vIndex.y < 0 || vIndex.y >= m_iNumVerticesZ)
@@ -595,43 +601,73 @@ _Vector CVIBuffer_Terrain::Pick_ByRay(_fVector vRayPos, _fVector vRayDir, _float
 
 }
 
-CVIBuffer_Terrain * CVIBuffer_Terrain::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, const _tchar* pHeightMap)
+HRESULT CVIBuffer_DynamicTerrain::Chage_VertexBuffer(_float2 vChangeVertexIndex, _float fValueY)
 {
-	CVIBuffer_Terrain*	pInstance = new CVIBuffer_Terrain(pDevice, pDeviceContext);
+	m_bIsVertexChange = true;
+
+	_uint		iIndex = _uint(vChangeVertexIndex.y) * m_iNumVerticesX + _uint(vChangeVertexIndex.x);
+	m_pKeepVertices[iIndex].vPosition.y = fValueY;
+
+	return S_OK;
+}
+
+HRESULT CVIBuffer_DynamicTerrain::Renew_VertexBuffer()
+{
+	if (!m_bIsVertexChange) return S_OK;
+
+
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
+
+	FAILED_CHECK(m_pDeviceContext->Map(m_pVB, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
+	//  Update the vertex buffer here.
+	memcpy(mappedResource.pData, m_pKeepVertices, sizeof(VTXNORTEX) * m_iNumVertices);
+	//  Reenable GPU access to the vertex buffer data.
+	m_pDeviceContext->Unmap(m_pVB, 0);
+
+	return S_OK;
+}
+
+CVIBuffer_DynamicTerrain * CVIBuffer_DynamicTerrain::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, const _tchar* pHeightMap)
+{
+	CVIBuffer_DynamicTerrain*	pInstance = new CVIBuffer_DynamicTerrain(pDevice, pDeviceContext);
 
 	if (FAILED(pInstance->Initialize_Prototype(pHeightMap)))
 	{
-		MSGBOX("Failed to Created CVIBuffer_Terrain");
+		MSGBOX("Failed to Created CVIBuffer_DynamicTerrain");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-CVIBuffer_Terrain * CVIBuffer_Terrain::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, _uint iNumWidthPixelX, _uint iNumWidthPixelY)
+CVIBuffer_DynamicTerrain * CVIBuffer_DynamicTerrain::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, _uint iNumWidthPixelX, _uint iNumWidthPixelY)
 {
-	CVIBuffer_Terrain*	pInstance = new CVIBuffer_Terrain(pDevice, pDeviceContext);
+	CVIBuffer_DynamicTerrain*	pInstance = new CVIBuffer_DynamicTerrain(pDevice, pDeviceContext);
 
 	if (FAILED(pInstance->Initialize_Prototype(iNumWidthPixelX, iNumWidthPixelY)))
 	{
-		MSGBOX("Failed to Created CVIBuffer_Terrain");
+		MSGBOX("Failed to Created CVIBuffer_DynamicTerrain");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-CComponent * CVIBuffer_Terrain::Clone(void * pArg)
+CComponent * CVIBuffer_DynamicTerrain::Clone(void * pArg)
 {
-	CVIBuffer_Terrain*	pInstance = new CVIBuffer_Terrain(*this);
+	CVIBuffer_DynamicTerrain*	pInstance = new CVIBuffer_DynamicTerrain(*this);
 
 	if (FAILED(pInstance->Initialize_Clone(pArg)))
 	{
-		MSGBOX("Failed to Created CVIBuffer_Terrain");
+		MSGBOX("Failed to Created CVIBuffer_DynamicTerrain");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-void CVIBuffer_Terrain::Free()
+void CVIBuffer_DynamicTerrain::Free()
 {
 	__super::Free();
+
+	if(!m_bIsClone)
+		Safe_Delete_Array(m_pKeepVertices);
 }

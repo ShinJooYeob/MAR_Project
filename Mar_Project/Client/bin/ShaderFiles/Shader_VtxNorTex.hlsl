@@ -11,6 +11,18 @@ cbuffer LightDesc
 
 texture2D		g_DiffuseTexture;
 
+
+texture2D		g_SourDiffuseTexture;
+texture2D		g_DestDiffuseTexture;
+texture2D		g_FilterTexture;
+texture2D		g_BrushTexture;
+cbuffer BrushDesc
+{
+	float4		g_vBrushPos = float4(10.0f, 0.0f, 10.f, 1.f);
+	float		g_fRadius = 3.f;
+};
+
+
 cbuffer CameraDesc
 {
 	float4			g_CamPosition;
@@ -152,6 +164,50 @@ PS_OUT PS_MAIN_TERRAIN_WIRE(PS_IN In)
 	return Out;
 }
 
+PS_OUT PS_MAIN_TERRAIN_EDIT(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+
+	vector	vSourMtrlDiffuse = g_SourDiffuseTexture.Sample(DefaultSampler, In.vTexUV * 30.f);
+	vector	vDestMtrlDiffuse = g_DestDiffuseTexture.Sample(DefaultSampler, In.vTexUV * 30.f);
+	//vector	vBrushColor = g_BrushTexture.Sample(DefaultSampler, In.vTexUV);	
+	vector	vBrushColor = (vector)0.f;
+	vector	vFilterColor = g_FilterTexture.Sample(PointSampler, In.vTexUV);
+
+	if (g_vBrushPos.x - g_fRadius < In.vWorldPos.x && In.vWorldPos.x <= g_vBrushPos.x + g_fRadius &&
+		g_vBrushPos.z - g_fRadius < In.vWorldPos.z && In.vWorldPos.z <= g_vBrushPos.z + g_fRadius)
+	{
+		float2		vBrushUV;
+
+		vBrushUV.x = (In.vWorldPos.x - (g_vBrushPos.x - g_fRadius)) / (2.f * g_fRadius);
+		vBrushUV.y = ((g_vBrushPos.z + g_fRadius) - In.vWorldPos.z) / (2.f * g_fRadius);
+
+
+		vBrushColor = g_BrushTexture.Sample(DefaultSampler, vBrushUV);
+	}
+
+
+
+	vector	vMtrlDiffuse = vSourMtrlDiffuse * vFilterColor.r + vDestMtrlDiffuse * (1.f - vFilterColor.r) + vBrushColor;
+
+	float	fShade = max(dot(normalize(g_vLightVector) * -1.f, In.vWorldNormal), 0.f);
+
+	vector	vReflect = reflect(normalize(g_vLightVector), In.vWorldNormal);
+	vector	vLook = normalize(In.vWorldPos - g_CamPosition);
+
+	float	fSpecular = pow(max(dot(normalize(vReflect) * -1.f, vLook), 0.f), 30.f);
+
+	Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient))
+		+ (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
+
+
+
+	return Out;
+}
+
+
+
 technique11		DefaultTechnique
 {
 	pass Terrain_DirectionalLight // 0
@@ -184,5 +240,15 @@ technique11		DefaultTechnique
 		VertexShader = compile vs_5_0 VS_MAIN_TERRAIN();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN_TERRAIN_WIRE();
+	}
+	pass Terrain_EditTerrain // 3
+	{
+		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(ZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_ccw);
+
+		VertexShader = compile vs_5_0 VS_MAIN_TERRAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_TERRAIN_EDIT();
 	}
 }

@@ -104,6 +104,7 @@ namespace Engine
 	{
 		tagMyFloat4() :XMFLOAT4(0, 0, 0, 0) {};
 		tagMyFloat4(const XMFLOAT4& _Param) :XMFLOAT4(_Param.x, _Param.y, _Param.z, _Param.w) {	};
+		tagMyFloat4(const XMFLOAT3& _Param, _float w) :XMFLOAT4(_Param.x, _Param.y, _Param.z, w) {};
 		tagMyFloat4(const XMFLOAT3& _Param) :XMFLOAT4(_Param.x, _Param.y, _Param.z, 0) {};
 		tagMyFloat4(const XMFLOAT2& _Param) :XMFLOAT4(_Param.x, _Param.y, 0, 0) {};
 
@@ -171,6 +172,17 @@ namespace Engine
 		tagMyFloat3(float _X, float _Y, float _Z) : XMFLOAT3(_X,_Y,_Z) { };
 
 		tagMyFloat3(const FXMVECTOR& _Param) { XMStoreFloat3(this,_Param); };
+
+
+		_bool operator==(tagMyFloat3& _Param)
+		{
+			return (x == _Param.x && y == _Param.y && z == _Param.z);
+		}
+
+		_bool operator!=(tagMyFloat3& _Param)
+		{
+			return (x != _Param.x || y != _Param.y || z != _Param.z);
+		}
 
 
 		/*

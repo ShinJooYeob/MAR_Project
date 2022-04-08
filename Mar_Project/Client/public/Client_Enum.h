@@ -317,7 +317,7 @@ enum COMPONENTPROTOTYPEID
 	//////////////////////////////////////////////////////////////////////////
 	Prototype_VIBuffer_Rect,
 	Prototype_VIBuffer_Cube,
-	Prototype_VIBuffer_Terrain_1,
+	Prototype_VIBuffer_Terrain,
 	Prototype_VIBuffer_Terrain_2,
 	Prototype_VIBuffer_Terrain_3,
 	Prototype_VIBuffer_Terrain_Edit,
@@ -345,7 +345,8 @@ enum COMPONENTPROTOTYPEID
 	Prototype_Texture_Player,
 	Prototype_Texture_SkyBox,
 	Prototype_Texture_EditScene,
-	Prototype_Texture_Terrain
+	Prototype_Texture_Terrain,
+	Prototype_Texture_Edit_Terrain
 
 };
 static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
@@ -453,7 +454,7 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 	case Prototype_Mesh_Player:
 		return TEXT("Mesh_Player");
 		break;
-		//메쉬////////////////////////////////////////////////////////////////////////
+		/////////////////텍스처////////////////////////////////////////////////////////
 
 
 	case Prototype_Texture_Player:
@@ -465,12 +466,26 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 
 	case Prototype_Texture_EditScene:
 		return TEXT("Prototype_Component_Texture_EditScene");
+
 		break;
 	case 	Prototype_Texture_Terrain:
 		return TEXT("Prototype_Component_Texture_Terrain");
+
 		break;
-	case 	Prototype_VIBuffer_Terrain_1:
-		return TEXT("Prototype_Component_VIBuffer_Terrain_1");
+	case 	Prototype_Texture_Edit_Terrain:
+		return TEXT("Prototype_Texture_Edit_Terrain");
+
+		//메쉬////////////////////////////////////////////////////////////////////////
+
+
+		
+
+
+
+
+		break;
+	case 	Prototype_VIBuffer_Terrain:
+		return TEXT("Prototype_Component_VIBuffer_Terrain");
 		break;
 	case 	Prototype_VIBuffer_Terrain_2:
 		return TEXT("Prototype_Component_VIBuffer_Terrain_2");

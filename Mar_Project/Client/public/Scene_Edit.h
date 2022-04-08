@@ -138,7 +138,7 @@ private:
 
 private:
 	_int		m_iMapSize[2];
-	class CTerrain* m_pCreatedTerrain = nullptr;
+	class CWireTerrain* m_pCreatedTerrain = nullptr;
 
 #pragma endregion HeightMap
 
