@@ -43,6 +43,13 @@ private:/*뼈들의 상속관계 순서대로 정렬해 보관*/
 	typedef vector<class CHierarchyNode*>	HIERARCHYNODES;
 
 private:
+	_uint									m_iCurrentAnimIndex = 0;
+	_uint									m_iNumAnimationClip = 0;
+	vector<class CAnimationClip*>			m_vecAnimator;
+	typedef vector<class CAnimationClip*>	ANIMATOR;
+
+
+private:
 	MODELTYPE								m_eModelType = TYPE_END;
 	_float4x4								m_DefaultPivotMatrix;
 
@@ -52,6 +59,7 @@ private:
 
 	HRESULT Ready_MeshContainers(_fMatrix TransformMatrix);
 	HRESULT Ready_Materials(const char* pModelFilePath);
+	HRESULT Ready_Animation();
 
 private:
 	CHierarchyNode* Find_HierarchyNode(const char* pName);

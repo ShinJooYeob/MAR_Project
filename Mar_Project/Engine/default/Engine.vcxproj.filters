@@ -121,6 +121,15 @@
     <Filter Include="01.Utility\01.ComponentMgr\01.Component\03.Model\01.Model\MeshContainer\HierarchyNode">
       <UniqueIdentifier>{7ba891b2-eec4-45ef-8bd1-aec3119a4035}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\01.ComponentMgr\01.Component\03.Model\01.Model\MeshContainer\Animator">
+      <UniqueIdentifier>{0fd920ce-fa58-4dba-8201-620e157654cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\01.ComponentMgr\01.Component\03.Model\01.Model\MeshContainer\Animator\AnimationClip">
+      <UniqueIdentifier>{90dbf1c3-2bf0-4d5c-b0f2-78a27749952d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\01.ComponentMgr\01.Component\03.Model\01.Model\MeshContainer\Animator\AnimationClip\AnimBone">
+      <UniqueIdentifier>{7955b3eb-4dac-4d4f-b5d7-eb6a82b39739}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Base.h">
@@ -246,6 +255,12 @@
     <ClInclude Include="..\public\VIBuffer_DynamicTerrain.h">
       <Filter>01.Utility\01.ComponentMgr\01.Component\03.Model\02.VIBuffer\Terrain</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\AnimationClip.h">
+      <Filter>01.Utility\01.ComponentMgr\01.Component\03.Model\01.Model\MeshContainer\Animator\AnimationClip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\ClipBone.h">
+      <Filter>01.Utility\01.ComponentMgr\01.Component\03.Model\01.Model\MeshContainer\Animator\AnimationClip\AnimBone</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">
@@ -352,6 +367,12 @@
     </ClCompile>
     <ClCompile Include="..\private\VIBuffer_DynamicTerrain.cpp">
       <Filter>01.Utility\01.ComponentMgr\01.Component\03.Model\02.VIBuffer\Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\AnimationClip.cpp">
+      <Filter>01.Utility\01.ComponentMgr\01.Component\03.Model\01.Model\MeshContainer\Animator\AnimationClip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\ClipBone.cpp">
+      <Filter>01.Utility\01.ComponentMgr\01.Component\03.Model\01.Model\MeshContainer\Animator\AnimationClip\AnimBone</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

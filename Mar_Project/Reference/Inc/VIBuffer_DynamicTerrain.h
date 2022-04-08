@@ -21,7 +21,9 @@ public:
 	_float EquationPlane(_bool* pbIsOnTerrain, _float3 PosOnTerrainLocal, _float* CaculateY = nullptr, _float3* vNormVector = nullptr);
 
 	_Vector Pick_ByRay(_fVector vRayPos, _fVector vRayDir, _float2 vIndex, _bool* bIsPieck);
+	_float Get_NowValueY(_float2 vIndex);
 
+	_float2 Get_NumVerticesXY() { return _float2(_float(m_iNumVerticesX), _float(m_iNumVerticesZ)); };
 public:
 	HRESULT		Chage_VertexBuffer(_float2 vChangeVertexIndex, _float fValueY);
 	HRESULT		Renew_VertexBuffer();

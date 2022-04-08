@@ -601,6 +601,19 @@ _Vector CVIBuffer_DynamicTerrain::Pick_ByRay(_fVector vRayPos, _fVector vRayDir,
 
 }
 
+_float CVIBuffer_DynamicTerrain::Get_NowValueY(_float2 vIndex)
+{
+	if (vIndex.x < 0 || vIndex.x >= m_iNumVerticesX ||
+		vIndex.y < 0 || vIndex.y >= m_iNumVerticesZ)
+	{
+		return NOT_EXIST_FLOAT;
+	}
+
+	_uint iIndex = _uint(_uint(vIndex.y) * m_iNumVerticesX + vIndex.x);
+
+	return m_pKeepVertices[iIndex].vPosition.y;
+}
+
 HRESULT CVIBuffer_DynamicTerrain::Chage_VertexBuffer(_float2 vChangeVertexIndex, _float fValueY)
 {
 	m_bIsVertexChange = true;
@@ -624,6 +637,8 @@ HRESULT CVIBuffer_DynamicTerrain::Renew_VertexBuffer()
 	memcpy(mappedResource.pData, m_pKeepVertices, sizeof(VTXNORTEX) * m_iNumVertices);
 	//  Reenable GPU access to the vertex buffer data.
 	m_pDeviceContext->Unmap(m_pVB, 0);
+
+	m_bIsVertexChange = false;	
 
 	return S_OK;
 }

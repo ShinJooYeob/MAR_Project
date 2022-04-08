@@ -483,5 +483,8 @@
     <FxCompile Include="..\bin\ShaderFiles\Shader_NonAnimModel.hlsl">
       <Filter>04.Shader</Filter>
     </FxCompile>
+    <FxCompile Include="..\bin\ShaderFiles\Shader_AnimModel.hlsl">
+      <Filter>04.Shader</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

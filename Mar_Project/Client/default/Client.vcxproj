@@ -272,6 +272,7 @@
     <Natvis Include="..\public\Imgui\imgui.natvis" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="..\bin\ShaderFiles\Shader_AnimModel.hlsl" />
     <FxCompile Include="..\bin\ShaderFiles\Shader_NonAnimModel.hlsl" />
     <FxCompile Include="..\bin\ShaderFiles\Shader_VtxCubeTex.hlsl" />
     <FxCompile Include="..\bin\ShaderFiles\Shader_VtxNorTex.hlsl" />

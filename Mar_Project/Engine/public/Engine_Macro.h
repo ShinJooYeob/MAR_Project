@@ -23,8 +23,11 @@
 #define DIS_DoubleDown		0b00000100
 #define DIS_Press			0b11111111
 
+#define D3D11COLOR_ARGB(a,r,g,b) \
+    ((D3DCOLOR)((((a)&0xff)<<24)|(((r)&0xff)<<16)|(((g)&0xff)<<8)|((b)&0xff)))
 
 #define NOT_EXIST_VECTOR		_float3(99999.f,99999.f,99999.f)
+#define NOT_EXIST_FLOAT			-99999.f
 
 //// »ö
 //#define COLOR_GRAY		(D3DCOLOR_ARGB(255, 124, 124, 124))

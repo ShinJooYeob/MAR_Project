@@ -2,6 +2,15 @@
 
 namespace Engine
 {
+	typedef struct tagKeyFrame
+	{
+		_float3		vScale;
+		_float4		vRotation;
+		_float3		vPosition;
+		_double		Time;
+	}KEYFRAME;
+
+
 	typedef struct tagMeshMaterialDesc
 	{
 		class CTexture*	pTexture;

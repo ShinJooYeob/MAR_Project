@@ -37,6 +37,8 @@ class CScene_Edit final : public CScene
 		Data_UI,
 		Data_Particle,
 		Data_CameraAction,
+		Data_HeightMap,
+		Data_FilterMap,
 		Datatype_End
 	};
 #endif
@@ -135,10 +137,25 @@ private:
 
 	HRESULT Update_HeightMap(_double fDeltatime);
 	HRESULT Widget_CreateDeleteHeightMap(_double fDeltatime);
+	HRESULT Widget_ChangeValue(_double fDeltatime);
+
+	HRESULT Widget_TextureSaveNLoad(_double fDeltatime);
+
 
 private:
 	_int		m_iMapSize[2];
 	class CWireTerrain* m_pCreatedTerrain = nullptr;
+
+	_int		m_PickingEasingType = 0;
+	_float		m_fPickingRadius = 3.f;
+
+	_float		m_fPickingHeight = 3.f;
+	_float		m_fRandomHeightRange[2] = {0,1};
+
+	_float		m_fEasingSharpness = 0;
+
+	_bool		m_bIsBlockPick = false;
+	_bool		m_bIsRandomHeight = false;
 
 #pragma endregion HeightMap
 

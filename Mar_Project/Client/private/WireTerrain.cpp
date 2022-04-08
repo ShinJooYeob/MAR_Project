@@ -27,8 +27,10 @@ HRESULT CWireTerrain::Initialize_Clone(void * pArg)
 
 	FAILED_CHECK(SetUp_Components());
 
-	m_vPickedPos = NOT_EXIST_VECTOR;
+	FAILED_CHECK(Create_FilterMap());
 
+
+	m_vPickedPos = NOT_EXIST_VECTOR;
 	return S_OK;
 }
 
@@ -40,12 +42,6 @@ _int CWireTerrain::Update(_double fDeltaTime)
 	//m_InverseWorldMat = m_pTransformCom->Get_InverseWorldMatrix();
 
 
-	if (g_pGameInstance->Get_DIKeyState(DIK_C)&DIS_Down)
-	{
-		static _uint i = 0;
-		i++;
-		m_pVIBufferCom->Chage_VertexBuffer(_float2(1, 1), i);
-	}
 
 
 	return _int();
@@ -57,6 +53,8 @@ _int CWireTerrain::LateUpdate(_double fDeltaTime)
 		return -1;
 
 	FAILED_CHECK(m_pVIBufferCom->Renew_VertexBuffer());
+
+	FAILED_CHECK(Renew_FilterMap());
 
 	FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_PRIORITY, this));
 
@@ -84,8 +82,11 @@ _int CWireTerrain::Render()
 		FAILED_CHECK(m_pShaderCom->Set_RawValue("g_CamPosition", &pInstance->Get_TargetPostion_float4(PLV_CAMERA), sizeof(_float4)));
 		FAILED_CHECK(m_pShaderCom->Set_RawValue("g_CamLookDir", &pInstance->Get_TargetPostion_float4(PLV_CAMLOOK), sizeof(_float4)));
 
-		if(m_vPickedPos != NOT_EXIST_VECTOR)
-			FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vBrushPos", &(_float4(m_vPickedPos,1)), sizeof(_float4)));
+	
+			FAILED_CHECK(m_pShaderCom->Set_RawValue("g_fRadius", &(m_fRadius), sizeof(_float)));
+			FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vBrushPos", &(_float4(m_vPickedPos, 1)), sizeof(_float4)));
+			
+		
 
 
 		const LIGHTDESC* pLightDesc = pInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0);
@@ -105,8 +106,11 @@ _int CWireTerrain::Render()
 		FAILED_CHECK(m_pTextureCom->Change_TextureLayer(L"Brush"));
 		FAILED_CHECK(m_pTextureCom->Bind_OnShader(m_pShaderCom, "g_BrushTexture", 0));
 
-		FAILED_CHECK(m_pTextureCom->Change_TextureLayer(L"Filter"));
-		FAILED_CHECK(m_pTextureCom->Bind_OnShader(m_pShaderCom, "g_FilterTexture", 0));
+
+		FAILED_CHECK(m_pShaderCom->Set_Texture("g_FilterTexture", m_pFilterMap));
+
+		//FAILED_CHECK(m_pTextureCom->Change_TextureLayer(L"Filter"));
+		//FAILED_CHECK(m_pTextureCom->Bind_OnShader(m_pShaderCom, "g_FilterTexture", 0));
 
 	}
 	FAILED_CHECK(m_pVIBufferCom->Render(m_pShaderCom, m_iPassIndex));
@@ -147,6 +151,111 @@ _float3 CWireTerrain::Pick_OnTerrain(_bool * pbIsObTerrain, _fVector ObjectWorld
 	return ObjectWorldPos;
 }
 
+HRESULT CWireTerrain::Change_VertexBuffer(_float2 vChangedVertexIndex, _float fValueY)
+{
+	NULL_CHECK_RETURN(m_pVIBufferCom, E_FAIL);
+
+	return m_pVIBufferCom->Chage_VertexBuffer(vChangedVertexIndex, fValueY);
+}
+
+
+HRESULT CWireTerrain::Easing_Terrain_Curve(EasingTypeID eEasingType, _float3 vPosition, _float fTargetHeight, _float fRadius)
+{
+	NULL_CHECK_RETURN(m_pVIBufferCom, E_FAIL);
+
+	_Matrix InverMat = m_InverseWorldMat.XMatrix();
+	_float3 vLocalPosition = XMVector3TransformCoord(vPosition.XMVector(), InverMat);
+	
+
+	_uint minX, maxX, minZ, maxZ;
+
+	minX = _uint(vLocalPosition.x - fRadius);
+	maxX = _uint(vLocalPosition.x + fRadius);
+	minZ = _uint(vLocalPosition.z - fRadius);
+	maxZ = _uint(vLocalPosition.z + fRadius);
+
+	CGameInstance* pInstance = GetSingle(CGameInstance);
+
+	for (_uint i = minX; i <= maxX; i++)
+	{
+		for (_uint j = minZ; j < maxZ; j++)
+		{
+			_float2 Temp = { _float(i),_float(j) };
+			_float fDist = Temp.Get_Distance(_float2(vLocalPosition.x, vLocalPosition.z).XMVector());
+
+			if (fDist < fRadius)
+			{
+
+				_float OldY = m_pVIBufferCom->Get_NowValueY(Temp);
+
+				if(OldY <= NOT_EXIST_FLOAT)
+					continue;
+
+				_float ValueY = pInstance->Easing(eEasingType, fTargetHeight, OldY, fDist, fRadius);
+
+				FAILED_CHECK(Change_VertexBuffer(Temp, ValueY));
+			}
+		}
+	}
+	return S_OK;
+}
+
+HRESULT CWireTerrain::Draw_FilterMap(_uint iFilterMapIndex, _float3 vPosition, _float fTargetHeight, _float fRadius, _bool bEasing)
+{
+	NULL_CHECK_RETURN(m_pVIBufferCom, E_FAIL);
+
+
+	_Matrix InverMat = m_InverseWorldMat.XMatrix();
+	_float3 vLocalPosition = XMVector3TransformCoord(vPosition.XMVector(), InverMat);
+
+
+	_uint minX, maxX, minZ, maxZ;
+
+	minX = _uint(vLocalPosition.x - fRadius);
+	maxX = _uint(vLocalPosition.x + fRadius);
+	minZ = _uint(vLocalPosition.z - fRadius);
+	maxZ = _uint(vLocalPosition.z + fRadius);
+
+	CGameInstance* pInstance = GetSingle(CGameInstance);
+
+
+
+
+	for (_uint i = minX; i <= maxX; i++)
+	{
+		for (_uint j = minZ; j < maxZ; j++)
+		{
+			_float2 Temp = { _float(i),_float(j) };
+			_float fDist = Temp.Get_Distance(_float2(vLocalPosition.x, vLocalPosition.z).XMVector());
+
+			if (fDist < fRadius)
+			{
+
+				_float OldY = m_pVIBufferCom->Get_NowValueY(Temp);
+				if (OldY <= NOT_EXIST_FLOAT)
+					continue;
+
+				_uint iIndex = (j)* m_tTextureDesc.Width + i;
+
+				_uint OldColor = _uint((m_pFilterPixel[iIndex] & 0x00ff0000)>>16);
+
+				_float ValueY = (pInstance->Easing(TYPE_Linear, fTargetHeight, _float(OldColor), fDist, fRadius));
+
+				if (ValueY > 255) ValueY = 255;
+				if (ValueY < 0)  ValueY = 0;
+
+				
+
+				m_pFilterPixel[iIndex] = D3D11COLOR_ARGB(255, _uint(ValueY), 0, 0);
+				m_bIsFilterChaged = true;
+			}
+		}
+	}
+
+	return S_OK;
+}
+
+
 
 
 HRESULT CWireTerrain::SetUp_Components()
@@ -169,6 +278,91 @@ HRESULT CWireTerrain::SetUp_Components()
 	m_InverseWorldMat = m_pTransformCom->Get_InverseWorldMatrix();
 	
 
+	return S_OK;
+}
+
+HRESULT CWireTerrain::Create_FilterMap()
+{
+	NULL_CHECK_RETURN(m_pVIBufferCom, E_FAIL);
+
+	if (m_pFilterMap != nullptr) Safe_Release(m_pFilterMap);
+	if (m_pFilterTexture != nullptr) Safe_Release(m_pFilterTexture);
+	if (m_pFilterPixel != nullptr)Safe_Delete_Array(m_pFilterPixel);
+
+	_float2 VertexXZ = m_pVIBufferCom->Get_NumVerticesXY();
+
+
+	ZeroMemory(&m_tTextureDesc, sizeof(D3D11_TEXTURE2D_DESC));
+
+	m_tTextureDesc.Width = _uint(VertexXZ.x);
+	m_tTextureDesc.Height = _uint(VertexXZ.y);
+	m_tTextureDesc.MipLevels = 1;
+	m_tTextureDesc.ArraySize = 1;
+	m_tTextureDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+	m_tTextureDesc.SampleDesc.Count = 1;
+	m_tTextureDesc.SampleDesc.Quality = 0;
+	m_tTextureDesc.Usage = D3D11_USAGE_DYNAMIC;
+	m_tTextureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	m_tTextureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+	D3D11_SUBRESOURCE_DATA			SubResourceData;
+	ZeroMemory(&SubResourceData, sizeof(D3D11_SUBRESOURCE_DATA));
+
+	m_pFilterPixel = new _ulong[m_tTextureDesc.Width * m_tTextureDesc.Height];
+	ZeroMemory(m_pFilterPixel, sizeof(_ulong) * m_tTextureDesc.Width * m_tTextureDesc.Height);
+
+
+	SubResourceData.pSysMem = m_pFilterPixel;
+	SubResourceData.SysMemPitch = sizeof(_ulong) * m_tTextureDesc.Width;
+
+	if (FAILED(m_pDevice->CreateTexture2D(&m_tTextureDesc, &SubResourceData, &m_pFilterTexture)))
+		return E_FAIL;
+
+	if (FAILED(m_pDevice->CreateShaderResourceView(m_pFilterTexture, nullptr, &m_pFilterMap)))
+		return E_FAIL;
+
+
+	return S_OK;
+}
+
+HRESULT CWireTerrain::Save_FilterMap(const _tchar* FileFullpath)
+{
+
+	NULL_CHECK_RETURN(m_pDeviceContext, E_FAIL);
+	NULL_CHECK_RETURN(m_pFilterTexture, E_FAIL);
+
+	FAILED_CHECK(SaveWICTextureToFile(m_pDeviceContext, m_pFilterTexture, GUID_ContainerFormatPng, FileFullpath, &GUID_WICPixelFormat32bppBGRA));
+
+
+
+	return S_OK;
+}
+
+HRESULT CWireTerrain::Renew_FilterMap()
+{
+	if (!m_bIsFilterChaged) return S_FALSE;
+
+
+	NULL_CHECK_RETURN(m_pVIBufferCom, E_FAIL);
+	NULL_CHECK_RETURN(m_pFilterPixel, E_FAIL);
+
+	if (m_pFilterMap != nullptr) Safe_Release(m_pFilterMap);
+	if (m_pFilterTexture != nullptr) Safe_Release(m_pFilterTexture);
+
+	D3D11_SUBRESOURCE_DATA			SubResourceData;
+	ZeroMemory(&SubResourceData, sizeof(D3D11_SUBRESOURCE_DATA));
+
+
+	SubResourceData.pSysMem = m_pFilterPixel;
+	SubResourceData.SysMemPitch = sizeof(_ulong) * m_tTextureDesc.Width;
+
+	if (FAILED(m_pDevice->CreateTexture2D(&m_tTextureDesc, &SubResourceData, &m_pFilterTexture)))
+		return E_FAIL;
+
+	if (FAILED(m_pDevice->CreateShaderResourceView(m_pFilterTexture, nullptr, &m_pFilterMap)))
+		return E_FAIL;
+	
+	m_bIsFilterChaged = false;
 	return S_OK;
 }
 
@@ -205,5 +399,8 @@ void CWireTerrain::Free()
 	Safe_Release(m_pVIBufferCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pTextureCom);
-	
+
+	Safe_Release(m_pFilterMap);
+	Safe_Release(m_pFilterTexture);
+	Safe_Delete_Array(m_pFilterPixel);
 }

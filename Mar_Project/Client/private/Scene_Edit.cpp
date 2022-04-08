@@ -227,7 +227,7 @@ HRESULT CScene_Edit::Update_First_Frame(_double fDeltatime, const char * szFrame
 
 	ImGuiWindowFlags window_flags = 0;
 	if (bArrWindowFlag[0])				window_flags |= ImGuiWindowFlags_NoBackground;
-	if (bArrWindowFlag[1])				window_flags |= ImGuiWindowFlags_NoMove;
+	if (!bArrWindowFlag[1])				window_flags |= ImGuiWindowFlags_NoMove;
 	/*
 	if (bArrWindowFlag[2])				window_flags |= ImGuiWindowFlags_NoTitleBar;
 	if (bArrWindowFlag[3])				window_flags |= ImGuiWindowFlags_NoScrollbar;
@@ -409,6 +409,33 @@ HRESULT CScene_Edit::Sava_Data(const char* szFileName, eDATATYPE iKinds)
 
 	}
 		break;
+
+
+	case Client::CScene_Edit::Data_HeightMap:
+	{
+		_tchar szFullPath[MAX_PATH] = L"../bin/Resources/Textures/HeightMap/";
+		_tchar wFileName[MAX_PATH] = L"";
+
+		MultiByteToWideChar(CP_UTF8, 0, szFileName, -1, wFileName, sizeof(wFileName));
+		//WideCharToMultiByte(CP_UTF8, 0, fd.name, -1, szFilename, sizeof(szFilename), NULL, NULL);
+		lstrcat(szFullPath, wFileName);
+
+	}
+	break;
+
+	case Client::CScene_Edit::Data_FilterMap:
+	{
+		NULL_CHECK_RETURN(m_pCreatedTerrain, E_FAIL);
+
+		_tchar szFullPath[MAX_PATH] = L"../bin/Resources/Textures/FilterMap/";
+		_tchar wFileName[MAX_PATH] = L"";
+
+		MultiByteToWideChar(CP_UTF8, 0, szFileName, -1, wFileName, sizeof(wFileName));
+		lstrcat(szFullPath, wFileName);
+
+		FAILED_CHECK(m_pCreatedTerrain->Save_FilterMap(szFullPath));
+	}
+	break;
 	default:
 
 		break;
@@ -678,7 +705,6 @@ HRESULT CScene_Edit::Input_KeyBoard(_double fDeltaTime)
 				FAILED_CHECK(RenewElenmetTransform(&(m_vecBatchedObject[m_iBatchedVecIndex])));
 				memcpy(((_float*)(&(m_SelectedObjectSRT->m[2 - m_iKindsOfMoving])) + m_iSelectedXYZ), &tempValue, sizeof(_float));
 
-				int t = 0;
 			}
 
 		}
@@ -734,68 +760,112 @@ HRESULT CScene_Edit::Input_KeyBoard(_double fDeltaTime)
 	{
 #pragma region HeightMap
 
+
+		if (pInstance->Get_DIKeyState(DIK_SPACE) & DIS_Down) m_bIsBlockPick = !m_bIsBlockPick;
+
+		m_fPickingRadius;
+		if (!(pInstance->Get_DIKeyState(DIK_LSHIFT) & DIS_Press))
+		{
+			_long fWheelMove = pInstance->Get_DIMouseMoveState(CInput_Device::MMS_WHEEL);
+
+			if (fWheelMove)
+			{
+				m_fPickingRadius += _float(fWheelMove *0.021f * fDeltaTime);
+
+			}
+			
+		}
+
 		if (m_pCreatedTerrain != nullptr)
 		{
-			////마우스 터레인 피킹
-			if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_LBUTTON) & DIS_Press)
+			if (!m_bIsBlockPick)
 			{
-				POINT ptMouse;
-				GetCursorPos(&ptMouse);
-				ScreenToClient(g_hWnd, &ptMouse);
-
-				_Vector vCursorPos = XMVectorSet(
-					(_float(ptMouse.x) / (g_iWinCX * 0.5f)) - 1.f,
-					(_float(ptMouse.y) / -(g_iWinCY * 0.5f)) + 1.f,
-					0, 1.f);
-
-				_Matrix InvProjMat = XMMatrixInverse(nullptr, pInstance->Get_Transform_Matrix(PLM_PROJ));
-				_Vector vRayDir = XMVector4Transform(vCursorPos, InvProjMat) - XMVectorSet(0, 0, 0, 1);
-				_Matrix InvViewMat = XMMatrixInverse(nullptr, pInstance->Get_Transform_Matrix(PLM_VIEW));
-				vRayDir = XMVector3TransformNormal(vRayDir, InvViewMat);
-
-				_Vector vCamPos = m_pEditorCam->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_POS);
-
-				_Vector vOldPos = vCamPos;
-				_Vector vNewPos;
-				_float3 vResult;
-				_bool IsPicked = false;
-
-
-				for (_uint i = 0; i < 200; i ++)
+				////마우스 터레인 피킹
+				if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_LBUTTON) & DIS_Press||
+					pInstance->Get_DIMouseButtonState(CInput_Device::MBS_RBUTTON) & DIS_Press)
 				{
-					vNewPos = vOldPos + vRayDir;
 
-					vResult = m_pCreatedTerrain->Pick_OnTerrain(&IsPicked, vNewPos, vOldPos);
+
+					POINT ptMouse;
+					GetCursorPos(&ptMouse);
+					ScreenToClient(g_hWnd, &ptMouse);
+
+					_Vector vCursorPos = XMVectorSet(
+						(_float(ptMouse.x) / (g_iWinCX * 0.5f)) - 1.f,
+						(_float(ptMouse.y) / -(g_iWinCY * 0.5f)) + 1.f,
+						0, 1.f);
+
+					_Matrix InvProjMat = XMMatrixInverse(nullptr, pInstance->Get_Transform_Matrix(PLM_PROJ));
+					_Vector vRayDir = XMVector4Transform(vCursorPos, InvProjMat) - XMVectorSet(0, 0, 0, 1);
+					_Matrix InvViewMat = XMMatrixInverse(nullptr, pInstance->Get_Transform_Matrix(PLM_VIEW));
+					vRayDir = XMVector3TransformNormal(vRayDir, InvViewMat);
+
+					_Vector vCamPos = m_pEditorCam->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_POS);
+
+					_Vector vOldPos = vCamPos;
+					_Vector vNewPos;
+					_float3 vResult;
+					_bool IsPicked = false;
+
+
+					for (_uint i = 0; i < 200; i++)
+					{
+						vNewPos = vOldPos + vRayDir;
+
+						vResult = m_pCreatedTerrain->Pick_OnTerrain(&IsPicked, vNewPos, vOldPos);
+
+						if (IsPicked)
+						{
+							//wstring ResultString = L"X : " + to_wstring(vResult.x) + L"	Y : " + to_wstring(vResult.y) + L"	Z : " + to_wstring(vResult.z) + L"\n";
+							//OutputDebugStringW(ResultString.c_str());
+							break;
+						}
+
+						vOldPos = vNewPos;
+					}
 
 					if (IsPicked)
 					{
-						//wstring ResultString = L"X : " + to_wstring(vResult.x) + L"	Y : " + to_wstring(vResult.y) + L"	Z : " + to_wstring(vResult.z) + L"\n";
-						//OutputDebugStringW(ResultString.c_str());
-						break;
+						m_pCreatedTerrain->Set_PickedPos(&vResult);
+
+
+						if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_LBUTTON) & DIS_Press)
+						{
+							static _double Timer = 0;
+
+							if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_LBUTTON) & DIS_Down) Timer = m_fEasingSharpness;
+
+							Timer += fDeltaTime;               
+							if (Timer > m_fEasingSharpness)
+							{
+								Timer = 0;
+
+								if (m_bIsRandomHeight)
+								{
+									_float tempY = GetSingle(CUtilityMgr)->RandomFloat(m_fRandomHeightRange[0], m_fRandomHeightRange[1]);
+									m_pCreatedTerrain->Easing_Terrain_Curve(EasingTypeID(m_PickingEasingType), vResult, tempY, m_fPickingRadius);
+								}
+								else 
+								{
+									m_pCreatedTerrain->Draw_FilterMap(1, vResult, m_fPickingHeight, m_fPickingRadius);
+									//m_pCreatedTerrain->Easing_Terrain_Curve(EasingTypeID(m_PickingEasingType), vResult, m_fPickingHeight, m_fPickingRadius);
+								}
+							}
+						}
+
 					}
 
-					vOldPos = vNewPos;
 				}
 
-				if (IsPicked)
+				if (pInstance->Get_DIKeyState(DIK_TAB) & DIS_Down)
 				{
-					m_pCreatedTerrain->Set_PickedPos(&vResult);
-
+					static bool IsWire = false;
+					IsWire = !IsWire;
+					m_pCreatedTerrain->Set_ShaderPass((IsWire) ? 3 : 2);
 				}
 
 
-
-				
 			}
-
-			if (pInstance->Get_DIKeyState(DIK_TAB) & DIS_Down)
-			{
-				static bool IsWire = false;
-				IsWire = !IsWire;
-				m_pCreatedTerrain->Set_ShaderPass((IsWire) ? 3:2);
-			}
-
-
 
 		}
 
@@ -1722,8 +1792,12 @@ HRESULT CScene_Edit::Update_HeightMap(_double fDeltatime)
 {
 
 	FAILED_CHECK(Widget_CreateDeleteHeightMap(fDeltatime));
+	
+	Make_VerticalSpacing(5);
 
+	FAILED_CHECK(Widget_ChangeValue(fDeltatime));
 
+	FAILED_CHECK(Widget_TextureSaveNLoad(fDeltatime));
 
 	return S_OK;
 }
@@ -1751,7 +1825,9 @@ HRESULT CScene_Edit::Widget_CreateDeleteHeightMap(_double fDeltatime)
 				FAILED_CHECK(m_pGameInstance->Add_GameObject_Out_of_Manager((CGameObject**)(&m_pCreatedTerrain), SCENE_EDIT, TAG_OP(Prototype_WireTerrain)));
 
 
-				m_pCreatedTerrain->Change_Component_by_Parameter(CVIBuffer_DynamicTerrain::Create(m_pDevice, m_pDeviceContext, _int(pow(2, m_iMapSize[0])) + 1, _int(pow(2, m_iMapSize[1])) + 1), TAG_COM(Com_VIBuffer));
+				FAILED_CHECK(m_pCreatedTerrain->Change_Component_by_Parameter(CVIBuffer_DynamicTerrain::Create(m_pDevice, m_pDeviceContext, _int(pow(2, m_iMapSize[0])) + 1, _int(pow(2, m_iMapSize[1])) + 1), TAG_COM(Com_VIBuffer)));
+			
+				FAILED_CHECK(m_pCreatedTerrain->Create_FilterMap());
 			}
 
 
@@ -1771,6 +1847,74 @@ HRESULT CScene_Edit::Widget_CreateDeleteHeightMap(_double fDeltatime)
 
 	return S_OK;
 }
+
+HRESULT CScene_Edit::Widget_ChangeValue(_double fDeltatime)
+{
+	ImGui::Checkbox("BlockPicking", &m_bIsBlockPick);
+
+	Make_VerticalSpacing(3);
+
+	//if (m_bIsBlockPick)
+	//	ImGui::BeginDisabled(true);
+
+	if (m_pCreatedTerrain != nullptr)
+	{
+
+		ImGui::InputInt("Easing Type", &(m_PickingEasingType));
+		ImGui::DragFloat("PickingRadius", &m_fPickingRadius, 0.03f, 1, 255);
+
+
+		ImGui::DragFloat("Sharpness ", &m_fEasingSharpness, 0.001f, 0, 1);
+		
+		Make_VerticalSpacing(1);
+		ImGui::Checkbox("RandomHeight", &m_bIsRandomHeight);
+		Make_VerticalSpacing(1);
+
+		if (m_bIsRandomHeight)
+			ImGui::BeginDisabled(true);
+		ImGui::DragFloat("Height ", &m_fPickingHeight, 0.03f, 0, 255);
+		Make_VerticalSpacing(1);
+		if (m_bIsRandomHeight)
+			ImGui::EndDisabled();
+
+
+
+		if (!m_bIsRandomHeight)
+			ImGui::BeginDisabled(true);
+		ImGui::DragFloat2("Height Range Min Max", m_fRandomHeightRange, 0.03f, 0, 255);
+		Make_VerticalSpacing(1);
+		if (!m_bIsRandomHeight)
+			ImGui::EndDisabled();
+
+		if (m_PickingEasingType < 0) m_PickingEasingType = 0;
+
+		if (m_bIsRandomHeight)
+		{
+			if (m_fRandomHeightRange[0] > m_fRandomHeightRange[1])m_fRandomHeightRange[1] = m_fRandomHeightRange[0];
+			if (m_fRandomHeightRange[1] < m_fRandomHeightRange[0])m_fRandomHeightRange[0] = m_fRandomHeightRange[1];
+
+		}
+
+		m_pCreatedTerrain->Set_Radius(m_fPickingRadius);
+
+	}
+
+
+	//if (m_bIsBlockPick)
+	//	ImGui::EndDisabled();
+
+	return S_OK;
+}
+
+HRESULT CScene_Edit::Widget_TextureSaveNLoad(_double fDeltatime)
+{
+	if (ImGui::Button("TestSaveButton", ImVec2(-FLT_MIN, 0.0f)))
+	{
+		FAILED_CHECK(Sava_Data("Test.bmp",CScene_Edit::Data_FilterMap));
+	}
+
+	return S_OK;
+}	
 
 #pragma endregion CamTab
 
