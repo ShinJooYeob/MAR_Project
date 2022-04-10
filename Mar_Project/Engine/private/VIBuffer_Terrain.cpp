@@ -10,6 +10,7 @@ CVIBuffer_Terrain::CVIBuffer_Terrain(const CVIBuffer_Terrain & rhs)
 	: CVIBuffer(rhs)
 	, m_iNumVerticesX(rhs.m_iNumVerticesX)
 	, m_iNumVerticesZ(rhs.m_iNumVerticesZ)
+	, m_fMinMapSize(rhs.m_fMinMapSize)
 {
 
 }
@@ -32,7 +33,7 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(const _tchar* pHeightMap)
 
 	ReadFile(hFile, &fh, sizeof(BITMAPFILEHEADER), &dwByte, nullptr);
 	ReadFile(hFile, &ih, sizeof(BITMAPINFOHEADER), &dwByte, nullptr);
-
+	 
 	m_iNumVerticesX = ih.biWidth;
 	m_iNumVerticesZ = ih.biHeight;
 
@@ -63,17 +64,20 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(const _tchar* pHeightMap)
 		for (_uint j = 0; j < m_iNumVerticesX; ++j)
 		{
 			_uint		iIndex = i * m_iNumVerticesX + j;
-			_float ValueY = (pPixel[iIndex] & 0x000000ff) / 10.f;
-			//if (ValueY <= 0.5f)
-			//	pVertices[iIndex].vPosition = m_pVertices[iIndex] =  _float3(_float(j), -FLT_MAX, _float(i));
-			//else
-			//	pVertices[iIndex].vPosition = m_pVertices[iIndex] = _float3(_float(j), (pPixel[iIndex] & 0x000000ff) / 10.f, _float(i));
-			pVertices[iIndex].vPosition = m_pVertices[iIndex] = _float3(_float(j), (pPixel[iIndex] & 0x000000ff) / 10.f, _float(i));
+			//_float ValueY = (pPixel[iIndex] & 0x000000ff) / 10.f;			
+
+			if ((pPixel[iIndex] & 0x00ff0000 >> 4) != 0)
+				pVertices[iIndex].vPosition = m_pVertices[iIndex] = _float3(_float(j), -FLT_MAX, _float(i));
+			else
+				pVertices[iIndex].vPosition = m_pVertices[iIndex] = _float3(_float(j), _float((pPixel[iIndex] & 0x000000ff)), _float(i));
+
+			//m_pKeepVertices[iIndex].vPosition = m_pVertices[iIndex] = _float3(_float(j), (pPixel[iIndex] & 0x000000ff) / 1.f, _float(i));
 
 			pVertices[iIndex].vNormal = _float3(0.f, 0.f, 0.f);
 			pVertices[iIndex].vTexUV = _float2(j / (m_iNumVerticesX - 1.f), i / (m_iNumVerticesZ - 1.f));
 		}
 	}
+
 
 
 	ZeroMemory(&m_VBSubResourceData, sizeof(D3D11_SUBRESOURCE_DATA));
@@ -181,7 +185,9 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(const _tchar* pHeightMap)
 	Safe_Delete_Array(pIndices);
 
 
-
+	_float2 vTerrainSize = Get_NumVerticesXY();
+	_float fCrossSize = vTerrainSize.Get_Lenth();
+	m_fMinMapSize = fCrossSize / 5;
 
 #pragma endregion
 
@@ -333,6 +339,11 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(_uint iNumWidthPixelX, _uint iNu
 	FAILED_CHECK(Create_IndexBuffer());
 	Safe_Delete_Array(pIndices);
 #pragma endregion
+
+
+	_float2 vTerrainSize = Get_NumVerticesXY();
+	_float fCrossSize = vTerrainSize.Get_Lenth();
+	m_fMinMapSize = fCrossSize / 5;
 
 	return S_OK;
 }
@@ -490,7 +501,7 @@ _float CVIBuffer_Terrain::EquationPlane(_bool * pbIsOnTerrain, _float3 PosOnTerr
 		iIndex + 1,
 		iIndex };
 
-	if (m_pVertices[iIndices[0]].y < -99999.f || m_pVertices[iIndices[2]].y < -99999.f)
+	if (m_pVertices[iIndices[0]].y < -9999.f || m_pVertices[iIndices[2]].y < -9999.f)
 	{
 		*pbIsOnTerrain = false;
 		return -FLT_MAX;
@@ -500,7 +511,7 @@ _float CVIBuffer_Terrain::EquationPlane(_bool * pbIsOnTerrain, _float3 PosOnTerr
 
 	if (PosOnTerrainLocal.x - m_pVertices[iIndices[0]].x < m_pVertices[iIndices[0]].z - PosOnTerrainLocal.z)
 	{//¾Æ·¡ 023
-		if (m_pVertices[iIndices[3]].y < -99999.f)
+		if (m_pVertices[iIndices[3]].y < -9999.f)
 		{
 			*pbIsOnTerrain = false;
 			return -FLT_MAX;
@@ -519,7 +530,7 @@ _float CVIBuffer_Terrain::EquationPlane(_bool * pbIsOnTerrain, _float3 PosOnTerr
 	}
 	else
 	{//À§ 012
-		if (m_pVertices[iIndices[1]].y < -99999.f)
+		if (m_pVertices[iIndices[1]].y < -9999.f)
 		{
 			*pbIsOnTerrain = false;
 			return -FLT_MAX;

@@ -89,6 +89,7 @@ private:
 #pragma region MapTab
 	HRESULT Update_MapTab(_double fDeltatime);
 	HRESULT Widget_SRT(_double fDeltatime);
+
 	HRESULT Widget_BatchedObjectList(_double fDeltatime);
 
 	HRESULT Widget_CreateDeleteObject(_double fDeltatime);
@@ -108,6 +109,7 @@ private:
 	vector<OBJELEMENT>		m_vecBatchedObject;
 
 	_uint m_iSelectedObjectNMesh[2];
+	_float	m_fPickingedPosition[3] = {0};
 #pragma endregion MapTab
 
 #pragma region UITab
@@ -144,6 +146,8 @@ private:
 
 private:
 	_int		m_iMapSize[2];
+	_int		m_iEditingKinds = 0;
+	_int		m_iKindsOfFilter = 0;
 	class CWireTerrain* m_pCreatedTerrain = nullptr;
 
 	_int		m_PickingEasingType = 0;
@@ -168,11 +172,10 @@ private:
 
 private:
 	class CCamera_Editor*				m_pEditorCam = nullptr;
-	class CWireTerrain*					m_pWireTerrain= nullptr;
+
 private:
 	HRESULT Ready_Layer_MainCamera(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_Player(const _tchar* pLayerTag);
-	HRESULT Ready_Layer_WireTerrain(const _tchar* pLayerTag);
 
 
 public:

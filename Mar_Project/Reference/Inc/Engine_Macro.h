@@ -25,6 +25,8 @@
 
 #define D3D11COLOR_ARGB(a,r,g,b) \
     ((D3DCOLOR)((((a)&0xff)<<24)|(((r)&0xff)<<16)|(((g)&0xff)<<8)|((b)&0xff)))
+//#define D3D11COLOR_ARGB(a,r,g,b) \
+//    ((D3DCOLOR)((((r)&0xff)<<24)|(((g)&0xff)<<16)|(((b)&0xff)<<8)|((a)&0xff)))
 
 #define NOT_EXIST_VECTOR		_float3(99999.f,99999.f,99999.f)
 #define NOT_EXIST_FLOAT			-99999.f

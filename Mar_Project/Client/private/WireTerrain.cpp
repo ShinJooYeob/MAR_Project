@@ -92,8 +92,7 @@ _int CWireTerrain::Render()
 		const LIGHTDESC* pLightDesc = pInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0);
 		NULL_CHECK_RETURN(pLightDesc, -1);
 
-
-
+		
 		FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vLightVector", &(pLightDesc->vVector), sizeof(_float4)));
 		FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4)));
 		FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4)));
@@ -101,13 +100,20 @@ _int CWireTerrain::Render()
 
 		FAILED_CHECK(m_pTextureCom->Change_TextureLayer(L"Diffuse"));
 		FAILED_CHECK(m_pTextureCom->Bind_OnShader(m_pShaderCom, "g_SourDiffuseTexture", 0));
-		FAILED_CHECK(m_pTextureCom->Bind_OnShader(m_pShaderCom, "g_DestDiffuseTexture", 1));
+		FAILED_CHECK(m_pTextureCom->Bind_OnShader(m_pShaderCom, "g_DestDiffuseTexture1", 1));
+		FAILED_CHECK(m_pTextureCom->Bind_OnShader(m_pShaderCom, "g_DestDiffuseTexture2", 2));
+		FAILED_CHECK(m_pTextureCom->Bind_OnShader(m_pShaderCom, "g_DestDiffuseTexture3", 3));
+		FAILED_CHECK(m_pTextureCom->Bind_OnShader(m_pShaderCom, "g_DestDiffuseTexture4", 4));
 
 		FAILED_CHECK(m_pTextureCom->Change_TextureLayer(L"Brush"));
 		FAILED_CHECK(m_pTextureCom->Bind_OnShader(m_pShaderCom, "g_BrushTexture", 0));
 
+		
+		_float fMinMap = m_pVIBufferCom->Get_MinMapSize();
+		FAILED_CHECK(m_pShaderCom->Set_RawValue("g_fMimMapSize", &fMinMap, sizeof(_float)));
 
-		FAILED_CHECK(m_pShaderCom->Set_Texture("g_FilterTexture", m_pFilterMap));
+		if (m_pFilterMap != nullptr)
+			FAILED_CHECK(m_pShaderCom->Set_Texture("g_FilterTexture", m_pFilterMap));
 
 		//FAILED_CHECK(m_pTextureCom->Change_TextureLayer(L"Filter"));
 		//FAILED_CHECK(m_pTextureCom->Bind_OnShader(m_pShaderCom, "g_FilterTexture", 0));
@@ -200,6 +206,60 @@ HRESULT CWireTerrain::Easing_Terrain_Curve(EasingTypeID eEasingType, _float3 vPo
 	return S_OK;
 }
 
+HRESULT CWireTerrain::Erasing_TerrainBuffer(_float3 vPosition, _float fRadius)
+{
+	NULL_CHECK_RETURN(m_pVIBufferCom, E_FAIL);
+
+
+
+	_Matrix InverMat = m_InverseWorldMat.XMatrix();
+	_float3 vLocalPosition = XMVector3TransformCoord(vPosition.XMVector(), InverMat);
+
+	_uint minX, maxX, minZ, maxZ;
+
+	minX = _uint(vLocalPosition.x - fRadius);
+	maxX = _uint(vLocalPosition.x + fRadius);
+	minZ = _uint(vLocalPosition.z - fRadius);
+	maxZ = _uint(vLocalPosition.z + fRadius);
+
+	CGameInstance* pInstance = GetSingle(CGameInstance);
+
+	for (_uint i = minX; i <= maxX; i++)
+	{
+		for (_uint j = minZ; j < maxZ; j++)
+		{
+			_float2 Temp = { _float(i),_float(j) };
+			_float fDist = Temp.Get_Distance(_float2(vLocalPosition.x, vLocalPosition.z).XMVector());
+
+			if (fDist < fRadius)
+			{
+
+				_float OldY = m_pVIBufferCom->Get_NowValueY(Temp);
+
+				if (OldY <= NOT_EXIST_FLOAT)
+					continue;
+
+				FAILED_CHECK(m_pVIBufferCom->Erase_VertexBuffer(Temp));
+			}
+		}
+	}
+
+	return S_OK;
+}
+
+HRESULT CWireTerrain::Save_HeightMap(const _tchar * FileFullpath)
+{
+	NULL_CHECK_RETURN(m_pDeviceContext, E_FAIL);
+	NULL_CHECK_RETURN(m_pVIBufferCom, E_FAIL);
+
+	FAILED_CHECK(m_pVIBufferCom->Save_HeightMap(FileFullpath));
+
+	//FAILED_CHECK(SaveWICTextureToFile(m_pDeviceContext, m_pFilterTexture, GUID_ContainerFormatPng, FileFullpath, &GUID_WICPixelFormat32bppBGRA));
+	//FAILED_CHECK(SaveWICTextureToFile(m_pDeviceContext, m_pFilterTexture, GUID_ContainerFormatBmp, FileFullpath, &GUID_WICPixelFormat32bppBGRA));
+	return S_OK;
+}
+
+
 HRESULT CWireTerrain::Draw_FilterMap(_uint iFilterMapIndex, _float3 vPosition, _float fTargetHeight, _float fRadius, _bool bEasing)
 {
 	NULL_CHECK_RETURN(m_pVIBufferCom, E_FAIL);
@@ -235,18 +295,59 @@ HRESULT CWireTerrain::Draw_FilterMap(_uint iFilterMapIndex, _float3 vPosition, _
 				if (OldY <= NOT_EXIST_FLOAT)
 					continue;
 
-				_uint iIndex = (j)* m_tTextureDesc.Width + i;
+				_ulong iIndex = (j)* m_tTextureDesc.Width + i;
+				
+				_ulong OldColor;
+				switch (iFilterMapIndex)
+				{
+				case 0:
+					OldColor = _ulong((m_pFilterPixel[iIndex] & 0xff000000) >> 24);
+					break;
+				case 1:
+					OldColor = _ulong((m_pFilterPixel[iIndex] & 0x00ff0000) >> 16);
+					break;
+				case 2:
+					OldColor = _ulong((m_pFilterPixel[iIndex] & 0x0000ff00) >> 8);
+					break;
+				case 3:
+					OldColor = _ulong((m_pFilterPixel[iIndex] & 0x000000ff));
+					break;
 
-				_uint OldColor = _uint((m_pFilterPixel[iIndex] & 0x00ff0000)>>16);
+				default:
+					break;
+				}
+				
+				
 
 				_float ValueY = (pInstance->Easing(TYPE_Linear, fTargetHeight, _float(OldColor), fDist, fRadius));
 
 				if (ValueY > 255) ValueY = 255;
 				if (ValueY < 0)  ValueY = 0;
+				_ulong Temp = 0;
+				switch (iFilterMapIndex)
+				{
+				case 0:
+					Temp = m_pFilterPixel[iIndex] & 0x00ffffff;
+					m_pFilterPixel[iIndex] = Temp | D3D11COLOR_ARGB(_ulong(ValueY), 0, 0, 0);
+					break;
+				case 1:
+					Temp = m_pFilterPixel[iIndex] & 0xff00ffff;
+					m_pFilterPixel[iIndex] = Temp | D3D11COLOR_ARGB(0, _ulong(ValueY), 0, 0);
+					break;
+				case 2:
+					Temp = m_pFilterPixel[iIndex] & 0xffff00ff;
+					m_pFilterPixel[iIndex] = Temp | D3D11COLOR_ARGB(0, 0, _ulong(ValueY), 0);
+					break;
+				case 3:
+					Temp = m_pFilterPixel[iIndex] & 0xffffff00;
+					m_pFilterPixel[iIndex] = Temp | D3D11COLOR_ARGB(0, 0, 0, _ulong(ValueY));
+					break;
 
-				
+				default:
+					break;
+				}
 
-				m_pFilterPixel[iIndex] = D3D11COLOR_ARGB(255, _uint(ValueY), 0, 0);
+
 				m_bIsFilterChaged = true;
 			}
 		}
@@ -325,13 +426,92 @@ HRESULT CWireTerrain::Create_FilterMap()
 	return S_OK;
 }
 
+HRESULT CWireTerrain::Create_FilterMap_byLoad(const char * pFileFullPath)
+{
+	if (m_pFilterMap != nullptr) Safe_Release(m_pFilterMap);
+	if (m_pFilterTexture != nullptr) Safe_Release(m_pFilterTexture);
+	if (m_pFilterPixel != nullptr)Safe_Delete_Array(m_pFilterPixel);
+
+
+	char szFileFath[MAX_PATH] = "../bin/Resources/Textures/Terrain/Filter/";
+	strcat_s(szFileFath, pFileFullPath);
+
+	_tchar szWidePath[MAX_PATH] = L"";
+
+	MultiByteToWideChar(CP_UTF8, 0, szFileFath, -1, szWidePath, sizeof(szWidePath));
+
+
+	HANDLE		hFile = CreateFile(szWidePath, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+
+	if (0 == hFile)
+	{
+		__debugbreak();
+		return E_FAIL;
+	}
+
+	_ulong					dwByte = 0;
+	BITMAPFILEHEADER		fh;
+	BITMAPINFOHEADER		ih;
+
+	
+
+	ReadFile(hFile, &fh, sizeof(BITMAPFILEHEADER), &dwByte, nullptr);
+	ReadFile(hFile, &ih, sizeof(BITMAPINFOHEADER), &dwByte, nullptr);
+
+	ZeroMemory(&m_tTextureDesc, sizeof(D3D11_TEXTURE2D_DESC));
+
+	m_tTextureDesc.Width = ih.biWidth;
+	m_tTextureDesc.Height = ih.biHeight;
+	m_tTextureDesc.MipLevels = 1;
+	m_tTextureDesc.ArraySize = 1;
+	m_tTextureDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+	m_tTextureDesc.SampleDesc.Count = 1;
+	m_tTextureDesc.SampleDesc.Quality = 0;
+	m_tTextureDesc.Usage = D3D11_USAGE_DYNAMIC;
+	m_tTextureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	m_tTextureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+	m_pFilterPixel = new _ulong[m_tTextureDesc.Width * m_tTextureDesc.Height];
+	//ZeroMemory(m_pFilterPixel, sizeof(_ulong) * m_tTextureDesc.Width * m_tTextureDesc.Height);
+	ReadFile(hFile, m_pFilterPixel, sizeof(_ulong) * m_tTextureDesc.Width  * m_tTextureDesc.Height, &dwByte, nullptr);
+
+
+	CloseHandle(hFile);
+
+
+	D3D11_SUBRESOURCE_DATA			SubResourceData;
+	ZeroMemory(&SubResourceData, sizeof(D3D11_SUBRESOURCE_DATA));
+
+
+	SubResourceData.pSysMem = m_pFilterPixel;
+	SubResourceData.SysMemPitch = sizeof(_ulong) * m_tTextureDesc.Width;
+
+	FAILED_CHECK(m_pDevice->CreateTexture2D(&m_tTextureDesc, &SubResourceData, &m_pFilterTexture));
+
+	FAILED_CHECK(m_pDevice->CreateShaderResourceView(m_pFilterTexture, nullptr, &m_pFilterMap));
+
+
+	return S_OK;
+}
+
+HRESULT CWireTerrain::Delete_FilterMap()
+{
+
+	Safe_Release(m_pFilterMap);
+	Safe_Release(m_pFilterTexture);
+	Safe_Delete_Array(m_pFilterPixel);
+
+	return S_OK;
+}
+
 HRESULT CWireTerrain::Save_FilterMap(const _tchar* FileFullpath)
 {
 
 	NULL_CHECK_RETURN(m_pDeviceContext, E_FAIL);
 	NULL_CHECK_RETURN(m_pFilterTexture, E_FAIL);
 
-	FAILED_CHECK(SaveWICTextureToFile(m_pDeviceContext, m_pFilterTexture, GUID_ContainerFormatPng, FileFullpath, &GUID_WICPixelFormat32bppBGRA));
+	//FAILED_CHECK(SaveWICTextureToFile(m_pDeviceContext, m_pFilterTexture, GUID_ContainerFormatPng, FileFullpath, &GUID_WICPixelFormat32bppBGRA));
+	FAILED_CHECK(SaveWICTextureToFile(m_pDeviceContext, m_pFilterTexture, GUID_ContainerFormatBmp, FileFullpath, &GUID_WICPixelFormat32bppBGRA));
 
 
 
@@ -341,10 +521,9 @@ HRESULT CWireTerrain::Save_FilterMap(const _tchar* FileFullpath)
 HRESULT CWireTerrain::Renew_FilterMap()
 {
 	if (!m_bIsFilterChaged) return S_FALSE;
-
+	if(m_pFilterPixel == nullptr)return S_FALSE;
 
 	NULL_CHECK_RETURN(m_pVIBufferCom, E_FAIL);
-	NULL_CHECK_RETURN(m_pFilterPixel, E_FAIL);
 
 	if (m_pFilterMap != nullptr) Safe_Release(m_pFilterMap);
 	if (m_pFilterTexture != nullptr) Safe_Release(m_pFilterTexture);
@@ -356,11 +535,9 @@ HRESULT CWireTerrain::Renew_FilterMap()
 	SubResourceData.pSysMem = m_pFilterPixel;
 	SubResourceData.SysMemPitch = sizeof(_ulong) * m_tTextureDesc.Width;
 
-	if (FAILED(m_pDevice->CreateTexture2D(&m_tTextureDesc, &SubResourceData, &m_pFilterTexture)))
-		return E_FAIL;
+	FAILED_CHECK(m_pDevice->CreateTexture2D(&m_tTextureDesc, &SubResourceData, &m_pFilterTexture));
 
-	if (FAILED(m_pDevice->CreateShaderResourceView(m_pFilterTexture, nullptr, &m_pFilterMap)))
-		return E_FAIL;
+	FAILED_CHECK(m_pDevice->CreateShaderResourceView(m_pFilterTexture, nullptr, &m_pFilterMap));
 	
 	m_bIsFilterChaged = false;
 	return S_OK;

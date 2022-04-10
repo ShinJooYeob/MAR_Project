@@ -16,6 +16,9 @@ public:
 	virtual HRESULT Initialize_Prototype(_uint iNumWidthPixelX, _uint iNumWidthPixelY);
 	virtual HRESULT Initialize_Clone(void* pArg)override;
 
+
+	HRESULT Save_HeightMap(const _tchar* FileFullPath);
+
 	_Vector Caculate_TerrainY(_bool* pbIsOnTerrain, _float3 PosOnTerrainLocal,_float3 OldPosOnTerrainLocal ,_float3* vLocalPlaneNormVector = nullptr);
 	_Vector Caculate_Terrain_Pick_byRay(_bool* pbIsOnTerrain, _float3 PosOnTerrainLocal, _float3 OldPosOnTerrainLocal, _float3* vLocalPlaneNormVector = nullptr);
 	_float EquationPlane(_bool* pbIsOnTerrain, _float3 PosOnTerrainLocal, _float* CaculateY = nullptr, _float3* vNormVector = nullptr);
@@ -24,13 +27,17 @@ public:
 	_float Get_NowValueY(_float2 vIndex);
 
 	_float2 Get_NumVerticesXY() { return _float2(_float(m_iNumVerticesX), _float(m_iNumVerticesZ)); };
+	_float	Get_MinMapSize() { return m_fMinMapSize; };
 public:
 	HRESULT		Chage_VertexBuffer(_float2 vChangeVertexIndex, _float fValueY);
 	HRESULT		Renew_VertexBuffer();
+	HRESULT		Erase_VertexBuffer(_float2 vChangeVertexIndex);
 
 private:
 	_uint			m_iNumVerticesX = 0;
 	_uint			m_iNumVerticesZ = 0;
+
+	_float			m_fMinMapSize = 20;
 
 	VTXNORTEX*		m_pKeepVertices = nullptr;
 	_bool			m_bIsVertexChange = false;

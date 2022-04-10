@@ -81,9 +81,20 @@ _int CTerrain::Render()
 	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4)));
 	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4)));
 
+	_float fMinMap = m_pVIBufferCom->Get_MinMapSize();
+	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_fMimMapSize", &fMinMap, sizeof(_float)));
+
+	FAILED_CHECK(m_pTextureCom->Change_TextureLayer(L"Diffuse"));
+	FAILED_CHECK(m_pTextureCom->Bind_OnShader(m_pShaderCom, "g_SourDiffuseTexture", 0));
+	FAILED_CHECK(m_pTextureCom->Bind_OnShader(m_pShaderCom, "g_DestDiffuseTexture1", 1));
+	FAILED_CHECK(m_pTextureCom->Bind_OnShader(m_pShaderCom, "g_DestDiffuseTexture2", 2));
+	FAILED_CHECK(m_pTextureCom->Bind_OnShader(m_pShaderCom, "g_DestDiffuseTexture3", 3));
+	FAILED_CHECK(m_pTextureCom->Bind_OnShader(m_pShaderCom, "g_DestDiffuseTexture4", 4));
+
+	if (m_pFilterMap != nullptr)
+		FAILED_CHECK(m_pShaderCom->Set_Texture("g_FilterTexture", m_pFilterMap));
 
 
-	FAILED_CHECK(m_pTextureCom->Bind_OnShader_AutoFrame(m_pShaderCom, "g_DiffuseTexture", g_fDeltaTime));
 
 	FAILED_CHECK(m_pVIBufferCom->Render(m_pShaderCom, 0));
 
@@ -143,8 +154,112 @@ HRESULT CTerrain::SetUp_Components()
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Transform), TAG_COM(Com_Transform), (CComponent**)&m_pTransformCom, &tDesc));
 
 
+	FAILED_CHECK(Ready_FilterMap());
+
 	m_InverseWorldMat = m_pTransformCom->Get_InverseWorldMatrix();
-	
+
+
+
+	_float2 vTerrainSize = m_pVIBufferCom->Get_NumVerticesXY();
+	_float fCrossSize = vTerrainSize.Get_Lenth();
+	_float m_fMimMapSize = fCrossSize / 5;
+
+	return S_OK;
+}
+
+HRESULT CTerrain::Ready_FilterMap()
+{
+	if (m_pFilterMap != nullptr) Safe_Release(m_pFilterMap);
+
+	char FileName[MAX_PATH];
+
+	switch (m_eNowSceneNum)
+	{
+	case SCENE_STATIC:
+		break;
+	case SCENE_LOBY:
+		strcpy_s(FileName, "Filter_0.bmp");
+		break;
+	case SCENE_LOADING:
+		break;
+	case SCENE_STAGESELECT:
+		strcpy_s(FileName, "Filter_0.bmp");
+		break;
+	case SCENE_STAGE1:
+		strcpy_s(FileName, "Filter_0.bmp");
+		break;
+	case SCENE_EDIT:
+		break;
+	case SCENE_END:
+		break;
+	default:
+		break;
+	}
+
+
+	char szFileFath[MAX_PATH] = "../bin/Resources/Textures/Terrain/Filter/";
+	strcat_s(szFileFath, FileName);
+
+	_tchar szWidePath[MAX_PATH] = L"";
+
+	MultiByteToWideChar(CP_UTF8, 0, szFileFath, -1, szWidePath, sizeof(szWidePath));
+
+
+	HANDLE		hFile = CreateFile(szWidePath, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+
+	if (0 == hFile)
+	{
+		__debugbreak();
+		return E_FAIL;
+	}
+
+	_ulong					dwByte = 0;
+	BITMAPFILEHEADER		fh;
+	BITMAPINFOHEADER		ih;
+
+	D3D11_TEXTURE2D_DESC TextureDesc;
+
+	ReadFile(hFile, &fh, sizeof(BITMAPFILEHEADER), &dwByte, nullptr);
+	ReadFile(hFile, &ih, sizeof(BITMAPINFOHEADER), &dwByte, nullptr);
+
+	ZeroMemory(&TextureDesc, sizeof(D3D11_TEXTURE2D_DESC));
+
+	TextureDesc.Width = ih.biWidth;
+	TextureDesc.Height = ih.biHeight;
+	TextureDesc.MipLevels = 1;
+	TextureDesc.ArraySize = 1;
+	TextureDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+	TextureDesc.SampleDesc.Count = 1;
+	TextureDesc.SampleDesc.Quality = 0;
+	TextureDesc.Usage = D3D11_USAGE_DYNAMIC;
+	TextureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	TextureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+	_ulong* m_pFilterPixel = new _ulong[TextureDesc.Width * TextureDesc.Height];
+	//ZeroMemory(m_pFilterPixel, sizeof(_ulong) * m_tTextureDesc.Width * m_tTextureDesc.Height);
+	ReadFile(hFile, m_pFilterPixel, sizeof(_ulong) * TextureDesc.Width  * TextureDesc.Height, &dwByte, nullptr);
+
+
+	CloseHandle(hFile);
+
+
+
+	D3D11_SUBRESOURCE_DATA			SubResourceData;
+	ZeroMemory(&SubResourceData, sizeof(D3D11_SUBRESOURCE_DATA));
+
+
+	SubResourceData.pSysMem = m_pFilterPixel;
+	SubResourceData.SysMemPitch = sizeof(_ulong) * TextureDesc.Width;
+
+	ID3D11Texture2D* pTexture = nullptr;
+
+	FAILED_CHECK(m_pDevice->CreateTexture2D(&TextureDesc, &SubResourceData, &pTexture));
+
+	FAILED_CHECK(m_pDevice->CreateShaderResourceView(pTexture, nullptr, &m_pFilterMap));
+
+
+	Safe_Release(pTexture);
+	Safe_Delete_Array(m_pFilterPixel);
 
 	return S_OK;
 }
@@ -182,5 +297,7 @@ void CTerrain::Free()
 	Safe_Release(m_pVIBufferCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pTextureCom);
-	
+
+
+	Safe_Release(m_pFilterMap);
 }

@@ -93,6 +93,9 @@ _int CScene_Edit::Update(_double fDeltaTime)
 				return -1;
 			}
 		}
+
+		if (m_pCreatedTerrain != nullptr)
+			m_pCreatedTerrain->Update(fDeltaTime);
 		break;
 	case 1:
 		break;
@@ -146,6 +149,8 @@ _int CScene_Edit::LateUpdate(_double fDeltaTime)
 				return -1;
 			}
 		}
+		if (m_pCreatedTerrain != nullptr)
+			m_pCreatedTerrain->LateUpdate(fDeltaTime);
 		break;
 	case 1:
 		break;
@@ -420,6 +425,8 @@ HRESULT CScene_Edit::Sava_Data(const char* szFileName, eDATATYPE iKinds)
 		//WideCharToMultiByte(CP_UTF8, 0, fd.name, -1, szFilename, sizeof(szFilename), NULL, NULL);
 		lstrcat(szFullPath, wFileName);
 
+		NULL_CHECK_RETURN(m_pCreatedTerrain, E_FAIL);
+		FAILED_CHECK(m_pCreatedTerrain->Save_HeightMap(szFullPath));
 	}
 	break;
 
@@ -427,7 +434,7 @@ HRESULT CScene_Edit::Sava_Data(const char* szFileName, eDATATYPE iKinds)
 	{
 		NULL_CHECK_RETURN(m_pCreatedTerrain, E_FAIL);
 
-		_tchar szFullPath[MAX_PATH] = L"../bin/Resources/Textures/FilterMap/";
+		_tchar szFullPath[MAX_PATH] = L"../bin/Resources/Textures/Terrain/Filter/";
 		_tchar wFileName[MAX_PATH] = L"";
 
 		MultiByteToWideChar(CP_UTF8, 0, szFileName, -1, wFileName, sizeof(wFileName));
@@ -578,6 +585,34 @@ HRESULT CScene_Edit::Load_Data(const char * szFileName, eDATATYPE iKinds)
 
 	}
 	break;
+	case Client::CScene_Edit::Data_HeightMap:
+	{
+
+		FAILED_CHECK(m_pGameInstance->Add_GameObject_Out_of_Manager((CGameObject**)(&m_pCreatedTerrain), SCENE_EDIT, TAG_OP(Prototype_WireTerrain)));
+
+
+		_tchar szPath[MAX_PATH] = L"";
+
+		MultiByteToWideChar(CP_UTF8, 0, szFileName, -1, szPath, sizeof(szPath));
+
+
+		FAILED_CHECK(m_pCreatedTerrain->Change_Component_by_Parameter(CVIBuffer_DynamicTerrain::Create(m_pDevice, m_pDeviceContext, szPath), TAG_COM(Com_VIBuffer)));
+
+		FAILED_CHECK(m_pCreatedTerrain->Create_FilterMap());
+
+
+
+	}
+	break;
+	case Client::CScene_Edit::Data_FilterMap:
+	{
+
+
+		m_pCreatedTerrain->Create_FilterMap_byLoad(szFileName);
+
+	}
+	break;
+
 	default:
 
 		break;
@@ -732,19 +767,63 @@ HRESULT CScene_Edit::Input_KeyBoard(_double fDeltaTime)
 				vRayDir = XMVector3TransformNormal(vRayDir, InvViewMat);
 
 
-
-				_Vector vCamPos = m_pEditorCam->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_POS);
-
-				if (XMVectorGetY(vCamPos) * XMVectorGetY(vRayDir) < 0)
+				if (m_pCreatedTerrain)
 				{
-					_float Scale = XMVectorGetY(vCamPos) / -XMVectorGetY(vRayDir);
+					_Vector vCamPos = m_pEditorCam->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_POS);
 
-					_float3 vTargetPos = vCamPos + Scale * vRayDir;
+					_Vector vOldPos = vCamPos;
+					_Vector vNewPos;
+					_float3 vResult;
+					_bool IsPicked = false;
 
-					memcpy(m_vecBatchedObject[0].matSRT.m[2], &vTargetPos, sizeof(_float3));
 
-					RenewElenmetTransform(&m_vecBatchedObject[0]);
+					for (_uint i = 0; i < 200; i++)
+					{
+						vNewPos = vOldPos + vRayDir;
 
+						vResult = m_pCreatedTerrain->Pick_OnTerrain(&IsPicked, vNewPos, vOldPos);
+
+						if (IsPicked)
+						{
+
+							//wstring ResultString = L"X : " + to_wstring(vResult.x) + L"	Y : " + to_wstring(vResult.y) + L"	Z : " + to_wstring(vResult.z) + L"\n";
+							//OutputDebugStringW(ResultString.c_str());
+							m_fPickingedPosition[0] = vResult.x;
+							m_fPickingedPosition[1] = vResult.y;
+							m_fPickingedPosition[2] = vResult.z;
+							break;
+						}
+
+						vOldPos = vNewPos;
+					}
+
+					if (IsPicked)
+					{
+
+						memcpy(m_vecBatchedObject[0].matSRT.m[2], &vResult, sizeof(_float3));
+
+						RenewElenmetTransform(&m_vecBatchedObject[0]);
+					}
+				}
+				else
+				{
+					_Vector vCamPos = m_pEditorCam->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_POS);
+
+					if (XMVectorGetY(vCamPos) * XMVectorGetY(vRayDir) < 0)
+					{
+						_float Scale = XMVectorGetY(vCamPos) / -XMVectorGetY(vRayDir);
+
+						_float3 vTargetPos = vCamPos + Scale * vRayDir;
+
+						m_fPickingedPosition[0] = vTargetPos.x;
+						m_fPickingedPosition[1] = vTargetPos.y;
+						m_fPickingedPosition[2] = vTargetPos.z;
+
+						memcpy(m_vecBatchedObject[0].matSRT.m[2], &vTargetPos, sizeof(_float3));
+
+						RenewElenmetTransform(&m_vecBatchedObject[0]);
+
+					}
 				}
 
 			}
@@ -818,6 +897,10 @@ HRESULT CScene_Edit::Input_KeyBoard(_double fDeltaTime)
 						{
 							//wstring ResultString = L"X : " + to_wstring(vResult.x) + L"	Y : " + to_wstring(vResult.y) + L"	Z : " + to_wstring(vResult.z) + L"\n";
 							//OutputDebugStringW(ResultString.c_str());
+
+							m_fPickingedPosition[0] = vResult.x;
+							m_fPickingedPosition[1] = vResult.y;
+							m_fPickingedPosition[2] = vResult.z;
 							break;
 						}
 
@@ -840,19 +923,52 @@ HRESULT CScene_Edit::Input_KeyBoard(_double fDeltaTime)
 							{
 								Timer = 0;
 
-								if (m_bIsRandomHeight)
+								if (m_iEditingKinds==0)
 								{
-									_float tempY = GetSingle(CUtilityMgr)->RandomFloat(m_fRandomHeightRange[0], m_fRandomHeightRange[1]);
-									m_pCreatedTerrain->Easing_Terrain_Curve(EasingTypeID(m_PickingEasingType), vResult, tempY, m_fPickingRadius);
+									if (m_bIsRandomHeight)
+									{
+										_float tempY = GetSingle(CUtilityMgr)->RandomFloat(m_fRandomHeightRange[0], m_fRandomHeightRange[1]);
+										m_pCreatedTerrain->Easing_Terrain_Curve(EasingTypeID(m_PickingEasingType), vResult, tempY, m_fPickingRadius);
+									}
+									else
+									{
+										m_pCreatedTerrain->Easing_Terrain_Curve(EasingTypeID(m_PickingEasingType), vResult, m_fPickingHeight, m_fPickingRadius);
+									}
 								}
-								else 
+								else if (m_iEditingKinds == 1)
 								{
-									m_pCreatedTerrain->Draw_FilterMap(1, vResult, m_fPickingHeight, m_fPickingRadius);
-									//m_pCreatedTerrain->Easing_Terrain_Curve(EasingTypeID(m_PickingEasingType), vResult, m_fPickingHeight, m_fPickingRadius);
+
+									m_pCreatedTerrain->Erasing_TerrainBuffer(vResult, m_fPickingRadius);
+
+
+								}
+								else if (m_iEditingKinds == 2)
+								{
+									if (m_bIsRandomHeight)
+									{
+										_float tempY = GetSingle(CUtilityMgr)->RandomFloat(m_fRandomHeightRange[0], m_fRandomHeightRange[1]);
+										m_pCreatedTerrain->Draw_FilterMap(m_iKindsOfFilter, vResult, tempY, m_fPickingRadius);
+									}
+									else
+									{
+										m_pCreatedTerrain->Draw_FilterMap(m_iKindsOfFilter, vResult, m_fPickingHeight, m_fPickingRadius);
+										//m_pCreatedTerrain->Easing_Terrain_Curve(EasingTypeID(m_PickingEasingType), vResult, m_fPickingHeight, m_fPickingRadius);
+										//m_pCreatedTerrain->Erasing_TerrainBuffer(vResult, m_fPickingRadius);
+									}
 								}
 							}
 						}
 
+
+		
+						if (m_iEditingKinds == 2 && pInstance->Get_DIMouseButtonState(CInput_Device::MBS_RBUTTON) & DIS_Press)
+						{
+
+							m_pCreatedTerrain->Draw_FilterMap(0, vResult, 0, m_fPickingRadius);
+							m_pCreatedTerrain->Draw_FilterMap(1, vResult, 0, m_fPickingRadius);
+							m_pCreatedTerrain->Draw_FilterMap(2, vResult, 0, m_fPickingRadius);
+							m_pCreatedTerrain->Draw_FilterMap(3, vResult, 0, m_fPickingRadius);
+						}
 					}
 
 				}
@@ -867,6 +983,34 @@ HRESULT CScene_Edit::Input_KeyBoard(_double fDeltaTime)
 
 			}
 
+
+			if (pInstance->Get_DIKeyState(DIK_1) & DIS_Down)
+			{
+				m_iEditingKinds = 0;
+			}
+			if (pInstance->Get_DIKeyState(DIK_2) & DIS_Down)
+			{
+				m_iEditingKinds = 1;
+			}
+			if (pInstance->Get_DIKeyState(DIK_3) & DIS_Down)
+			{
+				if (m_iEditingKinds == 2)
+				{
+
+					m_iKindsOfFilter += 1;
+					if (m_iKindsOfFilter > 3) m_iKindsOfFilter = 0;
+				}
+				else
+				{
+
+					m_iEditingKinds = 2;
+				}
+
+
+			}
+
+
+			
 		}
 
 #pragma endregion HeightMap
@@ -916,6 +1060,8 @@ HRESULT CScene_Edit::Update_MapTab(_double fDeltatime)
 
 	Make_VerticalSpacing(3);
 
+	FAILED_CHECK(Widget_CreateDeleteHeightMap(fDeltatime));
+	Make_VerticalSpacing(3);
 	FAILED_CHECK(Widget_SaveLoadMapData(fDeltatime));
 
 	return S_OK;
@@ -923,6 +1069,14 @@ HRESULT CScene_Edit::Update_MapTab(_double fDeltatime)
 
 HRESULT CScene_Edit::Widget_SRT(_double fDeltatime)
 {
+	Make_VerticalSpacing(3);
+
+	char PickingPos[64] = "";
+	sprintf_s(PickingPos, "Picked Position : ( %f   , %f   , %f   )", m_fPickingedPosition[0], m_fPickingedPosition[1], m_fPickingedPosition[2]);
+	ImGui::Text(PickingPos);
+
+	Make_VerticalSpacing(3);
+
 	ibClickChecker = 0;
 	ImGui::RadioButton("Camera Moving", &m_bIsModelMove, 0); ImGui::SameLine();
 	ImGui::RadioButton("Model Moving      ", &m_bIsModelMove, 1); ImGui::SameLine();
@@ -985,6 +1139,8 @@ HRESULT CScene_Edit::Widget_SRT(_double fDeltatime)
 			sprintf_s(Label, "\n  Selected Object Index : %d", m_iBatchedVecIndex);
 		else
 			sprintf_s(Label, "\n  !!!!!!!!!!!Create New Object!!!!!!!!!");
+
+
 
 		ImGui::Text(Label);
 	}
@@ -1131,9 +1287,13 @@ HRESULT CScene_Edit::Widget_SRT(_double fDeltatime)
 	return S_OK;
 }
 
+
+
 HRESULT CScene_Edit::Widget_BatchedObjectList(_double fDeltatime)
 {
-	Make_VerticalSpacing(2);
+
+
+	Make_VerticalSpacing(3);
 	if (ImGui::TreeNode("Batched Object List"))
 	{
 		vector<string> ObjectLabelIist;
@@ -1791,13 +1951,18 @@ HRESULT CScene_Edit::Update_CameraActionTab(_double fDeltatime)
 HRESULT CScene_Edit::Update_HeightMap(_double fDeltatime)
 {
 
+
+
 	FAILED_CHECK(Widget_CreateDeleteHeightMap(fDeltatime));
 	
 	Make_VerticalSpacing(5);
 
 	FAILED_CHECK(Widget_ChangeValue(fDeltatime));
 
-	FAILED_CHECK(Widget_TextureSaveNLoad(fDeltatime));
+	if (m_pCreatedTerrain != nullptr)
+	{
+		FAILED_CHECK(Widget_TextureSaveNLoad(fDeltatime));
+	}
 
 	return S_OK;
 }
@@ -1820,7 +1985,7 @@ HRESULT CScene_Edit::Widget_CreateDeleteHeightMap(_double fDeltatime)
 			sprintf_s(buf, "X Size : %d\nZ Size : %d", _int(pow(2, m_iMapSize[0])) + 1, _int(pow(2, m_iMapSize[1])) + 1);
 			ImGui::Text(buf);
 
-			if (ImGui::Button("Create Height Map", ImVec2(-FLT_MIN, 0.0f)))
+			if (ImGui::Button("Create Height Map", ImVec2(-FLT_MIN, 20.0f)))
 			{
 				FAILED_CHECK(m_pGameInstance->Add_GameObject_Out_of_Manager((CGameObject**)(&m_pCreatedTerrain), SCENE_EDIT, TAG_OP(Prototype_WireTerrain)));
 
@@ -1831,16 +1996,321 @@ HRESULT CScene_Edit::Widget_CreateDeleteHeightMap(_double fDeltatime)
 			}
 
 
+
+			Make_VerticalSpacing(10);
+
+
+
+			if (ImGui::Button("Laod Hight Map", ImVec2(-FLT_MIN, 20.0f)))
+				ImGui::OpenPopup("Laod Hight Map");
+
+			ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+			ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+			if (ImGui::BeginPopupModal("Laod Hight Map", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+			{
+				ImGui::Text("Laod Hight Map!\n\n");
+				ImGui::Separator();
+
+
+				if (m_FilePathList.size() == 0)
+				{
+					m_FilePathList.clear();
+					_tfinddata64_t fd;
+					__int64 handle = _tfindfirst64(TEXT("../bin/Resources/Textures/HeightMap/*.*"), &fd);
+					if (handle == -1 || handle == 0)
+						return E_FAIL;
+
+					_int iResult = 0;
+
+					//char szCurPath[128] = "../bin/Resources/Data/Map/";
+					//char szFullPath[128] = "";
+					char szFilename[MAX_PATH];
+
+					while (iResult != -1)
+					{
+						if (!lstrcmp(fd.name, L".") || !lstrcmp(fd.name, L".."))
+						{
+							iResult = _tfindnext64(handle, &fd);
+							continue;
+						}
+
+
+						WideCharToMultiByte(CP_UTF8, 0, fd.name, -1, szFilename, sizeof(szFilename), NULL, NULL);
+						//strcpy_s(szFullPath, szCurPath);
+						//strcat_s(szFullPath, szFilename);
+						m_FilePathList.push_back({ szFilename });
+
+
+						iResult = _tfindnext64(handle, &fd);
+					}
+
+
+					_findclose(handle);
+
+				}
+
+
+
+				static ImGuiTextFilter filter;
+
+				char	szCheckforSameFileName[256] = "";
+
+				if (ImGui::BeginListBox(" "))
+				{
+					auto iter = m_FilePathList.begin();
+
+
+					for (; iter != m_FilePathList.end(); iter++)
+					{
+						const bool is_selected = false;
+
+						if (filter.PassFilter(iter->c_str()))
+						{
+							if (ImGui::Selectable(iter->c_str(), is_selected))
+							{
+								strcpy_s(filter.InputBuf, iter->c_str());
+							}
+
+							if (!strcmp(iter->c_str(), filter.InputBuf))
+								strcpy_s(szCheckforSameFileName, filter.InputBuf);
+						}
+					}
+					ImGui::EndListBox();
+
+				}
+
+				filter.Draw("Input FileName");
+
+
+
+
+				if (ImGui::Button("OK", ImVec2(120, 0)))
+				{
+
+					if (strcmp(filter.InputBuf, ""))
+					{
+						if (!strcmp(szCheckforSameFileName, filter.InputBuf))
+						{
+
+							Load_Data(filter.InputBuf, Data_HeightMap);
+							m_FilePathList.clear();
+							ImGui::CloseCurrentPopup();
+						}
+					}
+				}
+				ImGui::SetItemDefaultFocus();
+				ImGui::SameLine();
+				if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+					m_FilePathList.clear();
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+
 			ImGui::TreePop();
 		}
+
+
+
+
 	}
 	else {
-		if (ImGui::TreeNode("Delete HeightMap"))
+
+		Make_VerticalSpacing(3);
+
+		char PickingPos[64] = "";
+		sprintf_s(PickingPos, "Picked Position : ( %f   , %f   , %f   )", m_fPickingedPosition[0], m_fPickingedPosition[1], m_fPickingedPosition[2]);
+		ImGui::Text(PickingPos);
+
+		Make_VerticalSpacing(3);
+
+		if (ImGui::TreeNode("Save & Delete HeightMap"))
 		{
-			if (ImGui::Button("Delete HeightMap", ImVec2(-FLT_MIN, 0.0f)))
+
+
+			if (ImGui::Button("Save HeightMap", ImVec2(-FLT_MIN, 30.f)))
+				ImGui::OpenPopup("Save HeightMap");
+
+			if (ImGui::Button("Delete HeightMap", ImVec2(-FLT_MIN, 30.f)))
+				ImGui::OpenPopup("Delete HeightMap");
+
+
+			ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+			ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+			if (ImGui::BeginPopupModal("Save HeightMap", NULL, ImGuiWindowFlags_AlwaysAutoResize))
 			{
-				Safe_Release(m_pCreatedTerrain);
+
+				if (m_FilePathList.size() == 0)
+				{
+					m_FilePathList.clear();
+					_tfinddata64_t fd;
+					__int64 handle = _tfindfirst64(TEXT("../bin/Resources/Textures/HeightMap/*.*"), &fd);
+					if (handle == -1 || handle == 0)
+						return E_FAIL;
+
+					_int iResult = 0;
+
+					//char szCurPath[128] = "../bin/Resources/Data/Map/";
+					//char szFullPath[128] = "";
+					char szFilename[MAX_PATH];
+
+					while (iResult != -1)
+					{
+						if (!lstrcmp(fd.name, L".") || !lstrcmp(fd.name, L".."))
+						{
+							iResult = _tfindnext64(handle, &fd);
+							continue;
+						}
+
+
+						WideCharToMultiByte(CP_UTF8, 0, fd.name, -1, szFilename, sizeof(szFilename), NULL, NULL);
+						//strcpy_s(szFullPath, szCurPath);
+						//strcat_s(szFullPath, szFilename);
+						m_FilePathList.push_back({ szFilename });
+
+
+						iResult = _tfindnext64(handle, &fd);
+					}
+
+
+					_findclose(handle);
+
+				}
+
+				ImGui::Text("Save Map!\n\nExist MapDataFiles");
+
+				static ImGuiTextFilter filter;
+
+				char	szCheckforSameFileName[256] = "";
+
+				if (ImGui::BeginListBox(" "))
+				{
+					auto iter = m_FilePathList.begin();
+
+
+					for (; iter != m_FilePathList.end(); iter++)
+					{
+						const bool is_selected = false;
+
+						if (filter.PassFilter(iter->c_str()))
+						{
+							if (ImGui::Selectable(iter->c_str(), is_selected))
+							{
+								strcpy_s(filter.InputBuf, iter->c_str());
+							}
+
+							if (!strcmp(iter->c_str(), filter.InputBuf))
+								strcpy_s(szCheckforSameFileName, filter.InputBuf);
+						}
+					}
+					ImGui::EndListBox();
+
+				}
+
+				filter.Draw("Input FileName");
+
+
+				ImGui::Separator();
+				if (ImGui::Button("Save", ImVec2(120, 0)))
+				{
+
+					if (strcmp(filter.InputBuf, ""))
+					{
+
+						if (!strcmp(szCheckforSameFileName, filter.InputBuf))
+						{
+							ImGui::OpenPopup("One More Check");
+						}
+						else
+						{
+							//실제 저장
+
+							Sava_Data(filter.InputBuf, Data_HeightMap);
+
+							ImGui::CloseCurrentPopup();
+							m_FilePathList.clear();
+
+
+						}
+					}
+
+
+
+				}
+				ImGui::SetItemDefaultFocus();
+				ImGui::SameLine();
+				if (ImGui::Button("Cancel", ImVec2(120, 0)))
+				{
+					ImGui::CloseCurrentPopup();
+					m_FilePathList.clear();
+				}
+
+
+				//서브 팝업
+				ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+				if (ImGui::BeginPopupModal("One More Check", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+				{
+
+					ImGui::Text("Mapdata Already Exist\nDo you want to Override on it?");
+
+					if (ImGui::Button("Ok", ImVec2(130, 0)))
+					{
+
+						//실제 저장
+						Sava_Data(filter.InputBuf, Data_HeightMap);
+
+						ImGui::CloseCurrentPopup();
+						m_FilePathList.clear();
+					}
+
+					ImGui::SameLine();
+					if (ImGui::Button("Cancel", ImVec2(130, 0)))
+					{
+						ImGui::CloseCurrentPopup();
+					}
+					ImGui::EndPopup();
+				}
+
+
+				ImGui::EndPopup();
 			}
+
+
+
+
+
+			ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+			if (ImGui::BeginPopupModal("Delete HeightMap", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+			{
+				ImGui::Text("!!!!!!!!!!!!!!!!Waring!!!!!!!!!!!!!!!!\n\n Delete Batched Filter Without Save!!!\n\n	Please Check Save One more\n\n\n");
+				ImGui::Separator();
+
+				//static int unused_i = 0;
+				//ImGui::Combo("Combo", &unused_i, "Delete\0Delete harder\0");
+
+				//static bool dont_ask_me_next_time = false;
+				//ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+				//ImGui::Checkbox("Don't ask me next time", &dont_ask_me_next_time);
+				//ImGui::PopStyleVar();
+
+				if (ImGui::Button("OK!", ImVec2(130, 0)))
+				{
+					Safe_Release(m_pCreatedTerrain);
+					ImGui::CloseCurrentPopup();
+				}
+
+
+				ImGui::SetItemDefaultFocus();
+				ImGui::SameLine();
+				if (ImGui::Button("Cancel!", ImVec2(130, 0))) { ImGui::CloseCurrentPopup(); }
+				ImGui::EndPopup();
+			}
+
+
+
 			ImGui::TreePop();
 		}
 	}
@@ -1851,6 +2321,23 @@ HRESULT CScene_Edit::Widget_CreateDeleteHeightMap(_double fDeltatime)
 HRESULT CScene_Edit::Widget_ChangeValue(_double fDeltatime)
 {
 	ImGui::Checkbox("BlockPicking", &m_bIsBlockPick);
+
+	Make_VerticalSpacing(3);
+
+
+	ImGui::RadioButton("Height", &m_iEditingKinds, 0); ImGui::SameLine();
+	ImGui::RadioButton("Erase", &m_iEditingKinds, 1); ImGui::SameLine();
+	ImGui::RadioButton("Filter", &m_iEditingKinds, 2);
+
+	Make_VerticalSpacing(2);
+	if (m_iEditingKinds == 2)
+	{
+		ImGui::InputInt("Filter Kinds", &m_iKindsOfFilter);
+
+		if (m_iKindsOfFilter > 3) m_iKindsOfFilter = 3;
+		else if (m_iKindsOfFilter < 0)m_iKindsOfFilter = 0;
+
+	}
 
 	Make_VerticalSpacing(3);
 
@@ -1908,11 +2395,296 @@ HRESULT CScene_Edit::Widget_ChangeValue(_double fDeltatime)
 
 HRESULT CScene_Edit::Widget_TextureSaveNLoad(_double fDeltatime)
 {
-	if (ImGui::Button("TestSaveButton", ImVec2(-FLT_MIN, 0.0f)))
+	if (ImGui::Button("New Filter Map"))
+		ImGui::OpenPopup("New Filter Map");
+	ImGui::SameLine();
+	if (ImGui::Button("Save Filter Map"))
+		ImGui::OpenPopup("Save Filter Map");
+	ImGui::SameLine();
+	if (ImGui::Button("Laod Filter Map"))
+		ImGui::OpenPopup("Laod Filter Map");
+	ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+
+	// Always center this window when appearing
+	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+	if (ImGui::BeginPopupModal("New Filter Map", NULL, ImGuiWindowFlags_AlwaysAutoResize))
 	{
-		FAILED_CHECK(Sava_Data("Test.bmp",CScene_Edit::Data_FilterMap));
+		ImGui::Text("!!!!!!!!!!!!!!!!Waring!!!!!!!!!!!!!!!!\n\n Delete Batched Filter Without Save!!!\n\n	Please Check Save One more\n\n\n");
+		ImGui::Separator();
+
+		//static int unused_i = 0;
+		//ImGui::Combo("Combo", &unused_i, "Delete\0Delete harder\0");
+
+		//static bool dont_ask_me_next_time = false;
+		//ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+		//ImGui::Checkbox("Don't ask me next time", &dont_ask_me_next_time);
+		//ImGui::PopStyleVar();
+
+		if (ImGui::Button("OK!", ImVec2(130, 0))) 
+		{
+			FAILED_CHECK(m_pCreatedTerrain->Create_FilterMap());
+			ImGui::CloseCurrentPopup();
+		}
+
+
+		ImGui::SetItemDefaultFocus();
+		ImGui::SameLine();
+		if (ImGui::Button("Cancel!", ImVec2(130, 0))) { ImGui::CloseCurrentPopup(); }
+		ImGui::EndPopup();
 	}
 
+
+	//////////////////////////////////////////////////////////////////////////
+
+
+	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+	if (ImGui::BeginPopupModal("Save Filter Map", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+
+		if (m_FilePathList.size() == 0)
+		{
+			m_FilePathList.clear();
+			_tfinddata64_t fd;
+			__int64 handle = _tfindfirst64(TEXT("../bin/Resources/Textures/Terrain/Filter/*.*"), &fd);
+			if (handle == -1 || handle == 0)
+				return E_FAIL;
+
+			_int iResult = 0;
+
+			//char szCurPath[128] = "../bin/Resources/Data/Map/";
+			//char szFullPath[128] = "";
+			char szFilename[MAX_PATH];
+
+			while (iResult != -1)
+			{
+				if (!lstrcmp(fd.name, L".") || !lstrcmp(fd.name, L".."))
+				{
+					iResult = _tfindnext64(handle, &fd);
+					continue;
+				}
+
+
+				WideCharToMultiByte(CP_UTF8, 0, fd.name, -1, szFilename, sizeof(szFilename), NULL, NULL);
+				//strcpy_s(szFullPath, szCurPath);
+				//strcat_s(szFullPath, szFilename);
+				m_FilePathList.push_back({ szFilename });
+
+
+				iResult = _tfindnext64(handle, &fd);
+			}
+
+
+			_findclose(handle);
+
+		}
+
+		ImGui::Text("Save Map!\n\nExist MapDataFiles");
+
+		static ImGuiTextFilter filter;
+
+		char	szCheckforSameFileName[256] = "";
+
+		if (ImGui::BeginListBox(" "))
+		{
+			auto iter = m_FilePathList.begin();
+
+
+			for (; iter != m_FilePathList.end(); iter++)
+			{
+				const bool is_selected = false;
+
+				if (filter.PassFilter(iter->c_str()))
+				{
+					if (ImGui::Selectable(iter->c_str(), is_selected))
+					{
+						strcpy_s(filter.InputBuf, iter->c_str());
+					}
+
+					if (!strcmp(iter->c_str(), filter.InputBuf))
+						strcpy_s(szCheckforSameFileName, filter.InputBuf);
+				}
+			}
+			ImGui::EndListBox();
+
+		}
+
+		filter.Draw("Input FileName");
+
+
+		ImGui::Separator();
+		if (ImGui::Button("Save", ImVec2(120, 0)))
+		{
+
+			if (strcmp(filter.InputBuf, ""))
+			{
+
+				if (!strcmp(szCheckforSameFileName, filter.InputBuf))
+				{
+					ImGui::OpenPopup("One More Check");
+				}
+				else
+				{
+					//실제 저장
+
+					Sava_Data(filter.InputBuf, Data_FilterMap);
+
+					ImGui::CloseCurrentPopup();
+					m_FilePathList.clear();
+
+
+				}
+			}
+
+
+
+		}
+		ImGui::SetItemDefaultFocus();
+		ImGui::SameLine();
+		if (ImGui::Button("Cancel", ImVec2(120, 0)))
+		{
+			ImGui::CloseCurrentPopup();
+			m_FilePathList.clear();
+		}
+
+
+		//서브 팝업
+		ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+		if (ImGui::BeginPopupModal("One More Check", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+		{
+
+			ImGui::Text("Mapdata Already Exist\nDo you want to Override on it?");
+
+			if (ImGui::Button("Ok", ImVec2(130, 0)))
+			{
+
+				//실제 저장
+				Sava_Data(filter.InputBuf, Data_FilterMap);
+
+				ImGui::CloseCurrentPopup();
+				m_FilePathList.clear();
+			}
+
+			ImGui::SameLine();
+			if (ImGui::Button("Cancel", ImVec2(130, 0)))
+			{
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::EndPopup();
+		}
+
+
+		ImGui::EndPopup();
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
+
+	// Always center this window when appearing
+	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+	if (ImGui::BeginPopupModal("Laod Filter Map", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		ImGui::Text("Laod Filter Map!\n\n");
+		ImGui::Separator();
+
+
+		if (m_FilePathList.size() == 0)
+		{
+			m_FilePathList.clear();
+			_tfinddata64_t fd;
+			__int64 handle = _tfindfirst64(TEXT("../bin/Resources/Textures/Terrain/Filter/*.*"), &fd);
+			if (handle == -1 || handle == 0)
+				return E_FAIL;
+
+			_int iResult = 0;
+
+			//char szCurPath[128] = "../bin/Resources/Data/Map/";
+			//char szFullPath[128] = "";
+			char szFilename[MAX_PATH];
+
+			while (iResult != -1)
+			{
+				if (!lstrcmp(fd.name, L".") || !lstrcmp(fd.name, L".."))
+				{
+					iResult = _tfindnext64(handle, &fd);
+					continue;
+				}
+
+
+				WideCharToMultiByte(CP_UTF8, 0, fd.name, -1, szFilename, sizeof(szFilename), NULL, NULL);
+				//strcpy_s(szFullPath, szCurPath);
+				//strcat_s(szFullPath, szFilename);
+				m_FilePathList.push_back({ szFilename });
+
+
+				iResult = _tfindnext64(handle, &fd);
+			}
+
+
+			_findclose(handle);
+
+		}
+
+
+
+		static ImGuiTextFilter filter;
+
+		char	szCheckforSameFileName[256] = "";
+
+		if (ImGui::BeginListBox(" "))
+		{
+			auto iter = m_FilePathList.begin();
+
+
+			for (; iter != m_FilePathList.end(); iter++)
+			{
+				const bool is_selected = false;
+
+				if (filter.PassFilter(iter->c_str()))
+				{
+					if (ImGui::Selectable(iter->c_str(), is_selected))
+					{
+						strcpy_s(filter.InputBuf, iter->c_str());
+					}
+
+					if (!strcmp(iter->c_str(), filter.InputBuf))
+						strcpy_s(szCheckforSameFileName, filter.InputBuf);
+				}
+			}
+			ImGui::EndListBox();
+
+		}
+
+		filter.Draw("Input FileName");
+
+
+
+
+		if (ImGui::Button("OK", ImVec2(120, 0)))
+		{
+
+			if (strcmp(filter.InputBuf, ""))
+			{
+				if (!strcmp(szCheckforSameFileName, filter.InputBuf))
+				{
+
+					Load_Data(filter.InputBuf, Data_FilterMap);
+					m_FilePathList.clear();
+					ImGui::CloseCurrentPopup();
+				}
+			}
+		}
+		ImGui::SetItemDefaultFocus();
+		ImGui::SameLine();
+		if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+			m_FilePathList.clear();
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::EndPopup();
+	}
+	return S_OK;
 	return S_OK;
 }	
 
@@ -2007,16 +2779,6 @@ HRESULT CScene_Edit::Ready_Layer_Player(const _tchar * pLayerTag)
 	return S_OK;
 }
 
-HRESULT CScene_Edit::Ready_Layer_WireTerrain(const _tchar * pLayerTag)
-{
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENEID::SCENE_EDIT, pLayerTag, TAG_OP(Prototype_WireTerrain)));
-
-	m_pWireTerrain = (CWireTerrain*)(g_pGameInstance->Get_GameObject_By_LayerIndex(SCENE_EDIT, pLayerTag));
-
-	NULL_CHECK_RETURN(m_pWireTerrain, E_FAIL);
-
-	return S_OK;
-}
 
 
 CScene_Edit * CScene_Edit::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)

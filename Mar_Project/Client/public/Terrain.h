@@ -33,9 +33,13 @@ private:
 	CTexture*			m_pTextureCom = nullptr;
 	CTransform*			m_pTransformCom = nullptr;
 
+
+	ID3D11ShaderResourceView*		m_pFilterMap = nullptr;
+
 private:
 	HRESULT SetUp_Components();
-	
+	HRESULT Ready_FilterMap();
+
 
 private:
 	_float4x4			m_InverseWorldMat;

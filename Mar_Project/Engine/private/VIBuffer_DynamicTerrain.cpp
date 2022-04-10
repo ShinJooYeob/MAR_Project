@@ -10,6 +10,7 @@ CVIBuffer_DynamicTerrain::CVIBuffer_DynamicTerrain(const CVIBuffer_DynamicTerrai
 	: CVIBuffer(rhs)
 	, m_iNumVerticesX(rhs.m_iNumVerticesX)
 	, m_iNumVerticesZ(rhs.m_iNumVerticesZ)
+	, m_fMinMapSize(rhs.m_fMinMapSize)
 {
 
 }
@@ -64,12 +65,14 @@ HRESULT CVIBuffer_DynamicTerrain::Initialize_Prototype(const _tchar* pHeightMap)
 		for (_uint j = 0; j < m_iNumVerticesX; ++j)
 		{
 			_uint		iIndex = i * m_iNumVerticesX + j;
-			_float ValueY = (pPixel[iIndex] & 0x000000ff) / 10.f;
-			//if (ValueY <= 0.5f)
-			//	pVertices[iIndex].vPosition = m_pVertices[iIndex] =  _float3(_float(j), -FLT_MAX, _float(i));
-			//else
-			//	pVertices[iIndex].vPosition = m_pVertices[iIndex] = _float3(_float(j), (pPixel[iIndex] & 0x000000ff) / 10.f, _float(i));
-			m_pKeepVertices[iIndex].vPosition = m_pVertices[iIndex] = _float3(_float(j), (pPixel[iIndex] & 0x000000ff) / 10.f, _float(i));
+			//_float ValueY = (pPixel[iIndex] & 0x000000ff) / 10.f;			
+
+			if ((pPixel[iIndex] & 0x00ff0000 >> 4) != 0)
+				m_pKeepVertices[iIndex].vPosition = m_pVertices[iIndex] = _float3(_float(j), -FLT_MAX, _float(i));
+			else
+				m_pKeepVertices[iIndex].vPosition = m_pVertices[iIndex] = _float3(_float(j), _float((pPixel[iIndex] & 0x000000ff)), _float(i));
+
+			//m_pKeepVertices[iIndex].vPosition = m_pVertices[iIndex] = _float3(_float(j), (pPixel[iIndex] & 0x000000ff) / 1.f, _float(i));
 
 			m_pKeepVertices[iIndex].vNormal = _float3(0.f, 0.f, 0.f);
 			m_pKeepVertices[iIndex].vTexUV = _float2(j / (m_iNumVerticesX - 1.f), i / (m_iNumVerticesZ - 1.f));
@@ -188,7 +191,9 @@ HRESULT CVIBuffer_DynamicTerrain::Initialize_Prototype(const _tchar* pHeightMap)
 	Safe_Delete_Array(pIndices);
 
 #pragma endregion
-
+	_float2 vTerrainSize = Get_NumVerticesXY();
+	_float fCrossSize = vTerrainSize.Get_Lenth();
+	m_fMinMapSize = fCrossSize / 5;
 	return S_OK;
 }
 
@@ -339,13 +344,83 @@ HRESULT CVIBuffer_DynamicTerrain::Initialize_Prototype(_uint iNumWidthPixelX, _u
 	Safe_Delete_Array(pIndices);
 
 #pragma endregion
-
+	_float2 vTerrainSize = Get_NumVerticesXY();
+	_float fCrossSize = vTerrainSize.Get_Lenth();
+	m_fMinMapSize = fCrossSize / 5;
 	return S_OK;
 }
 
 HRESULT CVIBuffer_DynamicTerrain::Initialize_Clone(void * pArg)
 {
 	FAILED_CHECK(__super::Initialize_Clone(pArg));
+
+	return S_OK;
+}
+
+HRESULT CVIBuffer_DynamicTerrain::Save_HeightMap(const _tchar * FileFullPath)
+{
+	NULL_CHECK_RETURN(m_pDeviceContext, E_FAIL);
+
+
+	D3D11_TEXTURE2D_DESC TextureDesc;
+	ZeroMemory(&TextureDesc, sizeof(D3D11_TEXTURE2D_DESC));
+
+	TextureDesc.Width = _uint(m_iNumVerticesX);
+	TextureDesc.Height = _uint(m_iNumVerticesZ);
+	TextureDesc.MipLevels = 1;
+	TextureDesc.ArraySize = 1;
+	TextureDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+	TextureDesc.SampleDesc.Count = 1;
+	TextureDesc.SampleDesc.Quality = 0;
+	TextureDesc.Usage = D3D11_USAGE_DYNAMIC;
+	TextureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	TextureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+	D3D11_SUBRESOURCE_DATA			SubResourceData;
+	ZeroMemory(&SubResourceData, sizeof(D3D11_SUBRESOURCE_DATA));
+
+	_ulong*		pPixel = nullptr;
+
+	pPixel = new _ulong[TextureDesc.Width * TextureDesc.Height];
+	ZeroMemory(pPixel, sizeof(_ulong) * TextureDesc.Width * TextureDesc.Height);
+
+
+	for (_uint i  = 0; i < m_iNumVerticesZ; i++)
+	{
+		for (_uint j = 0; j < m_iNumVerticesX; j++)
+		{
+			_uint		iIndex = i * m_iNumVerticesX + j;
+
+			_ulong	Value = 0;
+
+			if (m_pKeepVertices[iIndex].vPosition.y >= 0)
+			{
+				Value = _ulong(m_pKeepVertices[iIndex].vPosition.y);
+				if (Value > 255)Value = 255;
+
+				pPixel[iIndex] = D3D11COLOR_ARGB(255, 0, Value, Value);
+			}
+			else
+			{
+				pPixel[iIndex] = D3D11COLOR_ARGB(255, 255, 0, 0);
+
+			}
+		}
+	}
+
+
+
+	SubResourceData.pSysMem = pPixel;
+	SubResourceData.SysMemPitch = sizeof(_ulong) * TextureDesc.Width;
+
+
+	ID3D11Texture2D*				pTexture = nullptr;
+
+	FAILED_CHECK(m_pDevice->CreateTexture2D(&TextureDesc, &SubResourceData, &pTexture));
+
+	FAILED_CHECK(SaveWICTextureToFile(m_pDeviceContext, pTexture, GUID_ContainerFormatBmp, FileFullPath, &GUID_WICPixelFormat32bppBGRA));
+
+	Safe_Delete_Array(pPixel);
 
 	return S_OK;
 }
@@ -623,6 +698,15 @@ HRESULT CVIBuffer_DynamicTerrain::Chage_VertexBuffer(_float2 vChangeVertexIndex,
 
 	return S_OK;
 }
+HRESULT CVIBuffer_DynamicTerrain::Erase_VertexBuffer(_float2 vChangeVertexIndex)
+{
+	m_bIsVertexChange = true;
+
+	_uint		iIndex = _uint(vChangeVertexIndex.y) * m_iNumVerticesX + _uint(vChangeVertexIndex.x);
+	m_pKeepVertices[iIndex].vPosition.y = -999999.f;
+
+	return S_OK;
+}
 
 HRESULT CVIBuffer_DynamicTerrain::Renew_VertexBuffer()
 {
@@ -642,6 +726,7 @@ HRESULT CVIBuffer_DynamicTerrain::Renew_VertexBuffer()
 
 	return S_OK;
 }
+
 
 CVIBuffer_DynamicTerrain * CVIBuffer_DynamicTerrain::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, const _tchar* pHeightMap)
 {

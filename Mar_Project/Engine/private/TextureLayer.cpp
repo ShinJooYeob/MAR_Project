@@ -280,13 +280,14 @@ void CTextureLayer::Free()
 	{
 		for (auto& pTexture : m_vecTextures)
 		{
-			ID3D11ShaderResourceView*		pSRV = pTexture;
-			_ulong hr = Safe_Release(pSRV);
-			while (hr != 0)
-			{
-				pSRV = pTexture;
-				hr = Safe_Release(pSRV);
-			}
+			Safe_Release(pTexture);
+			//ID3D11ShaderResourceView*		pSRV = pTexture;
+			//_ulong hr = Safe_Release(pSRV);
+			//while (hr != 0)
+			//{
+			//	pSRV = pTexture;
+			//	hr = Safe_Release(pSRV);
+			//}
 		}
 	}
 	else
