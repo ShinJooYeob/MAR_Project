@@ -341,6 +341,11 @@ enum COMPONENTPROTOTYPEID
 	Prototype_Mesh_KelpWallBack,
 
 	Prototype_Mesh_Player,
+	Prototype_Mesh_Executor,
+	Prototype_Mesh_Grunt,
+	Prototype_Mesh_WaspArrow,
+	Prototype_Mesh_WaspInk,
+	Prototype_Mesh_Eyepot,
 	//////////////////////////////////////////////////////////////////////////
 	Prototype_Texture_Player,
 	Prototype_Texture_SkyBox,
@@ -453,6 +458,21 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 
 	case Prototype_Mesh_Player:
 		return TEXT("Mesh_Player");
+		break;
+	case Prototype_Mesh_Executor:
+		return TEXT("Mesh_Executor");
+		break;
+	case Prototype_Mesh_Grunt:
+		return TEXT("Mesh_Grunt");
+		break;
+	case Prototype_Mesh_WaspArrow:
+		return TEXT("Mesh_WaspArrow");
+		break;
+	case Prototype_Mesh_WaspInk:
+		return TEXT("Mesh_WaspInk");
+		break;
+	case Prototype_Mesh_Eyepot:
+		return TEXT("Mesh_Eyepot");
 		break;
 		/////////////////≈ÿΩ∫√≥////////////////////////////////////////////////////////
 

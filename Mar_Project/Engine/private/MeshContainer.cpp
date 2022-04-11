@@ -1,4 +1,6 @@
 #include "MeshContainer.h"
+#include "HierarchyNode.h"
+#include "Shader.h"
 
 
 
@@ -15,6 +17,8 @@ CMeshContainer::CMeshContainer(const CMeshContainer & rhs)
 
 HRESULT CMeshContainer::Initialize_Prototype(CModel::MODELTYPE eMeshtype, aiMesh * pAIMesh, _fMatrix TransformMatrix)
 {
+	m_pAIMesh = pAIMesh;
+
 #pragma region VERTICES
 	m_iNumIndicesPerPrimitive = 3;
 	m_iNumVertices = pAIMesh->mNumVertices;
@@ -70,12 +74,39 @@ HRESULT CMeshContainer::Initialize_Prototype(CModel::MODELTYPE eMeshtype, aiMesh
 
 HRESULT CMeshContainer::Initialize_Clone(void * pArg)
 {
-	return E_NOTIMPL;
+	return S_OK;
+}
+
+HRESULT CMeshContainer::Bind_AffectingBones_OnShader(CShader* pShader, _fMatrix DefultPivotMatrix, _float4x4* pBoneMatrices, const char* szBoneName)
+{
+	ZeroMemory(pBoneMatrices, sizeof(_float4x4) * 128);
+	_uint	iIndex = 0;
+
+	for (auto& pHierarchyNode : m_vecAffectingBones)
+	{
+		_Matrix UpdatedMatrix = pHierarchyNode->Get_UpdatedMatrix();
+
+		XMStoreFloat4x4(&pBoneMatrices[iIndex++], XMMatrixTranspose(UpdatedMatrix*DefultPivotMatrix));
+		//XMStoreFloat4x4(&pBoneMatrices[iIndex++], XMMatrixTranspose(UpdatedMatrix));
+	}
+
+	FAILED_CHECK(pShader->Set_RawValue(szBoneName, pBoneMatrices, sizeof(_float4x4) * 128));
+
+	return S_OK;
 }
 
 _uint CMeshContainer::Get_MaterialIndex()
 {
 	return m_MaterialIndex;
+}
+
+HRESULT CMeshContainer::Add_AffectingBone(CHierarchyNode * pHierarchyNode)
+{
+	m_vecAffectingBones.push_back(pHierarchyNode);
+
+	Safe_AddRef(pHierarchyNode);
+
+	return S_OK;
 }
 
 HRESULT CMeshContainer::Ready_NonAnimMeshContainer(aiMesh * pAIMesh, _fMatrix TransformMatrix)
@@ -224,4 +255,10 @@ CComponent * CMeshContainer::Clone(void * pArg)
 void CMeshContainer::Free()
 {
 	__super::Free();
+
+	for (auto& pHierarchyNode : m_vecAffectingBones)
+		Safe_Release(pHierarchyNode);
+
+	m_vecAffectingBones.clear();
+
 }

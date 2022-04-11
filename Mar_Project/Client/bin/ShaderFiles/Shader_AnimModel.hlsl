@@ -1,8 +1,15 @@
 
 #include "Shader_Define.hpp" 
 
+struct BoneMatrixArray
+{
+	matrix				BoneMatrices[128];
+};
 
-matrix				g_BoneMatrices[128];
+cbuffer Matrices
+{
+	BoneMatrixArray		g_BoneMatrices;
+};
 
 texture2D			g_DiffuseTexture;
 texture2D			g_SpecularTexture;
@@ -48,10 +55,10 @@ VS_OUT VS_MAIN_DEFAULT(VS_IN In)
 
 	float		fWeightW = 1.f - (In.vBlendWeight.x + In.vBlendWeight.y + In.vBlendWeight.z);
 	
-	matrix		BoneMatrix = g_BoneMatrices[In.vBlendIndex.x] * In.vBlendWeight.x +
-		g_BoneMatrices[In.vBlendIndex.y] * In.vBlendWeight.y +
-		g_BoneMatrices[In.vBlendIndex.z] * In.vBlendWeight.z +
-		g_BoneMatrices[In.vBlendIndex.w] * In.vBlendWeight.w;
+	matrix		BoneMatrix = g_BoneMatrices.BoneMatrices[In.vBlendIndex.x] * In.vBlendWeight.x +
+		g_BoneMatrices.BoneMatrices[In.vBlendIndex.y] * In.vBlendWeight.y +
+		g_BoneMatrices.BoneMatrices[In.vBlendIndex.z] * In.vBlendWeight.z +
+		g_BoneMatrices.BoneMatrices[In.vBlendIndex.w] * In.vBlendWeight.w;
 
 	vector		vLocalPosition = mul(vector(In.vModelDataPosition, 1.f), BoneMatrix);
 	vector		vLocalNormal = mul(vector(In.vModelDataNormal, 0.f), BoneMatrix);

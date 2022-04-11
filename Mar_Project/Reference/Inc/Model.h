@@ -20,11 +20,13 @@ public:
 
 
 public:
+	HRESULT Change_AnimIndex(_uint iAnimIndex);
+	HRESULT Bind_OnShader(class CShader* pShader, _uint iMaterialIndex , _uint eTextureType, const char* pHlslConstValueName);
+	HRESULT Update_AnimationClip(_double fDeltaTime);	
+	HRESULT Render(class CShader* pShader, _uint iPassIndex, _uint iMaterialIndex, const char* szBoneValueName = nullptr);
+
+public:
 	_uint	Get_NumMaterial() { return m_iNumMaterials; };
-	HRESULT Bind_OnShader(class CShader* pShader, _uint iMaterialIndex , _uint eTextureType, const char* pHlslConstValueName );
-	HRESULT Render(class CShader* pShader, _uint iPassIndex, _uint iMaterialIndex);
-
-
 private:
 	const aiScene*				m_pScene = nullptr;
 	Importer					m_Importer;

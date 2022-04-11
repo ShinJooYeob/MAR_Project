@@ -3,6 +3,7 @@
 #include "Model.h"
 
 BEGIN(Engine)
+class CHierarchyNode;
 
 class CMeshContainer final : public CVIBuffer
 {
@@ -15,14 +16,24 @@ public:
 	virtual HRESULT Initialize_Prototype(CModel::MODELTYPE eMeshtype, aiMesh* pAIMesh, _fMatrix TransformMatrix);
 	virtual HRESULT Initialize_Clone(void* pArg);
 
-	_uint Get_MaterialIndex();
+	HRESULT Bind_AffectingBones_OnShader(CShader* pShader, _fMatrix DefultPivotMatrix ,_float4x4* pBoneMatrices, const char* szBoneName);
+public:
+	_uint		Get_MaterialIndex();
+	_uint		Get_NumAffectingBones() { return m_iNumAffectingBones; };
+	aiMesh*		Get_AiMesh() { return m_pAIMesh; };
+	HRESULT		Add_AffectingBone(CHierarchyNode* pHierarchyNode);
 
 private:
 	//이 매쉬가 사용하는 머테리얼의 인덱스
 	_uint		m_MaterialIndex = 0;
 	//이 매쉬에 영향을 미치는 뼈의 총 개수
 	_uint		m_iNumAffectingBones = 0;
+	//이 매쉬의		AiMesh
+	aiMesh*			m_pAIMesh = nullptr;
 
+
+	/* 현재 메시에 영향을 주는 노드들. */
+	vector<CHierarchyNode*>		m_vecAffectingBones;
 private:
 	HRESULT Ready_NonAnimMeshContainer(aiMesh* pAIMesh, _fMatrix TransformMatrix);
 	HRESULT Ready_AnimMeshContainer(aiMesh* pAIMesh);

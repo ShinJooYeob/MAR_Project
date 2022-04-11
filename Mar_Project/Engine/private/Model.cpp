@@ -20,8 +20,10 @@ CModel::CModel(const CModel & rhs)
 	m_iNumMeshContainers(rhs.m_iNumMeshContainers),
 	m_iNumMaterials(rhs.m_iNumMaterials),
 	m_vecHierarchyNode(rhs.m_vecHierarchyNode),
+	m_DefaultPivotMatrix(rhs.m_DefaultPivotMatrix),
 	//////////////////////////////////////////////////////////////////////////
-	m_vecAnimator(rhs.m_vecAnimator)
+	m_vecAnimator(rhs.m_vecAnimator),
+	m_iNumAnimationClip(rhs.m_iNumAnimationClip)
 {
 	for (auto& pAnimationClip : m_vecAnimator)
 		Safe_AddRef(pAnimationClip);
@@ -84,8 +86,6 @@ HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, const char * pModelFi
 			return pSour->Get_Depth() < pDest->Get_Depth();
 		});
 
-		//뼈 구조가 매쉬의 로컬상태와 맞지 않을 수 있기 떄문에 보정해주는 메트릭스를 계층뼈에 저장
-		FAILED_CHECK(Ready_OffsetMatrices());
 
 #ifdef _DEBUG
 		string szLog = "Mesh Name : " + string(pModelFileName) + "		Num Bones : " + to_string(m_vecHierarchyNode.size()) + "\n";
@@ -102,7 +102,12 @@ HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, const char * pModelFi
 
 
 	if (TYPE_ANIM == m_eModelType)
+	{
+		//뼈 구조가 매쉬의 로컬상태와 맞지 않을 수 있기 떄문에 보정해주는 메트릭스를 계층뼈에 저장
+		FAILED_CHECK(Ready_OffsetMatrices());
+
 		FAILED_CHECK(Ready_Animation());
+	}
 	
 	return S_OK;
 }
@@ -111,6 +116,16 @@ HRESULT CModel::Initialize_Clone(void * pArg)
 {
 	FAILED_CHECK(__super::Initialize_Clone(nullptr));
 
+
+	return S_OK;
+}
+
+HRESULT CModel::Change_AnimIndex(_uint iAnimIndex)
+{
+	if (iAnimIndex >= m_iNumAnimationClip)
+		return E_FAIL;
+
+	m_iCurrentAnimIndex = iAnimIndex;
 
 	return S_OK;
 }
@@ -137,20 +152,56 @@ HRESULT CModel::Bind_OnShader(CShader * pShader, _uint iMaterialIndex, _uint eTe
 	return S_OK;
 }
 
-HRESULT CModel::Render(CShader * pShader, _uint iPassIndex,_uint iMaterialIndex)
+HRESULT CModel::Update_AnimationClip(_double fDeltaTime)
 {
+	//해당 애니메이션을 따라서 트렌스폼매트릭스를 갱신해주고
+	FAILED_CHECK(m_vecAnimator[m_iCurrentAnimIndex]->Update_TransformMatrices_byClipBones(fDeltaTime));
 
+	//갱신된 매트릭스를 따라서 컴바인드 메트릭스를 업데이트 해준다.
+	for (auto& pHierarchyNode : m_vecHierarchyNode)
+		pHierarchyNode->Update_CombinedMatrix();
 
-	for (auto& pMeshContainer : m_vecMeshContainerArr[iMaterialIndex])
+	return S_OK;
+}
+
+HRESULT CModel::Render(CShader * pShader, _uint iPassIndex,_uint iMaterialIndex, const char* szBoneValueName)
+{
+	if (iMaterialIndex >= m_iNumMaterials || nullptr == m_MeshMaterialDesc.pTexture)
+		return E_FAIL;
+
+	if (TYPE_ANIM == m_eModelType)
 	{
-		m_MeshMaterialDesc.pTexture->Change_TextureLayer(to_wstring(iMaterialIndex).c_str());
+		NULL_CHECK_RETURN(szBoneValueName, E_FAIL);
+		_float4x4		BoneMatrices[128];
+		_Matrix matDefualtPivot = m_DefaultPivotMatrix.XMatrix();
+		for (auto& pMeshContainer : m_vecMeshContainerArr[iMaterialIndex])
+		{
+			FAILED_CHECK(pMeshContainer->Bind_AffectingBones_OnShader(pShader, matDefualtPivot,BoneMatrices, szBoneValueName));
 
-		FAILED_CHECK(m_MeshMaterialDesc.pTexture->NullCheckBinedTextureLayer());
 
-		m_MeshMaterialDesc.pTexture->Bind_OnShader(pShader, "g_DiffuseTexture", 1);
-
-		pMeshContainer->Render(pShader, iPassIndex);
+			m_MeshMaterialDesc.pTexture->Change_TextureLayer(to_wstring(iMaterialIndex).c_str());
+			FAILED_CHECK(m_MeshMaterialDesc.pTexture->NullCheckBinedTextureLayer());
+			m_MeshMaterialDesc.pTexture->Bind_OnShader(pShader, "g_DiffuseTexture", 1);
+			pMeshContainer->Render(pShader, iPassIndex);
+		}
 	}
+	else
+	{
+		for (auto& pMeshContainer : m_vecMeshContainerArr[iMaterialIndex])
+		{
+			m_MeshMaterialDesc.pTexture->Change_TextureLayer(to_wstring(iMaterialIndex).c_str());
+
+			FAILED_CHECK(m_MeshMaterialDesc.pTexture->NullCheckBinedTextureLayer());
+
+			m_MeshMaterialDesc.pTexture->Bind_OnShader(pShader, "g_DiffuseTexture", 1);
+
+			pMeshContainer->Render(pShader, iPassIndex);
+		}
+
+
+	}
+
+
 
 
 
@@ -179,26 +230,58 @@ HRESULT CModel::Ready_HierarchyNodes(aiNode * pNode, CHierarchyNode * pParent, _
 HRESULT CModel::Ready_OffsetMatrices()
 {
 
-	for (_uint i = 0; i < m_iNumMeshContainers; ++i)
+	for (_uint i = 0 ; i < m_iNumMaterials; i++)
 	{
-		//각각의 매쉬들이 영향을 받는 모든 뼈들을 순회하면서
-		for (_uint j = 0; j < m_pScene->mMeshes[i]->mNumBones; ++j)
+		for (auto& pMeshContainer : m_vecMeshContainerArr[i])
 		{
-			//특정 매쉬가 영향을 받는 뼈들 중 j번째 뼈와 
-			//이름이 같은 뼈를 계층뼈에서 찾아서
-			aiBone*		pBone = m_pScene->mMeshes[i]->mBones[j];
-			CHierarchyNode*		pHierarchyNode = Find_HierarchyNode(pBone->mName.data);
+			_uint iNumAffectingBones = pMeshContainer->Get_NumAffectingBones();
+			aiMesh*		pAIMesh = pMeshContainer->Get_AiMesh();
 
+			NULL_CHECK_RETURN(pAIMesh, E_FAIL);
 
-			NULL_CHECK_RETURN(pHierarchyNode, E_FAIL);
+			//각각의 매쉬들이 영향을 받는 모든 뼈들을 순회하면서
+			for (_uint j = 0 ; j < iNumAffectingBones; j++)
+			{
 
-			_float4x4		OffsetMatrix;
-			memcpy(&OffsetMatrix, &pBone->mOffsetMatrix, sizeof(_float4x4));
+				//특정 매쉬가 영향을 받는 뼈들 중 j번째 뼈와 
+				//이름이 같은 뼈를 계층뼈에서 찾아서
+				CHierarchyNode*		pHierarchyNode = Find_HierarchyNode(pAIMesh->mBones[j]->mName.data);
 
-			//계층뼈에 오프셋 매트릭스를 저장하자
-			pHierarchyNode->Set_OffsetMatrix(OffsetMatrix);
+				NULL_CHECK_RETURN(pHierarchyNode, E_FAIL);
+
+				_float4x4		OffsetMatrix;
+				memcpy(&OffsetMatrix, &(pAIMesh->mBones[j]->mOffsetMatrix), sizeof(_float4x4));
+
+				//계층뼈에 오프셋 매트릭스를 저장하자
+				pHierarchyNode->Set_OffsetMatrix(&OffsetMatrix);
+				pMeshContainer->Add_AffectingBone(pHierarchyNode);
+
+			}
+
 		}
 	}
+
+
+	//for (_uint i = 0; i < m_iNumMeshContainers; ++i)
+	//{
+	//	//각각의 매쉬들이 영향을 받는 모든 뼈들을 순회하면서
+	//	for (_uint j = 0; j < m_pScene->mMeshes[i]->mNumBones; ++j)
+	//	{
+	//		//특정 매쉬가 영향을 받는 뼈들 중 j번째 뼈와 
+	//		//이름이 같은 뼈를 계층뼈에서 찾아서
+	//		aiBone*		pBone = m_pScene->mMeshes[i]->mBones[j];
+	//		CHierarchyNode*		pHierarchyNode = Find_HierarchyNode(pBone->mName.data);
+
+
+	//		NULL_CHECK_RETURN(pHierarchyNode, E_FAIL);
+
+	//		_float4x4		OffsetMatrix;
+	//		memcpy(&OffsetMatrix, &pBone->mOffsetMatrix, sizeof(_float4x4));
+
+	//		//계층뼈에 오프셋 매트릭스를 저장하자
+	//		pHierarchyNode->Set_OffsetMatrix(OffsetMatrix);
+	//	}
+	//}
 
 
 
@@ -304,8 +387,12 @@ HRESULT CModel::Ready_Animation()
 			//해당 애니메이션에서 영향을 받는 j번째 뼈의 정보를 이용해서
 			aiNodeAnim*	pAIChannel = paiAnimation->mChannels[j];
 
+			//해당 뼈와 같은 이름의 하이어러키 노드를 찾아서
+			CHierarchyNode*		pHierarchyNode = Find_HierarchyNode(pAIChannel->mNodeName.data);
+			NULL_CHECK_RETURN(pHierarchyNode, E_FAIL);
+
 			//해당 뼈를 만든다
-			CClipBone* pClipBone = CClipBone::Create(pAIChannel->mNodeName.data);
+			CClipBone* pClipBone = CClipBone::Create(pAIChannel->mNodeName.data, pHierarchyNode);
 			NULL_CHECK_RETURN(pClipBone,E_FAIL);
 
 			//해당 뼈의 최대 키프래임(해당 뼈가 애니메이션 재생도중 움직여야하는 정보)을 구해서
