@@ -68,6 +68,10 @@ _int CPlayer::LateUpdate(_double fDeltaTime)
 	
 	FAILED_CHECK(Set_Camera_On_Player(fDeltaTime));
 
+
+
+	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime));
+
 	if (g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS)))
 		FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this));
 
@@ -104,7 +108,7 @@ _int CPlayer::Render()
 		for (_uint j = 0; j < AI_TEXTURE_TYPE_MAX; j++)
 			FAILED_CHECK(m_pModel->Bind_OnShader(m_pShaderCom, i, j, MODLETEXTYPE(j)));
 
-		FAILED_CHECK(m_pModel->Render(m_pShaderCom, 2, i));
+		FAILED_CHECK(m_pModel->Render(m_pShaderCom, 0, i, "g_BoneMatrices"));
 	}
 	//FAILED_CHECK(m_pVIBufferCom->Render(m_pShaderCom, 0));
 
@@ -134,12 +138,14 @@ HRESULT CPlayer::SetUp_Components()
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Renderer), TAG_COM(Com_Renderer), (CComponent**)&m_pRendererCom));
 
-	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Shader_VNAM), TAG_COM(Com_Shader), (CComponent**)&m_pShaderCom));
+	//FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Shader_VNAM), TAG_COM(Com_Shader), (CComponent**)&m_pShaderCom));
+	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Shader_VAM), TAG_COM(Com_Shader), (CComponent**)&m_pShaderCom));
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Mesh_Player), TAG_COM(Com_Model), (CComponent**)&m_pModel));
+	FAILED_CHECK(m_pModel->Change_AnimIndex(0));
 
-	//FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Texture_SkyBox), TAG_COM(Com_Texture), (CComponent**)&m_pTextureCom));
 
+	
 
 	CTransform::TRANSFORMDESC tDesc = {};
 

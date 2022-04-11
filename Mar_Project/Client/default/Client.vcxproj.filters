@@ -327,6 +327,9 @@
     <ClInclude Include="..\public\GrenadeBullet.h">
       <Filter>01.GameObject\08.Weapon\99.Bullet\GrenadeBullet</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Executor.h">
+      <Filter>01.GameObject\03.Monster\05.Executor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -445,6 +448,9 @@
     </ClCompile>
     <ClCompile Include="..\private\GrenadeBullet.cpp">
       <Filter>01.GameObject\08.Weapon\99.Bullet\GrenadeBullet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Executor.cpp">
+      <Filter>01.GameObject\03.Monster\05.Executor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

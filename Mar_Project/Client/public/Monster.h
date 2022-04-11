@@ -6,7 +6,7 @@ BEGIN(Client)
 class CMonster abstract : public CGameObject
 {
 
-private:
+protected:
 	CMonster(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	CMonster(const CMonster& rhs);
 	virtual ~CMonster() = default;
