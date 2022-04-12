@@ -183,6 +183,10 @@
     <ClInclude Include="..\public\Client_Enum.h" />
     <ClInclude Include="..\public\Client_Macro.h" />
     <ClInclude Include="..\public\Client_Struct.h" />
+    <ClInclude Include="..\public\Grunt.h" />
+    <ClInclude Include="..\public\WaspArrow.h" />
+    <ClInclude Include="..\public\WaspInk.h" />
+    <ClInclude Include="..\public\Eyepot.h" />
     <ClInclude Include="..\public\Executor.h" />
     <ClInclude Include="..\public\ImguiMgr.h" />
     <ClInclude Include="..\public\HiddenPad.h" />
@@ -220,6 +224,10 @@
     <ClCompile Include="..\private\Bullet.cpp" />
     <ClCompile Include="..\private\Camera_Editor.cpp" />
     <ClCompile Include="..\private\Camera_Main.cpp" />
+    <ClCompile Include="..\private\Grunt.cpp" />
+    <ClCompile Include="..\private\WaspArrow.cpp" />
+    <ClCompile Include="..\private\WaspInk.cpp" />
+    <ClCompile Include="..\private\Eyepot.cpp" />
     <ClCompile Include="..\private\Executor.cpp" />
     <ClCompile Include="..\private\ImguiMgr.cpp" />
     <ClCompile Include="..\private\HiddenPad.cpp" />

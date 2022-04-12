@@ -1,19 +1,19 @@
 #include "stdafx.h"
-#include "..\public\Executor.h"
+#include "..\public\Grunt.h"
 
 
 
-CExecutor::CExecutor(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
+CGrunt::CGrunt(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
 	:CMonster(pDevice,pDeviceContext)
 {
 }
 
-CExecutor::CExecutor(const CExecutor & rhs)
+CGrunt::CGrunt(const CGrunt & rhs)
 	: CMonster(rhs)
 {
 }
 
-HRESULT CExecutor::Initialize_Prototype(void * pArg)
+HRESULT CGrunt::Initialize_Prototype(void * pArg)
 {
 	FAILED_CHECK(__super::Initialize_Prototype(pArg));
 
@@ -21,7 +21,7 @@ HRESULT CExecutor::Initialize_Prototype(void * pArg)
 	return S_OK;
 }
 
-HRESULT CExecutor::Initialize_Clone(void * pArg)
+HRESULT CGrunt::Initialize_Clone(void * pArg)
 {
 	FAILED_CHECK(__super::Initialize_Clone(pArg));
 
@@ -29,17 +29,15 @@ HRESULT CExecutor::Initialize_Clone(void * pArg)
 
 	if (pArg != nullptr)
 		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, *((_float3*)pArg));
-
-
 	return S_OK;
 }
 
-_int CExecutor::Update(_double fDeltaTime)
+_int CGrunt::Update(_double fDeltaTime)
 {
 	return _int();
 }
 
-_int CExecutor::LateUpdate(_double fDeltaTime)
+_int CGrunt::LateUpdate(_double fDeltaTime)
 {
 
 
@@ -52,7 +50,7 @@ _int CExecutor::LateUpdate(_double fDeltaTime)
 	return _int();
 }
 
-_int CExecutor::Render()
+_int CGrunt::Render()
 {
 	if (__super::Render() < 0)
 		return -1;
@@ -81,22 +79,21 @@ _int CExecutor::Render()
 	}
 
 	return _int();
-	return _int();
 }
 
-_int CExecutor::LateRender()
+_int CGrunt::LateRender()
 {
 	return _int();
 }
 
-HRESULT CExecutor::SetUp_Components()
+HRESULT CGrunt::SetUp_Components()
 {
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Renderer), TAG_COM(Com_Renderer), (CComponent**)&m_pRendererCom));
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Shader_VAM), TAG_COM(Com_Shader), (CComponent**)&m_pShaderCom));
 
-	FAILED_CHECK(Add_Component(m_eNowSceneNum, TAG_CP(Prototype_Mesh_Executor), TAG_COM(Com_Model), (CComponent**)&m_pModel));
+	FAILED_CHECK(Add_Component(m_eNowSceneNum, TAG_CP(Prototype_Mesh_Grunt), TAG_COM(Com_Model), (CComponent**)&m_pModel));
 	FAILED_CHECK(m_pModel->Change_AnimIndex(0));
 
 
@@ -115,31 +112,31 @@ HRESULT CExecutor::SetUp_Components()
 	return S_OK;
 }
 
-CExecutor * CExecutor::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, void * pArg)
+CGrunt * CGrunt::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, void * pArg)
 {
-	CExecutor*	pInstance = new CExecutor(pDevice, pDeviceContext);
+	CGrunt*	pInstance = new CGrunt(pDevice, pDeviceContext);
 
 	if (FAILED(pInstance->Initialize_Prototype(pArg)))
 	{
-		MSGBOX("Failed to Created CExecutor");
+		MSGBOX("Failed to Created CGrunt");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-CGameObject * CExecutor::Clone(void * pArg)
+CGameObject * CGrunt::Clone(void * pArg)
 {
-	CExecutor*	pInstance = new CExecutor(*this);
+	CGrunt*	pInstance = new CGrunt(*this);
 
 	if (FAILED(pInstance->Initialize_Clone(pArg)))
 	{
-		MSGBOX("Failed to Created CExecutor");
+		MSGBOX("Failed to Created CGrunt");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-void CExecutor::Free()
+void CGrunt::Free()
 {
 	__super::Free();
 

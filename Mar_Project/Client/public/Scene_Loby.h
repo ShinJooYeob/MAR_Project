@@ -33,6 +33,13 @@ private:
 
 	HRESULT Ready_Layer_StaticMapObj(const _tchar* pLayerTag);
 
+	HRESULT Ready_Layer_Executor(const _tchar* pLayerTag);
+	HRESULT Ready_Layer_Eyepot(const _tchar* pLayerTag);
+	HRESULT Ready_Layer_Grunt(const _tchar* pLayerTag);
+	HRESULT Ready_Layer_WaspArrow(const _tchar* pLayerTag);
+	HRESULT Ready_Layer_WaspInk(const _tchar* pLayerTag);
+
+
 
 private:
 	class CCamera_Main*				m_pMainCam = nullptr;

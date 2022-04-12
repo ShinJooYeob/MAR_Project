@@ -330,6 +330,18 @@
     <ClInclude Include="..\public\Executor.h">
       <Filter>01.GameObject\03.Monster\05.Executor</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Eyepot.h">
+      <Filter>01.GameObject\03.Monster\04.Eyepot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\WaspInk.h">
+      <Filter>01.GameObject\03.Monster\03.WaspInk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\WaspArrow.h">
+      <Filter>01.GameObject\03.Monster\02.WaspArrow</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Grunt.h">
+      <Filter>01.GameObject\03.Monster\01.Grunt</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -451,6 +463,18 @@
     </ClCompile>
     <ClCompile Include="..\private\Executor.cpp">
       <Filter>01.GameObject\03.Monster\05.Executor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Eyepot.cpp">
+      <Filter>01.GameObject\03.Monster\04.Eyepot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\WaspInk.cpp">
+      <Filter>01.GameObject\03.Monster\03.WaspInk</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\WaspArrow.cpp">
+      <Filter>01.GameObject\03.Monster\02.WaspArrow</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Grunt.cpp">
+      <Filter>01.GameObject\03.Monster\01.Grunt</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

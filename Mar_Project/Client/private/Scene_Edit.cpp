@@ -1928,6 +1928,16 @@ HRESULT CScene_Edit::Update_UITab(_double fDeltatime)
 	return S_OK;
 }
 
+HRESULT CScene_Edit::Widget_BatchTexture(_double fDeltatime)
+{
+	return E_NOTIMPL;
+}
+
+HRESULT CScene_Edit::Widget_DeleteBatchedTexture(_double fDeltatime)
+{
+	return E_NOTIMPL;
+}
+
 
 #pragma endregion UITab
 

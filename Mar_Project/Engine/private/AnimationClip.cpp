@@ -16,7 +16,7 @@ HRESULT CAnimationClip::Initialize_AnimationClip(const char * pName, _double Dur
 	return S_OK;
 }
 
-HRESULT CAnimationClip::Update_TransformMatrices_byClipBones(_double TimeDelta)
+HRESULT CAnimationClip::Update_TransformMatrices_byClipBones(_bool* bIsFinished,_double TimeDelta)
 {
 	/* 현재 내 애니메이션이 진행 정도. */
 	m_PlayTimeAcc += m_UpdatePerSecond * TimeDelta;
@@ -28,7 +28,7 @@ HRESULT CAnimationClip::Update_TransformMatrices_byClipBones(_double TimeDelta)
 		for (_uint i = 0 ; i <m_iNumClipBones ;++ i)
 			m_vecClipBones[i]->Set_CurrentKeyFrame(0);
 		
-		m_bIsFinished = true;
+		*bIsFinished = m_bIsFinished = true;
 	}
 
 

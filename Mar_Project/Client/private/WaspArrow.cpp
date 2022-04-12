@@ -1,19 +1,19 @@
 #include "stdafx.h"
-#include "..\public\Executor.h"
+#include "..\public\WaspArrow.h"
 
 
 
-CExecutor::CExecutor(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
+CWaspArrow::CWaspArrow(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
 	:CMonster(pDevice,pDeviceContext)
 {
 }
 
-CExecutor::CExecutor(const CExecutor & rhs)
+CWaspArrow::CWaspArrow(const CWaspArrow & rhs)
 	: CMonster(rhs)
 {
 }
 
-HRESULT CExecutor::Initialize_Prototype(void * pArg)
+HRESULT CWaspArrow::Initialize_Prototype(void * pArg)
 {
 	FAILED_CHECK(__super::Initialize_Prototype(pArg));
 
@@ -21,7 +21,7 @@ HRESULT CExecutor::Initialize_Prototype(void * pArg)
 	return S_OK;
 }
 
-HRESULT CExecutor::Initialize_Clone(void * pArg)
+HRESULT CWaspArrow::Initialize_Clone(void * pArg)
 {
 	FAILED_CHECK(__super::Initialize_Clone(pArg));
 
@@ -30,16 +30,15 @@ HRESULT CExecutor::Initialize_Clone(void * pArg)
 	if (pArg != nullptr)
 		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, *((_float3*)pArg));
 
-
 	return S_OK;
 }
 
-_int CExecutor::Update(_double fDeltaTime)
+_int CWaspArrow::Update(_double fDeltaTime)
 {
 	return _int();
 }
 
-_int CExecutor::LateUpdate(_double fDeltaTime)
+_int CWaspArrow::LateUpdate(_double fDeltaTime)
 {
 
 
@@ -52,7 +51,7 @@ _int CExecutor::LateUpdate(_double fDeltaTime)
 	return _int();
 }
 
-_int CExecutor::Render()
+_int CWaspArrow::Render()
 {
 	if (__super::Render() < 0)
 		return -1;
@@ -79,24 +78,22 @@ _int CExecutor::Render()
 
 		FAILED_CHECK(m_pModel->Render(m_pShaderCom, 0, i, "g_BoneMatrices"));
 	}
-
-	return _int();
 	return _int();
 }
 
-_int CExecutor::LateRender()
+_int CWaspArrow::LateRender()
 {
 	return _int();
 }
 
-HRESULT CExecutor::SetUp_Components()
+HRESULT CWaspArrow::SetUp_Components()
 {
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Renderer), TAG_COM(Com_Renderer), (CComponent**)&m_pRendererCom));
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Shader_VAM), TAG_COM(Com_Shader), (CComponent**)&m_pShaderCom));
 
-	FAILED_CHECK(Add_Component(m_eNowSceneNum, TAG_CP(Prototype_Mesh_Executor), TAG_COM(Com_Model), (CComponent**)&m_pModel));
+	FAILED_CHECK(Add_Component(m_eNowSceneNum, TAG_CP(Prototype_Mesh_WaspArrow), TAG_COM(Com_Model), (CComponent**)&m_pModel));
 	FAILED_CHECK(m_pModel->Change_AnimIndex(0));
 
 
@@ -111,35 +108,36 @@ HRESULT CExecutor::SetUp_Components()
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Transform), TAG_COM(Com_Transform), (CComponent**)&m_pTransformCom, &tDesc));
 
+	m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, _float3(0, 5.f, 0));
 
 	return S_OK;
 }
 
-CExecutor * CExecutor::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, void * pArg)
+CWaspArrow * CWaspArrow::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, void * pArg)
 {
-	CExecutor*	pInstance = new CExecutor(pDevice, pDeviceContext);
+	CWaspArrow*	pInstance = new CWaspArrow(pDevice, pDeviceContext);
 
 	if (FAILED(pInstance->Initialize_Prototype(pArg)))
 	{
-		MSGBOX("Failed to Created CExecutor");
+		MSGBOX("Failed to Created CWaspArrow");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-CGameObject * CExecutor::Clone(void * pArg)
+CGameObject * CWaspArrow::Clone(void * pArg)
 {
-	CExecutor*	pInstance = new CExecutor(*this);
+	CWaspArrow*	pInstance = new CWaspArrow(*this);
 
 	if (FAILED(pInstance->Initialize_Clone(pArg)))
 	{
-		MSGBOX("Failed to Created CExecutor");
+		MSGBOX("Failed to Created CWaspArrow");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-void CExecutor::Free()
+void CWaspArrow::Free()
 {
 	__super::Free();
 

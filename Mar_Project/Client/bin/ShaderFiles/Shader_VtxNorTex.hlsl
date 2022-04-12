@@ -114,7 +114,7 @@ PS_OUT PS_MAIN_TERRAIN_DIRECTIONAL(PS_IN In)
 		vector	vDestMtrlDiffuse4 = g_DestDiffuseTexture4.Sample(DefaultSampler, In.vTexUV * g_fMimMapSize);
 
 
-		vector	vFilterColor = g_FilterTexture.Sample(PointSampler, In.vTexUV);
+		vector	vFilterColor = g_FilterTexture.Sample(DefaultSampler, In.vTexUV);
 
 
 		vector	vMtrlDiffuse = vSourMtrlDiffuse * (1.f - vFilterColor.a) + vDestMtrlDiffuse1 * (vFilterColor.a);
@@ -210,7 +210,7 @@ PS_OUT PS_MAIN_TERRAIN_EDIT(PS_IN In)
 
 		//vector	vBrushColor = g_BrushTexture.Sample(DefaultSampler, In.vTexUV);	
 		vector	vBrushColor = (vector)0.f;
-		vector	vFilterColor = g_FilterTexture.Sample(PointSampler, In.vTexUV);
+		vector	vFilterColor = g_FilterTexture.Sample(DefaultSampler, In.vTexUV);
 
 		if (g_vBrushPos.x - g_fRadius < In.vWorldPos.x && In.vWorldPos.x <= g_vBrushPos.x + g_fRadius &&
 			g_vBrushPos.z - g_fRadius < In.vWorldPos.z && In.vWorldPos.z <= g_vBrushPos.z + g_fRadius)
@@ -254,7 +254,7 @@ technique11		DefaultTechnique
 	pass Terrain_DirectionalLight // 0
 	{
 		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff); 
-			SetDepthStencilState(ZTestAndWriteState, 0);
+		SetDepthStencilState(ZTestAndWriteState, 0);
 		SetRasterizerState(CullMode_ccw);
 
 		VertexShader = compile vs_5_0 VS_MAIN_TERRAIN();

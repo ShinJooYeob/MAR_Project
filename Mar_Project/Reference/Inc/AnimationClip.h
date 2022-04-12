@@ -19,7 +19,7 @@ public:
 
 public:
 	HRESULT Initialize_AnimationClip(const char* pName, _double Duration, _double UpdatePerSecond);
-	HRESULT Update_TransformMatrices_byClipBones(_double TimeDelta);
+	HRESULT Update_TransformMatrices_byClipBones(_bool* bIsFinished,_double TimeDelta);
 
 
 private:

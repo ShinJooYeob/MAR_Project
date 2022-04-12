@@ -15,12 +15,16 @@ private:
 	virtual ~CModel() = default;
 
 public:
-	virtual HRESULT Initialize_Prototype(MODELTYPE eModelType, const char * pModelFilePath, const char * pModelFileName, _fMatrix DefaultPivotMatrix);
+	virtual HRESULT Initialize_Prototype(MODELTYPE eModelType, const char * pModelFilePath, const char * pModelFileName, _fMatrix DefaultPivotMatrix, _uint iAnimCount);
 	virtual HRESULT Initialize_Clone(void* pArg)override;
 
 
 public:
 	HRESULT Change_AnimIndex(_uint iAnimIndex);
+	HRESULT Change_AnimIndex_Wait(_uint iAnimIndex);
+	HRESULT Change_AnimIndex_ReturnTo(_uint iAnimIndex, _uint iReturnIndex);
+	HRESULT Change_AnimIndex_ReturnToWait(_uint iAnimIndex, _uint iReturnIndex);
+
 	HRESULT Bind_OnShader(class CShader* pShader, _uint iMaterialIndex , _uint eTextureType, const char* pHlslConstValueName);
 	HRESULT Update_AnimationClip(_double fDeltaTime);	
 	HRESULT Render(class CShader* pShader, _uint iPassIndex, _uint iMaterialIndex, const char* szBoneValueName = nullptr);
@@ -62,13 +66,14 @@ private:
 	HRESULT Ready_MeshContainers(_fMatrix TransformMatrix);
 	HRESULT Ready_Materials(const char* pModelFilePath);
 	HRESULT Ready_Animation();
+	HRESULT Ready_MoreAnimation(const char* szFileFullPath, _uint iAnimCount, _uint iFlag = 0);
 
 private:
 	CHierarchyNode* Find_HierarchyNode(const char* pName);
 
 public:
 	static CModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext,
-		MODELTYPE eModelType, const char* pModelFilePath, const char* pModelFileName, _fMatrix TransformMatrix = XMMatrixIdentity());
+		MODELTYPE eModelType, const char* pModelFilePath, const char* pModelFileName,_fMatrix TransformMatrix = XMMatrixIdentity(), _uint iAnimCount = 1);
 	virtual CComponent* Clone(void* pArg) override;
 	virtual void Free() override;
 };

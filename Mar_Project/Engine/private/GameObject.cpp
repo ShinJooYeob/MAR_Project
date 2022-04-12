@@ -20,6 +20,7 @@ CGameObject::CGameObject(const CGameObject & rhs)
 {
 	Safe_AddRef(m_pDevice);
 	Safe_AddRef(m_pDeviceContext);
+	m_eNowSceneNum = GetSingle(CGameInstance)->Get_TargetSceneNum();
 }
 
 HRESULT CGameObject::Initialize_Prototype(void * pArg)
@@ -29,7 +30,6 @@ HRESULT CGameObject::Initialize_Prototype(void * pArg)
 
 HRESULT CGameObject::Initialize_Clone(void * pArg)
 {
-	m_eNowSceneNum = GetSingle(CGameInstance)->Get_TargetSceneNum();
 	return S_OK;
 }
 

@@ -117,6 +117,12 @@ private:
 	HRESULT Update_UITab(_double fDeltatime);
 
 
+	HRESULT Widget_BatchTexture(_double fDeltatime);
+	HRESULT Widget_DeleteBatchedTexture(_double fDeltatime);
+
+
+	vector<_float2>		m_vecBatchedUI;
+
 #pragma endregion UITab
 
 #pragma region ParticleTab

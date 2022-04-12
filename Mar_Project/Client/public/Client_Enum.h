@@ -24,6 +24,12 @@ enum OBJECTPROTOTYPEID
 	Prototype_SkyBox,
 	Prototype_Player,
 
+	Prototype_Executor,
+	Prototype_Grunt,
+	Prototype_Eyepot,
+	Prototype_WaspArrow,
+	Prototype_WaspInk,
+
 
 	Prototype_Camera_Main,
 	Prototype_Camera_Editor,
@@ -98,6 +104,26 @@ static const _tchar* Tag_Object_Prototype(OBJECTPROTOTYPEID eTag)
 	case Prototype_Player:
 		return TEXT("Player");
 		break;
+
+
+	case Prototype_Executor:
+		return TEXT("Prototype_Executor");
+		break;
+	case Prototype_Grunt:
+		return TEXT("Prototype_Grunt");
+		break;
+	case Prototype_Eyepot:
+		return TEXT("Prototype_Eyepot");
+		break;
+	case Prototype_WaspArrow:
+		return TEXT("Prototype_WaspArrow");
+		break;
+	case Prototype_WaspInk:
+		return TEXT("Prototype_WaspInk");
+		break;
+
+
+
 
 	case Prototype_JumpPad:
 		return TEXT("JumpPad");
@@ -210,6 +236,8 @@ enum LAYERID
 	Layer_Player,
 	Layer_Bullet,
 
+	Layer_Monster,
+
 	Layer_Terrain,
 	Layer_WireTerrain,
 
@@ -253,8 +281,10 @@ static const _tchar* Tag_Layer(LAYERID eTag)
 	case Layer_WireTerrain:
 		return TEXT("Layer_WireTerrain");
 		break;
-
 		
+	case Layer_Monster:
+		return TEXT("Layer_Monster");
+		break;
 	case Layer_Player:
 		return TEXT("Layer_Player");
 		break;

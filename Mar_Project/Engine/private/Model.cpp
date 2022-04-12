@@ -41,7 +41,7 @@ CModel::CModel(const CModel & rhs)
 	Safe_AddRef(m_MeshMaterialDesc.pTexture);
 }
 
-HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, const char * pModelFilePath, const char * pModelFileName, _fMatrix DefaultPivotMatrix)
+HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, const char * pModelFilePath, const char * pModelFileName, _fMatrix DefaultPivotMatrix, _uint iAnimCount)
 {
 	FAILED_CHECK(__super::Initialize_Prototype(nullptr));
 
@@ -107,6 +107,15 @@ HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, const char * pModelFi
 		FAILED_CHECK(Ready_OffsetMatrices());
 
 		FAILED_CHECK(Ready_Animation());
+
+		if (iAnimCount != 1)
+			FAILED_CHECK(Ready_MoreAnimation(szFullPath, iAnimCount, iFlag));
+
+		string ttszLog = "Num AnimationClip: " + to_string(m_iNumAnimationClip) + "\n";
+		wstring ttDebugLog;
+		ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+
+		OutputDebugStringW(ttDebugLog.c_str());
 	}
 	
 	return S_OK;
@@ -126,6 +135,30 @@ HRESULT CModel::Change_AnimIndex(_uint iAnimIndex)
 		return E_FAIL;
 
 	m_iCurrentAnimIndex = iAnimIndex;
+
+	return S_OK;
+}
+
+HRESULT CModel::Change_AnimIndex_Wait(_uint iAnimIndex)
+{
+	if (iAnimIndex >= m_iNumAnimationClip)
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CModel::Change_AnimIndex_ReturnTo(_uint iAnimIndex, _uint iReturnIndex)
+{
+	if (iAnimIndex >= m_iNumAnimationClip|| iReturnIndex >= m_iNumAnimationClip)
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CModel::Change_AnimIndex_ReturnToWait(_uint iAnimIndex, _uint iReturnIndex)
+{
+	if (iAnimIndex >= m_iNumAnimationClip || iReturnIndex >= m_iNumAnimationClip)
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -154,8 +187,16 @@ HRESULT CModel::Bind_OnShader(CShader * pShader, _uint iMaterialIndex, _uint eTe
 
 HRESULT CModel::Update_AnimationClip(_double fDeltaTime)
 {
+
+	_bool TestBool = false;
 	//해당 애니메이션을 따라서 트렌스폼매트릭스를 갱신해주고
-	FAILED_CHECK(m_vecAnimator[m_iCurrentAnimIndex]->Update_TransformMatrices_byClipBones(fDeltaTime));
+	FAILED_CHECK(m_vecAnimator[m_iCurrentAnimIndex]->Update_TransformMatrices_byClipBones(&TestBool,fDeltaTime));
+	if (TestBool)
+	{
+		m_iCurrentAnimIndex++;
+		if (m_iCurrentAnimIndex >= m_iNumAnimationClip)
+			m_iCurrentAnimIndex = 0;
+	}
 
 	//갱신된 매트릭스를 따라서 컴바인드 메트릭스를 업데이트 해준다.
 	for (auto& pHierarchyNode : m_vecHierarchyNode)
@@ -456,6 +497,126 @@ HRESULT CModel::Ready_Animation()
 	return S_OK;
 }
 
+HRESULT CModel::Ready_MoreAnimation(const char * szFileFullPath, _uint iAnimCount, _uint iFlag )
+{
+	char FullPath[MAX_PATH] = "";
+
+	strcpy_s(FullPath, string(szFileFullPath).substr(0,strlen(szFileFullPath) - 4).c_str());
+
+
+	for (_uint AnimIndex = 0; AnimIndex< iAnimCount - 1; AnimIndex++)
+	{
+		char LoopFileFullPath[MAX_PATH] = "";
+		char LoopFilePath[MAX_PATH] = "";
+		sprintf_s(LoopFilePath, "_%d.FBX", AnimIndex);
+
+		strcpy_s(LoopFileFullPath, FullPath);
+		strcat_s(LoopFileFullPath, LoopFilePath);
+
+
+		const aiScene*				pScene = nullptr;
+		Importer				Importer;
+
+		pScene = Importer.ReadFile(LoopFileFullPath, iFlag);
+
+
+		NULL_CHECK_RETURN(pScene, E_FAIL);
+
+		//해당 모델에 존자해는 총 애니메이션의 갯수
+		_uint iNumAnimClip = pScene->mNumAnimations;
+		m_iNumAnimationClip += iNumAnimClip;
+
+		//만큼 모든 애니메이션을 순회하면서
+		for (_uint i = 0; i < iNumAnimClip; i++)
+		{
+			//해당 모델에 존재하는 i번째 애니메이션
+			aiAnimation* paiAnimation = pScene->mAnimations[i];
+
+			//을 가지고 애니메이션 클립을 하나 만든다
+			CAnimationClip* pAinmationClip = CAnimationClip::Create(paiAnimation->mName.data, paiAnimation->mDuration, paiAnimation->mTicksPerSecond);
+			NULL_CHECK_RETURN(pAinmationClip, E_FAIL);
+
+			//만든 애니메이션 클립에 애니메이션 뼈 개수만큼 공간을 확보하고
+			pAinmationClip->Reserve(paiAnimation->mNumChannels);
+
+
+			for (_uint j = 0; j < paiAnimation->mNumChannels; j++)
+			{
+				//해당 애니메이션에서 영향을 받는 j번째 뼈의 정보를 이용해서
+				aiNodeAnim*	pAIChannel = paiAnimation->mChannels[j];
+
+				//해당 뼈와 같은 이름의 하이어러키 노드를 찾아서
+				CHierarchyNode*		pHierarchyNode = Find_HierarchyNode(pAIChannel->mNodeName.data);
+				NULL_CHECK_RETURN(pHierarchyNode, E_FAIL);
+
+				//해당 뼈를 만든다
+				CClipBone* pClipBone = CClipBone::Create(pAIChannel->mNodeName.data, pHierarchyNode);
+				NULL_CHECK_RETURN(pClipBone, E_FAIL);
+
+				//해당 뼈의 최대 키프래임(해당 뼈가 애니메이션 재생도중 움직여야하는 정보)을 구해서
+				_uint		iNumKeyFrames = max(pAIChannel->mNumScalingKeys, pAIChannel->mNumRotationKeys);
+				iNumKeyFrames = max(iNumKeyFrames, pAIChannel->mNumPositionKeys);
+
+				//해당 뼈에게 키프레임 공간을 확보해놓고
+				pClipBone->Reserve(iNumKeyFrames);
+
+				//없는 프레임을 이전 프레임으로 채워주기 위한 변수
+				//ex 총 5프레임중 3프레임밖에 없는 애니메이션을 위해 이전 프레임을 저장하는 용도
+				_float3		vScale;
+				_float4		vRotation;
+				_float3		vPosition;
+				_double		Time;
+
+				//모든 키프레임을 순회하면서
+				for (_uint k = 0; k < iNumKeyFrames; k++)
+				{
+					//키프레임을 생성한다
+					KEYFRAME*			pKeyFrame = new KEYFRAME;
+					ZeroMemory(pKeyFrame, sizeof(KEYFRAME));
+
+
+					//없는 프레임을 이전 프레임으로 채워주기 위한 조건 검사
+					if (pAIChannel->mNumScalingKeys > k)
+					{
+						vScale = _float3(pAIChannel->mScalingKeys[k].mValue);
+						Time = pAIChannel->mScalingKeys[k].mTime;
+					}
+					if (pAIChannel->mNumRotationKeys > k)
+					{
+						vRotation = _float4(pAIChannel->mRotationKeys[k].mValue);
+						Time = pAIChannel->mRotationKeys[k].mTime;
+					}
+					if (pAIChannel->mNumPositionKeys > k)
+					{
+						vPosition = _float3(pAIChannel->mPositionKeys[k].mValue);
+						Time = pAIChannel->mPositionKeys[k].mTime;
+					}
+
+					//조건 검사를 마친 값들을 생성한 키프레임에 넣어주고
+					pKeyFrame->vScale = vScale;
+					pKeyFrame->vRotation = vRotation;
+					pKeyFrame->vPosition = vPosition;
+					pKeyFrame->Time = Time;
+
+					//키프레임을 만들었으면 뼈에 해당 키프레임(움직임)을 넣어준다
+					pClipBone->Add_KeyFrame(pKeyFrame);
+				}
+
+				//키프레임까지 다 채워진 뼈가 생성되었으면 해당 뼈를 애니메이션 클립에 넣어주고
+				pAinmationClip->Add_ClipBone(pClipBone);
+			}
+
+			//움직여야할 뼈에 대한 정보를 모두 다 저장한 애니메이션은 에니메이터에 넣어준다.
+			m_vecAnimator.push_back(pAinmationClip);
+		}
+
+
+		Importer.FreeScene();
+	}
+
+	return S_OK;
+}
+
 CHierarchyNode * CModel::Find_HierarchyNode(const char * pName)
 {
 	auto	iter = find_if(m_vecHierarchyNode.begin(), m_vecHierarchyNode.end(), [&](CHierarchyNode* pNode)
@@ -469,11 +630,11 @@ CHierarchyNode * CModel::Find_HierarchyNode(const char * pName)
 	return *iter;
 }
 
-CModel * CModel::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, MODELTYPE eModelType, const char * pModelFilePath, const char * pModelFileName, _fMatrix TransformMatrix)
+CModel * CModel::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, MODELTYPE eModelType, const char * pModelFilePath, const char * pModelFileName, _fMatrix TransformMatrix, _uint iAnimCount)
 {
 	CModel*	pInstance = new CModel(pDevice, pDeviceContext);
 
-	if (FAILED(pInstance->Initialize_Prototype(eModelType, pModelFilePath, pModelFileName, TransformMatrix)))
+	if (FAILED(pInstance->Initialize_Prototype(eModelType, pModelFilePath, pModelFileName, TransformMatrix, iAnimCount)))
 	{
 		MSGBOX("Failed to Created CModel");
 		Safe_Release(pInstance);
