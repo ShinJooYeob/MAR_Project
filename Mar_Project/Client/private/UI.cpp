@@ -84,7 +84,7 @@ HRESULT CUI::Bind_Transform_OnShader(CShader * pShader, const char * pValueName)
 
 
 
-UIDESC CUI::Convert_UI_To_Rect(FLOATRECT tRect)
+UIDESC CUI::Convert_Rect_To_UI(FLOATRECT tRect)
 {
 	UIDESC Result;
 
@@ -96,7 +96,7 @@ UIDESC CUI::Convert_UI_To_Rect(FLOATRECT tRect)
 	return Result;
 }
 
-FLOATRECT CUI::Convert_Rect_To_UI(UIDESC tUIDesc)
+FLOATRECT CUI::Convert_UI_To_Rect(UIDESC tUIDesc)
 {
 	FLOATRECT Result;
 
@@ -120,6 +120,9 @@ HRESULT CUI::Apply_UIDesc_To_Transform()
 
 	m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, _float3(m_UIDesc.fX - g_iWinCX * 0.5f, -m_UIDesc.fY + g_iWinCY * 0.5f, 0.f));
 
+	if (m_fAngle != 0)
+		m_pTransformCom->Rotation_CW(XMVectorSet(0, 1, 0, 0), XMConvertToRadians(m_fAngle));
+
 	return S_OK;
 }
 
@@ -138,6 +141,9 @@ HRESULT CUI::Apply_Rect_To_Transform()
 		_float3((m_UIRect.right + m_UIRect.left) * 0.5f - g_iWinCX * 0.5f,
 			-(m_UIRect.bottom + m_UIRect.top) * 0.5f + g_iWinCY * 0.5f, 0.f));
 
+
+	if (m_fAngle != 0)
+		m_pTransformCom->Rotation_CCW(XMVectorSet(0, 0, 1, 0), XMConvertToRadians(m_fAngle));
 	return S_OK;
 }
 

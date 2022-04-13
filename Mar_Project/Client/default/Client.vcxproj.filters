@@ -342,6 +342,9 @@
     <ClInclude Include="..\public\Grunt.h">
       <Filter>01.GameObject\03.Monster\01.Grunt</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\RendererEditSceneUI.h">
+      <Filter>01.GameObject\96.EditorSceneObj</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -475,6 +478,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Grunt.cpp">
       <Filter>01.GameObject\03.Monster\01.Grunt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\RendererEditSceneUI.cpp">
+      <Filter>01.GameObject\96.EditorSceneObj</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

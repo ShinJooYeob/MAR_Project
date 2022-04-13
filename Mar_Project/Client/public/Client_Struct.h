@@ -85,6 +85,8 @@ typedef struct tagUIDesc
 
 }UIDESC;
 
+
+
 typedef struct tagFloatRect
 {
 	_float left = 0;
@@ -93,6 +95,17 @@ typedef struct tagFloatRect
 	_float bottom = 0;
 
 }FLOATRECT;
+
+typedef struct tagEditSceneUI {
+
+	UIDESC			UIDesc ;
+	FLOATRECT		UIRect ;
+	_bool			bIsRect = false;
+	_float			fAngle = 0;
+	_float			fDepth = 0;
+	ID3D11ShaderResourceView* SRV = nullptr;
+}EDITUI;
+
 
 // 전역화함
 static float GetRandomFloat(float lowBound, float highBound)

@@ -50,16 +50,16 @@ PS_OUT PS_MAIN_RECT(PS_IN In)
 
 	Out.vColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);//vector(1.f, 0.f, 0.f, 1.f);rgba
 
-	//if (Out.vColor.a < 0.1f)
-	//	discard; 
-
 	if (Out.vColor.a < 0.1f)
-	{
-		Out.vColor = vector(1,0,1,0);
-	}
-	else {
-		Out.vColor = vector(0, 0, 1, 1) * (In.vTexUV.x * In.vTexUV.y);
-	}
+		discard; 
+
+	//if (Out.vColor.a < 0.1f)
+	//{
+	//	Out.vColor = vector(1,0,1,0);
+	//}
+	//else {
+	//	Out.vColor = vector(0, 0, 1, 1) * (In.vTexUV.x * In.vTexUV.y);
+	//}
 
 
 	

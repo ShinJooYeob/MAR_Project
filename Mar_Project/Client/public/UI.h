@@ -30,15 +30,16 @@ public:
 
 
 	HRESULT Bind_Transform_OnShader(class CShader* pShader, const char* pValueName);
-
-	UIDESC Convert_UI_To_Rect(FLOATRECT tRect);
-	FLOATRECT Convert_Rect_To_UI(UIDESC tUIDesc);
+	
+	UIDESC Convert_Rect_To_UI(FLOATRECT tRect);
+	FLOATRECT Convert_UI_To_Rect(UIDESC tUIDesc);
 
 	HRESULT Apply_UIDesc_To_Transform();
 	HRESULT Apply_Rect_To_Transform();
 
 protected:
 	_float			m_fDepth = 0;
+	_float			m_fAngle = 0;
 	UIDESC			m_UIDesc;
 	FLOATRECT		m_UIRect;
 	_float4x4		m_ProjMatrix;

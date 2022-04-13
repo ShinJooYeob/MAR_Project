@@ -184,6 +184,7 @@
     <ClInclude Include="..\public\Client_Macro.h" />
     <ClInclude Include="..\public\Client_Struct.h" />
     <ClInclude Include="..\public\Grunt.h" />
+    <ClInclude Include="..\public\RendererEditSceneUI.h" />
     <ClInclude Include="..\public\WaspArrow.h" />
     <ClInclude Include="..\public\WaspInk.h" />
     <ClInclude Include="..\public\Eyepot.h" />
@@ -225,6 +226,7 @@
     <ClCompile Include="..\private\Camera_Editor.cpp" />
     <ClCompile Include="..\private\Camera_Main.cpp" />
     <ClCompile Include="..\private\Grunt.cpp" />
+    <ClCompile Include="..\private\RendererEditSceneUI.cpp" />
     <ClCompile Include="..\private\WaspArrow.cpp" />
     <ClCompile Include="..\private\WaspInk.cpp" />
     <ClCompile Include="..\private\Eyepot.cpp" />

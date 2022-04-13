@@ -3,6 +3,8 @@
 #include "Scene_Loading.h"
 #include "Camera_Editor.h"
 #include "WireTerrain.h"
+#include "UIImage.h"
+#include "RendererEditSceneUI.h"
 
 CScene_Edit::CScene_Edit(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
 	:CScene(pDevice, pDeviceContext)
@@ -20,7 +22,7 @@ HRESULT CScene_Edit::Initialize()
 
 	FAILED_CHECK(Ready_Layer_Player(TAG_LAY(Layer_Player)));
 	FAILED_CHECK(Ready_Layer_MainCamera(TAG_LAY(Layer_Camera_Main)));
-	//FAILED_CHECK(Ready_Layer_WireTerrain(TAG_LAY(Layer_WireTerrain)));
+	FAILED_CHECK(Ready_Layer_RendererEditUI(TAG_LAY(Layer_UI_IMG)));
 	
 	
 
@@ -98,6 +100,16 @@ _int CScene_Edit::Update(_double fDeltaTime)
 			m_pCreatedTerrain->Update(fDeltaTime);
 		break;
 	case 1:
+
+	
+			if (m_pRendererEditUI->Update(fDeltaTime) < 0)
+			{
+				__debugbreak();
+				return -1;
+			}
+
+		
+
 		break;
 	case 2:
 		break;
@@ -153,6 +165,14 @@ _int CScene_Edit::LateUpdate(_double fDeltaTime)
 			m_pCreatedTerrain->LateUpdate(fDeltaTime);
 		break;
 	case 1:
+		
+			if (m_pRendererEditUI->LateUpdate(fDeltaTime) < 0)
+			{
+				__debugbreak();
+				return -1;
+			}
+
+		
 		break;
 	case 2:
 		break;
@@ -572,6 +592,21 @@ HRESULT CScene_Edit::Load_Data(const char * szFileName, eDATATYPE iKinds)
 	break;
 	case Client::CScene_Edit::Data_UI:
 	{
+		Safe_Release(m_TargetSRV);
+
+		char szFileFath[MAX_PATH] = "";
+		strcat_s(szFileFath, szFileName);
+
+		_tchar szWidePath[MAX_PATH] = L"";
+
+		MultiByteToWideChar(CP_UTF8, 0, szFileFath, -1, szWidePath, sizeof(szWidePath));
+
+		FAILED_CHECK( LoadTextureByAssimp(szWidePath));
+
+
+		if (m_TargetSRV == nullptr)			return E_FAIL;
+
+
 
 	}
 	break;
@@ -608,7 +643,7 @@ HRESULT CScene_Edit::Load_Data(const char * szFileName, eDATATYPE iKinds)
 	{
 
 
-		m_pCreatedTerrain->Create_FilterMap_byLoad(szFileName);
+		FAILED_CHECK(m_pCreatedTerrain->Create_FilterMap_byLoad(szFileName));
 
 	}
 	break;
@@ -835,7 +870,7 @@ HRESULT CScene_Edit::Input_KeyBoard(_double fDeltaTime)
 #pragma endregion MapTab
 	}
 
-	if (m_iNowTab == 4)
+	else if (m_iNowTab == 4)
 	{
 #pragma region HeightMap
 
@@ -1015,9 +1050,136 @@ HRESULT CScene_Edit::Input_KeyBoard(_double fDeltaTime)
 
 #pragma endregion HeightMap
 	}
-#pragma region HeightMap
-#pragma endregion HeightMap
+	else if (m_iNowTab == 1)
+	{
+#pragma region UITOOL
 
+		if (pInstance->Get_DIKeyState(DIK_TAB) & DIS_Down) m_bIsRect = !m_bIsRect;
+
+		
+			if (pInstance->Get_DIKeyState(DIK_LSHIFT) & DIS_Press)
+			{
+				if (!m_bIsRect)
+				{
+					if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_LBUTTON) & DIS_Press)
+					{
+
+						POINT ptMouse;
+						GetCursorPos(&ptMouse);
+						ScreenToClient(g_hWnd, &ptMouse);
+
+						m_fUIDesc.fX = _float(ptMouse.x);
+						m_fUIDesc.fY = _float(ptMouse.y);
+					}
+
+
+					static bool bIsY = false;
+
+					if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_WHEEL) & DIS_Down)
+						bIsY = !bIsY;
+
+					_long fWheelMove = pInstance->Get_DIMouseMoveState(CInput_Device::MMS_WHEEL);
+
+					if (fWheelMove)
+					{
+						if (bIsY)
+							m_fUIDesc.fCY += _float(fWheelMove *0.21f * fDeltaTime);
+						else
+							m_fUIDesc.fCX += _float(fWheelMove *0.21f * fDeltaTime);
+
+
+					}
+
+				}
+				else
+				{
+					if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_LBUTTON) & DIS_Down)
+					{
+
+						POINT ptMouse;
+						GetCursorPos(&ptMouse);
+						ScreenToClient(g_hWnd, &ptMouse);
+
+						m_fUIRect.left = _float(ptMouse.x);
+						m_fUIRect.top = _float(ptMouse.y);
+					}
+					if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_LBUTTON) & DIS_Press)
+					{
+
+						POINT ptMouse;
+						GetCursorPos(&ptMouse);
+						ScreenToClient(g_hWnd, &ptMouse);
+
+						m_fUIRect.right = _float(ptMouse.x);
+						m_fUIRect.bottom = _float(ptMouse.y);
+					}
+
+				}
+			}
+		
+			if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_RBUTTON) & DIS_Down)
+			{
+
+				POINT ptMouse;
+				GetCursorPos(&ptMouse);
+				ScreenToClient(g_hWnd, &ptMouse);
+				m_bModifyBatchedUI = false;
+
+				for (_uint i = 0 ; i < m_vecBatchedUI.size(); i++)
+				{
+					
+					if (ptMouse.x > m_vecBatchedUI[i].UIRect.left	&& ptMouse.x < m_vecBatchedUI[i].UIRect.right &&
+						ptMouse.y > m_vecBatchedUI[i].UIRect.top	&& ptMouse.y < m_vecBatchedUI[i].UIRect.bottom)
+					{
+						m_bModifyBatchedUI = true;
+						m_iModifyUIIndex = i;
+
+
+
+
+						m_fUIDesc = m_vecBatchedUI[m_iModifyUIIndex].UIDesc;
+
+						m_bIsRect=	m_vecBatchedUI[m_iModifyUIIndex].bIsRect;
+						m_fUIAngle=	m_vecBatchedUI[m_iModifyUIIndex].fAngle ;
+						m_fUIRect=	m_vecBatchedUI[m_iModifyUIIndex].UIRect ;
+
+
+
+						if (m_TargetSRV != nullptr)
+						{
+
+							Safe_Release(m_TargetSRV);
+
+							m_TargetSRV = m_vecBatchedUI[m_iModifyUIIndex].SRV;
+
+							Safe_AddRef(m_TargetSRV);
+
+						}
+
+
+
+
+
+
+
+
+						break;
+					}
+					
+				}
+
+			}
+	
+			if (pInstance->Get_DIKeyState(DIK_R) & DIS_Down)
+				m_bModifyBatchedUI = false;
+			
+
+		
+
+			
+	
+#pragma endregion UITOOL
+	}
 #pragma region HeightMap
 #pragma endregion HeightMap
 
@@ -1922,20 +2084,364 @@ HRESULT CScene_Edit::RenewElenmetTransform(OBJELEMENT * pObjElement)
 HRESULT CScene_Edit::Update_UITab(_double fDeltatime)
 {
 
+	FAILED_CHECK(Widget_LoadUISRVTexture(fDeltatime));
+
+	FAILED_CHECK(Widget_CreateNBatchUI(fDeltatime));
+	FAILED_CHECK(Widget_DeleteBatchedUI(fDeltatime));
+
+	return S_OK;
+}
+
+
+HRESULT CScene_Edit::Widget_LoadUISRVTexture(_double fDeltatime)
+{
+	if (ImGui::TreeNode("Texture"))
+	{
+
+		static char str0[128] = "";
+		ImGui::InputText("Input Path", str0, IM_ARRAYSIZE(str0));
+
+		if (ImGui::Button("Load Texture", ImVec2(-FLT_MIN, 30)))
+		{
+
+
+			char TempPath[MAX_PATH] = "";
+			//char FileFullPath[MAX_PATH] = "../bin/Resources/Textures/UI/UI/";
+			ZeroMemory(m_szTexturPath, sizeof(char)*MAX_PATH);
+			strcpy_s(m_szTexturPath, "../bin/Resources/Textures/UI/UI/");
+			strcpy_s(TempPath, "../bin/Resources/Textures/UI/UI/");
+
+
+			m_FilePathList.clear();
+			_tfinddata64_t fd;
+
+			strcat_s(m_szTexturPath, str0);
+			strcat_s(TempPath, str0);
+			if (!strcmp(str0, ""))
+			{
+				strcat_s(TempPath, "*.*");
+			}
+			else
+			{
+				strcat_s(TempPath, "/*.*");
+				strcat_s(m_szTexturPath, "/");
+			}
+
+			string Temp = TempPath;
+			wstring wtemp;
+			wtemp.assign(Temp.begin(), Temp.end());
+
+			__int64 handle = _tfindfirst64(wtemp.c_str(), &fd);
+			if (handle == -1 || handle == 0)
+			{
+				__debugbreak();
+				return E_FAIL;
+			}
+
+			_int iResult = 0;
+
+			//char szCurPath[128] = "../bin/Resources/Data/Map/";
+			//char szFullPath[128] = "";
+			char szFilename[MAX_PATH];
+
+			while (iResult != -1)
+			{
+				if (!lstrcmp(fd.name, L".") || !lstrcmp(fd.name, L".."))
+				{
+					iResult = _tfindnext64(handle, &fd);
+					continue;
+				}
+
+
+				WideCharToMultiByte(CP_UTF8, 0, fd.name, -1, szFilename, sizeof(szFilename), NULL, NULL);
+				//strcpy_s(szFullPath, szCurPath);
+				//strcat_s(szFullPath, szFilename);
+				m_FilePathList.push_back({ szFilename });
+
+
+				iResult = _tfindnext64(handle, &fd);
+			}
+
+
+			_findclose(handle);
+
+
+
+		}
+
+		static ImGuiTextFilter filter;
+		char	szCheckforSameFileName[256] = "";
+
+		if (ImGui::BeginListBox(" "))
+		{
+			auto iter = m_FilePathList.begin();
+
+
+			for (; iter != m_FilePathList.end(); iter++)
+			{
+				const bool is_selected = false;
+
+				if (filter.PassFilter(iter->c_str()))
+				{
+					if (ImGui::Selectable(iter->c_str(), is_selected))
+					{
+						strcpy_s(filter.InputBuf, iter->c_str());
+					}
+
+					if (!strcmp(iter->c_str(), filter.InputBuf))
+						strcpy_s(szCheckforSameFileName, filter.InputBuf);
+				}
+			}
+			ImGui::EndListBox();
+			if (m_TargetSRV != nullptr)
+			{
+
+				ImTextureID my_tex_id = m_TargetSRV;
+				float my_tex_w = 110;
+				float my_tex_h = 120;
+				{
+					ImGui::SameLine();
+					ImVec2 uv_min = ImVec2(0.0f, 0.0f);                 // Top-left
+					ImVec2 uv_max = ImVec2(1.0f, 1.0f);                 // Lower-right
+					ImVec4 tint_col = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);   // No tint
+					ImVec4 border_col = ImVec4(1.0f, 1.0f, 1.0f, 0.5f); // 50% opaque white
+					ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max, tint_col, border_col);
+
+				}
+
+
+
+			}
+		}
+
+		filter.Draw("Input FileName");
+
+
+
+
+		if (ImGui::Button("OK", ImVec2(120, 0)))
+		{
+
+			if (strcmp(filter.InputBuf, ""))
+			{
+				if (!strcmp(szCheckforSameFileName, filter.InputBuf))
+				{
+
+					char TempPath[MAX_PATH] = "";
+
+					strcpy_s(TempPath, m_szTexturPath);
+					strcat_s(TempPath, filter.InputBuf);
+
+
+					Load_Data(TempPath, Data_UI);
+					//m_FilePathList.clear();
+					ImGui::CloseCurrentPopup();
+				}
+			}
+
+
+
+
+
+
+		}
+		ImGui::TreePop();
+	}
+
+	return S_OK;
+}
+
+HRESULT CScene_Edit::Widget_CreateNBatchUI(_double fDeltatime)
+{
+	Make_VerticalSpacing(5);
+
+	ImGui::Checkbox("UI Drawing by Rect?" ,&m_bIsRect);
+
+	Make_VerticalSpacing(3);
+
+	if (m_bIsRect)
+	{
+		float tempArr[2] = { m_fUIRect.left,m_fUIRect.top};
+
+		ImGui::DragFloat2("L / T ", tempArr);
+
+		m_fUIRect.left = tempArr[0];
+		m_fUIRect.top = tempArr[1];
+
+		tempArr[0] = m_fUIRect.right;
+		tempArr[1] = m_fUIRect.bottom;
+
+		ImGui::DragFloat2("R / B ", tempArr);
+
+		m_fUIRect.right = tempArr[0];
+		m_fUIRect.bottom = tempArr[1];
+
+		m_fUIDesc.fCX = m_fUIRect.right - m_fUIRect.left;
+		m_fUIDesc.fCY = m_fUIRect.bottom - m_fUIRect.top;
+		m_fUIDesc.fX = m_fUIRect.left + m_fUIDesc.fCX * 0.5f;
+		m_fUIDesc.fY = m_fUIRect.top + m_fUIDesc.fCY * 0.5f;
+
+
+		
+
+	}
+	else
+	{
+		float tempArr[2] = {m_fUIDesc.fX,m_fUIDesc.fY };
+		ImGui::DragFloat2("X / Y ", tempArr);
+
+		m_fUIDesc.fX = tempArr[0];
+		m_fUIDesc.fY = tempArr[1];
+
+		tempArr[0] = m_fUIDesc.fCX;
+		tempArr[1] = m_fUIDesc.fCY;
+
+		ImGui::DragFloat2("CX / CY ", tempArr);
+
+
+		m_fUIDesc.fCX = tempArr[0];
+		m_fUIDesc.fCY = tempArr[1];
+
+
+		m_fUIRect.left = m_fUIDesc.fX - m_fUIDesc.fCX * 0.5f;
+		m_fUIRect.top = m_fUIDesc.fY - m_fUIDesc.fCY * 0.5f;
+		m_fUIRect.right = m_fUIDesc.fX + m_fUIDesc.fCX * 0.5f;
+		m_fUIRect.bottom = m_fUIDesc.fY + m_fUIDesc.fCY * 0.5f;
+
+	}
+
+	ImGui::DragFloat("Angle", &m_fUIAngle);
+	if (!m_bModifyBatchedUI)
+		ImGui::DragFloat("Depth", &m_fDepth);
+
+	if (m_fUIAngle > 360) m_fUIAngle = _float(_int(m_fUIAngle) % 360);
+
+	if (m_fUIAngle < 0)
+	{
+		m_fUIAngle *= -1;
+		m_fUIAngle = _float(_int(m_fUIAngle) % 360);
+		m_fUIAngle *= -1;
+		m_fUIAngle += 360;
+	}
+
+
+
+	if (m_bModifyBatchedUI)
+	{
+
+
+		m_vecBatchedUI[m_iModifyUIIndex].UIDesc = m_fUIDesc;
+		m_vecBatchedUI[m_iModifyUIIndex].bIsRect = m_bIsRect;
+		m_vecBatchedUI[m_iModifyUIIndex].fAngle = m_fUIAngle;
+		m_vecBatchedUI[m_iModifyUIIndex].UIRect = m_fUIRect;
+
+
+
+		if (m_TargetSRV != nullptr)
+		{
+
+			Safe_Release(m_vecBatchedUI[m_iModifyUIIndex].SRV);
+
+			m_vecBatchedUI[m_iModifyUIIndex].SRV = m_TargetSRV;
+
+			Safe_AddRef(m_vecBatchedUI[m_iModifyUIIndex].SRV);
+
+		}
+
+
+	}
+
+
+
+	if(ImGui::Button("Create UI Button",ImVec2(-FLT_MIN, 30)))
+	{
+		if (m_TargetSRV != nullptr)
+		{
+			EDITUI Temp;
+
+
+			Temp.UIDesc = m_fUIDesc;
+			Temp.bIsRect = m_bIsRect;
+			Temp.fAngle = m_fUIAngle;
+			Temp.UIRect = m_fUIRect;
+			Temp.SRV    = m_TargetSRV;
+			Temp.fDepth = m_fDepth;
+			Safe_AddRef(Temp.SRV);
+
+			m_vecBatchedUI.push_back(Temp);
+		
+
+			sort(m_vecBatchedUI.begin(), m_vecBatchedUI.end(), [&](EDITUI& pSour, EDITUI& pDest)
+			{
+				return pSour.fDepth < pDest.fDepth;
+			});
+
+			m_fDepth -= 0.001f;
+		}
+	}
+
+
+	return S_OK;
+}
+
+HRESULT CScene_Edit::Widget_DeleteBatchedUI(_double fDeltatime)
+{
+
+	ImGui::Checkbox("Modify Batched UI", &m_bModifyBatchedUI);
+
+
+	if (m_bModifyBatchedUI)
+	{
+
+
+
+
+	}
+
 
 
 
 	return S_OK;
 }
 
-HRESULT CScene_Edit::Widget_BatchTexture(_double fDeltatime)
+HRESULT CScene_Edit::LoadTextureByAssimp(const _tchar * FileFullPath)
 {
-	return E_NOTIMPL;
-}
+	CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 
-HRESULT CScene_Edit::Widget_DeleteBatchedTexture(_double fDeltatime)
-{
-	return E_NOTIMPL;
+	_tchar		szTextureFilePath[MAX_PATH] = TEXT("");
+	_tchar		szExt[MAX_PATH] = TEXT("");
+
+	lstrcpy(szTextureFilePath, FileFullPath);
+
+
+		_wsplitpath_s(szTextureFilePath, nullptr, 0, nullptr, 0, nullptr, 0, szExt, MAX_PATH);
+
+		if (!lstrcmp(szExt, TEXT(".dds")))
+		{
+			FAILED_CHECK(CreateDDSTextureFromFile(m_pDevice, szTextureFilePath, nullptr, &m_TargetSRV));
+		}
+
+		else if (!lstrcmp(szExt, TEXT(".tga")))
+		{
+			__debugbreak();
+			MSGBOX("Not Available TGA File");
+			return E_FAIL;
+		}
+
+		else
+		{
+			FAILED_CHECK(CreateWICTextureFromFile(m_pDevice, szTextureFilePath, nullptr, &m_TargetSRV));
+		}
+
+	
+		if (m_TargetSRV == nullptr)
+		{
+			__debugbreak();
+			return E_FAIL;
+		}
+
+
+	return S_OK;
 }
 
 
@@ -2789,6 +3295,28 @@ HRESULT CScene_Edit::Ready_Layer_Player(const _tchar * pLayerTag)
 	return S_OK;
 }
 
+HRESULT CScene_Edit::Ready_Layer_RendererEditUI(const _tchar * pLayerTag)
+{
+
+	FAILED_CHECK(m_pGameInstance->Add_GameObject_Out_of_Manager((CGameObject**)(&m_pRendererEditUI), SCENE_LOBY, L"ProtoType_EditRendererUI"));
+
+	NULL_CHECK_RETURN(m_pRendererEditUI, E_FAIL);
+
+	m_pRendererEditUI->Set_VecEditUI(&m_vecBatchedUI);
+
+
+	ZeroMemory(&m_fUIDesc, sizeof(UIDESC));
+	m_fUIDesc.fCX = m_fUIDesc.fCY = 10;
+
+
+	m_fUIRect.left = m_fUIDesc.fX - m_fUIDesc.fCX * 0.5f;
+	m_fUIRect.top = m_fUIDesc.fY - m_fUIDesc.fCY * 0.5f;
+	m_fUIRect.right = m_fUIDesc.fX + m_fUIDesc.fCX * 0.5f;
+	m_fUIRect.bottom = m_fUIDesc.fY + m_fUIDesc.fCY * 0.5f;
+
+	return S_OK;
+}
+
 
 
 CScene_Edit * CScene_Edit::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
@@ -2815,9 +3343,19 @@ void CScene_Edit::Free()
 		//객채 없애기 죽이기 비워주기
 		Safe_Release(iter.pObject);
 	}
+	
+	for (auto& EditedUI : m_vecBatchedUI)
+	{
+		Safe_Release(EditedUI.SRV);
+	}
+	
 	m_vecBatchedObject.clear();
+
+
 
 	Safe_Release(m_pCreatedTerrain);
 	Safe_Release(m_pGameInstance);
+	Safe_Release(m_TargetSRV);
+	Safe_Release(m_pRendererEditUI);
 #endif
 }

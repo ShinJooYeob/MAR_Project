@@ -1,8 +1,10 @@
 #include "stdafx.h"
 #include "..\Public\Loader.h"
+//Editor
 #include "ESCursor.h"
 #include "Camera_Editor.h"
 #include "WireTerrain.h"
+#include "RendererEditSceneUI.h"
 
 //MapObject
 #include "Terrain.h"
@@ -292,6 +294,7 @@ HRESULT CLoader::Load_Scene_Edit(_bool * _IsClientQuit, CRITICAL_SECTION * _CriS
 
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_Camera_Editor), CCamera_Editor::Create(m_pDevice, m_pDeviceContext)));
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_WireTerrain), CWireTerrain::Create(m_pDevice, m_pDeviceContext)));
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(L"ProtoType_EditRendererUI", CRendererEditSceneUI::Create(m_pDevice, m_pDeviceContext)));
 
 
 	RELEASE_INSTANCE(CGameInstance);

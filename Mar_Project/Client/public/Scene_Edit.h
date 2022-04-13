@@ -114,14 +114,32 @@ private:
 
 #pragma region UITab
 
+
 	HRESULT Update_UITab(_double fDeltatime);
 
+	HRESULT Widget_LoadUISRVTexture(_double fDeltatime);
+	HRESULT Widget_CreateNBatchUI(_double fDeltatime);
+	HRESULT Widget_DeleteBatchedUI(_double fDeltatime);
 
-	HRESULT Widget_BatchTexture(_double fDeltatime);
-	HRESULT Widget_DeleteBatchedTexture(_double fDeltatime);
 
 
-	vector<_float2>		m_vecBatchedUI;
+	HRESULT LoadTextureByAssimp(const _tchar* FileFullPath);
+
+	ID3D11ShaderResourceView*  m_TargetSRV = nullptr;
+	vector<EDITUI>		m_vecBatchedUI;
+	_uint					m_iBatchedUIIndex = 0;
+	char			m_szTexturPath[MAX_PATH] = "";
+	class	CRendererEditSceneUI* m_pRendererEditUI = nullptr;
+
+	UIDESC				m_fUIDesc ;
+	FLOATRECT			m_fUIRect ;
+	_float				m_fUIAngle = 0;
+	_float				m_fDepth = 0;
+	_bool				m_bIsRect = false;
+
+
+	_bool				m_bModifyBatchedUI = false;
+	_int				m_iModifyUIIndex= 0;
 
 #pragma endregion UITab
 
@@ -182,6 +200,7 @@ private:
 private:
 	HRESULT Ready_Layer_MainCamera(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_Player(const _tchar* pLayerTag);
+	HRESULT Ready_Layer_RendererEditUI(const _tchar* pLayerTag);
 
 
 public:
