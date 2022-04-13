@@ -54,6 +54,14 @@ private:
 	vector<class CAnimationClip*>			m_vecAnimator;
 	typedef vector<class CAnimationClip*>	ANIMATOR;
 
+	//i번째 애니메이션이 사용하는 j번째 클립본의 현재 키프레임을 저장
+	vector<vector<_uint>>					m_vecCurrentKeyFrameIndices;
+	//현재 재생되고있는 애니메이션 재생 시간
+	_double		m_NowPlayTimeAcc = 0.0;
+	//다음에 재생될 애니메이션의 시간
+	_double		m_NextPlayTimeAcc = 0.0;
+	_double		m_AnimExitTime = 0.15;
+
 
 private:
 	MODELTYPE								m_eModelType = TYPE_END;
@@ -69,7 +77,7 @@ private:
 	HRESULT Ready_MoreAnimation(const char* szFileFullPath, _uint iAnimCount, _uint iFlag = 0);
 
 private:
-	CHierarchyNode* Find_HierarchyNode(const char* pName);
+	CHierarchyNode* Find_HierarchyNode(const char* pName, _uint* pNodeIndex = nullptr);
 
 public:
 	static CModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext,

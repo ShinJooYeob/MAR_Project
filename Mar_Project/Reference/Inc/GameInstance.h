@@ -80,7 +80,7 @@ public: /* For.TimerMgr */
 
 
 public: /*For SceneMgr*/
-	HRESULT		Scene_Change(CScene* pScene, _int iNextSceneIdx);
+	HRESULT		Scene_Change( CScene* pScene, _int iNextSceneIdx);
 	_int		Render_Scene();
 
 	_uint		Get_NowSceneNum();

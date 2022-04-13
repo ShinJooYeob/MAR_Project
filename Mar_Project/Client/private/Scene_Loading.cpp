@@ -66,10 +66,12 @@ _int CScene_Loading::LateUpdate(_double fDeltaTime)
 		switch (m_eNextSceneIndex)
 		{
 		case SCENEID::SCENE_LOBY:
-			FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Loby::Create(m_pDevice,m_pDeviceContext), m_eNextSceneIndex));
+			FAILED_CHECK(GetSingle(CUtilityMgr)->Clear_RenderGroup_forSceneChange());
+			FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Loby::Create(m_pDevice, m_pDeviceContext), m_eNextSceneIndex));
 			break;
 
 		case SCENEID::SCENE_STAGESELECT:
+			FAILED_CHECK(GetSingle(CUtilityMgr)->Clear_RenderGroup_forSceneChange());
 			FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_StageSelect::Create(m_pDevice, m_pDeviceContext), m_eNextSceneIndex));
 			break;
 
@@ -77,6 +79,7 @@ _int CScene_Loading::LateUpdate(_double fDeltaTime)
 
 #ifdef USE_IMGUI
 		case SCENEID::SCENE_EDIT:
+			FAILED_CHECK(GetSingle(CUtilityMgr)->Clear_RenderGroup_forSceneChange());
 			FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Edit::Create(m_pDevice, m_pDeviceContext), m_eNextSceneIndex));
 			break;
 #endif // USE_IMGUI

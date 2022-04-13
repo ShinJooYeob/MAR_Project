@@ -233,6 +233,7 @@ _int CScene_Edit::Change_to_NextScene()
 
 	case SCENEID::SCENE_LOBY:
 	{
+		FAILED_CHECK(GetSingle(CUtilityMgr)->Clear_RenderGroup_forSceneChange());
 		FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Loading::Create(m_pDevice, m_pDeviceContext, SCENEID::SCENE_LOBY), SCENEID::SCENE_LOADING));
 		break;
 	}
@@ -2081,6 +2082,28 @@ HRESULT CScene_Edit::RenewElenmetTransform(OBJELEMENT * pObjElement)
 #pragma endregion MapTab
 
 #pragma region UITab
+HRESULT CScene_Edit::Ready_Layer_RendererEditUI(const _tchar * pLayerTag)
+{
+
+	FAILED_CHECK(m_pGameInstance->Add_GameObject_Out_of_Manager((CGameObject**)(&m_pRendererEditUI), SCENE_LOBY, L"ProtoType_EditRendererUI"));
+
+	NULL_CHECK_RETURN(m_pRendererEditUI, E_FAIL);
+
+	m_pRendererEditUI->Set_VecEditUI(&m_vecBatchedUI);
+
+
+	ZeroMemory(&m_fUIDesc, sizeof(UIDESC));
+	m_fUIDesc.fCX = m_fUIDesc.fCY = 10;
+
+
+	m_fUIRect.left = m_fUIDesc.fX - m_fUIDesc.fCX * 0.5f;
+	m_fUIRect.top = m_fUIDesc.fY - m_fUIDesc.fCY * 0.5f;
+	m_fUIRect.right = m_fUIDesc.fX + m_fUIDesc.fCX * 0.5f;
+	m_fUIRect.bottom = m_fUIDesc.fY + m_fUIDesc.fCY * 0.5f;
+
+	return S_OK;
+}
+
 HRESULT CScene_Edit::Update_UITab(_double fDeltatime)
 {
 
@@ -3295,27 +3318,7 @@ HRESULT CScene_Edit::Ready_Layer_Player(const _tchar * pLayerTag)
 	return S_OK;
 }
 
-HRESULT CScene_Edit::Ready_Layer_RendererEditUI(const _tchar * pLayerTag)
-{
 
-	FAILED_CHECK(m_pGameInstance->Add_GameObject_Out_of_Manager((CGameObject**)(&m_pRendererEditUI), SCENE_LOBY, L"ProtoType_EditRendererUI"));
-
-	NULL_CHECK_RETURN(m_pRendererEditUI, E_FAIL);
-
-	m_pRendererEditUI->Set_VecEditUI(&m_vecBatchedUI);
-
-
-	ZeroMemory(&m_fUIDesc, sizeof(UIDESC));
-	m_fUIDesc.fCX = m_fUIDesc.fCY = 10;
-
-
-	m_fUIRect.left = m_fUIDesc.fX - m_fUIDesc.fCX * 0.5f;
-	m_fUIRect.top = m_fUIDesc.fY - m_fUIDesc.fCY * 0.5f;
-	m_fUIRect.right = m_fUIDesc.fX + m_fUIDesc.fCX * 0.5f;
-	m_fUIRect.bottom = m_fUIDesc.fY + m_fUIDesc.fCY * 0.5f;
-
-	return S_OK;
-}
 
 
 

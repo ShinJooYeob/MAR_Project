@@ -57,6 +57,19 @@ void CUtilityMgr::SlowMotionStart(_float fTargetTime, _float TargetSpeed)
 	m_pMainApp->SlowMotionStart(fTargetTime, TargetSpeed);
 }
 
+HRESULT CUtilityMgr::Clear_RenderGroup_forSceneChange()
+{
+	NULL_CHECK_RETURN(m_pRenderer, E_FAIL);
+	
+	return m_pRenderer->Clear_RenderGroup_forSceneChaging();
+}
+
+void CUtilityMgr::Set_Renderer(CRenderer * pRenderer)
+{
+	m_pRenderer = pRenderer;
+	Safe_AddRef(m_pRenderer);
+}
+
 _uint CUtilityMgr::CountDigit(_uint iNum)
 {
 	string tmp;
@@ -66,6 +79,7 @@ _uint CUtilityMgr::CountDigit(_uint iNum)
 
 void CUtilityMgr::Free()
 {
+	Safe_Release(m_pRenderer);
 
 	Safe_Release(m_pDevice);
 	Safe_Release(m_pDeviceContext);

@@ -135,10 +135,10 @@ HRESULT CGameInstance::Clear_Scene_Resource(_uint eSceneNum)
 		return E_FAIL;
 	}
 
+	FAILED_CHECK(m_pObjectMgr->Clear_Scene_GameObjects(eSceneNum));
 
 	FAILED_CHECK(m_pComponenetMgr->Clear_Scene_Componenets(eSceneNum));
 
-	FAILED_CHECK(m_pObjectMgr->Clear_Scene_GameObjects(eSceneNum));
 
 	return S_OK;
 }
@@ -341,7 +341,7 @@ HRESULT CGameInstance::Add_Timer(const _tchar * tagTimer)
 
 
 
-HRESULT CGameInstance::Scene_Change(CScene * pScene, _int iNextSceneIdx)
+HRESULT CGameInstance::Scene_Change( CScene * pScene, _int iNextSceneIdx)
 {
 
 	if (m_pSceneMgr == nullptr || m_pObjectMgr == nullptr)
@@ -350,12 +350,11 @@ HRESULT CGameInstance::Scene_Change(CScene * pScene, _int iNextSceneIdx)
 		return E_FAIL;
 	}
 
+	FAILED_CHECK(m_pObjectMgr->Reset_StaticObject_NowSceneNum(iNextSceneIdx));
 
-	if(FAILED(m_pSceneMgr->Scene_Chage(pScene, iNextSceneIdx)))
-		return E_FAIL;
+	FAILED_CHECK(m_pSceneMgr->Scene_Chage(pScene, iNextSceneIdx));
 
-	if(FAILED(m_pObjectMgr->Reset_StaticObject_NowSceneNum(iNextSceneIdx)))
-		return E_FAIL;
+
 
 	return S_OK;
 }
@@ -409,10 +408,9 @@ CScene * CGameInstance::Get_NowScene()
 	return m_pSceneMgr->Get_NowScene();
 }
 
-HRESULT CGameInstance::Set_SceneChanging_to_Scene(_uint _INextScene)
+HRESULT CGameInstance::Set_SceneChanging_to_Scene( _uint _INextScene)
 {
 	NULL_CHECK_BREAK(m_pSceneMgr);
-
 	return m_pSceneMgr->Set_SceneChanging_to_Scene(_INextScene);
 }
 

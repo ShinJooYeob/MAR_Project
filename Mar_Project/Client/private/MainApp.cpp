@@ -115,12 +115,12 @@ HRESULT CMainApp::Render()
 	FAILED_CHECK(m_pGameInstance->Clear_BackBuffer_View(_float4(0.5f, 0.5f, 0.5f, 1.f)));
 	FAILED_CHECK(m_pGameInstance->Clear_DepthStencil_View());
 
-
 	FAILED_CHECK(m_pComRenderer->Render_RenderGroup());
 	FAILED_CHECK(m_pGameInstance->Render_Scene());
 
 
 	FAILED_CHECK(m_pGameInstance->Present());
+	//m_pGameInstance->Present();
 
 
 	//콜리전 내부 비워주는중
@@ -162,7 +162,8 @@ HRESULT CMainApp::Scene_Change(SCENEID eSceneID)
 	case SCENEID::SCENE_EDIT:
 
 		//Scene_Change에 디폴트로 false true 이걸 트루로 바꿔준다?
-		m_pGameInstance->Scene_Change(CScene_Loading::Create(m_pDevice,m_pDeviceContext, eSceneID), SCENEID::SCENE_LOADING);
+		FAILED_CHECK(GetSingle(CUtilityMgr)->Clear_RenderGroup_forSceneChange());
+		m_pGameInstance->Scene_Change(CScene_Loading::Create(m_pDevice, m_pDeviceContext, eSceneID), SCENEID::SCENE_LOADING);
 
 		break;
 
@@ -244,7 +245,7 @@ HRESULT CMainApp::Ready_Static_Component_Prototype()
 	FAILED_CHECK(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Renderer), 
 		m_pComRenderer = CRenderer::Create(m_pDevice,m_pDeviceContext)));
 	Safe_AddRef(m_pComRenderer);
-
+	GetSingle(CUtilityMgr)->Set_Renderer(m_pComRenderer);
 
 	FAILED_CHECK(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Transform),
 		CTransform::Create(m_pDevice, m_pDeviceContext)));

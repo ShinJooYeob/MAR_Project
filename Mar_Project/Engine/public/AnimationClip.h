@@ -4,6 +4,7 @@
 #include "Base.h"
 
 BEGIN(Engine)
+class CHierarchyNode;
 
 //하나의 애니메이션
 class CAnimationClip final : public CBase
@@ -19,7 +20,8 @@ public:
 
 public:
 	HRESULT Initialize_AnimationClip(const char* pName, _double Duration, _double UpdatePerSecond);
-	HRESULT Update_TransformMatrices_byClipBones(_bool* bIsFinished,_double TimeDelta);
+	HRESULT Update_TransformMatrices_byClipBones(_bool* bIsFinished,_double TimeDelta,_double* PlayTimeAcc,
+		const vector<CHierarchyNode*>* pVecHierarchyNodes, vector<_uint>* pVecCurrentKeyFrameIndex);
 
 
 private:
@@ -28,9 +30,6 @@ private:
 	_uint		m_iNumClipBones = 0;
 	_double		m_Duration = 0.0;
 
-	/* 현재 내 애니메이션이 진행 위치. */
-	_double		m_PlayTimeAcc = 0.0;
-	_bool		m_bIsFinished = false;
 
 	vector<class CClipBone*>			m_vecClipBones;
 	typedef vector<class CClipBone*>	CLIPBONES;

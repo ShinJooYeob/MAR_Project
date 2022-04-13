@@ -79,17 +79,23 @@ HRESULT CMeshContainer::Initialize_Clone(void * pArg)
 	return S_OK;
 }
 
-HRESULT CMeshContainer::Bind_AffectingBones_OnShader(CShader* pShader, _fMatrix DefultPivotMatrix, _float4x4* pBoneMatrices, const char* szBoneName)
+HRESULT CMeshContainer::Bind_AffectingBones_OnShader(CShader* pShader, _fMatrix DefultPivotMatrix, _float4x4* pBoneMatrices, const char* szBoneName, const vector<CHierarchyNode*>* pVecHierarchyNodes)
 {
 	ZeroMemory(pBoneMatrices, sizeof(_float4x4) * 128);
 	_uint	iIndex = 0;
 
-	for (auto& pHierarchyNode : m_vecAffectingBones)
-	{
-		_Matrix UpdatedMatrix = pHierarchyNode->Get_UpdatedMatrix();
+	if (!m_iNumAffectingBones)
+		pBoneMatrices[0] = XMMatrixTranspose(XMMatrixIdentity() * DefultPivotMatrix);
 
-		XMStoreFloat4x4(&pBoneMatrices[iIndex++], XMMatrixTranspose(UpdatedMatrix*DefultPivotMatrix));
-		//XMStoreFloat4x4(&pBoneMatrices[iIndex++], XMMatrixTranspose(UpdatedMatrix));
+	else
+	{
+		for (auto& iHierarchyIndex : m_vecAffectingBoneIndex)
+		{
+			_Matrix UpdatedMatrix = ((*pVecHierarchyNodes)[iHierarchyIndex])->Get_UpdatedMatrix();
+
+			XMStoreFloat4x4(&pBoneMatrices[iIndex++], XMMatrixTranspose(UpdatedMatrix * DefultPivotMatrix));
+			//XMStoreFloat4x4(&pBoneMatrices[iIndex++], XMMatrixTranspose(UpdatedMatrix));
+		}
 	}
 
 	FAILED_CHECK(pShader->Set_RawValue(szBoneName, pBoneMatrices, sizeof(_float4x4) * 128));
@@ -102,11 +108,10 @@ _uint CMeshContainer::Get_MaterialIndex()
 	return m_MaterialIndex;
 }
 
-HRESULT CMeshContainer::Add_AffectingBone(CHierarchyNode * pHierarchyNode)
+HRESULT CMeshContainer::Add_AffectingBoneIndex(_uint iHierarchyIndex)
 {
-	m_vecAffectingBones.push_back(pHierarchyNode);
+	m_vecAffectingBoneIndex.push_back(iHierarchyIndex);
 
-	Safe_AddRef(pHierarchyNode);
 
 	return S_OK;
 }
@@ -258,9 +263,8 @@ void CMeshContainer::Free()
 {
 	__super::Free();
 
-	for (auto& pHierarchyNode : m_vecAffectingBones)
-		Safe_Release(pHierarchyNode);
 
-	m_vecAffectingBones.clear();
+
+	m_vecAffectingBoneIndex.clear();
 
 }

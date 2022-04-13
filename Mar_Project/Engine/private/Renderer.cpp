@@ -71,6 +71,23 @@ HRESULT CRenderer::Render_RenderGroup()
 }
 
 
+HRESULT CRenderer::Clear_RenderGroup_forSceneChaging()
+{
+	for (_uint i = 0; i < RENDER_END; ++i)
+	{
+		for (auto& RenderObject : m_RenderObjectList[i])
+		{
+			Safe_Release(RenderObject);
+		}
+		m_RenderObjectList[i].clear();
+	}
+
+	return S_OK;
+}
+
+
+
+
 
 HRESULT CRenderer::Render_Priority()
 {

@@ -7,35 +7,40 @@ CClipBone::CClipBone()
 {
 }
 
-void CClipBone::Set_CurrentKeyFrame(_uint iKeyFrameIndex)
-{
-	if (iKeyFrameIndex >= m_vecKeyFrames.size()) __debugbreak();
+//void CClipBone::Set_CurrentKeyFrame(_uint iKeyFrameIndex)
+//{
+//	if (iKeyFrameIndex >= m_vecKeyFrames.size()) __debugbreak();
+//
+//	m_iCurrentKeyFrame = iKeyFrameIndex;
+//
+//}
 
-	m_iCurrentKeyFrame = iKeyFrameIndex;
+void CClipBone::Set_TransformationMatrix_ToHierarchyNode(_fMatrix TransformationMatrix, const vector<CHierarchyNode*>* pVecHierarchyNodes)
+{
+	if (m_iHierarchyNodeIndex == -1)
+	{
+		__debugbreak();
+		return;
+	}
+
+	(*pVecHierarchyNodes)[m_iHierarchyNodeIndex]->Set_Transformation(TransformationMatrix);
 
 }
 
-void CClipBone::Set_TransformationMatrix_ToHierarchyNode(_fMatrix TransformationMatrix)
-{
-	NULL_CHECK_BREAK(m_pHierarchyNode);
-
-	m_pHierarchyNode->Set_Transformation(TransformationMatrix);
-
-}
-
-HRESULT CClipBone::Initialize_ClipBone(const char * pClipBoneName, CHierarchyNode* pHierarchyNode)
+HRESULT CClipBone::Initialize_ClipBone(const char * pClipBoneName, _int HierarchyNodeIndex)
 {
 	m_szClipBoneName = pClipBoneName;
-	m_pHierarchyNode = pHierarchyNode;
-	Safe_AddRef(m_pHierarchyNode);
+	m_iHierarchyNodeIndex = HierarchyNodeIndex;
+
+
 	return S_OK;
 }
 
-CClipBone * CClipBone::Create(const char * pClipBoneName, CHierarchyNode* pHierarchyNode)
+CClipBone * CClipBone::Create(const char * pClipBoneName, _int HierarchyNodeIndex)
 {
 	CClipBone*	pInstance = new CClipBone();
 
-	if (FAILED(pInstance->Initialize_ClipBone(pClipBoneName, pHierarchyNode)))
+	if (FAILED(pInstance->Initialize_ClipBone(pClipBoneName, HierarchyNodeIndex)))
 	{
 		MSGBOX("Failed to Created CClipBone");
 		Safe_Release(pInstance);
@@ -50,6 +55,5 @@ void CClipBone::Free()
 
 	m_vecKeyFrames.clear();
 
-	Safe_Release(m_pHierarchyNode);
 }
 

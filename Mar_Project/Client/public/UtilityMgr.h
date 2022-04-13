@@ -21,10 +21,14 @@ public:
 public:
 	void SlowMotionStart(_float fTargetTime = 0.5f, _float TargetSpeed = 0.3f);
 
+public:
+	HRESULT Clear_RenderGroup_forSceneChange();
+	void Set_Renderer(CRenderer* pRenderer);
 private:
 	ID3D11Device*			m_pDevice = nullptr;
 	ID3D11DeviceContext*	m_pDeviceContext = nullptr;
 	class CMainApp*			m_pMainApp = nullptr;
+	CRenderer*				m_pRenderer = nullptr;
 
 	_uint CountDigit(_uint iNum);
 public:

@@ -24,6 +24,8 @@ public:/*GetSet*/
 	void Set_Transformation(_fMatrix matTransformation) { m_matTransformation = matTransformation; };
 	void Update_CombinedMatrix();
 
+
+	_float4x4	Get_OffsetMatrix() { return m_matOffset.TransposeXMatrix(); }
 private:
 	CHierarchyNode*				m_pParent = nullptr;
 	string						m_szName = "";

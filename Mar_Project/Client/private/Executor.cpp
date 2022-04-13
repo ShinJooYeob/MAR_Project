@@ -43,10 +43,12 @@ _int CExecutor::LateUpdate(_double fDeltaTime)
 {
 
 
-	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime));
 
 	if (g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS)))
+	{
+		FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime));
 		FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this));
+	}
 
 	m_vOldPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
 	return _int();
@@ -97,7 +99,7 @@ HRESULT CExecutor::SetUp_Components()
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Shader_VAM), TAG_COM(Com_Shader), (CComponent**)&m_pShaderCom));
 
 	FAILED_CHECK(Add_Component(m_eNowSceneNum, TAG_CP(Prototype_Mesh_Executor), TAG_COM(Com_Model), (CComponent**)&m_pModel));
-	FAILED_CHECK(m_pModel->Change_AnimIndex(0));
+	FAILED_CHECK(m_pModel->Change_AnimIndex(rand()%25));
 
 
 

@@ -115,6 +115,8 @@ private:
 #pragma region UITab
 
 
+	HRESULT Ready_Layer_RendererEditUI(const _tchar* pLayerTag);
+
 	HRESULT Update_UITab(_double fDeltatime);
 
 	HRESULT Widget_LoadUISRVTexture(_double fDeltatime);
@@ -200,7 +202,6 @@ private:
 private:
 	HRESULT Ready_Layer_MainCamera(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_Player(const _tchar* pLayerTag);
-	HRESULT Ready_Layer_RendererEditUI(const _tchar* pLayerTag);
 
 
 public:

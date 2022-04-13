@@ -27,6 +27,7 @@ private:
 public:
 	HRESULT Add_RenderGroup(RENDERGROUP eRenderID ,CGameObject* pGameObject);
 	HRESULT Render_RenderGroup();
+	HRESULT Clear_RenderGroup_forSceneChaging();
 
 
 

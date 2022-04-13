@@ -80,6 +80,7 @@ _int CScene_Loby::LateUpdate(_double fDeltaTime)
 #ifdef USE_IMGUI
 	if (GetKeyState(VK_F1) & 0x8000)
 	{
+		FAILED_CHECK(GetSingle(CUtilityMgr)->Clear_RenderGroup_forSceneChange());
 		FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Loading::Create(m_pDevice, m_pDeviceContext, SCENEID::SCENE_EDIT), SCENEID::SCENE_LOADING));
 	}
 #endif // USE_IMGUI
@@ -88,6 +89,7 @@ _int CScene_Loby::LateUpdate(_double fDeltaTime)
 
 	if (GetKeyState(VK_F2) & 0x8000)
 	{
+		FAILED_CHECK(GetSingle(CUtilityMgr)->Clear_RenderGroup_forSceneChange());
 		FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Loading::Create(m_pDevice, m_pDeviceContext, SCENEID::SCENE_STAGESELECT), SCENEID::SCENE_LOADING));
 	}
 
@@ -252,7 +254,11 @@ HRESULT CScene_Loby::Ready_Layer_StaticMapObj(const _tchar * pLayerTag)
 
 HRESULT CScene_Loby::Ready_Layer_Executor(const _tchar * pLayerTag)
 {
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_Executor),&_float3(2,0,7)));
+
+	for (_uint i = 0; i < 50; i++)
+	{
+		FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_Executor), &_float3(i * 2.f, 0, 7)));
+	}
 
 	return S_OK;
 }

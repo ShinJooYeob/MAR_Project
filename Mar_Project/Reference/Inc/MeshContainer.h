@@ -16,12 +16,12 @@ public:
 	virtual HRESULT Initialize_Prototype(CModel::MODELTYPE eMeshtype, aiMesh* pAIMesh, _fMatrix TransformMatrix);
 	virtual HRESULT Initialize_Clone(void* pArg);
 
-	HRESULT Bind_AffectingBones_OnShader(CShader* pShader, _fMatrix DefultPivotMatrix ,_float4x4* pBoneMatrices, const char* szBoneName);
+	HRESULT Bind_AffectingBones_OnShader(CShader* pShader, _fMatrix DefultPivotMatrix ,_float4x4* pBoneMatrices, const char* szBoneName, const vector<CHierarchyNode*>* pVecHierarchyNodes);
 public:
 	_uint		Get_MaterialIndex();
 	_uint		Get_NumAffectingBones() { return m_iNumAffectingBones; };
 	aiMesh*		Get_AiMesh() { return m_pAIMesh; };
-	HRESULT		Add_AffectingBone(CHierarchyNode* pHierarchyNode);
+	HRESULT		Add_AffectingBoneIndex(_uint iHierarchyIndex);
 
 private:
 	//이 매쉬가 사용하는 머테리얼의 인덱스
@@ -33,7 +33,7 @@ private:
 
 
 	/* 현재 메시에 영향을 주는 노드들. */
-	vector<CHierarchyNode*>		m_vecAffectingBones;
+	vector<_uint>		m_vecAffectingBoneIndex;
 private:
 	HRESULT Ready_NonAnimMeshContainer(aiMesh* pAIMesh, _fMatrix TransformMatrix);
 	HRESULT Ready_AnimMeshContainer(aiMesh* pAIMesh);

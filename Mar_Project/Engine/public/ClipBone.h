@@ -22,30 +22,29 @@ public:
 
 
 	const vector<KEYFRAME*>*	Get_KeyFrameContainor() { return &m_vecKeyFrames; };
-	_uint Get_CurrentKeyFrame() const {	return m_iCurrentKeyFrame;}
-	void Set_CurrentKeyFrame(_uint iKeyFrameIndex);
+	//_uint Get_CurrentKeyFrame() const {	return m_iCurrentKeyFrame;}
+	//void Set_CurrentKeyFrame(_uint iKeyFrameIndex);
 
-	void Set_TransformationMatrix_ToHierarchyNode(_fMatrix TransformationMatrix);
+	void Set_TransformationMatrix_ToHierarchyNode(_fMatrix TransformationMatrix, const vector<CHierarchyNode*>* pVecHierarchyNodes);
 
 public:
-	HRESULT Initialize_ClipBone(const char* pClipBoneName, CHierarchyNode* pHierarchyNode);
+	HRESULT Initialize_ClipBone(const char* pClipBoneName, _int HierarchyNodeIndex);
 
 
 private:
 	string						m_szClipBoneName = "";
 
-	_uint						m_iCurrentKeyFrame = 0;
 
 
 	_uint						m_iNumKeyFrames = 0;
 	vector<KEYFRAME*>			m_vecKeyFrames;
 	typedef vector<KEYFRAME*>	KEYFRAME;
 
-	CHierarchyNode*				m_pHierarchyNode = nullptr;
+	_int					m_iHierarchyNodeIndex = -1;
 
 
 public:
-	static CClipBone* Create(const char* pClipBoneName, CHierarchyNode* pHierarchyNode);
+	static CClipBone* Create(const char* pClipBoneName, _int HierarchyNodeIndex);
 	virtual void Free() override;
 };
 

@@ -75,7 +75,7 @@ _int CRendererEditSceneUI::Render()
 		}
 
 		if(EditUIDesc.fAngle != 0)
-			m_pTransformCom->Rotation_CW(XMVectorSet(0, 0, 1, 0), XMConvertToRadians(EditUIDesc.fAngle));
+			m_pTransformCom->Rotation_CCW(XMVectorSet(0, 0, 1, 0), XMConvertToRadians(EditUIDesc.fAngle));
 
 
 		FAILED_CHECK(m_pTransformCom->Bind_OnShader(m_pShaderCom, "g_WorldMatrix"));
