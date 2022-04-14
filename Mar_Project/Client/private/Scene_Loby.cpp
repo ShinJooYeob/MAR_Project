@@ -122,8 +122,10 @@ HRESULT CScene_Loby::Ready_Light()
 {
 	LIGHTDESC LightDesc;
 
+
+
 	LightDesc.eLightType = tagLightDesc::TYPE_DIRECTIONAL;
-	LightDesc.vDiffuse = _float4(1);
+	LightDesc.vDiffuse = _float4(0.6f, 0.6f,1.f,1.f);
 	LightDesc.vAmbient = _float4(1);
 	LightDesc.vSpecular = _float4(1);
 	LightDesc.vVector = _float4(1, -1, 1, 0);
@@ -194,12 +196,15 @@ HRESULT CScene_Loby::Ready_Layer_Terrain(const _tchar * pLayerTag)
 {
 	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_Terrain)));
 
+	CTransform* TerrainTransform = (CTransform*)( g_pGameInstance->Get_Commponent_By_LayerIndex(SCENE_LOBY, pLayerTag, TAG_COM(Com_Transform)));
+
+
 	return S_OK;
 }
 
 HRESULT CScene_Loby::Ready_Layer_Player(const _tchar * pLayerTag)
 {
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STATIC, pLayerTag, TAG_OP(Prototype_Player)));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STATIC, pLayerTag, TAG_OP(Prototype_Player),&_float3(4,20,4)));
 
 	return S_OK;
 }
@@ -255,10 +260,11 @@ HRESULT CScene_Loby::Ready_Layer_StaticMapObj(const _tchar * pLayerTag)
 HRESULT CScene_Loby::Ready_Layer_Executor(const _tchar * pLayerTag)
 {
 
-	for (_uint i = 0; i < 50; i++)
+	for (_uint i = 0; i < 20; i++)
 	{
-		FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_Executor), &_float3(i * 2.f, 0, 7)));
+		FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_Executor), &_float3( i* 2.f, 20, 7)));
 	}
+	
 
 	return S_OK;
 }

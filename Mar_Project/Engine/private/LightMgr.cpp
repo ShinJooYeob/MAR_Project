@@ -28,9 +28,32 @@ const LIGHTDESC * CLightMgr::Get_LightDesc(LIGHTDESC::TYPE eLightType, _uint iIn
 
 	for (_uint i = 0; i < iIndex; ++i)
 		++iter;
-
 	return (*iter)->Get_LightDesc();
 }
+
+HRESULT CLightMgr::EasingDiffuseLightDesc(LIGHTDESC::TYPE eLightType, _uint iIndex, _fVector vTargetDiffuse, _float MixRate)
+{
+	if (iIndex >= m_ArrLightList[eLightType].size())
+		return E_FAIL;
+
+	auto	iter = m_ArrLightList[eLightType].begin();
+
+
+	for (_uint i = 0; i < iIndex; ++i)
+		++iter;
+
+	LIGHTDESC* LightDesc = ((*iter)->Get_LightDesc());
+
+	NULL_CHECK_RETURN(LightDesc, E_FAIL);
+
+
+	LightDesc->vDiffuse = XMVectorLerp(LightDesc->vDiffuse.XMVector(), vTargetDiffuse, MixRate);
+
+
+	return S_OK;
+}
+
+
 
 HRESULT CLightMgr::Add_Light(const LIGHTDESC & LightDesc)
 {

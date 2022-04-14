@@ -87,7 +87,7 @@ PS_OUT PS_MAIN_TESTPLAYER(PS_IN In)
 
 	Out.vColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
 
-	if (Out.vColor.r > 0.99 && Out.vColor.g > 0.99 && Out.vColor.b > 0.99)
+	if (Out.vColor.r == 1 && Out.vColor.g == 1&& Out.vColor.b == 1)
 		discard;
 
 	return Out;

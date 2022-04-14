@@ -11,6 +11,16 @@ BEGIN(Client)
 
 class CPlayer final : public CGameObject
 {
+public:
+	enum eWeaponState
+	{
+		Weapon_None = 0, Weapon_Knife, Weapon_Grinder, Weapon_Hammer, Weapon_Teapot, Weapon_Umbrella, Weapon_End
+	};
+	enum ePlayerState
+	{
+
+	};
+
 private:
 	CPlayer(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	CPlayer(const CPlayer& rhs);
@@ -28,6 +38,9 @@ public:
 
 
 	void Add_JumpForce(_float JumpPower);
+	void Add_Force(_float3 vDir, _float Power);
+	HRESULT Calculate_Force(_bool* _IsClientQuit, CRITICAL_SECTION* _CriSec);
+
 	_float	Get_SmallVisualTime() { return m_fSmallVisualTime; }
 private:
 	CShader*			m_pShaderCom = nullptr;
@@ -45,6 +58,7 @@ private:
 	_float				m_fMaxJumpPower = 0;
 	_float				m_fJumpPower = 0;
 	_double				m_LevitationTime = 0;
+	_uint				m_iJumpCount = 0;
 
 	/*For Shrink*/
 	_float				m_fSmallScale = 1.f;
@@ -65,6 +79,14 @@ private:
 	/*For Bullet*/
 	_double				m_BulletNormalInterver = 0;
 
+
+	/*For Weapon*/
+	eWeaponState		m_eNowWeapon = Weapon_None;
+
+	/*For AddForce*/
+	_bool				m_bIsActived = false;
+	_float3				m_vAddedForce = _float3(0, 0, 0);
+
 private:
 	HRESULT SetUp_Components();
 	
@@ -82,6 +104,9 @@ private:
 	HRESULT Set_Player_On_Terrain();
 	HRESULT Set_Player_On_Slieder(_double fDeltatime);
 	HRESULT Set_Camera_On_Player(_double fDeltaTime);
+
+	/*For_Animation*/
+	//HRESULT Play_Animation();
 
 public:
 	static CPlayer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext,void* pArg = nullptr);

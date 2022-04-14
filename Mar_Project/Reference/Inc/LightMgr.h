@@ -18,6 +18,7 @@ public:
 
 public:
 	const LIGHTDESC* Get_LightDesc(LIGHTDESC::TYPE eLightType, _uint iIndex) const;
+	HRESULT EasingDiffuseLightDesc(LIGHTDESC::TYPE eLightType, _uint iIndex, _fVector vTargetDiffuse, _float MixRate = 1.f);
 	HRESULT Add_Light(const LIGHTDESC& LightDesc);
 
 private:

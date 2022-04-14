@@ -93,6 +93,8 @@ PS_OUT PS_MAIN_DEFAULT(PS_IN In)
 
 	Out.vColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
 
+	Out.vColor.a = 1;
+
 	return Out;
 }
 

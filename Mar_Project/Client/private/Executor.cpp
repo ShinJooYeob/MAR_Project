@@ -36,6 +36,27 @@ HRESULT CExecutor::Initialize_Clone(void * pArg)
 
 _int CExecutor::Update(_double fDeltaTime)
 {
+
+	if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
+		m_pModel->Change_AnimIndex(0);
+	if (g_pGameInstance->Get_DIKeyState(DIK_2)&DIS_Down)
+		m_pModel->Change_AnimIndex(1);
+	if (g_pGameInstance->Get_DIKeyState(DIK_3)&DIS_Down)
+		m_pModel->Change_AnimIndex(2);
+	if (g_pGameInstance->Get_DIKeyState(DIK_4)&DIS_Down)
+		m_pModel->Change_AnimIndex(3);
+	if (g_pGameInstance->Get_DIKeyState(DIK_5)&DIS_Down)
+		m_pModel->Change_AnimIndex(4);
+	if (g_pGameInstance->Get_DIKeyState(DIK_6)&DIS_Down)
+		m_pModel->Change_AnimIndex(5);
+	if (g_pGameInstance->Get_DIKeyState(DIK_7)&DIS_Down)
+		m_pModel->Change_AnimIndex(6);
+	if (g_pGameInstance->Get_DIKeyState(DIK_8)&DIS_Down)
+		m_pModel->Change_AnimIndex(7);
+	if (g_pGameInstance->Get_DIKeyState(DIK_9)&DIS_Down)
+		m_pModel->Change_AnimIndex(8);
+
+
 	return _int();
 }
 

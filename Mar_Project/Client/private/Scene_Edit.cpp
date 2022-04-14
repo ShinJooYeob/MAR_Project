@@ -878,15 +878,14 @@ HRESULT CScene_Edit::Input_KeyBoard(_double fDeltaTime)
 
 		if (pInstance->Get_DIKeyState(DIK_SPACE) & DIS_Down) m_bIsBlockPick = !m_bIsBlockPick;
 
-		m_fPickingRadius;
 		if (!(pInstance->Get_DIKeyState(DIK_LSHIFT) & DIS_Press))
 		{
 			_long fWheelMove = pInstance->Get_DIMouseMoveState(CInput_Device::MMS_WHEEL);
 
 			if (fWheelMove)
 			{
-				m_fPickingRadius += _float(fWheelMove *0.021f * fDeltaTime);
-
+				//m_fPickingRadius += _float(fWheelMove *0.021f * fDeltaTime);
+				m_fPickingHeight += _float(fWheelMove *0.021f * fDeltaTime);
 			}
 			
 		}

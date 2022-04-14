@@ -20,10 +20,11 @@ public:
 
 
 public:
-	HRESULT Change_AnimIndex(_uint iAnimIndex);
-	HRESULT Change_AnimIndex_Wait(_uint iAnimIndex);
-	HRESULT Change_AnimIndex_ReturnTo(_uint iAnimIndex, _uint iReturnIndex);
-	HRESULT Change_AnimIndex_ReturnToWait(_uint iAnimIndex, _uint iReturnIndex);
+	HRESULT Change_AnimIndex(_uint iAnimIndex, _double ExitTime = 0.15);
+	HRESULT Change_AnimIndex_ReturnTo(_uint iAnimIndex, _uint iReturnIndex, _double ExitTime = 0.15);
+	HRESULT Change_AnimIndex_UntilTo(_uint iAnimIndex, _uint iReturnIndex, _double ExitTime = 0.15);
+	_uint  Get_NowAnimIndex() { return m_iNowAnimIndex; };
+	_uint Get_KindsOfAnimChange() { return m_KindsOfAnimChange; };
 
 	HRESULT Bind_OnShader(class CShader* pShader, _uint iMaterialIndex , _uint eTextureType, const char* pHlslConstValueName);
 	HRESULT Update_AnimationClip(_double fDeltaTime);	
@@ -49,7 +50,6 @@ private:/*뼈들의 상속관계 순서대로 정렬해 보관*/
 	typedef vector<class CHierarchyNode*>	HIERARCHYNODES;
 
 private:
-	_uint									m_iCurrentAnimIndex = 0;
 	_uint									m_iNumAnimationClip = 0;
 	vector<class CAnimationClip*>			m_vecAnimator;
 	typedef vector<class CAnimationClip*>	ANIMATOR;
@@ -57,10 +57,17 @@ private:
 	//i번째 애니메이션이 사용하는 j번째 클립본의 현재 키프레임을 저장
 	vector<vector<_uint>>					m_vecCurrentKeyFrameIndices;
 	//현재 재생되고있는 애니메이션 재생 시간
+	_uint		m_iNextAnimIndex = 0;
+	_uint		m_iNowAnimIndex = 0;
+	_uint		m_iOldAnimIndex = 0;
 	_double		m_NowPlayTimeAcc = 0.0;
-	//다음에 재생될 애니메이션의 시간
-	_double		m_NextPlayTimeAcc = 0.0;
-	_double		m_AnimExitTime = 0.15;
+	_double		m_OldPlayTimeAcc = 0.0;
+	//이전에 재생된 애니메이션의 시간
+	_double		m_TotalAnimExitTime = 0.2;
+	_double		m_AnimExitAcc = 0.0;
+	_uint		m_KindsOfAnimChange = 0;
+
+	_bool		m_bIsChagingAnim = false;
 
 
 private:

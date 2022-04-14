@@ -184,8 +184,22 @@ PS_OUT PS_MAIN_TERRAIN_WIRE(PS_IN In)
 		discard;
 	}
 	else {
+		vector	vBrushColor = (vector)0.f;
 
-		Out.vColor = vector(0, 0.5, 0, 1);
+		if (g_vBrushPos.x - g_fRadius < In.vWorldPos.x && In.vWorldPos.x <= g_vBrushPos.x + g_fRadius &&
+			g_vBrushPos.z - g_fRadius < In.vWorldPos.z && In.vWorldPos.z <= g_vBrushPos.z + g_fRadius)
+		{
+			float2		vBrushUV;
+
+			vBrushUV.x = (In.vWorldPos.x - (g_vBrushPos.x - g_fRadius)) / (2.f * g_fRadius);
+			vBrushUV.y = ((g_vBrushPos.z + g_fRadius) - In.vWorldPos.z) / (2.f * g_fRadius);
+
+
+			vBrushColor = g_BrushTexture.Sample(DefaultSampler, vBrushUV);
+		}
+
+
+		Out.vColor = vector(0, 0.5, 0, 1) +vBrushColor;
 
 	}
 
@@ -232,7 +246,7 @@ PS_OUT PS_MAIN_TERRAIN_EDIT(PS_IN In)
 
 
 
-		float	fShade = max(dot(normalize(g_vLightVector) * -1.f, In.vWorldNormal), 0.f);
+	/*	float	fShade = max(dot(normalize(g_vLightVector) * -1.f, In.vWorldNormal), 0.f);
 
 		vector	vReflect = reflect(normalize(g_vLightVector), In.vWorldNormal);
 		vector	vLook = normalize(In.vWorldPos - g_CamPosition);
@@ -240,9 +254,9 @@ PS_OUT PS_MAIN_TERRAIN_EDIT(PS_IN In)
 		float	fSpecular = pow(max(dot(normalize(vReflect) * -1.f, vLook), 0.f), 30.f);
 
 		Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient))
-			+ (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
+			+ (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;*/
 
-
+		Out.vColor = vMtrlDiffuse;
 	}
 	return Out;
 }

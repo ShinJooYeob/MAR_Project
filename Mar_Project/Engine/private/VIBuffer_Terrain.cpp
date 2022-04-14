@@ -66,7 +66,7 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(const _tchar* pHeightMap)
 			_uint		iIndex = i * m_iNumVerticesX + j;
 			//_float ValueY = (pPixel[iIndex] & 0x000000ff) / 10.f;			
 
-			if ((pPixel[iIndex] & 0x00ff0000 >> 4) != 0)
+			if ((_ulong(pPixel[iIndex] & 0x00ff0000) >> 4) != 0)
 				pVertices[iIndex].vPosition = m_pVertices[iIndex] = _float3(_float(j), -FLT_MAX, _float(i));
 			else
 				pVertices[iIndex].vPosition = m_pVertices[iIndex] = _float3(_float(j), _float((pPixel[iIndex] & 0x000000ff)), _float(i));

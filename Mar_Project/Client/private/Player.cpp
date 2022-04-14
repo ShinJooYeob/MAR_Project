@@ -4,6 +4,20 @@
 #include "Terrain.h"
 
 
+
+_uint CALLBACK Add_Force_Thread(void* _Prameter)
+{
+	THREADARG tThreadArg{};
+	memcpy(&tThreadArg, _Prameter, sizeof(THREADARG));
+	delete _Prameter;
+
+
+	CPlayer* pPlayer = (CPlayer*)(tThreadArg.pArg);
+	FAILED_CHECK(pPlayer->Calculate_Force(tThreadArg.IsClientQuit, tThreadArg.CriSec));
+	return 0;
+}
+
+
 CPlayer::CPlayer(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext) 
 	: CGameObject(pDevice, pDeviceContext)
 {
@@ -27,6 +41,10 @@ HRESULT CPlayer::Initialize_Clone(void * pArg)
 	FAILED_CHECK(__super::Initialize_Clone(pArg));
 
 	FAILED_CHECK(SetUp_Components());
+
+	if (pArg != nullptr)
+		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, *((_float3*)pArg));
+
 
 	return S_OK;
 }
@@ -132,6 +150,63 @@ void CPlayer::Add_JumpForce(_float JumpPower)
 	m_LevitationTime = 0.0000000001f;
 }
 
+void CPlayer::Add_Force(_float3 vDir, _float Power)
+{
+	m_vAddedForce = (vDir.Get_Nomalize() * Power) + m_vAddedForce.XMVector();
+
+	if (!m_bIsActived)
+	{
+		m_bIsActived = false;
+		g_pGameInstance->PlayThread(Add_Force_Thread, this);
+	}
+
+}
+
+HRESULT CPlayer::Calculate_Force(_bool * _IsClientQuit, CRITICAL_SECTION * _CriSec)
+{
+
+	DWORD  NowTick = GetTickCount();
+	DWORD  OldTick = NowTick;
+
+	while (true)
+	{
+		if (*_IsClientQuit == true)
+			return S_OK;
+
+		NowTick = GetTickCount();
+
+		if ((NowTick - OldTick) < g_fDeltaTime * 1000)
+			continue;
+		OldTick = NowTick;
+
+		_float Power = m_vAddedForce.Get_Lenth();
+		_Vector vDir = m_vAddedForce.Get_Nomalize();
+
+
+		if (Power * 0.78f < 0.2)
+		{
+			EnterCriticalSection(_CriSec);
+			m_vAddedForce = _float3(0, 0, 0);
+			LeaveCriticalSection(_CriSec);
+			break;
+		}
+
+		EnterCriticalSection(_CriSec);
+		m_pTransformCom->MovetoDir_bySpeed(vDir, Power , g_fDeltaTime);
+		m_vAddedForce = vDir * Power * 0.78f;
+		LeaveCriticalSection(_CriSec);
+
+
+	}
+
+	EnterCriticalSection(_CriSec);
+	m_bIsActived = false;
+	LeaveCriticalSection(_CriSec);
+
+
+	return S_OK;
+}
+
 HRESULT CPlayer::SetUp_Components()
 {
 
@@ -177,15 +252,18 @@ HRESULT CPlayer::Input_Keyboard(_double fDeltaTime)
 		GetSingle(CUtilityMgr)->SlowMotionStart();
 
 
-	FAILED_CHECK(Smalling_Update(fDeltaTime, pInstance));
-	FAILED_CHECK(Dash_Update(fDeltaTime, pInstance));
-	if (!m_fDashPassedTime)
-		FAILED_CHECK(Move_Update(fDeltaTime, pInstance));
-	FAILED_CHECK(Jump_Update(fDeltaTime, pInstance));
+	if (m_pModel->Get_NowAnimIndex() != 19)
+	{
+		FAILED_CHECK(Smalling_Update(fDeltaTime, pInstance));
+		FAILED_CHECK(Dash_Update(fDeltaTime, pInstance));
+		if (!m_fDashPassedTime)
+			FAILED_CHECK(Move_Update(fDeltaTime, pInstance));
+		FAILED_CHECK(Jump_Update(fDeltaTime, pInstance));
+		FAILED_CHECK(Lunch_Bullet(fDeltaTime, pInstance));
+		FAILED_CHECK(Lunch_Grenade(fDeltaTime, pInstance));
+	}
 	FAILED_CHECK(RockOn_Update(fDeltaTime, pInstance));
 
-	FAILED_CHECK(Lunch_Bullet(fDeltaTime, pInstance));
-	FAILED_CHECK(Lunch_Grenade(fDeltaTime, pInstance));
 
 	
 
@@ -196,14 +274,14 @@ HRESULT CPlayer::Input_Keyboard(_double fDeltaTime)
 HRESULT CPlayer::Smalling_Update(_double fDeltaTime, CGameInstance* pInstance)
 {
 
-	BYTE LShiftState = pInstance->Get_DIKeyState(DIK_LCONTROL);
-	if (LShiftState & DIS_Press)
+	BYTE KeyState = pInstance->Get_DIKeyState(DIK_LCONTROL);
+	if (KeyState & DIS_Press)
 	{
-		if (LShiftState & DIS_Down)
+		if (KeyState & DIS_Down)
 		{
 			m_fSmallPassedTime = 0;
 		}
-		else if (LShiftState & DIS_Up)
+		else if (KeyState & DIS_Up)
 		{
 
 			m_fSmallPassedTime = 0;
@@ -256,56 +334,76 @@ HRESULT CPlayer::Smalling_Update(_double fDeltaTime, CGameInstance* pInstance)
 
 HRESULT CPlayer::Move_Update(_double fDeltaTime, CGameInstance* pInstance)
 {
-	_int PressedChecker[4];
-	ZeroMemory(PressedChecker, sizeof(_bool) * 4);
+
+	
+
+		_int PressedChecker[4];
+		ZeroMemory(PressedChecker, sizeof(_bool) * 4);
+
+		PressedChecker[0] = _int(pInstance->Get_DIKeyState(DIK_W) & DIS_Press);
+		PressedChecker[1] = _int(pInstance->Get_DIKeyState(DIK_S) & DIS_Press);
+		PressedChecker[2] = _int(pInstance->Get_DIKeyState(DIK_A) & DIS_Press);
+		PressedChecker[3] = _int(pInstance->Get_DIKeyState(DIK_D) & DIS_Press);
+
+		if (PressedChecker[0] || PressedChecker[1] || PressedChecker[2] || PressedChecker[3])
+		{
+			//m_pTransformCom->LookDir(XMVectorSetY(m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0)
+			//	- XMVectorSetY(m_pMainCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_POS), 0));
+
+			_Vector forword = XMVector3Normalize(XMVectorSetY(m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0)
+				- XMVectorSetY(m_pMainCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_POS), 0));
+
+			_Vector right = XMVector3Cross(XMVectorSet(0, 1, 0, 0), forword);
+
+			_Vector Dir = XMVectorSet(0, 0, 0, 0);
+
+			/*
+			//if (PressedChecker[0]) Dir += m_pTransformCom->Get_MatrixState_Normalized(CTransform::STATE_LOOK);
+			//if (PressedChecker[1]) Dir -= m_pTransformCom->Get_MatrixState_Normalized(CTransform::STATE_LOOK);
+			//if (PressedChecker[2]) Dir -= m_pTransformCom->Get_MatrixState_Normalized(CTransform::STATE_RIGHT);
+			//if (PressedChecker[3]) Dir += m_pTransformCom->Get_MatrixState_Normalized(CTransform::STATE_RIGHT);
+			*/
+
+			if (PressedChecker[0]) Dir += forword;
+			if (PressedChecker[1]) Dir -= forword;
+			if (PressedChecker[2]) Dir -= right;
+			if (PressedChecker[3]) Dir += right;
+
+			Dir = XMVector3Normalize(Dir);
+			_Vector vOldLook = m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK);
+
+			if (XMVector3Equal(Dir * -1, vOldLook))
+				m_pTransformCom->LookDir(m_pTransformCom->Get_MatrixState(CTransform::STATE_RIGHT));
+			else
+				m_pTransformCom->LookDir((Dir + vOldLook));
+
+			m_pTransformCom->MovetoDir(XMVector3Normalize(Dir), fDeltaTime);
 
 
-	PressedChecker[0] = _int(pInstance->Get_DIKeyState(DIK_W) & DIS_Press);
-	PressedChecker[1] = _int(pInstance->Get_DIKeyState(DIK_S) & DIS_Press);
-	PressedChecker[2] = _int(pInstance->Get_DIKeyState(DIK_A) & DIS_Press);
-	PressedChecker[3] = _int(pInstance->Get_DIKeyState(DIK_D) & DIS_Press);
+			if (!m_LevitationTime)
+				m_pModel->Change_AnimIndex(8);
+		}
+		else {
+			if (!m_LevitationTime)
+				m_pModel->Change_AnimIndex(0);
 
-	if (PressedChecker[0] || PressedChecker[1] || PressedChecker[2] || PressedChecker[3])
-	{
-		//m_pTransformCom->LookDir(XMVectorSetY(m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0)
-		//	- XMVectorSetY(m_pMainCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_POS), 0));
-
-		_Vector forword = XMVector3Normalize(XMVectorSetY(m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0)
-						- XMVectorSetY(m_pMainCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_POS), 0));
-
-		_Vector right = XMVector3Cross(XMVectorSet(0, 1, 0, 0), forword);
-
-		_Vector Dir = XMVectorSet(0, 0, 0, 0);
-
-		//if (PressedChecker[0]) Dir += m_pTransformCom->Get_MatrixState_Normalized(CTransform::STATE_LOOK);
-		//if (PressedChecker[1]) Dir -= m_pTransformCom->Get_MatrixState_Normalized(CTransform::STATE_LOOK);
-		//if (PressedChecker[2]) Dir -= m_pTransformCom->Get_MatrixState_Normalized(CTransform::STATE_RIGHT);
-		//if (PressedChecker[3]) Dir += m_pTransformCom->Get_MatrixState_Normalized(CTransform::STATE_RIGHT);
-
-		if (PressedChecker[0]) Dir += forword;
-		if (PressedChecker[1]) Dir -= forword;
-		if (PressedChecker[2]) Dir -= right;
-		if (PressedChecker[3]) Dir += right;
-
-		Dir = XMVector3Normalize(Dir);
-		_Vector vOldLook = m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK);
-
-		if (XMVector3Equal(Dir * -1, vOldLook))
-			m_pTransformCom->LookDir(m_pTransformCom->Get_MatrixState(CTransform::STATE_RIGHT));
-		else 
-			m_pTransformCom->LookDir((Dir + vOldLook));
 		
-		m_pTransformCom->MovetoDir(XMVector3Normalize(Dir), fDeltaTime);
-	}
 
+	}
 	return S_OK;
 }
 
 HRESULT CPlayer::Jump_Update(_double fDeltaTime, CGameInstance* pInstance)
 {
-	if (pInstance->Get_DIKeyState(DIK_SPACE) & DIS_Down)
+	if (m_iJumpCount < 2 &&pInstance->Get_DIKeyState(DIK_SPACE) & DIS_Down)
 	{
 		Add_JumpForce(PlayerMaxJumpPower * m_fSmallScale);
+
+		m_pModel->Change_AnimIndex_UntilTo(15 + m_iJumpCount * 5, 17 + m_iJumpCount * 5, 0.08);
+
+
+		m_iJumpCount++;
+
 	}
 
 	m_LevitationTime += fDeltaTime;
@@ -326,6 +424,8 @@ HRESULT CPlayer::Jump_Update(_double fDeltaTime, CGameInstance* pInstance)
 		fGravity = _float((m_LevitationTime) * (m_LevitationTime)* -29.4f);
 	}
 
+	if (m_LevitationTime != fDeltaTime &&fGravity < 0)
+		m_pModel->Change_AnimIndex(17);
 
 	m_pTransformCom->MovetoDir_bySpeed(XMVectorSet(0, 1.f, 0, 0), fGravity, fDeltaTime);
 
@@ -492,6 +592,19 @@ HRESULT CPlayer::Set_Player_On_Terrain()
 
 	if (bIsOn)
 	{
+		if (m_LevitationTime > g_fDeltaTime)
+		{
+			if (m_LevitationTime < 0.9f)
+				m_pModel->Change_AnimIndex_ReturnTo(18 + m_iJumpCount * 5, 0,0);
+			else
+			{
+				m_pModel->Change_AnimIndex_ReturnTo(19, 0,0);
+				Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 10);
+			}
+		}
+		
+
+		m_iJumpCount = 0;
 		m_LevitationTime = 0;
 		m_fJumpPower = -1.f;
 		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, CaculatedPos);

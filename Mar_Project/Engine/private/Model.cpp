@@ -150,11 +150,14 @@ HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, const char * pModelFi
 		if (iAnimCount != 1)
 			FAILED_CHECK(Ready_MoreAnimation(szFullPath, iAnimCount, iFlag));
 
+#ifdef _DEBUG
 		string ttszLog = "Num AnimationClip: " + to_string(m_iNumAnimationClip) + "\n";
 		wstring ttDebugLog;
 		ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
 
 		OutputDebugStringW(ttDebugLog.c_str());
+
+#endif
 	}
 	
 	return S_OK;
@@ -170,39 +173,115 @@ HRESULT CModel::Initialize_Clone(void * pArg)
 	return S_OK;
 }
 
-HRESULT CModel::Change_AnimIndex(_uint iAnimIndex)
+HRESULT CModel::Change_AnimIndex(_uint iAnimIndex, _double ExitTime)
 {
 	if (iAnimIndex >= m_iNumAnimationClip)
 		return E_FAIL;
 
-	m_iCurrentAnimIndex = iAnimIndex;
+	if (iAnimIndex == m_iNowAnimIndex) return S_FALSE;
+
+	m_bIsChagingAnim = true;
+
+	if (m_AnimExitAcc)
+	{
+		_uint iNumOldAnimKeyFrameIdx = _uint(m_vecCurrentKeyFrameIndices[m_iOldAnimIndex].size());
+		m_vecCurrentKeyFrameIndices[m_iOldAnimIndex].clear();
+		m_vecCurrentKeyFrameIndices[m_iOldAnimIndex].resize(iNumOldAnimKeyFrameIdx);
+	}
+	m_AnimExitAcc = 0;
+	m_TotalAnimExitTime = ExitTime;
+
+
+	m_OldPlayTimeAcc = m_NowPlayTimeAcc;
+	m_iOldAnimIndex = m_iNowAnimIndex;
+
+
+	m_NowPlayTimeAcc = 0;
+	m_iNowAnimIndex = iAnimIndex;
+
+
+	m_iNextAnimIndex = iAnimIndex;
+
+	m_KindsOfAnimChange = 0;
 
 	return S_OK;
 }
 
-HRESULT CModel::Change_AnimIndex_Wait(_uint iAnimIndex)
-{
-	if (iAnimIndex >= m_iNumAnimationClip)
-		return E_FAIL;
-
-	return S_OK;
-}
-
-HRESULT CModel::Change_AnimIndex_ReturnTo(_uint iAnimIndex, _uint iReturnIndex)
-{
-	if (iAnimIndex >= m_iNumAnimationClip|| iReturnIndex >= m_iNumAnimationClip)
-		return E_FAIL;
-
-	return S_OK;
-}
-
-HRESULT CModel::Change_AnimIndex_ReturnToWait(_uint iAnimIndex, _uint iReturnIndex)
+HRESULT CModel::Change_AnimIndex_UntilTo(_uint iAnimIndex, _uint iReturnIndex, _double ExitTime)
 {
 	if (iAnimIndex >= m_iNumAnimationClip || iReturnIndex >= m_iNumAnimationClip)
 		return E_FAIL;
 
+
+	if (iAnimIndex == m_iNowAnimIndex) return S_FALSE;
+
+	if (m_bIsChagingAnim || m_AnimExitAcc) // m_AnimExitAcc 변환 중이였다면
+	{
+		_uint iNumOldAnimKeyFrameIdx = _uint(m_vecCurrentKeyFrameIndices[m_iOldAnimIndex].size());
+		m_vecCurrentKeyFrameIndices[m_iOldAnimIndex].clear();
+		m_vecCurrentKeyFrameIndices[m_iOldAnimIndex].resize(iNumOldAnimKeyFrameIdx);
+	}
+
+	m_bIsChagingAnim = true;
+
+	
+	m_AnimExitAcc = 0;
+	m_TotalAnimExitTime = ExitTime;
+
+
+	m_OldPlayTimeAcc = m_NowPlayTimeAcc;
+	m_iOldAnimIndex = m_iNowAnimIndex;
+
+
+	m_NowPlayTimeAcc = 0;
+	m_iNowAnimIndex = iAnimIndex;
+
+
+	m_iNextAnimIndex = iReturnIndex;
+
+	m_KindsOfAnimChange = 0;
+
 	return S_OK;
 }
+
+
+
+HRESULT CModel::Change_AnimIndex_ReturnTo(_uint iAnimIndex, _uint iReturnIndex, _double ExitTime)
+{
+	if (iAnimIndex >= m_iNumAnimationClip || iReturnIndex >= m_iNumAnimationClip)
+		return E_FAIL;
+
+
+	if (iAnimIndex == m_iNowAnimIndex) return S_FALSE;
+
+	m_bIsChagingAnim = true;
+
+	if (m_AnimExitAcc)
+	{
+		_uint iNumOldAnimKeyFrameIdx = _uint(m_vecCurrentKeyFrameIndices[m_iOldAnimIndex].size());
+		m_vecCurrentKeyFrameIndices[m_iOldAnimIndex].clear();
+		m_vecCurrentKeyFrameIndices[m_iOldAnimIndex].resize(iNumOldAnimKeyFrameIdx);
+	}
+	m_AnimExitAcc = 0;
+	m_TotalAnimExitTime = ExitTime;
+
+
+	m_OldPlayTimeAcc = m_NowPlayTimeAcc;
+	m_iOldAnimIndex = m_iNowAnimIndex;
+
+
+	m_NowPlayTimeAcc = 0;
+	m_iNowAnimIndex = iAnimIndex;
+
+
+	m_iNextAnimIndex = iReturnIndex;
+
+	m_KindsOfAnimChange = 1;
+
+	return S_OK;
+}
+
+
 
 HRESULT CModel::Bind_OnShader(CShader * pShader, _uint iMaterialIndex, _uint eTextureType, const char * pHlslConstValueName)
 {
@@ -228,31 +307,148 @@ HRESULT CModel::Bind_OnShader(CShader * pShader, _uint iMaterialIndex, _uint eTe
 
 HRESULT CModel::Update_AnimationClip(_double fDeltaTime)
 {
+	switch (m_KindsOfAnimChange)
+	{
+	case 0:
+	{
+		if (!m_bIsChagingAnim)
+		{
+			//해당 애니메이션을 따라서 트렌스폼매트릭스를 갱신해주고
+			FAILED_CHECK(m_vecAnimator[m_iNowAnimIndex]->Update_TransformMatrices_byClipBones(&m_bIsChagingAnim, fDeltaTime, &m_NowPlayTimeAcc,
+				&m_vecHierarchyNode, &(m_vecCurrentKeyFrameIndices[m_iNowAnimIndex])));
 
-	_bool TestBool = false;
+			if (m_bIsChagingAnim)
+			{
+				m_OldPlayTimeAcc = m_NowPlayTimeAcc;
+				m_iOldAnimIndex = m_iNowAnimIndex;
 
-	HRESULT hr = 0;
+				m_NowPlayTimeAcc = 0;
 
-	//해당 애니메이션을 따라서 트렌스폼매트릭스를 갱신해주고
-	hr = (m_vecAnimator[m_iCurrentAnimIndex]->Update_TransformMatrices_byClipBones(	&TestBool,fDeltaTime,&m_NowPlayTimeAcc,
-		&m_vecHierarchyNode, &(m_vecCurrentKeyFrameIndices[m_iCurrentAnimIndex])));
+				if (m_iNowAnimIndex < m_iNextAnimIndex)
+				{
+					m_iNowAnimIndex = m_iNowAnimIndex + 1;
+
+				}
+				else
+				{
+					m_iNowAnimIndex = m_iNowAnimIndex;
+					m_TotalAnimExitTime = 0;
+				}
+
+				m_AnimExitAcc = 0;
+			}
+
+		}
+
+
+
+		if (m_bIsChagingAnim)
+		{
+			m_AnimExitAcc += fDeltaTime;
+
+			if (m_AnimExitAcc <= m_TotalAnimExitTime)
+			{
+
+				FAILED_CHECK(m_vecAnimator[m_iNowAnimIndex]->Update_TransformMatrices_byEasing_OldAnim(m_iNowAnimIndex, m_vecAnimator[m_iOldAnimIndex], m_iOldAnimIndex,
+					m_OldPlayTimeAcc, m_AnimExitAcc / m_TotalAnimExitTime, &m_vecHierarchyNode, &m_vecCurrentKeyFrameIndices));
+
+			}
+			else
+			{
+
+				//이전 애니메이션 초기화
+				_uint iNumOldAnimKeyFrameIdx = _uint(m_vecCurrentKeyFrameIndices[m_iOldAnimIndex].size());
+				m_vecCurrentKeyFrameIndices[m_iOldAnimIndex].clear();
+				m_vecCurrentKeyFrameIndices[m_iOldAnimIndex].resize(iNumOldAnimKeyFrameIdx);
+
+				m_OldPlayTimeAcc = 0;
+
+				m_bIsChagingAnim = false;
+				m_AnimExitAcc = 0;
+
+				FAILED_CHECK(m_vecAnimator[m_iNowAnimIndex]->Update_TransformMatrices_byClipBones(&m_bIsChagingAnim, fDeltaTime, &m_NowPlayTimeAcc,
+					&m_vecHierarchyNode, &(m_vecCurrentKeyFrameIndices[m_iNowAnimIndex])));
+			}
+
+		}
+
+	}
+		break;
+
+	case 1: //ReturnTo
+	{
+		if (!m_bIsChagingAnim)
+		{
+			//해당 애니메이션을 따라서 트렌스폼매트릭스를 갱신해주고
+			FAILED_CHECK(m_vecAnimator[m_iNowAnimIndex]->Update_TransformMatrices_byClipBones(&m_bIsChagingAnim, fDeltaTime, &m_NowPlayTimeAcc,
+				&m_vecHierarchyNode, &(m_vecCurrentKeyFrameIndices[m_iNowAnimIndex])));
+
+			if (m_bIsChagingAnim)
+			{
+				m_OldPlayTimeAcc = m_NowPlayTimeAcc;
+				m_iOldAnimIndex = m_iNowAnimIndex;
+				m_NowPlayTimeAcc = 0;
+				m_iNowAnimIndex = m_iNextAnimIndex;
+				m_AnimExitAcc = 0;
+				m_KindsOfAnimChange = 0;
+			}
+
+		}
+
+
+
+		if (m_bIsChagingAnim)
+		{
+			m_AnimExitAcc += fDeltaTime;
+
+			if (m_AnimExitAcc <= m_TotalAnimExitTime)
+			{
+
+				FAILED_CHECK(m_vecAnimator[m_iNowAnimIndex]->Update_TransformMatrices_byEasing_OldAnim(m_iNowAnimIndex, m_vecAnimator[m_iOldAnimIndex], m_iOldAnimIndex,
+					m_OldPlayTimeAcc, m_AnimExitAcc / m_TotalAnimExitTime, &m_vecHierarchyNode, &m_vecCurrentKeyFrameIndices));
+
+			}
+			else
+			{
+
+				//이전 애니메이션 초기화
+				_uint iNumOldAnimKeyFrameIdx = _uint(m_vecCurrentKeyFrameIndices[m_iOldAnimIndex].size());
+				m_vecCurrentKeyFrameIndices[m_iOldAnimIndex].clear();
+				m_vecCurrentKeyFrameIndices[m_iOldAnimIndex].resize(iNumOldAnimKeyFrameIdx);
+
+				m_OldPlayTimeAcc = 0;
+				m_bIsChagingAnim = false;
+				m_AnimExitAcc = 0;
+
+				FAILED_CHECK(m_vecAnimator[m_iNowAnimIndex]->Update_TransformMatrices_byClipBones(&m_bIsChagingAnim, fDeltaTime, &m_NowPlayTimeAcc,
+					&m_vecHierarchyNode, &(m_vecCurrentKeyFrameIndices[m_iNowAnimIndex])));
+
+
+				if (m_bIsChagingAnim)
+				{
+					m_OldPlayTimeAcc = m_NowPlayTimeAcc;
+					m_iOldAnimIndex = m_iNowAnimIndex;
+					m_NowPlayTimeAcc = 0;
+					m_iNowAnimIndex = m_iNextAnimIndex;
+					m_AnimExitAcc = 0;
+					m_KindsOfAnimChange = 0;
+				}
+
+			}
+
+		}
+
+	}
+		break;
+
+	default:
+		break;
+	}
+
+
+
 	
-	FAILED_CHECK(hr);
 
-	if (hr == S_FALSE)
-	{
-
-
-
-
-	}
-
-	if (TestBool)
-	{
-		//m_iCurrentAnimIndex++;
-		//if (m_iCurrentAnimIndex >= m_iNumAnimationClip)
-		//	m_iCurrentAnimIndex = 0;
-	}
 
 	//갱신된 매트릭스를 따라서 컴바인드 메트릭스를 업데이트 해준다.
 	for (auto& pHierarchyNode : m_vecHierarchyNode)
@@ -468,6 +664,16 @@ HRESULT CModel::Ready_Animation()
 		CAnimationClip* pAinmationClip = CAnimationClip::Create(paiAnimation->mName.data, paiAnimation->mDuration, paiAnimation->mTicksPerSecond);
 		NULL_CHECK_RETURN(pAinmationClip,E_FAIL);
 
+
+#ifdef _DEBUG
+		string szLog = "Anim Name : " + string(paiAnimation->mName.data) + "\n";
+		wstring DebugLog;
+		DebugLog.assign(szLog.begin(), szLog.end());
+
+		OutputDebugStringW(DebugLog.c_str());
+#endif
+
+
 		//만든 애니메이션 클립에 애니메이션 뼈 개수만큼 공간을 확보하고
 		pAinmationClip->Reserve(paiAnimation->mNumChannels);
 		m_vecCurrentKeyFrameIndices[i].resize(paiAnimation->mNumChannels);
@@ -575,6 +781,8 @@ HRESULT CModel::Ready_MoreAnimation(const char * szFileFullPath, _uint iAnimCoun
 		//해당 모델에 존자해는 총 애니메이션의 갯수
 		_uint iNumAnimClip = pScene->mNumAnimations;
 		m_iNumAnimationClip += iNumAnimClip;
+		_uint iNumOldAnimClip = _uint(m_vecCurrentKeyFrameIndices.size());
+		m_vecCurrentKeyFrameIndices.resize(m_iNumAnimationClip);
 
 		//만큼 모든 애니메이션을 순회하면서
 		for (_uint i = 0; i < iNumAnimClip; i++)
@@ -586,8 +794,18 @@ HRESULT CModel::Ready_MoreAnimation(const char * szFileFullPath, _uint iAnimCoun
 			CAnimationClip* pAinmationClip = CAnimationClip::Create(paiAnimation->mName.data, paiAnimation->mDuration, paiAnimation->mTicksPerSecond);
 			NULL_CHECK_RETURN(pAinmationClip, E_FAIL);
 
+#ifdef _DEBUG
+			string szLog = "Anim Name : " + string(paiAnimation->mName.data) + "\n";
+			wstring DebugLog;
+			DebugLog.assign(szLog.begin(), szLog.end());
+
+			OutputDebugStringW(DebugLog.c_str());
+#endif
+
+
 			//만든 애니메이션 클립에 애니메이션 뼈 개수만큼 공간을 확보하고
 			pAinmationClip->Reserve(paiAnimation->mNumChannels);
+			m_vecCurrentKeyFrameIndices[iNumOldAnimClip + i].resize(paiAnimation->mNumChannels);
 
 
 			for (_uint j = 0; j < paiAnimation->mNumChannels; j++)

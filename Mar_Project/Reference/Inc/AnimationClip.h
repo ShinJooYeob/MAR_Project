@@ -18,10 +18,15 @@ public:
 	void Reserve(_uint iNumClipBones) { m_vecClipBones.reserve(iNumClipBones);	m_iNumClipBones = iNumClipBones; }
 	void Add_ClipBone(class CClipBone* pClipBone) { m_vecClipBones.push_back(pClipBone); };
 
+	_uint Get_NumClipBone() { return m_iNumClipBones; };
+
 public:
 	HRESULT Initialize_AnimationClip(const char* pName, _double Duration, _double UpdatePerSecond);
 	HRESULT Update_TransformMatrices_byClipBones(_bool* bIsFinished,_double TimeDelta,_double* PlayTimeAcc,
 		const vector<CHierarchyNode*>* pVecHierarchyNodes, vector<_uint>* pVecCurrentKeyFrameIndex);
+
+	HRESULT Update_TransformMatrices_byEasing_OldAnim(_uint iNewAnimIndex, CAnimationClip* pOldAnimationClip, _uint iOldAnimIndex, _double OldTimeAcc, _double MixRatio,
+		const vector<CHierarchyNode*>* pVecHierarchyNodes, vector<vector<_uint>>* pVecAllAnimKeyFrameIndex);
 
 
 private:
@@ -35,7 +40,9 @@ private:
 	typedef vector<class CClipBone*>	CLIPBONES;
 
 
-
+private:
+	HRESULT Get_SRT_CertainClipNTime(_float4x4* pOut,_double TimeAcc, _uint iClipBoneIndex, vector<_uint> *pVecKeyFrameIndex);
+	//const vector<KEYFRAME*>* Get_CertainClipBoneVecKeyFrames(_uint iClipBoneIndex);
 
 public:
 	static CAnimationClip* Create(const char* pAnimationClipName, _double Duration, _double UpdatePerSecond);

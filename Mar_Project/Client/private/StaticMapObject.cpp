@@ -34,32 +34,6 @@ _int CStaticMapObject::Update(_double fDeltaTime)
 		return -1;
 
 
-	if (g_pGameInstance->Get_DIKeyState(DIK_RETURN)&DIS_Down)
-	{
-		static int test = 0;
-		test++;
-
-		if (test > 2)
-			test = 0;
-
-		switch (test)
-		{
-		case 0:
-			FAILED_CHECK(Change_Component_by_NewAssign(m_eNowSceneNum, TAG_CP(Prototype_Mesh_AlgaeRock_Ledge), TAG_COM(Com_Model)));
-			break;
-		case 1:
-			FAILED_CHECK(Change_Component_by_NewAssign(m_eNowSceneNum, TAG_CP(Prototype_Mesh_AlgaeRock_Pillar), TAG_COM(Com_Model)));
-
-			break;
-		case 2:
-			FAILED_CHECK(Change_Component_by_NewAssign(m_eNowSceneNum, TAG_CP(Prototype_Mesh_AlgaeRock_Wall), TAG_COM(Com_Model)));
-
-			break;
-		default:
-			break;
-		}
-	}
-
 
 	return _int();
 }
