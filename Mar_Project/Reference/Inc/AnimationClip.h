@@ -23,7 +23,7 @@ public:
 public:
 	HRESULT Initialize_AnimationClip(const char* pName, _double Duration, _double UpdatePerSecond);
 	HRESULT Update_TransformMatrices_byClipBones(_bool* bIsFinished,_double TimeDelta,_double* PlayTimeAcc,
-		const vector<CHierarchyNode*>* pVecHierarchyNodes, vector<_uint>* pVecCurrentKeyFrameIndex);
+		const vector<CHierarchyNode*>* pVecHierarchyNodes, vector<_uint>* pVecCurrentKeyFrameIndex, _bool IsUpdateAll = true);
 
 	HRESULT Update_TransformMatrices_byEasing_OldAnim(_uint iNewAnimIndex, CAnimationClip* pOldAnimationClip, _uint iOldAnimIndex, _double OldTimeAcc, _double MixRatio,
 		const vector<CHierarchyNode*>* pVecHierarchyNodes, vector<vector<_uint>>* pVecAllAnimKeyFrameIndex);

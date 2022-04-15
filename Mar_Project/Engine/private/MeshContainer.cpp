@@ -84,9 +84,12 @@ HRESULT CMeshContainer::Bind_AffectingBones_OnShader(CShader* pShader, _fMatrix 
 	ZeroMemory(pBoneMatrices, sizeof(_float4x4) * 128);
 	_uint	iIndex = 0;
 
-	if (!m_iNumAffectingBones)
-		pBoneMatrices[0] = XMMatrixTranspose(XMMatrixIdentity() * DefultPivotMatrix);
+	if (m_iNumAffectingBones == 0)
+	{
+		_Matrix UpdatedMatrix = ((*pVecHierarchyNodes)[m_iParantHierarchyNodeIndex])->Get_UpdatedMatrix();
+		XMStoreFloat4x4(&pBoneMatrices[0], XMMatrixTranspose(UpdatedMatrix * DefultPivotMatrix));
 
+	}
 	else
 	{
 		for (auto& iHierarchyIndex : m_vecAffectingBoneIndex)
@@ -190,6 +193,7 @@ HRESULT CMeshContainer::Ready_SkinnedInfo(aiMesh* pAIMesh, VTXANIMMODEL * pVerti
 
 	
 	m_iNumAffectingBones = pAIMesh->mNumBones;
+
 
 	//이 매쉬에 영향을 끼치는 모든 뼈들을 순차적으로 돌면서
 	for (_uint i = 0 ; i< m_iNumAffectingBones; i++)

@@ -15,7 +15,8 @@ HRESULT CHierarchyNode::Initialize_HierarchyNode(CHierarchyNode* pParent, const 
 	memcpy(&m_matTransformation, TransformationMatrix, sizeof(_float4x4));
 	XMStoreFloat4x4(&m_matCombinedTransformation, XMMatrixIdentity());
 	XMStoreFloat4x4(&m_matUpdatedTransform, XMMatrixIdentity());
-
+	XMStoreFloat4x4(&m_matOffset, XMMatrixIdentity());
+	
 	
 	m_iDepth = iDepth;
 

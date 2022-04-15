@@ -36,6 +36,7 @@ public:
 	virtual _int Render()override;
 	virtual _int LateRender()override;
 
+	void	Add_Dmg_to_Player(_uint iDmgAmount);
 
 	void Add_JumpForce(_float JumpPower);
 	void Add_Force(_float3 vDir, _float Power);
@@ -87,6 +88,9 @@ private:
 	_bool				m_bIsActived = false;
 	_float3				m_vAddedForce = _float3(0, 0, 0);
 
+
+	/*For HP*/
+	_uint				m_iHP;
 private:
 	HRESULT SetUp_Components();
 	

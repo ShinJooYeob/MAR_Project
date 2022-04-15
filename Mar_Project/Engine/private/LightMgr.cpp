@@ -47,7 +47,7 @@ HRESULT CLightMgr::EasingDiffuseLightDesc(LIGHTDESC::TYPE eLightType, _uint iInd
 	NULL_CHECK_RETURN(LightDesc, E_FAIL);
 
 
-	LightDesc->vDiffuse = XMVectorLerp(LightDesc->vDiffuse.XMVector(), vTargetDiffuse, MixRate);
+	LightDesc->vDiffuse = XMVectorLerp(XMVectorSet(1,1,1,1), vTargetDiffuse, MixRate);
 
 
 	return S_OK;

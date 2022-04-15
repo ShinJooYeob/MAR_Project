@@ -55,6 +55,7 @@ protected:
 	_bool						m_bIsDead = false;
 
 	_float						m_fRenderSortValue = 0;
+	_bool						m_bIsOnScreen = false;
 
 protected:
 	HRESULT Add_Component(_uint iScenenNum, const _tchar* tagPrototype,const _tchar* tagComponent, CComponent** ppOut , void* pArg =nullptr);

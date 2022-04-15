@@ -35,6 +35,7 @@ HRESULT CGameObject::Initialize_Clone(void * pArg)
 
 _int CGameObject::Update(_double fDeltaTime)
 {
+	m_bIsOnScreen = true;
 	return _int();
 }
 

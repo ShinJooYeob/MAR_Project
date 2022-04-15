@@ -60,6 +60,25 @@ _int CPlayer::Update(_double fDeltaTime)
 
 	FAILED_CHECK(Input_Keyboard(fDeltaTime));
 
+	if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
+		Add_Dmg_to_Player(1);
+	if (g_pGameInstance->Get_DIKeyState(DIK_2)&DIS_Down)
+		Add_Dmg_to_Player(2);
+	if (g_pGameInstance->Get_DIKeyState(DIK_3)&DIS_Down)
+		Add_Dmg_to_Player(3);
+	if (g_pGameInstance->Get_DIKeyState(DIK_4)&DIS_Down)
+		Add_Dmg_to_Player(4);
+	if (g_pGameInstance->Get_DIKeyState(DIK_5)&DIS_Down)
+		Add_Dmg_to_Player(5);
+	if (g_pGameInstance->Get_DIKeyState(DIK_6)&DIS_Down)
+		Add_Dmg_to_Player(6);
+	//if (g_pGameInstance->Get_DIKeyState(DIK_7)&DIS_Down)
+	//	m_pModel->Change_AnimIndex(6);
+	//if (g_pGameInstance->Get_DIKeyState(DIK_8)&DIS_Down)
+	//	m_pModel->Change_AnimIndex(7);
+	//if (g_pGameInstance->Get_DIKeyState(DIK_9)&DIS_Down)
+	//	m_pModel->Change_AnimIndex(8);
+	//
 
 	return _int();
 }
@@ -90,8 +109,8 @@ _int CPlayer::LateUpdate(_double fDeltaTime)
 
 	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime));
 
-	if (g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS)))
-		FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this));
+	//if (g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS)))
+	FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this));
 
 	m_vOldPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
 	return _int();
@@ -142,6 +161,38 @@ _int CPlayer::LateRender()
 
 
 	return _int();
+}
+
+void CPlayer::Add_Dmg_to_Player(_uint iDmgAmount)
+{
+	if (!iDmgAmount) return;
+
+
+	switch (iDmgAmount)
+	{
+	case 1:
+	case 2:
+		m_pModel->Change_AnimIndex_ReturnTo(rand() % 2 + 38, 0, 0.1, true);
+		break;
+
+	case 3:
+		m_pModel->Change_AnimIndex_ReturnTo(40, 0, 0.1, true);
+		Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK)*-1, 10);
+		break;
+
+
+	case 4:
+		m_pModel->Change_AnimIndex_ReturnTo(41, 0, 0.1, true);
+		Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK)*-1, 15);
+		break;
+
+
+	default:
+		m_pModel->Change_AnimIndex_ReturnTo(rand() % 2 + 42, 0, 0.1, true);
+		break;
+	}
+
+
 }
 
 void CPlayer::Add_JumpForce(_float JumpPower)
@@ -224,7 +275,7 @@ HRESULT CPlayer::SetUp_Components()
 
 	CTransform::TRANSFORMDESC tDesc = {};
 
-	tDesc.fMovePerSec = 5;
+	tDesc.fMovePerSec = PlayerMoveSpeed;
 	tDesc.fRotationPerSec = XMConvertToRadians(60);
 	tDesc.fScalingPerSec = 1;
 	tDesc.vPivot = _float3(0, 0, 0);
@@ -252,8 +303,7 @@ HRESULT CPlayer::Input_Keyboard(_double fDeltaTime)
 		GetSingle(CUtilityMgr)->SlowMotionStart();
 
 
-	if (m_pModel->Get_NowAnimIndex() != 19)
-	{
+
 		FAILED_CHECK(Smalling_Update(fDeltaTime, pInstance));
 		FAILED_CHECK(Dash_Update(fDeltaTime, pInstance));
 		if (!m_fDashPassedTime)
@@ -261,7 +311,7 @@ HRESULT CPlayer::Input_Keyboard(_double fDeltaTime)
 		FAILED_CHECK(Jump_Update(fDeltaTime, pInstance));
 		FAILED_CHECK(Lunch_Bullet(fDeltaTime, pInstance));
 		FAILED_CHECK(Lunch_Grenade(fDeltaTime, pInstance));
-	}
+	
 	FAILED_CHECK(RockOn_Update(fDeltaTime, pInstance));
 
 
@@ -274,68 +324,83 @@ HRESULT CPlayer::Input_Keyboard(_double fDeltaTime)
 HRESULT CPlayer::Smalling_Update(_double fDeltaTime, CGameInstance* pInstance)
 {
 
-	BYTE KeyState = pInstance->Get_DIKeyState(DIK_LCONTROL);
-	if (KeyState & DIS_Press)
-	{
-		if (KeyState & DIS_Down)
+		BYTE KeyState = pInstance->Get_DIKeyState(DIK_LCONTROL);
+		if (!m_iJumpCount && (KeyState & DIS_Press))
 		{
-			m_fSmallPassedTime = 0;
-		}
-		else if (KeyState & DIS_Up)
-		{
+			if (KeyState & DIS_Down)
+			{
 
-			m_fSmallPassedTime = 0;
+				if (!m_pModel->Get_IsHavetoBlockAnimChange())
+				{
+					m_fSmallPassedTime = 0;
+					m_pModel->Change_AnimIndex_ReturnTo(9, 0, 0.15, true);
+				}
+			}
+			else if (KeyState & DIS_Up)
+			{
+				if (!m_pModel->Get_IsHavetoBlockAnimChange())
+				{
+					m_fSmallPassedTime = 0;
+					m_pModel->Change_AnimIndex_ReturnTo(9, 0, 0.15, true);
+				}
+			}
+			else
+			{
+				if (m_fSmallPassedTime < 0.3f)
+				{
+
+					m_fSmallPassedTime += _float(fDeltaTime);
+					m_fSmallScale = pInstance->Easing(TYPE_QuarticOut, 1.f, PlayerSmallingSize, m_fSmallPassedTime, 0.3f);
+
+					if (m_fSmallPassedTime > 0.3f)
+					{
+						m_fSmallScale = PlayerSmallingSize;
+					}
+
+					m_fSmallVisualTime = (1 - m_fSmallScale) / (1 - PlayerSmallingSize);
+					FAILED_CHECK(pInstance->EasingDiffuseLightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0, XMVectorSet(0.6f, 0.6f, 1, 1), m_fSmallVisualTime));
+
+					m_pTransformCom->Scaled_All(_float3(m_fSmallScale));
+					m_pTransformCom->Set_MoveSpeed(PlayerMoveSpeed * m_fSmallScale);
+				}
+
+			}
 		}
-		else 
-		{
+		else {
+
 			if (m_fSmallPassedTime < 0.3f)
 			{
-				
 				m_fSmallPassedTime += _float(fDeltaTime);
-				m_fSmallScale = pInstance->Easing(TYPE_QuarticOut, 1.f, PlayerSmallingSize, m_fSmallPassedTime, 0.3f);
+				m_fSmallScale = pInstance->Easing(TYPE_QuarticOut, PlayerSmallingSize, 1.f, m_fSmallPassedTime, 0.3f);
 
 				if (m_fSmallPassedTime > 0.3f)
 				{
-					m_fSmallScale = PlayerSmallingSize;
+					m_fSmallScale = 1.f;
 				}
 
-				m_fSmallVisualTime = (1 - m_fSmallScale) / (1 - PlayerSmallingSize);
-
 				m_pTransformCom->Scaled_All(_float3(m_fSmallScale));
+				m_pTransformCom->Set_MoveSpeed(PlayerMoveSpeed * m_fSmallScale);
+
 			}
 
-		}
-	}
-	else {
-
-		if (m_fSmallPassedTime < 0.3f)
-		{
-			m_fSmallPassedTime += _float(fDeltaTime);
-			m_fSmallScale = pInstance->Easing(TYPE_QuarticOut, PlayerSmallingSize, 1.f, m_fSmallPassedTime, 0.3f);
-
-			if (m_fSmallPassedTime > 0.3f)
+			if (m_fSmallVisualTime > 0.f)
 			{
-				m_fSmallScale = 1.f;
+				m_fSmallVisualTime -= _float(fDeltaTime);
+				if (m_fSmallVisualTime < 0) m_fSmallVisualTime = 0;
+				FAILED_CHECK(pInstance->EasingDiffuseLightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0, XMVectorSet(0.6f, 0.6f, 1, 1), m_fSmallVisualTime));
+
 			}
-
-			m_pTransformCom->Scaled_All(_float3(m_fSmallScale));
 		}
 
-		if (m_fSmallVisualTime > 0.f)
-		{
-			m_fSmallVisualTime -= _float(fDeltaTime);
-			if (m_fSmallVisualTime < 0) m_fSmallVisualTime = 0;
-		}
-	}
 
-	
 	return S_OK;
 }
 
 HRESULT CPlayer::Move_Update(_double fDeltaTime, CGameInstance* pInstance)
 {
 
-	
+	if (!m_pModel->Get_IsHavetoBlockAnimChange())
+	{
 
 		_int PressedChecker[4];
 		ZeroMemory(PressedChecker, sizeof(_bool) * 4);
@@ -382,30 +447,33 @@ HRESULT CPlayer::Move_Update(_double fDeltaTime, CGameInstance* pInstance)
 
 			if (!m_LevitationTime)
 				m_pModel->Change_AnimIndex(8);
+
 		}
 		else {
 			if (!m_LevitationTime)
-				m_pModel->Change_AnimIndex(0);
+				m_pModel->Change_AnimIndex_UntilTo(0, 5);
 
-		
 
+		}
 	}
 	return S_OK;
 }
 
 HRESULT CPlayer::Jump_Update(_double fDeltaTime, CGameInstance* pInstance)
 {
-	if (m_iJumpCount < 2 &&pInstance->Get_DIKeyState(DIK_SPACE) & DIS_Down)
+	if (!m_pModel->Get_IsHavetoBlockAnimChange())
 	{
-		Add_JumpForce(PlayerMaxJumpPower * m_fSmallScale);
+		if (m_iJumpCount < 2 && pInstance->Get_DIKeyState(DIK_SPACE) & DIS_Down)
+		{
+			Add_JumpForce(PlayerMaxJumpPower * m_fSmallScale);
 
-		m_pModel->Change_AnimIndex_UntilTo(15 + m_iJumpCount * 5, 17 + m_iJumpCount * 5, 0.08);
+			m_pModel->Change_AnimIndex_UntilTo(15 + m_iJumpCount * 5, 17 + m_iJumpCount * 5, 0.08);
 
 
-		m_iJumpCount++;
+			m_iJumpCount++;
 
+		}
 	}
-
 	m_LevitationTime += fDeltaTime;
 	_float fGravity = 0;
 	if (m_fJumpPower > 0)
@@ -598,7 +666,7 @@ HRESULT CPlayer::Set_Player_On_Terrain()
 				m_pModel->Change_AnimIndex_ReturnTo(18 + m_iJumpCount * 5, 0,0);
 			else
 			{
-				m_pModel->Change_AnimIndex_ReturnTo(19, 0,0);
+				m_pModel->Change_AnimIndex_ReturnTo(19, 0, 0, true);
 				Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 10);
 			}
 		}

@@ -21,13 +21,13 @@ public:
 
 public:
 	HRESULT Change_AnimIndex(_uint iAnimIndex, _double ExitTime = 0.15);
-	HRESULT Change_AnimIndex_ReturnTo(_uint iAnimIndex, _uint iReturnIndex, _double ExitTime = 0.15);
+	HRESULT Change_AnimIndex_ReturnTo(_uint iAnimIndex, _uint iReturnIndex, _double ExitTime = 0.15, _bool bBlockAnimUntilReturnChange = false);
 	HRESULT Change_AnimIndex_UntilTo(_uint iAnimIndex, _uint iReturnIndex, _double ExitTime = 0.15);
 	_uint  Get_NowAnimIndex() { return m_iNowAnimIndex; };
-	_uint Get_KindsOfAnimChange() { return m_KindsOfAnimChange; };
+	_uint Get_IsHavetoBlockAnimChange() { return m_bIsBlockAnim; };
 
 	HRESULT Bind_OnShader(class CShader* pShader, _uint iMaterialIndex , _uint eTextureType, const char* pHlslConstValueName);
-	HRESULT Update_AnimationClip(_double fDeltaTime);	
+	HRESULT Update_AnimationClip(_double fDeltaTime, _bool IsUpdateAll = true);	
 	HRESULT Render(class CShader* pShader, _uint iPassIndex, _uint iMaterialIndex, const char* szBoneValueName = nullptr);
 
 public:
@@ -65,10 +65,10 @@ private:
 	//이전에 재생된 애니메이션의 시간
 	_double		m_TotalAnimExitTime = 0.2;
 	_double		m_AnimExitAcc = 0.0;
-	_uint		m_KindsOfAnimChange = 0;
 
+	_bool		m_bIsBlockAnim = false;
 	_bool		m_bIsChagingAnim = false;
-
+	_uint		m_KindsOfAnimChange = 0;
 
 private:
 	MODELTYPE								m_eModelType = TYPE_END;

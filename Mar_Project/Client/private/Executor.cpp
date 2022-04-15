@@ -56,7 +56,9 @@ _int CExecutor::Update(_double fDeltaTime)
 	if (g_pGameInstance->Get_DIKeyState(DIK_9)&DIS_Down)
 		m_pModel->Change_AnimIndex(8);
 
+	m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
 
+	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime, m_bIsOnScreen));
 	return _int();
 }
 
@@ -65,9 +67,8 @@ _int CExecutor::LateUpdate(_double fDeltaTime)
 
 
 
-	if (g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS)))
+	if (m_bIsOnScreen)
 	{
-		FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime));
 		FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this));
 	}
 

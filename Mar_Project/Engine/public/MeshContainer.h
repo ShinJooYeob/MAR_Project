@@ -23,6 +23,9 @@ public:
 	aiMesh*		Get_AiMesh() { return m_pAIMesh; };
 	HRESULT		Add_AffectingBoneIndex(_uint iHierarchyIndex);
 
+	void		Set_TargetPararntNodeIndex(_uint iNodeIndex) { m_iParantHierarchyNodeIndex = iNodeIndex; }
+	//_uint		Get_TargetPararntNodeIndex() {return m_iParantHierarchyNodeIndex ; }
+
 private:
 	//이 매쉬가 사용하는 머테리얼의 인덱스
 	_uint		m_MaterialIndex = 0;
@@ -31,6 +34,7 @@ private:
 	//이 매쉬의		AiMesh
 	aiMesh*			m_pAIMesh = nullptr;
 
+	_uint			m_iParantHierarchyNodeIndex = 0;
 
 	/* 현재 메시에 영향을 주는 노드들. */
 	vector<_uint>		m_vecAffectingBoneIndex;
