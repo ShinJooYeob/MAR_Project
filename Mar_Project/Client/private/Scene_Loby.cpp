@@ -44,11 +44,11 @@ HRESULT CScene_Loby::Initialize()
 
 
 
-	//FAILED_CHECK(Ready_Layer_Executor(TAG_LAY(Layer_Monster)));
-	//FAILED_CHECK(Ready_Layer_Eyepot(TAG_LAY(Layer_Monster)));
-	//FAILED_CHECK(Ready_Layer_Grunt(TAG_LAY(Layer_Monster)));
-	//FAILED_CHECK(Ready_Layer_WaspArrow(TAG_LAY(Layer_Monster)));
-	//FAILED_CHECK(Ready_Layer_WaspInk(TAG_LAY(Layer_Monster)));
+	FAILED_CHECK(Ready_Layer_Executor(TAG_LAY(Layer_Monster)));
+	FAILED_CHECK(Ready_Layer_Eyepot(TAG_LAY(Layer_Monster)));
+	FAILED_CHECK(Ready_Layer_Grunt(TAG_LAY(Layer_Monster)));
+	FAILED_CHECK(Ready_Layer_WaspArrow(TAG_LAY(Layer_Monster)));
+	FAILED_CHECK(Ready_Layer_WaspInk(TAG_LAY(Layer_Monster)));
 
 
 		
@@ -217,35 +217,35 @@ HRESULT CScene_Loby::Ready_Layer_UIImage(const _tchar * pLayerTag)
 
 HRESULT CScene_Loby::Ready_Layer_JumpPad(const _tchar * pLayerTag)
 {
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_JumpPad),&_float3(5,3,5) ));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_JumpPad),&_float3(7, 22, 7) ));
 
 	return S_OK;
 }
 
 HRESULT CScene_Loby::Ready_Layer_SteamPad(const _tchar * pLayerTag)
 {
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_SteamPad), &_float3(7, 3, 5)));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_SteamPad), &_float3(9, 22, 7)));
 
 	return S_OK;
 }
 
 HRESULT CScene_Loby::Ready_Layer_HiddenPad(const _tchar * pLayerTag)
 {
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_HiddenPad), &_float3(7, 22, 7)));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_HiddenPad), &_float3(11, 22, 7)));
 
 	return S_OK;
 }
 
 HRESULT CScene_Loby::Ready_Layer_TeethObj(const _tchar * pLayerTag)
 {
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_TeethObj), &_float3(11, 3, 5)));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_TeethObj), &_float3(13, 22, 7)));
 
 	return S_OK;
 }
 
 HRESULT CScene_Loby::Ready_Layer_RoseObj(const _tchar * pLayerTag)
 {
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_RoseObj), &_float3(12, 3, 5)));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_RoseObj), &_float3(14, 22, 7)));
 
 	return S_OK;
 }
@@ -260,10 +260,8 @@ HRESULT CScene_Loby::Ready_Layer_StaticMapObj(const _tchar * pLayerTag)
 HRESULT CScene_Loby::Ready_Layer_Executor(const _tchar * pLayerTag)
 {
 
-	for (_uint i = 0; i < 40; i++)
-	{
-		FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_Executor), &_float3( i* 2.f, 20, 7)));
-	}
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_Executor), &_float3( 2, 21, 4)));
+	
 	
 
 	return S_OK;
@@ -271,28 +269,28 @@ HRESULT CScene_Loby::Ready_Layer_Executor(const _tchar * pLayerTag)
 
 HRESULT CScene_Loby::Ready_Layer_Eyepot(const _tchar * pLayerTag)
 {
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_Eyepot), &_float3(4, 0, 7)));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_Eyepot), &_float3(4, 21, 4)));
 
 	return S_OK;
 }
 
 HRESULT CScene_Loby::Ready_Layer_Grunt(const _tchar * pLayerTag)
 {
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_Grunt), &_float3(6, 0, 7)));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_Grunt), &_float3(6, 21, 4)));
 
 	return S_OK;
 }
 
 HRESULT CScene_Loby::Ready_Layer_WaspArrow(const _tchar * pLayerTag)
 {
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_WaspArrow), &_float3(8, 0, 7)));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_WaspArrow), &_float3(8, 21, 4)));
 
 	return S_OK;
 }
 
 HRESULT CScene_Loby::Ready_Layer_WaspInk(const _tchar * pLayerTag)
 {
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_WaspInk), &_float3(10, 0, 7)));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_LOBY, pLayerTag, TAG_OP(Prototype_WaspInk), &_float3(10, 21, 4)));
 
 	return S_OK;
 }

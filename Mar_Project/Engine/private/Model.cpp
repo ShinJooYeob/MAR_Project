@@ -136,15 +136,15 @@ HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, const char * pModelFi
 			OutputDebugStringW(DebugLog.c_str());
 		}
 
-		for (auto& pNode : m_vecHierarchyNode)
-		{
-			string szLog = "HierarchyNode Name : " + string(pNode->Get_Name()) + "\n";
-			wstring DebugLog;
-			DebugLog.assign(szLog.begin(), szLog.end());
+		//for (auto& pNode : m_vecHierarchyNode)
+		//{
+		//	string szLog = "HierarchyNode Name : " + string(pNode->Get_Name()) + "\n";
+		//	wstring DebugLog;
+		//	DebugLog.assign(szLog.begin(), szLog.end());
 
-			OutputDebugStringW(DebugLog.c_str());
+		//	OutputDebugStringW(DebugLog.c_str());
 
-		}
+		//}
 
 #endif
 
@@ -160,18 +160,18 @@ HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, const char * pModelFi
 		FAILED_CHECK(Ready_OffsetMatrices());
 
 		FAILED_CHECK(Ready_Animation());
+#ifdef _DEBUG
+		string ttszLog = "Num AnimationClip: " + to_string(m_iNumAnimationClip) + "\n";
+		wstring ttDebugLog;
+		ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
 
+		OutputDebugStringW(ttDebugLog.c_str());
+
+#endif
 		if (iAnimCount != 1)
 			FAILED_CHECK(Ready_MoreAnimation(szFullPath, iAnimCount, iFlag));
 
-//#ifdef _DEBUG
-//		string ttszLog = "Num AnimationClip: " + to_string(m_iNumAnimationClip) + "\n";
-//		wstring ttDebugLog;
-//		ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-//
-//		OutputDebugStringW(ttDebugLog.c_str());
-//
-//#endif
+
 	}
 	
 	return S_OK;
@@ -187,7 +187,7 @@ HRESULT CModel::Initialize_Clone(void * pArg)
 	return S_OK;
 }
 
-HRESULT CModel::Change_AnimIndex(_uint iAnimIndex, _double ExitTime)
+HRESULT CModel::Change_AnimIndex(_uint iAnimIndex, _double ExitTime, _bool bBlockAnimUntilReturnChange)
 {
 	if (iAnimIndex >= m_iNumAnimationClip)
 		return E_FAIL;
@@ -215,7 +215,7 @@ HRESULT CModel::Change_AnimIndex(_uint iAnimIndex, _double ExitTime)
 
 
 	m_iNextAnimIndex = iAnimIndex;
-	m_bIsBlockAnim = false;
+	m_bIsBlockAnim = bBlockAnimUntilReturnChange;
 
 	m_KindsOfAnimChange = 0;
 
@@ -261,7 +261,7 @@ HRESULT CModel::Change_AnimIndex_UntilTo(_uint iAnimIndex, _uint iReturnIndex, _
 
 
 
-HRESULT CModel::Change_AnimIndex_ReturnTo(_uint iAnimIndex, _uint iReturnIndex, _double ExitTime, _bool bBlockAnimChange)
+HRESULT CModel::Change_AnimIndex_ReturnTo(_uint iAnimIndex, _uint iReturnIndex, _double ExitTime, _bool bBlockAnimUntilReturnChange)
 {
 	if (iAnimIndex >= m_iNumAnimationClip || iReturnIndex >= m_iNumAnimationClip)
 		return E_FAIL;
@@ -291,13 +291,54 @@ HRESULT CModel::Change_AnimIndex_ReturnTo(_uint iAnimIndex, _uint iReturnIndex, 
 
 	m_iNextAnimIndex = iReturnIndex;
 
-	m_bIsBlockAnim = bBlockAnimChange;
+	m_bIsBlockAnim = bBlockAnimUntilReturnChange;
+	m_KindsOfAnimChange = 1;
+
+	return S_OK;
+}
+
+HRESULT CModel::Change_AnimIndex_ReturnTo_Must(_uint iAnimIndex, _uint iReturnIndex, _double ExitTime, _bool bBlockAnimUntilReturnChange)
+{
+	if (iAnimIndex >= m_iNumAnimationClip || iReturnIndex >= m_iNumAnimationClip)
+		return E_FAIL;
+
+	//if (iReturnIndex == m_iNextAnimIndex) return S_FALSE;
+
+
+	m_bIsChagingAnim = true;
+
+	if (m_AnimExitAcc)
+	{
+		_uint iNumOldAnimKeyFrameIdx = _uint(m_vecCurrentKeyFrameIndices[m_iOldAnimIndex].size());
+		m_vecCurrentKeyFrameIndices[m_iOldAnimIndex].clear();
+		m_vecCurrentKeyFrameIndices[m_iOldAnimIndex].resize(iNumOldAnimKeyFrameIdx);
+	}
+	m_AnimExitAcc = 0;
+	m_TotalAnimExitTime = ExitTime;
+
+
+	m_OldPlayTimeAcc = m_NowPlayTimeAcc;
+	m_iOldAnimIndex = m_iNowAnimIndex;
+
+
+	m_NowPlayTimeAcc = 0;
+	m_iNowAnimIndex = iAnimIndex;
+
+
+	m_iNextAnimIndex = iReturnIndex;
+
+	m_bIsBlockAnim = bBlockAnimUntilReturnChange;
 	m_KindsOfAnimChange = 1;
 
 	return S_OK;
 }
 
 
+
+_double CModel::Get_PlayRate()
+{
+	return m_vecAnimator[m_iNowAnimIndex]->Get_PlayRate(m_NowPlayTimeAcc);
+}
 
 HRESULT CModel::Bind_OnShader(CShader * pShader, _uint iMaterialIndex, _uint eTextureType, const char * pHlslConstValueName)
 {
@@ -544,16 +585,16 @@ HRESULT CModel::Ready_OffsetMatrices()
 
 			NULL_CHECK_RETURN(pAIMesh, E_FAIL);
 
-			if (!iNumAffectingBones)
-			{
-				_uint iNodeIndex = 0;
-				CHierarchyNode*		pHierarchyNode = Find_HierarchyNode(pAIMesh->mName.data, &iNodeIndex);
-				NULL_CHECK_RETURN(pHierarchyNode, E_FAIL);
-				pMeshContainer->Set_TargetPararntNodeIndex(iNodeIndex);
+			//if (!iNumAffectingBones)
+			//{
+			//	_uint iNodeIndex = 0;
+			//	CHierarchyNode*		pHierarchyNode = Find_HierarchyNode(pAIMesh->mName.data, &iNodeIndex);
+			//	NULL_CHECK_RETURN(pHierarchyNode, E_FAIL);
+			//	pMeshContainer->Set_TargetPararntNodeIndex(iNodeIndex);
 
-			}
-			else
-			{
+			//}
+			//else
+			//{
 
 				//각각의 매쉬들이 영향을 받는 모든 뼈들을 순회하면서
 				for (_uint j = 0; j < iNumAffectingBones; j++)
@@ -575,7 +616,7 @@ HRESULT CModel::Ready_OffsetMatrices()
 
 				}
 
-			}
+			//}
 		}
 	}
 
@@ -624,12 +665,12 @@ HRESULT CModel::Ready_MeshContainers(_fMatrix TransformMatrix)
 		m_vecMeshContainerArr[m_pScene->mMeshes[i]->mMaterialIndex].push_back(pMeshContainer);
 
 #ifdef _DEBUG
-		string Name = m_pScene->mMeshes[i]->mName.data;
-		string ttszLog = "MeshName: " + Name +" Affecting Bond Num : " + to_string(m_pScene->mMeshes[i]->mNumBones) + "\n";
-		wstring ttDebugLog;
-		ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+		//string Name = m_pScene->mMeshes[i]->mName.data;
+		//string ttszLog = "MeshName: " + Name +" Affecting Bond Num : " + to_string(m_pScene->mMeshes[i]->mNumBones) + "\n";
+		//wstring ttDebugLog;
+		//ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
 
-		OutputDebugStringW(ttDebugLog.c_str());
+		//OutputDebugStringW(ttDebugLog.c_str());
 
 #endif
 
@@ -831,6 +872,15 @@ HRESULT CModel::Ready_MoreAnimation(const char * szFileFullPath, _uint iAnimCoun
 		_uint iNumOldAnimClip = _uint(m_vecCurrentKeyFrameIndices.size());
 		m_vecCurrentKeyFrameIndices.resize(m_iNumAnimationClip);
 
+
+#ifdef _DEBUG
+		string ttszLog = "Num AnimationClip: " + to_string(m_iNumAnimationClip) + "\n";
+		wstring ttDebugLog;
+		ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+
+		OutputDebugStringW(ttDebugLog.c_str());
+
+#endif
 		//만큼 모든 애니메이션을 순회하면서
 		for (_uint i = 0; i < iNumAnimClip; i++)
 		{
@@ -842,11 +892,11 @@ HRESULT CModel::Ready_MoreAnimation(const char * szFileFullPath, _uint iAnimCoun
 			NULL_CHECK_RETURN(pAinmationClip, E_FAIL);
 
 #ifdef _DEBUG
-			string szLog = "Anim Name : " + string(paiAnimation->mName.data) + "\n";
-			wstring DebugLog;
-			DebugLog.assign(szLog.begin(), szLog.end());
+			//string szLog = "Anim Name : " + string(paiAnimation->mName.data) + "\n";
+			//wstring DebugLog;
+			//DebugLog.assign(szLog.begin(), szLog.end());
 
-			OutputDebugStringW(DebugLog.c_str());
+			//OutputDebugStringW(DebugLog.c_str());
 #endif
 
 

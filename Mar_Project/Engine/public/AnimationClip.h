@@ -29,6 +29,8 @@ public:
 		const vector<CHierarchyNode*>* pVecHierarchyNodes, vector<vector<_uint>>* pVecAllAnimKeyFrameIndex);
 
 
+	_double Get_PlayRate(_double NowAnimPlayAcc);
+
 private:
 	string		m_szAnimationClipName = "";
 	_double		m_UpdatePerSecond = 0.0;

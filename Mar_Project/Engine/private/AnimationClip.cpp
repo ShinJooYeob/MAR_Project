@@ -184,6 +184,11 @@ HRESULT CAnimationClip::Update_TransformMatrices_byEasing_OldAnim(_uint iNewAnim
 	return S_OK;
 }
 
+_double CAnimationClip::Get_PlayRate(_double NowAnimPlayAcc)
+{
+	return NowAnimPlayAcc / m_Duration;
+}
+
 
 
 HRESULT CAnimationClip::Get_SRT_CertainClipNTime(_float4x4* pOut,_double TimeAcc, _uint iClipBoneIndex, vector<_uint>* pVecKeyFrameIndex)

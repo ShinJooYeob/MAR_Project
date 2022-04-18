@@ -290,6 +290,8 @@ HRESULT CPlayer::SetUp_Components()
 	m_pMainCamera =(CCamera*)(g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Camera_Main)));
 	NULL_CHECK_RETURN(m_pMainCamera, E_FAIL);
 
+	ZeroMemory(m_bAtkMoveMentChecker, sizeof(_bool) * 3);
+
 	return S_OK;
 }
 
@@ -303,21 +305,192 @@ HRESULT CPlayer::Input_Keyboard(_double fDeltaTime)
 		GetSingle(CUtilityMgr)->SlowMotionStart();
 
 
+	if (g_pGameInstance->Get_DIKeyState(DIK_B) & DIS_Down)
+	{
+
+		switch (m_eNowWeapon)
+		{
+		case Client::CPlayer::Weapon_None:
+
+			m_eNowWeapon = CPlayer::Weapon_Knife;
+			m_pModel->Change_AnimIndex(Weapon_Knife + 0);
+			ZeroMemory(m_bAtkMoveMentChecker, sizeof(_bool) * 3);
+			m_pModel->Set_BlockAnim(false);
+
+			m_bIsAttackClicked = false;
+			m_iAttackCount = 0;
+			m_bIsZoom = false;
+			m_bIsCharged = false;
+			m_fCharedGauge = 0;
+			m_bIsCoolTime = false;
+			m_fUmbrellaIntro = 0;
+
+			break;
+		case Client::CPlayer::Weapon_Knife:
+			m_eNowWeapon = CPlayer::Weapon_Grinder;
+			m_pModel->Change_AnimIndex(Weapon_Grinder + 0);
+			ZeroMemory(m_bAtkMoveMentChecker, sizeof(_bool) * 3);
+			m_pModel->Set_BlockAnim(false);
+			m_bIsAttackClicked = false;
+			m_iAttackCount = 0;
+			m_bIsZoom = false;
+			m_bIsCharged = false;
+			m_fCharedGauge = 0;
+			m_bIsCoolTime = false;
+			m_fUmbrellaIntro = 0;
+			break;
+		case Client::CPlayer::Weapon_Grinder:
+
+			m_eNowWeapon = CPlayer::Weapon_Horse;
+			m_pModel->Change_AnimIndex(Weapon_Horse + 0);
+
+			ZeroMemory(m_bAtkMoveMentChecker, sizeof(_bool) * 3);
+			m_bIsAttackClicked = false;
+			m_iAttackCount = 0;
+			m_bIsZoom = false;
+			m_bIsCharged = false;
+			m_fCharedGauge = 0;
+			m_bIsCoolTime = false;
+			m_fUmbrellaIntro = 0;
+			m_pModel->Set_BlockAnim(false);
+
+			break;
+		case Client::CPlayer::Weapon_Horse:
+
+			m_eNowWeapon = CPlayer::Weapon_Teapot;
+
+			m_pModel->Change_AnimIndex(Weapon_Teapot + 0);
+			ZeroMemory(m_bAtkMoveMentChecker, sizeof(_bool) * 3);
+			m_bIsAttackClicked = false;
+			m_iAttackCount = 0;
+			m_bIsZoom = false;
+			m_bIsCharged = false;
+			m_fCharedGauge = 0;
+			m_bIsCoolTime = false;
+			m_fUmbrellaIntro = 0;
+			m_pModel->Set_BlockAnim(false);
+
+			break;
+		case Client::CPlayer::Weapon_Teapot:
+			m_eNowWeapon = CPlayer::Weapon_Umbrella;
+			ZeroMemory(m_bAtkMoveMentChecker, sizeof(_bool) * 3);			
+			m_bIsAttackClicked = false;
+			m_iAttackCount = 0;
+			m_bIsZoom = false;
+			m_bIsCharged = false;
+			m_fCharedGauge = 0;
+			m_bIsCoolTime = false;
+			m_fUmbrellaIntro = 0;
+			m_pModel->Change_AnimIndex_UntilTo(Weapon_Umbrella, Weapon_Umbrella + 1);
+			m_pModel->Set_BlockAnim(true);
+			break;
+		case Client::CPlayer::Weapon_Umbrella:
+			m_eNowWeapon = CPlayer::Weapon_None;
+			ZeroMemory(m_bAtkMoveMentChecker, sizeof(_bool) * 3);
+			m_bIsAttackClicked = false;
+			m_iAttackCount = 0;
+			m_bIsZoom = false;
+			m_bIsCharged = false;
+			m_fCharedGauge = 0;
+			m_bIsCoolTime = false;
+			m_fUmbrellaIntro = 0;
+			m_pModel->Change_AnimIndex(0);
+			m_pModel->Set_BlockAnim(false);
+			break;
+		default:
+			break;
+		}
+
+	}
+
+
+	/*To All*/
+	FAILED_CHECK(Dash_Update(fDeltaTime, pInstance));
+	FAILED_CHECK(RockOn_Update(fDeltaTime, pInstance));
+
+	switch (m_eNowWeapon)
+	{
+	case Client::CPlayer::Weapon_None:
+	{
 
 		FAILED_CHECK(Smalling_Update(fDeltaTime, pInstance));
-		FAILED_CHECK(Dash_Update(fDeltaTime, pInstance));
+		FAILED_CHECK(Plant_ClockBomb(fDeltaTime, pInstance));
 		if (!m_fDashPassedTime)
 			FAILED_CHECK(Move_Update(fDeltaTime, pInstance));
 		FAILED_CHECK(Jump_Update(fDeltaTime, pInstance));
-		FAILED_CHECK(Lunch_Bullet(fDeltaTime, pInstance));
-		FAILED_CHECK(Lunch_Grenade(fDeltaTime, pInstance));
-	
-	FAILED_CHECK(RockOn_Update(fDeltaTime, pInstance));
+
+	}
+	break;
+	case Client::CPlayer::Weapon_Knife:
+	{
+
+		FAILED_CHECK(Attack_Update_Knife(fDeltaTime, pInstance));
+
+		if (!m_fDashPassedTime)
+			FAILED_CHECK(Move_Update_Knife(fDeltaTime, pInstance));
+		FAILED_CHECK(Jump_Update_Knife(fDeltaTime, pInstance));
+
+	}
+		break;
+	case Client::CPlayer::Weapon_Grinder:
+	{
+
+		FAILED_CHECK(Attack_Update_Grinder(fDeltaTime, pInstance));
+
+		if (!m_fDashPassedTime)
+			FAILED_CHECK(Move_Update_Grinder(fDeltaTime, pInstance));
+		FAILED_CHECK(Jump_Update_Grinder(fDeltaTime, pInstance));
+	}
+		break;
 
 
-	
+	case Client::CPlayer::Weapon_Horse:
+	{
 
-	
+		FAILED_CHECK(Attack_Update_Horse(fDeltaTime, pInstance));
+
+		if (!m_fDashPassedTime)
+			FAILED_CHECK(Move_Update_Horse(fDeltaTime, pInstance));
+		FAILED_CHECK(Jump_Update_Horse(fDeltaTime, pInstance));
+
+	}
+		break;
+	case Client::CPlayer::Weapon_Teapot:
+	{
+
+		FAILED_CHECK(Attack_Update_Teapot(fDeltaTime, pInstance));
+
+		if (!m_fDashPassedTime)
+			FAILED_CHECK(Move_Update_Teapot(fDeltaTime, pInstance));
+		FAILED_CHECK(Jump_Update_Teapot(fDeltaTime, pInstance));
+
+	}
+		break;
+	case Client::CPlayer::Weapon_Umbrella:
+	{
+		m_fUmbrellaIntro += _float(fDeltaTime);
+		if (m_fUmbrellaIntro > 1) m_fUmbrellaIntro = 1;
+
+		FAILED_CHECK(Attack_Update_Umbrella(fDeltaTime, pInstance));
+
+		if (!m_fDashPassedTime)
+			FAILED_CHECK(Move_Update_Umbrella(fDeltaTime, pInstance));
+		FAILED_CHECK(Jump_Update_Umbrella(fDeltaTime, pInstance));
+	}
+		break;
+	default:
+		break;
+	}
+
+
+
+
+
+	//FAILED_CHECK(Lunch_Bullet(fDeltaTime, pInstance));
+	//FAILED_CHECK(Lunch_Grenade(fDeltaTime, pInstance));
+
+
+
 	return S_OK;
 }
 
@@ -437,10 +610,10 @@ HRESULT CPlayer::Move_Update(_double fDeltaTime, CGameInstance* pInstance)
 			Dir = XMVector3Normalize(Dir);
 			_Vector vOldLook = m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK);
 
-			if (XMVector3Equal(Dir * -1, vOldLook))
-				m_pTransformCom->LookDir(m_pTransformCom->Get_MatrixState(CTransform::STATE_RIGHT));
+			if (XMVectorGetX(XMVector3Length(Dir + vOldLook)) < 0.1f)
+				m_pTransformCom->LookDir( m_pTransformCom->Get_MatrixState(CTransform::STATE_RIGHT) + vOldLook);
 			else
-				m_pTransformCom->LookDir((Dir + vOldLook));
+				m_pTransformCom->LookDir((Dir *0.25 + vOldLook * 0.75));
 
 			m_pTransformCom->MovetoDir(XMVector3Normalize(Dir), fDeltaTime);
 
@@ -600,23 +773,43 @@ HRESULT CPlayer::RockOn_Update(_double fDeltaTime, CGameInstance * pInstance)
 	return S_OK;
 }
 
+HRESULT CPlayer::Plant_ClockBomb(_double fDeltaTime, CGameInstance * pInstance)
+{
+	if (pInstance->Get_DIKeyState(DIK_E) & DIS_Down)
+	{
+		m_pModel->Change_AnimIndex_ReturnTo(44, 0, 0.15, true);
+
+	}
+	return S_OK;
+}
+
 HRESULT CPlayer::Lunch_Bullet(_double fDeltaTime, CGameInstance * pInstance)
 {
-
-
 	
-	if (pInstance->Get_DIKeyState(DIK_E) & DIS_Press)
+	if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_LBUTTON) & DIS_Press)
 	{
+		m_pModel->Change_AnimIndex(Weapon_Grinder + 8,0.15, true);
+
 		m_BulletNormalInterver -=fDeltaTime;
-		if (pInstance->Get_DIKeyState(DIK_E) & DIS_Up)
+		if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_LBUTTON) & DIS_Up)
 			m_BulletNormalInterver = 0;
 
 		if (m_BulletNormalInterver < 0)
 		{
+			//_Vector vPlayerLook = m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK);
 
-			_Vector vPlayerPos = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
-			_Vector vCamPos = m_pMainCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_POS);
-			_float3 vBulletDir = XMVector3Normalize(vPlayerPos - vCamPos + XMVectorSet(0, -m_CamDegreeAngle.z * m_fSmallScale * 0.34f, 0, 0));
+			//_Vector vPlayerPos = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+
+			//CTransform* pCamTransform = m_pMainCamera->Get_Camera_Transform();
+			//_Matrix	CamInverce = pCamTransform->Get_InverseWorldMatrix();
+			//_Vector PlayerInVewSpace = XMVector3TransformCoord(vPlayerPos, CamInverce);
+
+			//_float3 vBulletDir = XMVector3Normalize(XMVector3TransformNormal(XMVectorSet(0, 0, 300, 0) - PlayerInVewSpace, pCamTransform->Get_WorldMatrix()));
+			//_float3 vBulletDir = XMVector3Normalize(vPlayerLook + XMVectorSet(0, -m_CamDegreeAngle.z * 0.1f, 0 , 0));
+
+			CTransform* pCamTransform = m_pMainCamera->Get_Camera_Transform();
+			_float3 vBulletDir = XMVector3Normalize(XMVector3TransformNormal(XMVectorSet(0, 0, 300, 0), pCamTransform->Get_WorldMatrix()));
+
 
 			pInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Bullet), TAG_OP(Prototype_Bullet_Normal),
 				&vBulletDir);
@@ -624,26 +817,1044 @@ HRESULT CPlayer::Lunch_Bullet(_double fDeltaTime, CGameInstance * pInstance)
 			m_BulletNormalInterver = GetSingle(CUtilityMgr)->RandomFloat(0.15f, 0.2f);
 		}
 	}
+	else
+	{
+		if (m_pModel->Get_NowAnimIndex() == Weapon_Grinder + 8)
+		{
+			m_pModel->Change_AnimIndex(Weapon_Grinder + 3);
+
+		}
+
+	}
+
+	return S_OK;
+}
+
+HRESULT CPlayer::Move_Update_Horse(_double fDeltaTime, CGameInstance * pInstance)
+{
+	if (!m_pModel->Get_IsHavetoBlockAnimChange())
+	{
+
+		_int PressedChecker[4];
+		ZeroMemory(PressedChecker, sizeof(_bool) * 4);
+
+		PressedChecker[0] = _int(pInstance->Get_DIKeyState(DIK_W) & DIS_Press);
+		PressedChecker[1] = _int(pInstance->Get_DIKeyState(DIK_S) & DIS_Press);
+		PressedChecker[2] = _int(pInstance->Get_DIKeyState(DIK_A) & DIS_Press);
+		PressedChecker[3] = _int(pInstance->Get_DIKeyState(DIK_D) & DIS_Press);
+
+		if (PressedChecker[0] || PressedChecker[1] || PressedChecker[2] || PressedChecker[3])
+		{
+			//m_pTransformCom->LookDir(XMVectorSetY(m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0)
+			//	- XMVectorSetY(m_pMainCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_POS), 0));
+
+			_Vector forword = XMVector3Normalize(XMVectorSetY(m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0)
+				- XMVectorSetY(m_pMainCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_POS), 0));
+
+			_Vector right = XMVector3Cross(XMVectorSet(0, 1, 0, 0), forword);
+
+			_Vector Dir = XMVectorSet(0, 0, 0, 0);
+
+
+			if (PressedChecker[0]) Dir += forword;
+			if (PressedChecker[1]) Dir -= forword;
+			if (PressedChecker[2]) Dir -= right;
+			if (PressedChecker[3]) Dir += right;
+
+			Dir = XMVector3Normalize(Dir);
+			_Vector vOldLook = m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK);
+
+			if (XMVectorGetX(XMVector3Length(Dir + vOldLook)) < 0.1f)
+				m_pTransformCom->LookDir(m_pTransformCom->Get_MatrixState(CTransform::STATE_RIGHT) + vOldLook);
+			else
+				m_pTransformCom->LookDir((Dir *0.25 + vOldLook * 0.75));
+
+			m_pTransformCom->MovetoDir(XMVector3Normalize(Dir), fDeltaTime);
+
+
+			if (!m_LevitationTime)
+				m_pModel->Change_AnimIndex(Weapon_Horse + 2);
+
+		}
+		else {
+			if (!m_LevitationTime)
+				m_pModel->Change_AnimIndex(Weapon_Horse + 0);
+
+
+		}
+	}
+	return S_OK;
+}
+
+HRESULT CPlayer::Jump_Update_Horse(_double fDeltaTime, CGameInstance * pInstance)
+{
+	if (!m_pModel->Get_IsHavetoBlockAnimChange())
+	{
+		if (m_iJumpCount < 2 && pInstance->Get_DIKeyState(DIK_SPACE) & DIS_Down)
+		{
+			Add_JumpForce(PlayerMaxJumpPower * m_fSmallScale);
+
+			m_pModel->Change_AnimIndex_UntilTo(15 + m_iJumpCount * 5, 17 + m_iJumpCount * 5, 0.08);
+
+
+			m_iJumpCount++;
+
+		}
+	}
+	m_LevitationTime += fDeltaTime;
+	_float fGravity = 0;
+	if (m_fJumpPower > 0)
+	{
+		m_fJumpPower = _float(m_fMaxJumpPower * (m_LevitationTime - 1.f)* (m_LevitationTime - 1.f));
+		fGravity = m_fJumpPower;
+
+		if (m_fJumpPower <= 1.0f)
+		{
+			m_fJumpPower = 0;
+			m_LevitationTime = fDeltaTime;
+		}
+	}
+	else
+	{
+		fGravity = _float((m_LevitationTime) * (m_LevitationTime)* -29.4f);
+	}
+
+	if (m_LevitationTime != fDeltaTime &&fGravity < 0)
+		m_pModel->Change_AnimIndex(17);
+
+	m_pTransformCom->MovetoDir_bySpeed(XMVectorSet(0, 1.f, 0, 0), fGravity, fDeltaTime);
+	return S_OK;
+}
+
+HRESULT CPlayer::Attack_Update_Horse(_double fDeltaTime, CGameInstance * pInstance)
+{
+	if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_LBUTTON) & DIS_Down)
+		m_bIsAttackClicked = true;
+
+
+	_uint iNowAnimIndex = m_pModel->Get_NowAnimIndex();
+	_double PlayRate = m_pModel->Get_PlayRate();
+
+
+	if (m_bIsAttackClicked && m_iAttackCount < 4)
+	{
+
+		if (iNowAnimIndex >= Weapon_Horse)
+			//if (iNowAnimIndex >= Weapon_Knife + 3)
+		{
+			if (iNowAnimIndex < Weapon_Horse + 8)
+			{
+				m_pModel->Change_AnimIndex(Weapon_Horse + 8, 0.15, true);
+				m_iAttackCount++;
+				m_bIsAttackClicked = false;
+				ZeroMemory(m_bAtkMoveMentChecker, sizeof(_bool) * 3);
+
+			}
+			else if (iNowAnimIndex >= Weapon_Horse + 8 && iNowAnimIndex <= Weapon_Horse + 14 && iNowAnimIndex % 2 == Weapon_Horse % 2)
+			{
+
+
+				if (PlayRate > 0.8)
+				{
+					m_pModel->Change_AnimIndex(Weapon_Horse + 8 + m_iAttackCount * 2, 0.15, true);
+
+					ZeroMemory(m_bAtkMoveMentChecker, sizeof(_bool) * 3);
+
+					m_iAttackCount++;
+					if (m_iAttackCount > 5) m_iAttackCount = 5;
+					m_bIsAttackClicked = false;
+				}
+
+			}
+
+		}
+	}
+	else
+	{
+
+
+		if (m_iAttackCount && iNowAnimIndex % 2 == Weapon_Horse % 2)
+			//if (iNowAnimIndex >= Weapon_Knife + 8 && iNowAnimIndex <= Weapon_Knife + 16 && iNowAnimIndex % 2 == Weapon_Knife % 2)
+		{
+			if (PlayRate > 0.8)
+			{
+				m_pModel->Change_AnimIndex_ReturnTo(Weapon_Horse + 8 + (m_iAttackCount - 1) * 2 + 1, Weapon_Horse + 3, 0.15, true);
+				m_iAttackCount = 0;
+				m_bIsAttackClicked = false;
+				ZeroMemory(m_bAtkMoveMentChecker, sizeof(_bool) * 3);
+
+			}
+
+		}
+
+
+	}
+
+	PlayRate = m_pModel->Get_PlayRate();
+
+	switch (m_iAttackCount)
+	{
+	case 1:
+		if (!m_bAtkMoveMentChecker[0] && PlayRate > 0.45)
+		{
+			m_bAtkMoveMentChecker[0] = true;
+			Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 10);
+		}
+		break;
+	case 2:
+		if (!m_bAtkMoveMentChecker[0] && PlayRate > 0.43)
+		{
+			m_bAtkMoveMentChecker[0] = true;
+			Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 10);
+		}
+		break;
+	case 3:
+		if (!m_bAtkMoveMentChecker[0] && PlayRate > 0.33)
+		{
+			m_bAtkMoveMentChecker[0] = true;
+			Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 10);
+		}
+		break;
+	case 4:
+		if (!m_bAtkMoveMentChecker[0] && PlayRate > 0.06)
+		{
+			m_bAtkMoveMentChecker[0] = true;
+			Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 20);
+		}
+		break;
+
+	default:
+		break;
+	}
+
+
+
+
+	return S_OK;
+}
+
+HRESULT CPlayer::Move_Update_Teapot(_double fDeltaTime, CGameInstance * pInstance)
+{
+	if (m_bIsZoom)
+	{
+		_Vector NewLook = XMVector3Normalize(XMVectorSetY(m_pMainCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_LOOK) * 0.75
+			+ m_pMainCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_RIGHT) * 0.25, 0));
+
+		m_pTransformCom->LookDir(NewLook);
+
+
+
+		if (!m_pModel->Get_IsHavetoBlockAnimChange())
+		{
+
+			_int PressedChecker[4];
+			ZeroMemory(PressedChecker, sizeof(_bool) * 4);
+
+			PressedChecker[0] = _int(pInstance->Get_DIKeyState(DIK_W) & DIS_Press);
+			PressedChecker[1] = _int(pInstance->Get_DIKeyState(DIK_S) & DIS_Press);
+			PressedChecker[2] = _int(pInstance->Get_DIKeyState(DIK_A) & DIS_Press);
+			PressedChecker[3] = _int(pInstance->Get_DIKeyState(DIK_D) & DIS_Press);
+
+			if (PressedChecker[0] || PressedChecker[1] || PressedChecker[2] || PressedChecker[3])
+			{
+
+
+
+				_Vector forword = XMVector3Normalize(XMVectorSetY(m_pMainCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_LOOK), 0));
+
+
+				m_pTransformCom->LookDir(forword);
+
+				_float MoveSpeed = _float(-0.85 * m_fCharedGauge + 1);
+
+
+				if (PressedChecker[0])
+					m_pTransformCom->Move_Forward(fDeltaTime * MoveSpeed);
+
+				else if (PressedChecker[1])
+					m_pTransformCom->Move_Backward(fDeltaTime * MoveSpeed);
+
+
+				else if (PressedChecker[2])
+					m_pTransformCom->Move_Left(fDeltaTime * MoveSpeed);
+
+				else
+					m_pTransformCom->Move_Right(fDeltaTime * MoveSpeed);
+
+
+				m_pTransformCom->LookDir(NewLook);
+
+
+
+				if (!m_LevitationTime)
+				{
+					if (PressedChecker[0])
+					{
+						if (m_fCharedGauge < 0.4f)
+							m_pModel->Change_AnimIndex(Weapon_Teapot + 4);
+						else
+							m_pModel->Change_AnimIndex(Weapon_Teapot + 12);
+
+
+					}
+					else if (PressedChecker[1])
+					{
+						if (m_fCharedGauge < 0.4f)
+							m_pModel->Change_AnimIndex(Weapon_Teapot + 5);
+						else
+							m_pModel->Change_AnimIndex(Weapon_Teapot + 13);
+
+					}
+
+					else if (PressedChecker[2])
+					{
+						if (m_fCharedGauge < 0.4f)
+							m_pModel->Change_AnimIndex(Weapon_Teapot + 6);
+						else
+							m_pModel->Change_AnimIndex(Weapon_Teapot + 14);
+
+					}
+
+					else
+					{
+						if (m_fCharedGauge < 0.4f)
+							m_pModel->Change_AnimIndex(Weapon_Teapot + 7);
+						else
+							m_pModel->Change_AnimIndex(Weapon_Teapot + 15);
+
+					}
+				}
+
+			}
+			else {
+
+
+
+
+				if (!m_LevitationTime)
+					m_pModel->Change_AnimIndex(Weapon_Teapot + 3);
+
+
+			}
+		}
+
+	}
+	else {
+
+
+		if (!m_pModel->Get_IsHavetoBlockAnimChange())
+		{
+
+			_int PressedChecker[4];
+			ZeroMemory(PressedChecker, sizeof(_bool) * 4);
+
+			PressedChecker[0] = _int(pInstance->Get_DIKeyState(DIK_W) & DIS_Press);
+			PressedChecker[1] = _int(pInstance->Get_DIKeyState(DIK_S) & DIS_Press);
+			PressedChecker[2] = _int(pInstance->Get_DIKeyState(DIK_A) & DIS_Press);
+			PressedChecker[3] = _int(pInstance->Get_DIKeyState(DIK_D) & DIS_Press);
+
+			if (PressedChecker[0] || PressedChecker[1] || PressedChecker[2] || PressedChecker[3])
+			{
+				//m_pTransformCom->LookDir(XMVectorSetY(m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0)
+				//	- XMVectorSetY(m_pMainCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_POS), 0));
+
+				_Vector forword = XMVector3Normalize(XMVectorSetY(m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0)
+					- XMVectorSetY(m_pMainCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_POS), 0));
+
+				_Vector right = XMVector3Cross(XMVectorSet(0, 1, 0, 0), forword);
+
+				_Vector Dir = XMVectorSet(0, 0, 0, 0);
+
+
+				if (PressedChecker[0]) Dir += forword;
+				if (PressedChecker[1]) Dir -= forword;
+				if (PressedChecker[2]) Dir -= right;
+				if (PressedChecker[3]) Dir += right;
+
+				Dir = XMVector3Normalize(Dir);
+				_Vector vOldLook = m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK);
+
+				if (XMVectorGetX(XMVector3Length(Dir + vOldLook)) < 0.1f)
+					m_pTransformCom->LookDir(m_pTransformCom->Get_MatrixState(CTransform::STATE_RIGHT) + vOldLook);
+				else
+					m_pTransformCom->LookDir((Dir *0.25 + vOldLook * 0.75));
+
+				m_pTransformCom->MovetoDir(XMVector3Normalize(Dir), fDeltaTime);
+
+
+				if (!m_LevitationTime)
+					m_pModel->Change_AnimIndex(Weapon_Teapot + 2);
+
+			}
+			else {
+				if (!m_LevitationTime)
+					m_pModel->Change_AnimIndex(Weapon_Teapot + 0);
+
+
+			}
+		}
+	}
+	return S_OK;
+}
+
+HRESULT CPlayer::Jump_Update_Teapot(_double fDeltaTime, CGameInstance * pInstance)
+{
+	if (!m_pModel->Get_IsHavetoBlockAnimChange())
+	{
+		if (m_iJumpCount < 2 && pInstance->Get_DIKeyState(DIK_SPACE) & DIS_Down)
+		{
+			Add_JumpForce(PlayerMaxJumpPower * m_fSmallScale);
+
+			m_pModel->Change_AnimIndex_UntilTo(15 + m_iJumpCount * 5, 17 + m_iJumpCount * 5, 0.08);
+
+
+			m_iJumpCount++;
+
+		}
+	}
+	m_LevitationTime += fDeltaTime;
+	_float fGravity = 0;
+	if (m_fJumpPower > 0)
+	{
+		m_fJumpPower = _float(m_fMaxJumpPower * (m_LevitationTime - 1.f)* (m_LevitationTime - 1.f));
+		fGravity = m_fJumpPower;
+
+		if (m_fJumpPower <= 1.0f)
+		{
+			m_fJumpPower = 0;
+			m_LevitationTime = fDeltaTime;
+		}
+	}
+	else
+	{
+		fGravity = _float((m_LevitationTime) * (m_LevitationTime)* -29.4f);
+	}
+
+	if (m_LevitationTime != fDeltaTime &&fGravity < 0)
+		m_pModel->Change_AnimIndex(17);
+
+	m_pTransformCom->MovetoDir_bySpeed(XMVectorSet(0, 1.f, 0, 0), fGravity, fDeltaTime);
+	return S_OK;
+}
+
+HRESULT CPlayer::Attack_Update_Teapot(_double fDeltaTime, CGameInstance * pInstance)
+{
+
+	if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_RBUTTON) & DIS_DoubleDown)
+	{
+		m_bIsZoom = !m_bIsZoom;
+
+		if (!m_bIsZoom)
+		{
+			m_pModel->Set_BlockAnim(false);
+			m_fCharedGauge = 0;
+
+		}
+
+		m_bIsCoolTime = false;
+	}
+
+
+	if (m_bIsZoom)
+	{
+
+		if (m_bIsCoolTime)
+		{
+
+
+			if (m_pModel->Get_NowAnimIndex() == Weapon_Teapot + 8)
+			{
+				if (!m_bAtkMoveMentChecker[0] && m_pModel->Get_PlayRate() > 0.4)
+				{
+					m_bAtkMoveMentChecker[0] = true;
+					Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * -1, 10);
+
+
+					CTransform* pCamTransform = m_pMainCamera->Get_Camera_Transform();
+					_float3 vBulletDir = XMVector3Normalize(XMVector3TransformNormal(XMVectorSet(0, 0, 300, 0), pCamTransform->Get_WorldMatrix()));
+					pInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Bullet), TAG_OP(Prototype_Bullet_Grenade),
+						&vBulletDir);
+
+				}
+
+			}
+			else if (m_pModel->Get_NowAnimIndex() == Weapon_Teapot + 16)
+			{
+				if (!m_bAtkMoveMentChecker[0] && m_pModel->Get_PlayRate() > 0.1)
+				{
+					m_bAtkMoveMentChecker[0] = true;
+					CTransform* pCamTransform = m_pMainCamera->Get_Camera_Transform();
+					_float3 vBulletDir = XMVector3Normalize(XMVector3TransformNormal(XMVectorSet(0, 0, 300, 0), pCamTransform->Get_WorldMatrix()));
+
+
+					pInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Bullet), TAG_OP(Prototype_Bullet_Grenade),
+						&vBulletDir);
+
+
+					Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * -1, 25);
+				}
+
+			}
+			else
+			{
+				m_fCharedGauge -= _float(fDeltaTime * 0.33f);
+				if (m_fCharedGauge < 0)
+				{
+					m_fCharedGauge = 0;
+					m_bIsCoolTime = false;
+
+					ZeroMemory(m_bAtkMoveMentChecker, sizeof(_bool) * 3);
+
+				}
+			}
+
+
+
+		}
+		else
+		{
+
+
+			if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_RBUTTON) & DIS_Press)
+			{
+				m_fCharedGauge += _float(fDeltaTime * 0.33f);
+				if (m_fCharedGauge > 1)m_fCharedGauge = 1;
+
+
+				if (m_fCharedGauge < 0.4f)
+
+					m_pModel->Change_AnimIndex(Weapon_Teapot + 9, 0.15, true);
+				else
+					m_pModel->Change_AnimIndex(Weapon_Teapot + 11, 0.15, true);
+
+			}
+			else
+			{
+				if (m_pModel->Get_NowAnimIndex() == Weapon_Teapot + 9)
+					m_pModel->Change_AnimIndex(Weapon_Teapot + 3);
+
+				else if (m_pModel->Get_NowAnimIndex() == Weapon_Teapot + 11)
+					m_pModel->Change_AnimIndex(Weapon_Teapot + 10);
+
+			}
+
+
+			FAILED_CHECK(Lunch_Grenade(fDeltaTime, pInstance));
+
+		}
+	}
+
+
+
 
 	return S_OK;
 }
 
 HRESULT CPlayer::Lunch_Grenade(_double fDeltaTime, CGameInstance * pInstance)
 {
-	if (pInstance->Get_DIKeyState(DIK_Q) & DIS_Down)
+
+	if (!m_bIsCoolTime && pInstance->Get_DIMouseButtonState(CInput_Device::MBS_LBUTTON) & DIS_Down)
 	{
 
-		_Vector vPlayerPos = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
-		_Vector vCamPos = m_pMainCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_POS);
+		if (m_fCharedGauge < 0.4f)
+		{
+			m_pModel->Change_AnimIndex_ReturnTo_Must(Weapon_Teapot + 8, Weapon_Teapot + 3,0.15, true);
 
-		_float3 vBulletDir = (vPlayerPos - vCamPos + XMVectorSet(0, -m_CamDegreeAngle.z * m_fSmallScale * 0.34f, 0, 0));
+			//쿨링 타임 들어가는거로 해주자
+			
+		}
+		else
+		{
+			m_pModel->Change_AnimIndex_ReturnTo_Must(Weapon_Teapot + 16, Weapon_Teapot + 3, 0.15, true);
 
 
-		pInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Bullet), TAG_OP(Prototype_Bullet_Grenade),
-			&vBulletDir);
+		
+		}
+
+		m_bIsCoolTime = true;
+
+	}
+	
+	return S_OK;
+}
+
+HRESULT CPlayer::Move_Update_Umbrella(_double fDeltaTime, CGameInstance * pInstance)
+{
+	_Vector NewLook = XMVector3Normalize(XMVectorSetY(m_pMainCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_LOOK) * 0.75
+		+ m_pMainCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_RIGHT) * 0.25, 0));
+
+	m_pTransformCom->LookDir(NewLook);
+
+
+	if (!m_pModel->Get_IsHavetoBlockAnimChange())
+	{
+
+		if (!m_LevitationTime)
+			m_pModel->Change_AnimIndex_UntilTo(Weapon_Umbrella + 1, Weapon_Umbrella + 2);
+
+	}
+	return S_OK;
+}
+
+HRESULT CPlayer::Jump_Update_Umbrella(_double fDeltaTime, CGameInstance * pInstance)
+{
+	
+	m_LevitationTime += fDeltaTime;
+	_float fGravity = 0;
+	if (m_fJumpPower > 0)
+	{
+		m_fJumpPower = _float(m_fMaxJumpPower * (m_LevitationTime - 1.f)* (m_LevitationTime - 1.f));
+		fGravity = m_fJumpPower;
+
+		if (m_fJumpPower <= 1.0f)
+		{
+			m_fJumpPower = 0;
+			m_LevitationTime = fDeltaTime;
+		}
+	}
+	else
+	{
+		fGravity = _float((m_LevitationTime) * (m_LevitationTime)* -29.4f);
+	}
+
+	if (m_LevitationTime != fDeltaTime &&fGravity < 0)
+		m_pModel->Change_AnimIndex(17);
+
+	m_pTransformCom->MovetoDir_bySpeed(XMVectorSet(0, 1.f, 0, 0), fGravity, fDeltaTime);
+
+	return S_OK;
+}
+
+HRESULT CPlayer::Attack_Update_Umbrella(_double fDeltaTime, CGameInstance * pInstance)
+{
+
+	if (m_fUmbrellaIntro >= 1)
+	{
+		if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_LBUTTON) & DIS_Down)
+			m_pModel->Change_AnimIndex_ReturnTo_Must(Weapon_Umbrella + 4, Weapon_Umbrella + 1, 0.15, true);
+	}
+
+
+	return S_OK;
+}
+
+HRESULT CPlayer::Move_Update_Knife(_double fDeltaTime, CGameInstance * pInstance)
+{
+	if (!m_pModel->Get_IsHavetoBlockAnimChange())
+	{
+
+		_int PressedChecker[4];
+		ZeroMemory(PressedChecker, sizeof(_bool) * 4);
+
+		PressedChecker[0] = _int(pInstance->Get_DIKeyState(DIK_W) & DIS_Press);
+		PressedChecker[1] = _int(pInstance->Get_DIKeyState(DIK_S) & DIS_Press);
+		PressedChecker[2] = _int(pInstance->Get_DIKeyState(DIK_A) & DIS_Press);
+		PressedChecker[3] = _int(pInstance->Get_DIKeyState(DIK_D) & DIS_Press);
+
+		if (PressedChecker[0] || PressedChecker[1] || PressedChecker[2] || PressedChecker[3])
+		{
+			//m_pTransformCom->LookDir(XMVectorSetY(m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0)
+			//	- XMVectorSetY(m_pMainCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_POS), 0));
+
+			_Vector forword = XMVector3Normalize(XMVectorSetY(m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0)
+				- XMVectorSetY(m_pMainCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_POS), 0));
+
+			_Vector right = XMVector3Cross(XMVectorSet(0, 1, 0, 0), forword);
+
+			_Vector Dir = XMVectorSet(0, 0, 0, 0);
+
+
+			if (PressedChecker[0]) Dir += forword;
+			if (PressedChecker[1]) Dir -= forword;
+			if (PressedChecker[2]) Dir -= right;
+			if (PressedChecker[3]) Dir += right;
+
+			Dir = XMVector3Normalize(Dir);
+			_Vector vOldLook = m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK);
+
+			if (XMVectorGetX(XMVector3Length(Dir + vOldLook)) < 0.1f)
+				m_pTransformCom->LookDir(m_pTransformCom->Get_MatrixState(CTransform::STATE_RIGHT) + vOldLook);
+			else
+				m_pTransformCom->LookDir((Dir *0.25 + vOldLook * 0.75));
+
+			m_pTransformCom->MovetoDir(XMVector3Normalize(Dir), fDeltaTime);
+
+
+			if (!m_LevitationTime)
+				m_pModel->Change_AnimIndex(Weapon_Knife + 2);
+
+		}
+		else {
+			if (!m_LevitationTime)
+				m_pModel->Change_AnimIndex(Weapon_Knife + 0);
+
+
+		}
+	}
+	return S_OK;
+}
+
+HRESULT CPlayer::Jump_Update_Knife(_double fDeltaTime, CGameInstance * pInstance)
+{
+	if (!m_pModel->Get_IsHavetoBlockAnimChange())
+	{
+		if (m_iJumpCount < 2 && pInstance->Get_DIKeyState(DIK_SPACE) & DIS_Down)
+		{
+			Add_JumpForce(PlayerMaxJumpPower * m_fSmallScale);
+
+			m_pModel->Change_AnimIndex_UntilTo(15 + m_iJumpCount * 5, 17 + m_iJumpCount * 5, 0.08);
+
+
+			m_iJumpCount++;
+
+		}
+	}
+	m_LevitationTime += fDeltaTime;
+	_float fGravity = 0;
+	if (m_fJumpPower > 0)
+	{
+		m_fJumpPower = _float(m_fMaxJumpPower * (m_LevitationTime - 1.f)* (m_LevitationTime - 1.f));
+		fGravity = m_fJumpPower;
+
+		if (m_fJumpPower <= 1.0f)
+		{
+			m_fJumpPower = 0;
+			m_LevitationTime = fDeltaTime;
+		}
+	}
+	else
+	{
+		fGravity = _float((m_LevitationTime) * (m_LevitationTime)* -29.4f);
+	}
+
+	if (m_LevitationTime != fDeltaTime &&fGravity < 0)
+		m_pModel->Change_AnimIndex(17);
+
+	m_pTransformCom->MovetoDir_bySpeed(XMVectorSet(0, 1.f, 0, 0), fGravity, fDeltaTime);
+	return S_OK;
+}
+
+HRESULT CPlayer::Attack_Update_Knife(_double fDeltaTime, CGameInstance * pInstance)
+{
+
+	//_bool				m_bIsAttackClicked = false;
+	//_uint				m_iAttackCount = 0;
+
+
+	if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_LBUTTON) & DIS_Down)
+		m_bIsAttackClicked = true;
+	
+
+	_uint iNowAnimIndex = m_pModel->Get_NowAnimIndex();
+	_double PlayRate = m_pModel->Get_PlayRate();
+
+
+	if (m_bIsAttackClicked && m_iAttackCount < 5)
+	{
+
+		if (iNowAnimIndex >= Weapon_Knife)
+		//if (iNowAnimIndex >= Weapon_Knife + 3)
+		{
+			if (iNowAnimIndex < Weapon_Knife + 8)
+			{
+				m_pModel->Change_AnimIndex(Weapon_Knife + 8, 0.15, true);
+				m_iAttackCount++;
+				m_bIsAttackClicked = false;
+				ZeroMemory(m_bAtkMoveMentChecker, sizeof(_bool) * 3);
+
+			}
+			else if (iNowAnimIndex >= Weapon_Knife + 8 && iNowAnimIndex <= Weapon_Knife + 16 && iNowAnimIndex % 2 == Weapon_Knife % 2)
+			{
+
+
+				if (PlayRate > 0.8)
+				{
+					m_pModel->Change_AnimIndex(Weapon_Knife + 8 + m_iAttackCount * 2, 0.15, true);
+
+					ZeroMemory(m_bAtkMoveMentChecker, sizeof(_bool) * 3);
+
+					m_iAttackCount++;
+					if (m_iAttackCount > 5) m_iAttackCount = 5;
+					m_bIsAttackClicked = false;
+				}
+
+			}
+
+		}
+	}
+	else
+	{
+
+
+		if (m_iAttackCount && iNowAnimIndex % 2 == Weapon_Knife % 2)
+		//if (iNowAnimIndex >= Weapon_Knife + 8 && iNowAnimIndex <= Weapon_Knife + 16 && iNowAnimIndex % 2 == Weapon_Knife % 2)
+		{
+			if (PlayRate > 0.8)
+			{
+				m_pModel->Change_AnimIndex_ReturnTo(Weapon_Knife + 8 + (m_iAttackCount - 1) * 2 + 1, Weapon_Knife + 3, 0.15, true);
+				m_iAttackCount = 0;
+				m_bIsAttackClicked = false;
+				ZeroMemory(m_bAtkMoveMentChecker, sizeof(_bool) * 3);
+
+			}
+
+		}
 
 
 	}
+
+	PlayRate = m_pModel->Get_PlayRate();
+
+	switch (m_iAttackCount)
+	{
+	case 1:
+		if (!m_bAtkMoveMentChecker[0] && PlayRate > 0.1)
+		{
+			m_bAtkMoveMentChecker[0] = true;
+			Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 10);
+		}
+		break;
+	case 3:
+		if (!m_bAtkMoveMentChecker[0] && PlayRate > 0.6)
+		{
+			m_bAtkMoveMentChecker[0] = true;
+			Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 10);
+		}
+		break;
+	case 4:
+		if (!m_bAtkMoveMentChecker[0] && PlayRate > 0.15)
+		{
+			m_bAtkMoveMentChecker[0] = true;
+			Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 10);
+		}
+		break;
+	case 5:
+		if (!m_bAtkMoveMentChecker[0] && PlayRate > 0.28)
+		{
+			m_bAtkMoveMentChecker[0] = true;
+			Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 10);
+		}
+		break;
+	default:
+		break;
+	}
+
+
+
+
+	return S_OK;
+}
+
+HRESULT CPlayer::Move_Update_Grinder(_double fDeltaTime, CGameInstance * pInstance)
+{
+
+	if (m_bIsZoom)
+	{
+		_Vector NewLook = XMVector3Normalize(XMVectorSetY(m_pMainCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_LOOK) * 0.75
+			+ m_pMainCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_RIGHT) * 0.25, 0));
+
+		m_pTransformCom->LookDir(NewLook);
+
+
+
+		if (!m_pModel->Get_IsHavetoBlockAnimChange())
+		{
+
+			_int PressedChecker[4];
+			ZeroMemory(PressedChecker, sizeof(_bool) * 4);
+
+			PressedChecker[0] = _int(pInstance->Get_DIKeyState(DIK_W) & DIS_Press);
+			PressedChecker[1] = _int(pInstance->Get_DIKeyState(DIK_S) & DIS_Press);
+			PressedChecker[2] = _int(pInstance->Get_DIKeyState(DIK_A) & DIS_Press);
+			PressedChecker[3] = _int(pInstance->Get_DIKeyState(DIK_D) & DIS_Press);
+
+			if (PressedChecker[0] || PressedChecker[1] || PressedChecker[2] || PressedChecker[3])
+			{
+
+
+
+				_Vector forword = XMVector3Normalize(XMVectorSetY(m_pMainCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_LOOK), 0));
+
+
+				m_pTransformCom->LookDir(forword);
+
+
+
+				if (PressedChecker[0])
+					m_pTransformCom->Move_Forward(fDeltaTime);
+
+				else if (PressedChecker[1])										
+					m_pTransformCom->Move_Backward(fDeltaTime);
+
+
+				else if (PressedChecker[2])
+					m_pTransformCom->Move_Left(fDeltaTime);
+
+				else
+					m_pTransformCom->Move_Right(fDeltaTime);
+
+
+				m_pTransformCom->LookDir(NewLook);
+
+
+
+				if (!m_LevitationTime)
+				{
+					if (PressedChecker[0])
+					{
+						m_pModel->Change_AnimIndex(Weapon_Grinder + 4);
+
+					}
+					else if (PressedChecker[1])
+					{
+						m_pModel->Change_AnimIndex(Weapon_Grinder + 5);
+
+					}
+
+					else if (PressedChecker[2])
+					{
+						m_pModel->Change_AnimIndex(Weapon_Grinder + 6);
+
+					}
+
+					else 
+					{
+						m_pModel->Change_AnimIndex(Weapon_Grinder + 7);
+
+					}
+				}
+
+			}
+			else {
+
+
+
+
+				if (!m_LevitationTime)
+					m_pModel->Change_AnimIndex(Weapon_Grinder + 3);
+
+
+			}
+		}
+
+	}
+	else {
+
+
+		if (!m_pModel->Get_IsHavetoBlockAnimChange())
+		{
+
+			_int PressedChecker[4];
+			ZeroMemory(PressedChecker, sizeof(_bool) * 4);
+
+			PressedChecker[0] = _int(pInstance->Get_DIKeyState(DIK_W) & DIS_Press);
+			PressedChecker[1] = _int(pInstance->Get_DIKeyState(DIK_S) & DIS_Press);
+			PressedChecker[2] = _int(pInstance->Get_DIKeyState(DIK_A) & DIS_Press);
+			PressedChecker[3] = _int(pInstance->Get_DIKeyState(DIK_D) & DIS_Press);
+
+			if (PressedChecker[0] || PressedChecker[1] || PressedChecker[2] || PressedChecker[3])
+			{
+				//m_pTransformCom->LookDir(XMVectorSetY(m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0)
+				//	- XMVectorSetY(m_pMainCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_POS), 0));
+
+				_Vector forword = XMVector3Normalize(XMVectorSetY(m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0)
+					- XMVectorSetY(m_pMainCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_POS), 0));
+
+				_Vector right = XMVector3Cross(XMVectorSet(0, 1, 0, 0), forword);
+
+				_Vector Dir = XMVectorSet(0, 0, 0, 0);
+
+
+				if (PressedChecker[0]) Dir += forword;
+				if (PressedChecker[1]) Dir -= forword;
+				if (PressedChecker[2]) Dir -= right;
+				if (PressedChecker[3]) Dir += right;
+
+				Dir = XMVector3Normalize(Dir);
+				_Vector vOldLook = m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK);
+
+				if (XMVectorGetX(XMVector3Length(Dir + vOldLook)) < 0.1f)
+					m_pTransformCom->LookDir(m_pTransformCom->Get_MatrixState(CTransform::STATE_RIGHT) + vOldLook);
+				else
+					m_pTransformCom->LookDir((Dir *0.25 + vOldLook * 0.75));
+
+				m_pTransformCom->MovetoDir(XMVector3Normalize(Dir), fDeltaTime);
+
+
+				if (!m_LevitationTime)
+					m_pModel->Change_AnimIndex(Weapon_Grinder + 2);
+
+			}
+			else {
+				if (!m_LevitationTime)
+					m_pModel->Change_AnimIndex(Weapon_Grinder + 0);
+
+
+			}
+		}
+	}
+	return S_OK;
+}
+
+HRESULT CPlayer::Jump_Update_Grinder(_double fDeltaTime, CGameInstance * pInstance)
+{
+	if (!m_pModel->Get_IsHavetoBlockAnimChange())
+	{
+		if (m_iJumpCount < 2 && pInstance->Get_DIKeyState(DIK_SPACE) & DIS_Down)
+		{
+			Add_JumpForce(PlayerMaxJumpPower * m_fSmallScale);
+
+			m_pModel->Change_AnimIndex_UntilTo(15 + m_iJumpCount * 5, 17 + m_iJumpCount * 5, 0.08);
+
+
+			m_iJumpCount++;
+
+		}
+	}
+	m_LevitationTime += fDeltaTime;
+	_float fGravity = 0;
+	if (m_fJumpPower > 0)
+	{
+		m_fJumpPower = _float(m_fMaxJumpPower * (m_LevitationTime - 1.f)* (m_LevitationTime - 1.f));
+		fGravity = m_fJumpPower;
+
+		if (m_fJumpPower <= 1.0f)
+		{
+			m_fJumpPower = 0;
+			m_LevitationTime = fDeltaTime;
+		}
+	}
+	else
+	{
+		fGravity = _float((m_LevitationTime) * (m_LevitationTime)* -29.4f);
+	}
+
+	if (m_LevitationTime != fDeltaTime &&fGravity < 0)
+		m_pModel->Change_AnimIndex(17);
+
+	m_pTransformCom->MovetoDir_bySpeed(XMVectorSet(0, 1.f, 0, 0), fGravity, fDeltaTime);
+	return S_OK;
+}
+
+HRESULT CPlayer::Attack_Update_Grinder(_double fDeltaTime, CGameInstance * pInstance)
+{
+
+	if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_RBUTTON) & DIS_Press)
+	{
+		m_bIsZoom = true;
+
+		FAILED_CHECK(Lunch_Bullet(fDeltaTime, pInstance));
+
+
+		if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_RBUTTON) & DIS_Up)
+			m_pModel->Set_BlockAnim(false);
+	}
+	else
+	{
+		m_bIsZoom = false;
+		
+	}
+
 
 	return S_OK;
 }
@@ -738,24 +1949,146 @@ HRESULT CPlayer::Set_Camera_On_Player(_double fDeltaTime)
 	CGameInstance* pInstance = GetSingle(CGameInstance);
 
 
-	if (m_bIsRockOn)
+	if (m_eNowWeapon == CPlayer::Weapon_Grinder)
 	{
-		_Vector vMonsterPos = ((CTransform*)(m_pRockOnMonster->Get_Component(TAG_COM(Com_Transform))))->Get_MatrixState(CTransform::STATE_POS);
-		_Vector vPlayerPos = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+		if (m_bIsZoom)
+		{
+			_long		MouseMove = 0;
+			if (MouseMove = pInstance->Get_DIMouseMoveState(CInput_Device::MMS_X))
+			{
+				m_CamDegreeAngle.y += _float(fDeltaTime) * 20 * MouseMove * 0.1f;
 
-		_float fCamDist = _float(m_CamDegreeAngle.z * m_fSmallScale * (1 - m_fDashPower / PlayerMaxDashPower * 0.1f) );
-		_Vector vMon2PlayerDir = XMVector3Normalize(XMVectorSetY(vPlayerPos,0) - XMVectorSetY(vMonsterPos,0));
+			}
+
+			if (MouseMove = pInstance->Get_DIMouseMoveState(CInput_Device::MMS_Y))
+			{
+				m_CamDegreeAngle.x += _float(fDeltaTime) * 20 * MouseMove * 0.1f;
+
+				if (m_CamDegreeAngle.x < -20.f)m_CamDegreeAngle.x = -20.f;
+				else if (m_CamDegreeAngle.x > 60.f)m_CamDegreeAngle.x = 60.f;
+			}
+
+			_Matrix NewCamMatrix;
+			_float3 PlayerPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+
+			NewCamMatrix = XMMatrixTranslation(0.7f , 1.7f , m_CamDegreeAngle.z *0.3f
+				* m_fSmallScale * (1 - m_fDashPower / PlayerMaxDashPower * 0.1f))
+				* XMMatrixRotationX(XMConvertToRadians(m_CamDegreeAngle.x))
+				* XMMatrixRotationY(XMConvertToRadians(m_CamDegreeAngle.y))
+				* XMMatrixTranslation(PlayerPos.x, PlayerPos.y, PlayerPos.z);
 
 
-		CTransform* pCamTransform = m_pMainCamera->Get_Camera_Transform();
+			CTransform* pCamTransform = m_pMainCamera->Get_Camera_Transform();
 
-		pCamTransform->Set_MatrixState(CTransform::STATE_POS, 
-			vPlayerPos + (XMVectorSet(0, 1, 0, 0) * 1 )- (vMon2PlayerDir * fCamDist));
+			pCamTransform->Set_Matrix(NewCamMatrix);
+		}
+		else {
 
-		pCamTransform->LookAt(vMonsterPos);
+			_long		MouseMove = 0;
+			if (MouseMove = pInstance->Get_DIMouseMoveState(CInput_Device::MMS_X))
+			{
+				m_CamDegreeAngle.y += _float(fDeltaTime) * 20 * MouseMove * 0.1f;
+
+			}
+
+			if (MouseMove = pInstance->Get_DIMouseMoveState(CInput_Device::MMS_Y))
+			{
+				m_CamDegreeAngle.x += _float(fDeltaTime) * 20 * MouseMove * 0.1f;
+
+				if (m_CamDegreeAngle.x < -20.f)m_CamDegreeAngle.x = -20.f;
+				else if (m_CamDegreeAngle.x > 60.f)m_CamDegreeAngle.x = 60.f;
+			}
+
+			_Matrix NewCamMatrix;
+			_float3 PlayerPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+
+			NewCamMatrix = XMMatrixTranslation(0 , 1.5f , m_CamDegreeAngle.z
+				* m_fSmallScale * (1 - m_fDashPower / PlayerMaxDashPower * 0.1f))
+				* XMMatrixRotationX(XMConvertToRadians(m_CamDegreeAngle.x))
+				* XMMatrixRotationY(XMConvertToRadians(m_CamDegreeAngle.y))
+				* XMMatrixTranslation(PlayerPos.x, PlayerPos.y, PlayerPos.z);
+
+
+			CTransform* pCamTransform = m_pMainCamera->Get_Camera_Transform();
+
+			pCamTransform->Set_Matrix(NewCamMatrix);
+		}
+		FAILED_CHECK(m_pMainCamera->Set_ViewMatrix());
+		FAILED_CHECK(m_pMainCamera->Set_ProjectMatrix());
+
+
 	}
-	else {
+	else if (m_eNowWeapon == CPlayer::Weapon_Teapot)
+	{
+		if (m_bIsZoom)
+		{
+			_long		MouseMove = 0;
+			if (MouseMove = pInstance->Get_DIMouseMoveState(CInput_Device::MMS_X))
+			{
+				m_CamDegreeAngle.y += _float(fDeltaTime) * 20 * MouseMove * 0.1f;
 
+			}
+
+			if (MouseMove = pInstance->Get_DIMouseMoveState(CInput_Device::MMS_Y))
+			{
+				m_CamDegreeAngle.x += _float(fDeltaTime) * 20 * MouseMove * 0.1f;
+
+				if (m_CamDegreeAngle.x < -20.f)m_CamDegreeAngle.x = -20.f;
+				else if (m_CamDegreeAngle.x > 60.f)m_CamDegreeAngle.x = 60.f;
+			}
+
+			_Matrix NewCamMatrix;
+			_float3 PlayerPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+
+			NewCamMatrix = XMMatrixTranslation(0.7f, 1.7f, m_CamDegreeAngle.z * _float(-0.7 * m_fCharedGauge + 1)
+				* m_fSmallScale * (1 - m_fDashPower / PlayerMaxDashPower * 0.1f))
+				* XMMatrixRotationX(XMConvertToRadians(m_CamDegreeAngle.x))
+				* XMMatrixRotationY(XMConvertToRadians(m_CamDegreeAngle.y))
+				* XMMatrixTranslation(PlayerPos.x, PlayerPos.y, PlayerPos.z);
+
+
+			CTransform* pCamTransform = m_pMainCamera->Get_Camera_Transform();
+
+			pCamTransform->Set_Matrix(NewCamMatrix);
+		}
+		else {
+
+			_long		MouseMove = 0;
+			if (MouseMove = pInstance->Get_DIMouseMoveState(CInput_Device::MMS_X))
+			{
+				m_CamDegreeAngle.y += _float(fDeltaTime) * 20 * MouseMove * 0.1f;
+
+			}
+
+			if (MouseMove = pInstance->Get_DIMouseMoveState(CInput_Device::MMS_Y))
+			{
+				m_CamDegreeAngle.x += _float(fDeltaTime) * 20 * MouseMove * 0.1f;
+
+				if (m_CamDegreeAngle.x < -20.f)m_CamDegreeAngle.x = -20.f;
+				else if (m_CamDegreeAngle.x > 60.f)m_CamDegreeAngle.x = 60.f;
+			}
+
+			_Matrix NewCamMatrix;
+			_float3 PlayerPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+
+			NewCamMatrix = XMMatrixTranslation(0, 1.5f, m_CamDegreeAngle.z
+				* m_fSmallScale * (1 - m_fDashPower / PlayerMaxDashPower * 0.1f))
+				* XMMatrixRotationX(XMConvertToRadians(m_CamDegreeAngle.x))
+				* XMMatrixRotationY(XMConvertToRadians(m_CamDegreeAngle.y))
+				* XMMatrixTranslation(PlayerPos.x, PlayerPos.y, PlayerPos.z);
+
+
+			CTransform* pCamTransform = m_pMainCamera->Get_Camera_Transform();
+
+			pCamTransform->Set_Matrix(NewCamMatrix);
+		}
+		FAILED_CHECK(m_pMainCamera->Set_ViewMatrix());
+		FAILED_CHECK(m_pMainCamera->Set_ProjectMatrix());
+
+
+	}
+	else if (m_eNowWeapon == CPlayer::Weapon_Umbrella)
+	{
 		_long		MouseMove = 0;
 		if (MouseMove = pInstance->Get_DIMouseMoveState(CInput_Device::MMS_X))
 		{
@@ -774,7 +2107,7 @@ HRESULT CPlayer::Set_Camera_On_Player(_double fDeltaTime)
 		_Matrix NewCamMatrix;
 		_float3 PlayerPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
 
-		NewCamMatrix = XMMatrixTranslation(0, 0, m_CamDegreeAngle.z
+		NewCamMatrix = XMMatrixTranslation(0.7f, 1.3f, m_CamDegreeAngle.z * _float(-0.7 * m_fUmbrellaIntro + 1)
 			* m_fSmallScale * (1 - m_fDashPower / PlayerMaxDashPower * 0.1f))
 			* XMMatrixRotationX(XMConvertToRadians(m_CamDegreeAngle.x))
 			* XMMatrixRotationY(XMConvertToRadians(m_CamDegreeAngle.y))
@@ -784,10 +2117,67 @@ HRESULT CPlayer::Set_Camera_On_Player(_double fDeltaTime)
 		CTransform* pCamTransform = m_pMainCamera->Get_Camera_Transform();
 
 		pCamTransform->Set_Matrix(NewCamMatrix);
-	}
-	FAILED_CHECK(m_pMainCamera->Set_ViewMatrix());
-	FAILED_CHECK(m_pMainCamera->Set_ProjectMatrix());
 
+		FAILED_CHECK(m_pMainCamera->Set_ViewMatrix());
+		FAILED_CHECK(m_pMainCamera->Set_ProjectMatrix());
+
+
+	}
+	else
+	{
+
+
+		if (m_bIsRockOn)
+		{
+			_Vector vMonsterPos = ((CTransform*)(m_pRockOnMonster->Get_Component(TAG_COM(Com_Transform))))->Get_MatrixState(CTransform::STATE_POS);
+			_Vector vPlayerPos = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+
+			_float fCamDist = _float(m_CamDegreeAngle.z * m_fSmallScale * (1 - m_fDashPower / PlayerMaxDashPower * 0.1f));
+			_Vector vMon2PlayerDir = XMVector3Normalize(XMVectorSetY(vPlayerPos, 0) - XMVectorSetY(vMonsterPos, 0));
+
+
+			CTransform* pCamTransform = m_pMainCamera->Get_Camera_Transform();
+
+			pCamTransform->Set_MatrixState(CTransform::STATE_POS,
+				vPlayerPos + (XMVectorSet(0, 1, 0, 0) * 1) - (vMon2PlayerDir * fCamDist));
+
+			pCamTransform->LookAt(vMonsterPos);
+		}
+		else {
+
+			_long		MouseMove = 0;
+			if (MouseMove = pInstance->Get_DIMouseMoveState(CInput_Device::MMS_X))
+			{
+				m_CamDegreeAngle.y += _float(fDeltaTime) * 20 * MouseMove * 0.1f;
+
+			}
+
+			if (MouseMove = pInstance->Get_DIMouseMoveState(CInput_Device::MMS_Y))
+			{
+				m_CamDegreeAngle.x += _float(fDeltaTime) * 20 * MouseMove * 0.1f;
+
+				if (m_CamDegreeAngle.x < -20.f)m_CamDegreeAngle.x = -20.f;
+				else if (m_CamDegreeAngle.x > 60.f)m_CamDegreeAngle.x = 60.f;
+			}
+
+			_Matrix NewCamMatrix;
+			_float3 PlayerPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+
+			NewCamMatrix = XMMatrixTranslation(0, 1.5f * m_fSmallScale, m_CamDegreeAngle.z
+				* m_fSmallScale * (1 - m_fDashPower / PlayerMaxDashPower * 0.1f))
+				* XMMatrixRotationX(XMConvertToRadians(m_CamDegreeAngle.x))
+				* XMMatrixRotationY(XMConvertToRadians(m_CamDegreeAngle.y))
+				* XMMatrixTranslation(PlayerPos.x, PlayerPos.y, PlayerPos.z);
+
+
+			CTransform* pCamTransform = m_pMainCamera->Get_Camera_Transform();
+
+			pCamTransform->Set_Matrix(NewCamMatrix);
+		}
+		FAILED_CHECK(m_pMainCamera->Set_ViewMatrix());
+		FAILED_CHECK(m_pMainCamera->Set_ProjectMatrix());
+
+	}
 	return S_OK;
 }
 

@@ -290,7 +290,7 @@ HRESULT CMainApp::Ready_Static_Component_Prototype()
 
 	//모델 프로토타입
 	FAILED_CHECK(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Player),
-		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Alice", "Alice.FBX", TransformMatrix,2)));
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Alice", "Alice.FBX", TransformMatrix,7)));
 	//FAILED_CHECK(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Player),
 	//	CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "ForkLift", "ForkLift.FBX", TransformMatrix)));
 

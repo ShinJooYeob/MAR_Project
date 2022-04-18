@@ -14,12 +14,10 @@ class CPlayer final : public CGameObject
 public:
 	enum eWeaponState
 	{
-		Weapon_None = 0, Weapon_Knife, Weapon_Grinder, Weapon_Hammer, Weapon_Teapot, Weapon_Umbrella, Weapon_End
+		Weapon_None = 0, Weapon_Knife = 47, Weapon_Grinder = 73, Weapon_Horse = 89, Weapon_Teapot = 113, Weapon_Umbrella = 134, Weapon_End
+		//Weapon_None = 0, Weapon_Knife = 1, Weapon_Grinder = 2, Weapon_Horse = 3, Weapon_Teapot = 4, Weapon_Umbrella = 47, Weapon_End
 	};
-	enum ePlayerState
-	{
 
-	};
 
 private:
 	CPlayer(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
@@ -84,6 +82,19 @@ private:
 	/*For Weapon*/
 	eWeaponState		m_eNowWeapon = Weapon_None;
 
+	_bool				m_bIsAttackClicked = false;
+	_uint				m_iAttackCount = 0;
+	_bool				m_bAtkMoveMentChecker[3];
+
+	_bool				m_bIsZoom = false;
+	_bool				m_bIsCharged = false;
+	_float				m_fCharedGauge = 0;
+	_bool				m_bIsCoolTime = false;
+
+	_float				m_fUmbrellaIntro = 0;
+
+
+
 	/*For AddForce*/
 	_bool				m_bIsActived = false;
 	_float3				m_vAddedForce = _float3(0, 0, 0);
@@ -94,17 +105,50 @@ private:
 private:
 	HRESULT SetUp_Components();
 	
+
 	HRESULT Input_Keyboard(_double fDeltaTime);
-	HRESULT Smalling_Update(_double fDeltaTime, CGameInstance* pInstance);
-	HRESULT Move_Update(_double fDeltaTime, CGameInstance* pInstance);
-	HRESULT Jump_Update(_double fDeltaTime, CGameInstance* pInstance);
+	
+	/*All Weapon*/
 	HRESULT Dash_Update(_double fDeltaTime, CGameInstance* pInstance, _float TotalDashTime = 0.5f);
 	HRESULT RockOn_Update(_double fDeltaTime, CGameInstance* pInstance);
 	
+	/*NoneWeapon*/
+	HRESULT Smalling_Update(_double fDeltaTime, CGameInstance* pInstance);
+	HRESULT Plant_ClockBomb(_double fDeltaTime, CGameInstance* pInstance);
+	HRESULT Move_Update(_double fDeltaTime, CGameInstance* pInstance);
+	HRESULT Jump_Update(_double fDeltaTime, CGameInstance* pInstance);
+
+
+	/*Knife*/
+	HRESULT Move_Update_Knife(_double fDeltaTime, CGameInstance* pInstance);
+	HRESULT Jump_Update_Knife(_double fDeltaTime, CGameInstance* pInstance);
+	HRESULT Attack_Update_Knife(_double fDeltaTime, CGameInstance* pInstance);
+
+
+	/*Grinder*/
+	HRESULT Move_Update_Grinder(_double fDeltaTime, CGameInstance* pInstance);
+	HRESULT Jump_Update_Grinder(_double fDeltaTime, CGameInstance* pInstance);
+	HRESULT Attack_Update_Grinder(_double fDeltaTime, CGameInstance* pInstance);
 	HRESULT Lunch_Bullet(_double fDeltaTime, CGameInstance* pInstance);
+
+
+	/*Horse*/
+	HRESULT Move_Update_Horse(_double fDeltaTime, CGameInstance* pInstance);
+	HRESULT Jump_Update_Horse(_double fDeltaTime, CGameInstance* pInstance);
+	HRESULT Attack_Update_Horse(_double fDeltaTime, CGameInstance* pInstance);
+
+
+	/*Teapot*/
+	HRESULT Move_Update_Teapot(_double fDeltaTime, CGameInstance* pInstance);
+	HRESULT Jump_Update_Teapot(_double fDeltaTime, CGameInstance* pInstance);
+	HRESULT Attack_Update_Teapot(_double fDeltaTime, CGameInstance* pInstance);
 	HRESULT Lunch_Grenade(_double fDeltaTime, CGameInstance* pInstance);
-
-
+	
+	/*Umbrella*/
+	HRESULT Move_Update_Umbrella(_double fDeltaTime, CGameInstance* pInstance);
+	HRESULT Jump_Update_Umbrella(_double fDeltaTime, CGameInstance* pInstance);
+	HRESULT Attack_Update_Umbrella(_double fDeltaTime, CGameInstance* pInstance);
+	
 	HRESULT Set_Player_On_Terrain();
 	HRESULT Set_Player_On_Slieder(_double fDeltatime);
 	HRESULT Set_Camera_On_Player(_double fDeltaTime);

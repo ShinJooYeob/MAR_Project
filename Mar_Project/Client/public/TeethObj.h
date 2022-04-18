@@ -34,6 +34,7 @@ private:
 	_bool				m_bIsPlayerCloser = false;
 	_float				m_fRangeRadius = 3.f;
 
+	_float3				m_vReturnPos;
 
 	_float				m_fStartTimer = 0;
 	_bool				m_bIsSpout = false;

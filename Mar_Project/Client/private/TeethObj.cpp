@@ -29,8 +29,8 @@ HRESULT CTeethObj::Initialize_Clone(void * pArg)
 
 	if (pArg != nullptr)
 	{
-		_float3 Pos = *(_float3*)pArg;
-		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, Pos);
+		m_vReturnPos = *(_float3*)pArg;
+		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, m_vReturnPos);
 	}
 	m_pTransformCom->Scaled_All(_float3(0.3f));
 	m_fStartTimer = 0;
@@ -99,7 +99,7 @@ _int CTeethObj::Update(_double fDeltaTime)
 		if (abs(fBetweenLength) < 0.3f)
 		{
 			Set_IsDead();
-			FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_LOBY, TAG_LAY(Layer_TeethObj), TAG_OP(Prototype_TeethObj), &_float3(11, 3, 5)));
+			FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_LOBY, TAG_LAY(Layer_TeethObj), TAG_OP(Prototype_TeethObj), &m_vReturnPos));
 
 		}
 		m_pTransformCom->MovetoDir_bySpeed(ToPlayerDir, (m_fRangeRadius - fBetweenLength) * m_fRangeRadius, fDeltaTime);
