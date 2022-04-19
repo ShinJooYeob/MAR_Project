@@ -35,6 +35,8 @@ public:
 	virtual _int LateRender()override;
 
 	void	Add_Dmg_to_Player(_uint iDmgAmount);
+	void  Change_Weapon(_uint WeaponIndex);
+
 
 	void Add_JumpForce(_float JumpPower);
 	void Add_Force(_float3 vDir, _float Power);
@@ -101,7 +103,7 @@ private:
 
 
 	/*For HP*/
-	_uint				m_iHP;
+	_uint				m_iHP = 32;
 private:
 	HRESULT SetUp_Components();
 	

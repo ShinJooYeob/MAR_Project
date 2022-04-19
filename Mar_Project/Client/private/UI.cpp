@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "..\public\UI.h"
-
+#include "Texture.h"
 
 
 CUI::CUI(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
@@ -41,6 +41,16 @@ _float CUI::Get_RenderSortValue()
 _float CUI::Compute_RenderSortValue()
 {
 	return  m_fRenderSortValue = m_fDepth;
+}
+
+HRESULT CUI::Change_TextureLayer(const _tchar* tagTextureLayer, _double FrameTime)
+{
+	CTexture* pTexture = (CTexture*)(Find_Components(TAG_COM(Com_Texture)));
+	NULL_CHECK_RETURN(pTexture,E_FAIL);
+
+	
+
+	return pTexture->Change_TextureLayer(tagTextureLayer, FrameTime);;
 }
 
 _int CUI::Update(_double fDeltaTime)
@@ -107,6 +117,75 @@ FLOATRECT CUI::Convert_UI_To_Rect(UIDESC tUIDesc)
 
 
 	return Result;
+}
+
+UIDESC CUI::Apply_Rect_To_MemberValue(FLOATRECT tRect)
+{
+	m_UIRect = tRect;
+
+
+	m_UIDesc.fCX = m_UIRect.right - m_UIRect.left;
+	m_UIDesc.fCY = m_UIRect.bottom - m_UIRect.top;
+	m_UIDesc.fX = m_UIRect.left + m_UIDesc.fCX * 0.5f;
+	m_UIDesc.fY = m_UIRect.top + m_UIDesc.fCY * 0.5f;
+
+
+	return m_UIDesc;
+}
+
+FLOATRECT CUI::Apply_UI_To_MemberValue(UIDESC tUIDesc)
+{
+	m_UIDesc = tUIDesc;
+
+	m_UIRect.left = m_UIDesc.fX - m_UIDesc.fCX * 0.5f;
+	m_UIRect.top = m_UIDesc.fY - m_UIDesc.fCY * 0.5f;
+	m_UIRect.right = m_UIDesc.fX + m_UIDesc.fCX * 0.5f;
+	m_UIRect.bottom = m_UIDesc.fY + m_UIDesc.fCY * 0.5f;
+
+
+	return m_UIRect;
+}
+
+void CUI::Set_Angle(_float DegreeAngle)
+{
+	m_fAngle = DegreeAngle;
+}
+
+void CUI::Set_TextureLayerIndex(_uint iIndex)
+{
+	m_iTextureLayerIndex = iIndex;
+
+	m_iTargetTextureLayerIndex = 0;
+	m_fPassedTime = 0;
+	m_fTotalUntilTime = 0;
+	m_bIsUntilTo = false;
+
+
+}
+
+void CUI::Set_TextureLayerIndex_UntilTo(_uint iIndex, _uint iTargetIndex, _double ChangingTime)
+{
+	m_iTextureLayerIndex = iIndex;
+
+	m_iTargetTextureLayerIndex = iTargetIndex;
+	m_fPassedTime = 0;
+	m_fTotalUntilTime = ChangingTime;
+	m_bIsUntilTo = true;
+}
+
+_uint CUI::Get_NowTextureLayerIndex()
+{
+
+	if (m_bIsUntilTo)
+	{
+		return _uint(g_pGameInstance->Easing(TYPE_Linear, _float(m_iTextureLayerIndex), _float(m_iTargetTextureLayerIndex), _float(m_fPassedTime), _float(m_fTotalUntilTime)));
+
+	}
+	else
+	{
+		return m_iTextureLayerIndex;
+	}
+
 }
 
 HRESULT CUI::Apply_UIDesc_To_Transform()

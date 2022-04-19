@@ -4,12 +4,16 @@
 #include "Loader.h"
 #include "Scene_Loby.h"
 #include "Scene_StageSelect.h"
-#include "Camera_Main.h"
+#include "Scene_Stage1.h"
 
 
 #ifdef USE_IMGUI
 #include "Scene_Edit.h"
 #endif // USE_IMGUI
+
+
+#include "Camera_Main.h"
+
 
 
 
@@ -30,14 +34,10 @@ HRESULT CScene_Loading::Initialize(SCENEID eSceneID)
 	m_eNextSceneIndex = eSceneID;
 	m_pLoader = CLoader::Create(m_pDevice,m_pDeviceContext,eSceneID);
 
-	if (FAILED(Ready_Layer_Loading(TEXT("Layer_Loading"))))
+	if (FAILED(Ready_Layer_LoadingUI(TEXT("Layer_Loading"))))
 		return E_FAIL;
 
-	if (FAILED(Ready_Layer_LoadingBar(TEXT("Layer_LoadingBar"))))
-		return E_FAIL;
 
-	/*if (FAILED(Ready_Layer_MainCamera(TAG_LAY(Layer_Camera_Main))))
-		return E_FAIL;*/
 
 
 	return S_OK;
@@ -75,7 +75,10 @@ _int CScene_Loading::LateUpdate(_double fDeltaTime)
 			FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_StageSelect::Create(m_pDevice, m_pDeviceContext), m_eNextSceneIndex));
 			break;
 
-
+		case SCENEID::SCENE_STAGE1:
+			FAILED_CHECK(GetSingle(CUtilityMgr)->Clear_RenderGroup_forSceneChange());
+			FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Stage1::Create(m_pDevice, m_pDeviceContext), m_eNextSceneIndex));
+			break;
 
 #ifdef USE_IMGUI
 		case SCENEID::SCENE_EDIT:
@@ -128,35 +131,11 @@ _int CScene_Loading::LateRender()
 	return 0;
 }
 
-HRESULT CScene_Loading::Ready_Layer_Loading(const _tchar * pLayerTag)
-{
-	//오브젝트들을 써야함
-	return S_OK;
-}
-
-HRESULT CScene_Loading::Ready_Layer_LoadingBar(const _tchar * pLayerTag)
+HRESULT CScene_Loading::Ready_Layer_LoadingUI(const _tchar * pLayerTag)
 {
 
-	return S_OK;
-}
-
-HRESULT CScene_Loading::Ready_Layer_MainCamera(const _tchar * pLayerTag)
-{
-	//CAMERADESC CameraDesc;
-
-	//CameraDesc.bIsOrtho = true;
-	//CameraDesc.vWorldRotAxis = _float3(5.f, 3.f, 5.f);
-	//CameraDesc.vAxisY = _float3(0, 1, 0);
-	//CameraDesc.fFovy = XMConvertToRadians(60.0f);
-	//CameraDesc.fAspect = _float(g_iWinCX) / g_iWinCY;
-	//CameraDesc.fNear = 0.2f;
-	//CameraDesc.fFar = 300.f;
-
-	//CameraDesc.TransformDesc.fMovePerSec = 10.f;
-	//CameraDesc.TransformDesc.fRotationPerSec = XMConvertToRadians(90.0f);
-
-	//if (GetSingle(CGameInstance)->Add_GameObject_To_Layer(SCENEID::SCENE_STATIC, pLayerTag, TAG_OP(Prototype_Camera_Main), &CameraDesc))
-	//	return E_FAIL;
+	FAILED_CHECK(GetSingle(CGameInstance)->Add_GameObject_To_Layer(SCENEID::SCENE_LOADING, pLayerTag, TAG_OP(Prototype_UILoading)));
+	
 	return S_OK;
 }
 

@@ -892,11 +892,11 @@ HRESULT CModel::Ready_MoreAnimation(const char * szFileFullPath, _uint iAnimCoun
 			NULL_CHECK_RETURN(pAinmationClip, E_FAIL);
 
 #ifdef _DEBUG
-			//string szLog = "Anim Name : " + string(paiAnimation->mName.data) + "\n";
-			//wstring DebugLog;
-			//DebugLog.assign(szLog.begin(), szLog.end());
+			string szLog = "Anim Name : " + string(paiAnimation->mName.data) + "\n";
+			wstring DebugLog;
+			DebugLog.assign(szLog.begin(), szLog.end());
 
-			//OutputDebugStringW(DebugLog.c_str());
+			OutputDebugStringW(DebugLog.c_str());
 #endif
 
 

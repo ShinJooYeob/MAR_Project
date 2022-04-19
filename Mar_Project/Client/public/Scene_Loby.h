@@ -20,25 +20,6 @@ public:
 
 private:
 	HRESULT Ready_Light();
-	HRESULT Ready_Layer_MainCamera(const _tchar* pLayerTag);
-	HRESULT Ready_Layer_SkyBox(const _tchar* pLayerTag);
-	HRESULT Ready_Layer_Terrain(const _tchar* pLayerTag);
-	HRESULT Ready_Layer_Player(const _tchar* pLayerTag);
-	HRESULT Ready_Layer_UIImage(const _tchar* pLayerTag);
-	HRESULT Ready_Layer_JumpPad(const _tchar* pLayerTag);
-	HRESULT Ready_Layer_SteamPad(const _tchar* pLayerTag);
-	HRESULT Ready_Layer_HiddenPad(const _tchar* pLayerTag);
-	HRESULT Ready_Layer_TeethObj(const _tchar* pLayerTag);
-	HRESULT Ready_Layer_RoseObj(const _tchar* pLayerTag);
-
-	HRESULT Ready_Layer_StaticMapObj(const _tchar* pLayerTag);
-
-	HRESULT Ready_Layer_Executor(const _tchar* pLayerTag);
-	HRESULT Ready_Layer_Eyepot(const _tchar* pLayerTag);
-	HRESULT Ready_Layer_Grunt(const _tchar* pLayerTag);
-	HRESULT Ready_Layer_WaspArrow(const _tchar* pLayerTag);
-	HRESULT Ready_Layer_WaspInk(const _tchar* pLayerTag);
-
 
 
 private:

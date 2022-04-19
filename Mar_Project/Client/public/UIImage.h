@@ -22,10 +22,11 @@ public:
 	virtual _int LateRender()override;
 
 
+
 protected:
 	CShader*			m_pShaderCom = nullptr;
 	CRenderer*			m_pRendererCom = nullptr;
-	CVIBuffer_Cube*		m_pVIBufferCom = nullptr;
+	CVIBuffer_Rect*		m_pVIBufferCom = nullptr;
 	CTexture*			m_pTextureCom = nullptr;
 
 

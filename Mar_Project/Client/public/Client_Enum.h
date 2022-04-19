@@ -8,6 +8,8 @@ enum SCENEID
 	SCENE_LOADING,
 	SCENE_STAGESELECT,
 	SCENE_STAGE1,
+	SCENE_STAGE2,
+	SCENE_STAGE3,
 
 	SCENE_EDIT,
 	SCENE_END
@@ -21,6 +23,13 @@ enum OBJECTPROTOTYPEID
 	Prototype_Bullet_Grenade,
 
 	Prototype_UIImage,
+
+	Prototype_UIGamePlay,
+	Prototype_UILoading,
+	Prototype_UILoby,
+	Prototype_UISetting,
+
+
 	Prototype_SkyBox,
 	Prototype_Player,
 
@@ -69,6 +78,19 @@ static const _tchar* Tag_Object_Prototype(OBJECTPROTOTYPEID eTag)
 		return TEXT("Bullet_Grenade");
 		break;
 
+	case Prototype_UILoading:
+		return TEXT("Prototype_UILoading");
+		break;
+
+	case Prototype_UILoby:
+		return TEXT("Prototype_UILoby");
+		break;
+	case Prototype_UISetting:
+		return TEXT("Prototype_UISetting");
+		break;
+
+
+
 	case Prototype_Camera_Editor:
 		return TEXT("Camera_Editor");
 		break;
@@ -84,6 +106,10 @@ static const _tchar* Tag_Object_Prototype(OBJECTPROTOTYPEID eTag)
 	case Prototype_UIImage:
 		return TEXT("UI_Image");
 		break;
+	case Prototype_UIGamePlay:
+		return TEXT("UIGamePlay");
+		break;
+		
 		
 	case Prototype_Rect:
 		return TEXT("Rect");
@@ -251,6 +277,10 @@ enum LAYERID
 	Layer_StaticMapObj,
 
 
+	Layer_UI_GamePlay,
+
+
+
 	Layer_UI_IMG,
 	Layer_UI_BTN,
 	Layer_UI_SLIDE,
@@ -307,7 +337,10 @@ static const _tchar* Tag_Layer(LAYERID eTag)
 	case Layer_StaticMapObj:
 		return TEXT("Layer_StaticMapObj");
 		break;
-		
+
+	case Layer_UI_GamePlay:
+		return TEXT("Layer_UI_GamePlay");
+		break;
 		
 	case Layer_UI_IMG:
 		return TEXT("Layer_UI_IMG");
@@ -381,7 +414,13 @@ enum COMPONENTPROTOTYPEID
 	Prototype_Texture_SkyBox,
 	Prototype_Texture_EditScene,
 	Prototype_Texture_Terrain,
-	Prototype_Texture_Edit_Terrain
+	Prototype_Texture_Edit_Terrain,
+	Prototype_Texture_DefaultUI,
+	Prototype_Texture_GamePlayScene,
+	Prototype_Texture_LoadingScene,
+	Prototype_Texture_LobyScene,
+	Prototype_Texture_SettingScene,
+
 
 };
 static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
@@ -525,6 +564,28 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 	case 	Prototype_Texture_Edit_Terrain:
 		return TEXT("Prototype_Texture_Edit_Terrain");
 
+	case 	Prototype_Texture_DefaultUI:
+		return TEXT("Prototype_Texture_DefaultUI");
+		break;
+
+
+	case 	Prototype_Texture_GamePlayScene:
+		return TEXT("Prototype_Texture_GamePlayScene");
+		break;
+
+	case 	Prototype_Texture_LoadingScene:
+		return TEXT("Prototype_Texture_LoadingScene");
+		break;
+
+	case 	Prototype_Texture_LobyScene:
+		return TEXT("Prototype_Texture_LobyScene");
+		break;
+
+		case
+			Prototype_Texture_SettingScene:
+				return TEXT("Prototype_Texture_SettingScene");
+		break;
+
 		//¸Þ½¬////////////////////////////////////////////////////////////////////////
 
 
@@ -546,6 +607,8 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 	case 	Prototype_VIBuffer_Terrain_Edit:
 		return TEXT("Prototype_Component_VIBuffer_Terrain_Edit");
 		break;
+
+		
 
 		//////////////////////////////////////////////////////////////////////////
 	default:

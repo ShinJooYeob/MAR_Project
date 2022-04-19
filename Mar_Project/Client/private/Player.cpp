@@ -2,6 +2,7 @@
 #include "..\public\Player.h"
 #include "Camera.h"
 #include "Terrain.h"
+#include "GamePlayUI.h"
 
 
 
@@ -167,30 +168,278 @@ void CPlayer::Add_Dmg_to_Player(_uint iDmgAmount)
 {
 	if (!iDmgAmount) return;
 
+	m_iHP -= iDmgAmount;
 
-	switch (iDmgAmount)
+	if (m_iHP <= 0)m_iHP = 32;
+
+
+	((CGamePlayUI*)(g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_UI_GamePlay))))->Add_Dmg_to_Player(m_iHP,iDmgAmount);
+
+	ZeroMemory(m_bAtkMoveMentChecker, sizeof(_bool) * 3);
+	m_bIsAttackClicked = false;
+	m_iAttackCount = 0;
+
+	switch (m_eNowWeapon)
 	{
-	case 1:
-	case 2:
-		m_pModel->Change_AnimIndex_ReturnTo(rand() % 2 + 38, 0, 0.1, true);
+	case Client::CPlayer::Weapon_None:
+	{
+		switch (iDmgAmount)
+		{
+		case 1:
+		case 2:
+			m_pModel->Change_AnimIndex_ReturnTo_Must(rand() % 2 + 38, 0, 0.1, true);
+			break;
+
+		case 3:
+			m_pModel->Change_AnimIndex_ReturnTo_Must(40, 0, 0.1, true);
+			Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK)*-1, 10);
+			break;
+
+
+		case 4:
+			m_pModel->Change_AnimIndex_ReturnTo_Must(41, 0, 0.1, true);
+			Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK)*-1, 15);
+			break;
+
+
+		default:
+			m_pModel->Change_AnimIndex_ReturnTo_Must(rand() % 2 + 42, 0, 0.1, true);
+			break;
+		}
+	}
 		break;
 
-	case 3:
-		m_pModel->Change_AnimIndex_ReturnTo(40, 0, 0.1, true);
-		Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK)*-1, 10);
+
+
+	case Client::CPlayer::Weapon_Knife:
+	{
+
+		switch (iDmgAmount)
+		{
+		case 1:
+		case 2:
+			m_pModel->Change_AnimIndex_ReturnTo_Must(Weapon_Knife + rand() % 2 + 18, Weapon_Knife + 0, 0.1, true);
+			Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK)*-1, 10);
+			break;
+
+		case 3:
+		case 4:
+			m_pModel->Change_AnimIndex_ReturnTo_Must(Weapon_Knife + 20, Weapon_Knife + 0, 0.1, true);
+			Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK)*-1, 15);
+			break;
+
+
+		default:
+			m_pModel->Change_AnimIndex_ReturnTo_Must(Weapon_Knife + 21 +rand() % 2, Weapon_Knife + 0, 0.1, true);
+			break;
+		}
+	}
 		break;
+	case Client::CPlayer::Weapon_Grinder:
+
+	{
+
+		switch (iDmgAmount)
+		{
+		case 1:
+		case 2:
+			if (m_bIsZoom)
+				m_pModel->Change_AnimIndex_ReturnTo_Must(Weapon_Grinder + rand() % 2 + 11, Weapon_Grinder + 3, 0.1, true);
+			else
+				m_pModel->Change_AnimIndex_ReturnTo_Must(Weapon_Grinder + rand() % 2 + 11, Weapon_Grinder + 0, 0.1, true);
+
+			break;
 
 
-	case 4:
-		m_pModel->Change_AnimIndex_ReturnTo(41, 0, 0.1, true);
-		Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK)*-1, 15);
+		default:
+			if (m_bIsZoom)
+				m_pModel->Change_AnimIndex_ReturnTo_Must(Weapon_Grinder + 13, Weapon_Grinder + 3, 0.1, true);
+			else
+				m_pModel->Change_AnimIndex_ReturnTo_Must(Weapon_Grinder + 13, Weapon_Grinder + 0, 0.1, true);
+
+			Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK)*-1, 15);
+
+			break;
+		}
+	}
+
+
+		break;
+	case Client::CPlayer::Weapon_Horse:
+
+	{
+
+		switch (iDmgAmount)
+		{
+		case 1:
+			m_pModel->Change_AnimIndex_ReturnTo_Must(Weapon_Horse + 16, Weapon_Horse + 0, 0.1, true);
+		case 2:
+		case 3:
+			m_pModel->Change_AnimIndex_ReturnTo_Must(Weapon_Horse + rand() % 2 + 17, Weapon_Horse + 0, 0.1, true);
+			break;
+
+		case 4:
+			m_pModel->Change_AnimIndex_ReturnTo_Must(Weapon_Horse + 19, Weapon_Horse + 0, 0.1, true);
+			Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK)*-1, 15);
+			break;
+
+		default:
+			m_pModel->Change_AnimIndex_ReturnTo_Must(Weapon_Horse + 20 + rand() % 2, Weapon_Horse + 0, 0.1, true);
+			break;
+		}
+
+	}
+		break;
+	case Client::CPlayer::Weapon_Teapot:
+
+	{
+
+		switch (iDmgAmount)
+		{
+		case 1:
+		case 2:
+			if (m_bIsZoom)
+			{
+				if (m_fCharedGauge > 0.4)
+					m_pModel->Change_AnimIndex_ReturnTo_Must(Weapon_Teapot + rand() % 2 + 17, Weapon_Teapot + 3, 0.1, true);
+				else
+					m_pModel->Change_AnimIndex_ReturnTo_Must(Weapon_Teapot + rand() % 2 + 17, Weapon_Teapot + 10, 0.1, true);
+
+			}
+			else
+				m_pModel->Change_AnimIndex_ReturnTo_Must(Weapon_Teapot + rand() % 2 + 17, Weapon_Teapot + 0, 0.1, true);
+
+			break;
+
+
+		default:
+			if (m_bIsZoom)
+				m_pModel->Change_AnimIndex_ReturnTo_Must(Weapon_Teapot + 19, Weapon_Teapot + 3, 0.1, true);
+			else
+				m_pModel->Change_AnimIndex_ReturnTo_Must(Weapon_Teapot + 19, Weapon_Teapot + 0, 0.1, true);
+
+			Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK)*-1, 15);
+
+			break;
+		}
+	}
+
+
+
+		break;
+	case Client::CPlayer::Weapon_Umbrella:
 		break;
 
 
 	default:
-		m_pModel->Change_AnimIndex_ReturnTo(rand() % 2 + 42, 0, 0.1, true);
 		break;
 	}
+
+
+
+}
+
+void CPlayer::Change_Weapon(_uint WeaponIndex)
+{
+
+
+	switch (WeaponIndex)
+	{
+	case 0:
+
+
+		m_eNowWeapon = CPlayer::Weapon_Knife;
+		m_pModel->Change_AnimIndex(Weapon_Knife + 0);
+		ZeroMemory(m_bAtkMoveMentChecker, sizeof(_bool) * 3);
+		m_pModel->Set_BlockAnim(false);
+
+		m_bIsAttackClicked = false;
+		m_iAttackCount = 0;
+		m_bIsZoom = false;
+		m_bIsCharged = false;
+		m_fCharedGauge = 0;
+		m_bIsCoolTime = false;
+		m_fUmbrellaIntro = 0;
+
+		break;
+	case 1:
+		m_eNowWeapon = CPlayer::Weapon_Grinder;
+		m_pModel->Change_AnimIndex(Weapon_Grinder + 0);
+		ZeroMemory(m_bAtkMoveMentChecker, sizeof(_bool) * 3);
+		m_pModel->Set_BlockAnim(false);
+		m_bIsAttackClicked = false;
+		m_iAttackCount = 0;
+		m_bIsZoom = false;
+		m_bIsCharged = false;
+		m_fCharedGauge = 0;
+		m_bIsCoolTime = false;
+		m_fUmbrellaIntro = 0;
+		break;
+	case 2:
+
+		m_eNowWeapon = CPlayer::Weapon_Horse;
+		m_pModel->Change_AnimIndex(Weapon_Horse + 0);
+
+		ZeroMemory(m_bAtkMoveMentChecker, sizeof(_bool) * 3);
+		m_bIsAttackClicked = false;
+		m_iAttackCount = 0;
+		m_bIsZoom = false;
+		m_bIsCharged = false;
+		m_fCharedGauge = 0;
+		m_bIsCoolTime = false;
+		m_fUmbrellaIntro = 0;
+		m_pModel->Set_BlockAnim(false);
+
+		break;
+	case 3:
+
+		m_eNowWeapon = CPlayer::Weapon_Teapot;
+
+		m_pModel->Change_AnimIndex(Weapon_Teapot + 0);
+		ZeroMemory(m_bAtkMoveMentChecker, sizeof(_bool) * 3);
+		m_bIsAttackClicked = false;
+		m_iAttackCount = 0;
+		m_bIsZoom = false;
+		m_bIsCharged = false;
+		m_fCharedGauge = 0;
+		m_bIsCoolTime = false;
+		m_fUmbrellaIntro = 0;
+		m_pModel->Set_BlockAnim(false);
+
+		break;
+	case 4:
+		m_eNowWeapon = CPlayer::Weapon_Umbrella;
+		ZeroMemory(m_bAtkMoveMentChecker, sizeof(_bool) * 3);
+		m_bIsAttackClicked = false;
+		m_iAttackCount = 0;
+		m_bIsZoom = false;
+		m_bIsCharged = false;
+		m_fCharedGauge = 0;
+		m_bIsCoolTime = false;
+		m_fUmbrellaIntro = 0;
+		m_pModel->Change_AnimIndex_UntilTo(Weapon_Umbrella, Weapon_Umbrella + 1);
+		m_pModel->Set_BlockAnim(true);
+		break;
+	case 5:
+		m_eNowWeapon = CPlayer::Weapon_None;
+		ZeroMemory(m_bAtkMoveMentChecker, sizeof(_bool) * 3);
+		m_bIsAttackClicked = false;
+		m_iAttackCount = 0;
+		m_bIsZoom = false;
+		m_bIsCharged = false;
+		m_fCharedGauge = 0;
+		m_bIsCoolTime = false;
+		m_fUmbrellaIntro = 0;
+		m_pModel->Change_AnimIndex(0);
+		m_pModel->Set_BlockAnim(false);
+		break;
+
+	default:
+		break;
+	}
+
+
+
 
 
 }
@@ -304,104 +553,6 @@ HRESULT CPlayer::Input_Keyboard(_double fDeltaTime)
 	if (pInstance->Get_DIKeyState(DIK_Z)&DIS_Down)
 		GetSingle(CUtilityMgr)->SlowMotionStart();
 
-
-	if (g_pGameInstance->Get_DIKeyState(DIK_B) & DIS_Down)
-	{
-
-		switch (m_eNowWeapon)
-		{
-		case Client::CPlayer::Weapon_None:
-
-			m_eNowWeapon = CPlayer::Weapon_Knife;
-			m_pModel->Change_AnimIndex(Weapon_Knife + 0);
-			ZeroMemory(m_bAtkMoveMentChecker, sizeof(_bool) * 3);
-			m_pModel->Set_BlockAnim(false);
-
-			m_bIsAttackClicked = false;
-			m_iAttackCount = 0;
-			m_bIsZoom = false;
-			m_bIsCharged = false;
-			m_fCharedGauge = 0;
-			m_bIsCoolTime = false;
-			m_fUmbrellaIntro = 0;
-
-			break;
-		case Client::CPlayer::Weapon_Knife:
-			m_eNowWeapon = CPlayer::Weapon_Grinder;
-			m_pModel->Change_AnimIndex(Weapon_Grinder + 0);
-			ZeroMemory(m_bAtkMoveMentChecker, sizeof(_bool) * 3);
-			m_pModel->Set_BlockAnim(false);
-			m_bIsAttackClicked = false;
-			m_iAttackCount = 0;
-			m_bIsZoom = false;
-			m_bIsCharged = false;
-			m_fCharedGauge = 0;
-			m_bIsCoolTime = false;
-			m_fUmbrellaIntro = 0;
-			break;
-		case Client::CPlayer::Weapon_Grinder:
-
-			m_eNowWeapon = CPlayer::Weapon_Horse;
-			m_pModel->Change_AnimIndex(Weapon_Horse + 0);
-
-			ZeroMemory(m_bAtkMoveMentChecker, sizeof(_bool) * 3);
-			m_bIsAttackClicked = false;
-			m_iAttackCount = 0;
-			m_bIsZoom = false;
-			m_bIsCharged = false;
-			m_fCharedGauge = 0;
-			m_bIsCoolTime = false;
-			m_fUmbrellaIntro = 0;
-			m_pModel->Set_BlockAnim(false);
-
-			break;
-		case Client::CPlayer::Weapon_Horse:
-
-			m_eNowWeapon = CPlayer::Weapon_Teapot;
-
-			m_pModel->Change_AnimIndex(Weapon_Teapot + 0);
-			ZeroMemory(m_bAtkMoveMentChecker, sizeof(_bool) * 3);
-			m_bIsAttackClicked = false;
-			m_iAttackCount = 0;
-			m_bIsZoom = false;
-			m_bIsCharged = false;
-			m_fCharedGauge = 0;
-			m_bIsCoolTime = false;
-			m_fUmbrellaIntro = 0;
-			m_pModel->Set_BlockAnim(false);
-
-			break;
-		case Client::CPlayer::Weapon_Teapot:
-			m_eNowWeapon = CPlayer::Weapon_Umbrella;
-			ZeroMemory(m_bAtkMoveMentChecker, sizeof(_bool) * 3);			
-			m_bIsAttackClicked = false;
-			m_iAttackCount = 0;
-			m_bIsZoom = false;
-			m_bIsCharged = false;
-			m_fCharedGauge = 0;
-			m_bIsCoolTime = false;
-			m_fUmbrellaIntro = 0;
-			m_pModel->Change_AnimIndex_UntilTo(Weapon_Umbrella, Weapon_Umbrella + 1);
-			m_pModel->Set_BlockAnim(true);
-			break;
-		case Client::CPlayer::Weapon_Umbrella:
-			m_eNowWeapon = CPlayer::Weapon_None;
-			ZeroMemory(m_bAtkMoveMentChecker, sizeof(_bool) * 3);
-			m_bIsAttackClicked = false;
-			m_iAttackCount = 0;
-			m_bIsZoom = false;
-			m_bIsCharged = false;
-			m_fCharedGauge = 0;
-			m_bIsCoolTime = false;
-			m_fUmbrellaIntro = 0;
-			m_pModel->Change_AnimIndex(0);
-			m_pModel->Set_BlockAnim(false);
-			break;
-		default:
-			break;
-		}
-
-	}
 
 
 	/*To All*/
@@ -928,12 +1079,15 @@ HRESULT CPlayer::Jump_Update_Horse(_double fDeltaTime, CGameInstance * pInstance
 
 HRESULT CPlayer::Attack_Update_Horse(_double fDeltaTime, CGameInstance * pInstance)
 {
-	if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_LBUTTON) & DIS_Down)
-		m_bIsAttackClicked = true;
-
 
 	_uint iNowAnimIndex = m_pModel->Get_NowAnimIndex();
 	_double PlayRate = m_pModel->Get_PlayRate();
+
+	if ((PlayRate < 0.8 && PlayRate > 0.5)|| !m_iAttackCount)
+	{
+		if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_LBUTTON) & DIS_Down)
+			m_bIsAttackClicked = true;
+	}
 
 
 	if (m_bIsAttackClicked && m_iAttackCount < 4)
@@ -1065,7 +1219,12 @@ HRESULT CPlayer::Move_Update_Teapot(_double fDeltaTime, CGameInstance * pInstanc
 
 				m_pTransformCom->LookDir(forword);
 
-				_float MoveSpeed = _float(-0.85 * m_fCharedGauge + 1);
+				_float MoveSpeed = 1;
+				//_float MoveSpeed = _float(-0.45 * m_fCharedGauge + 0.6);
+
+				if (m_fCharedGauge > 0.4f)
+					MoveSpeed = 0.15f;
+				else MoveSpeed = 0.4f;
 
 
 				if (PressedChecker[0])
@@ -1115,7 +1274,7 @@ HRESULT CPlayer::Move_Update_Teapot(_double fDeltaTime, CGameInstance * pInstanc
 
 					}
 
-					else
+					else  if (PressedChecker[3])
 					{
 						if (m_fCharedGauge < 0.4f)
 							m_pModel->Change_AnimIndex(Weapon_Teapot + 7);
@@ -1541,13 +1700,16 @@ HRESULT CPlayer::Attack_Update_Knife(_double fDeltaTime, CGameInstance * pInstan
 	//_uint				m_iAttackCount = 0;
 
 
-	if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_LBUTTON) & DIS_Down)
-		m_bIsAttackClicked = true;
 	
 
 	_uint iNowAnimIndex = m_pModel->Get_NowAnimIndex();
 	_double PlayRate = m_pModel->Get_PlayRate();
 
+	if ((PlayRate < 0.8 && PlayRate > 0.5) || !m_iAttackCount)
+	{
+		if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_LBUTTON) & DIS_Down)
+			m_bIsAttackClicked = true;
+	}
 
 	if (m_bIsAttackClicked && m_iAttackCount < 5)
 	{
@@ -1880,6 +2042,11 @@ HRESULT CPlayer::Set_Player_On_Terrain()
 				m_pModel->Change_AnimIndex_ReturnTo(19, 0, 0, true);
 				Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 10);
 			}
+
+
+			ZeroMemory(m_bAtkMoveMentChecker, sizeof(_bool) * 3);
+			m_bIsAttackClicked = false;
+			m_iAttackCount = 0;
 		}
 		
 

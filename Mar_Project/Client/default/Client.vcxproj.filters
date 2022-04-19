@@ -184,6 +184,15 @@
     <Filter Include="01.GameObject\08.Weapon\99.Bullet\GrenadeBullet">
       <UniqueIdentifier>{3680e6bd-38bc-4566-8cbb-ead603f94126}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.GameObject\99.UI\UsedUI">
+      <UniqueIdentifier>{63ce8578-d558-42ac-b0e6-d8aa14b42798}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\99.UI\UsedUI\LoadingUI">
+      <UniqueIdentifier>{9dbff93d-1319-4cc0-8aaa-b3d009109591}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\99.UI\UsedUI\GamePlayUI">
+      <UniqueIdentifier>{dd5bb2f8-fc13-4571-9bb8-3255bccc9ae4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -345,6 +354,15 @@
     <ClInclude Include="..\public\RendererEditSceneUI.h">
       <Filter>01.GameObject\96.EditorSceneObj</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\GamePlayUI.h">
+      <Filter>01.GameObject\99.UI\UsedUI\GamePlayUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\LoadingUI.h">
+      <Filter>01.GameObject\99.UI\UsedUI\LoadingUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Scene_Stage1.h">
+      <Filter>02.Scene\03.Scene_Gameplay\Scene_Stage1</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -481,6 +499,15 @@
     </ClCompile>
     <ClCompile Include="..\private\RendererEditSceneUI.cpp">
       <Filter>01.GameObject\96.EditorSceneObj</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\GamePlayUI.cpp">
+      <Filter>01.GameObject\99.UI\UsedUI\GamePlayUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\LoadingUI.cpp">
+      <Filter>01.GameObject\99.UI\UsedUI\LoadingUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Scene_Stage1.cpp">
+      <Filter>02.Scene\03.Scene_Gameplay\Scene_Stage1</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

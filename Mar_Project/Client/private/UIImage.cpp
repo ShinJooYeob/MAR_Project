@@ -44,30 +44,7 @@ _int CUIImage::Update(_double fDeltaTime)
 		return -1;
 
 
-	if (g_pGameInstance->Get_DIKeyState(DIK_RETURN)&DIS_Down)
-	{
-		static int test = 0;
-		test++;
 
-		if (test > 2)
-			test = 0;
-
-		switch (test)
-		{
-		case 0:
-
-			FAILED_CHECK(m_pTextureCom->Change_TextureLayer(L"lower"));
-			break;
-		case 1:
-			FAILED_CHECK(m_pTextureCom->Change_TextureLayer(L"upper"));
-			break;
-		case 2:
-			FAILED_CHECK(m_pTextureCom->Change_TextureLayer(L"number"));
-			break;
-		default:
-			break;
-		}
-	}
 
 	return _int();
 }
@@ -76,7 +53,6 @@ _int CUIImage::LateUpdate(_double fDeltaTime)
 {
 	if (__super::LateUpdate(fDeltaTime) < 0)
 		return -1;
-	FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_BLEND, this));
 
 	return _int();
 }
@@ -86,20 +62,50 @@ _int CUIImage::Render()
 	if (__super::Render( ) < 0)
 		return -1;
 
-	NULL_CHECK_RETURN(m_pVIBufferCom, E_FAIL);
+	if (m_bIsDraw)
+	{
 
 
-	FAILED_CHECK(Apply_Rect_To_Transform());
-	FAILED_CHECK(Bind_Transform_OnShader(m_pShaderCom, "g_WorldMatrix"));
+		NULL_CHECK_RETURN(m_pVIBufferCom, E_FAIL);
 
-	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ViewMatrix", &XMMatrixIdentity(), sizeof(_float4x4)));
-	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ProjMatrix", &m_ProjMatrix, sizeof(_float4x4)));
 
-	FAILED_CHECK(m_pTextureCom->Bind_OnShader_AutoFrame(m_pShaderCom, "g_DiffuseTexture", g_fDeltaTime));
-	//FAILED_CHECK(m_pTextureCom->Bind_OnShader(m_pShaderCom, "g_DiffuseTexture"));
+		FAILED_CHECK(Apply_Rect_To_Transform());
+		FAILED_CHECK(Bind_Transform_OnShader(m_pShaderCom, "g_WorldMatrix"));
 
-	FAILED_CHECK(m_pVIBufferCom->Render(m_pShaderCom, 0));
+		FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ViewMatrix", &XMMatrixIdentity(), sizeof(_float4x4)));
+		FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ProjMatrix", &m_ProjMatrix, sizeof(_float4x4)));
 
+		//FAILED_CHECK(m_pTextureCom->Bind_OnShader_AutoFrame(m_pShaderCom, "g_DiffuseTexture", g_fDeltaTime));
+		if (m_bIsUntilTo)
+		{
+			m_fPassedTime += g_fDeltaTime;
+
+			_uint iEasedIndex = 0;
+
+			if (m_fPassedTime >= m_fTotalUntilTime)
+			{
+				iEasedIndex = m_iTextureLayerIndex = m_iTargetTextureLayerIndex;
+				m_bIsUntilTo = false;
+			}
+			else
+			{
+				iEasedIndex = _uint(g_pGameInstance->Easing(TYPE_Linear, _float(m_iTextureLayerIndex), _float(m_iTargetTextureLayerIndex), _float(m_fPassedTime), _float(m_fTotalUntilTime)));
+			}
+
+
+			FAILED_CHECK(m_pTextureCom->Bind_OnShader(m_pShaderCom, "g_DiffuseTexture", iEasedIndex));
+
+
+		}
+		else
+		{
+
+			FAILED_CHECK(m_pTextureCom->Bind_OnShader(m_pShaderCom, "g_DiffuseTexture", m_iTextureLayerIndex));
+		}
+
+		FAILED_CHECK(m_pVIBufferCom->Render(m_pShaderCom, 1));
+
+	}
 	return _int();
 }
 
@@ -121,7 +127,7 @@ HRESULT CUIImage::SetUp_Components()
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_VIBuffer_Rect), TAG_COM(Com_VIBuffer), (CComponent**)&m_pVIBufferCom));
 
-	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Texture_Player), TAG_COM(Com_Texture), (CComponent**)&m_pTextureCom));
+	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Texture_DefaultUI), TAG_COM(Com_Texture), (CComponent**)&m_pTextureCom));
 
 	CTransform::TRANSFORMDESC tDesc = {};
 	tDesc.fMovePerSec = 5;
