@@ -218,6 +218,45 @@ HRESULT CModel::Change_AnimIndex(_uint iAnimIndex, _double ExitTime, _bool bBloc
 	m_bIsBlockAnim = bBlockAnimUntilReturnChange;
 
 	m_KindsOfAnimChange = 0;
+	m_bIsUntill = false;
+	return S_OK;
+}
+
+HRESULT CModel::Change_AnimIndex_UntilNReturn(_uint iAnimIndex, _uint iUntilIndex, _uint iReturnIndex, _double ExitTime, _bool bBlockAnimUntilReturnChange)
+{
+	if (iAnimIndex >= m_iNumAnimationClip || iReturnIndex >= m_iNumAnimationClip)
+		return E_FAIL;
+
+
+	if (iReturnIndex == m_iNextAnimIndex) return S_FALSE;
+
+	if (m_bIsChagingAnim || m_AnimExitAcc) // m_AnimExitAcc 변환 중이였다면
+	{
+		_uint iNumOldAnimKeyFrameIdx = _uint(m_vecCurrentKeyFrameIndices[m_iOldAnimIndex].size());
+		m_vecCurrentKeyFrameIndices[m_iOldAnimIndex].clear();
+		m_vecCurrentKeyFrameIndices[m_iOldAnimIndex].resize(iNumOldAnimKeyFrameIdx);
+	}
+
+	m_bIsChagingAnim = true;
+
+
+	m_AnimExitAcc = 0;
+	m_TotalAnimExitTime = ExitTime;
+
+
+	m_OldPlayTimeAcc = m_NowPlayTimeAcc;
+	m_iOldAnimIndex = m_iNowAnimIndex;
+
+
+	m_NowPlayTimeAcc = 0;
+	m_iNowAnimIndex = iAnimIndex;
+
+
+	m_iNextAnimIndex = iUntilIndex;
+	m_iReturnIndex = iReturnIndex;
+	m_bIsBlockAnim = bBlockAnimUntilReturnChange;
+	m_KindsOfAnimChange = 2;
+	m_bIsUntill = true;
 
 	return S_OK;
 }
@@ -255,6 +294,7 @@ HRESULT CModel::Change_AnimIndex_UntilTo(_uint iAnimIndex, _uint iReturnIndex, _
 	m_iNextAnimIndex = iReturnIndex;
 	m_bIsBlockAnim = bBlockAnimUntilReturnChange;
 	m_KindsOfAnimChange = 0;
+	m_bIsUntill = true;
 
 	return S_OK;
 }
@@ -293,6 +333,7 @@ HRESULT CModel::Change_AnimIndex_ReturnTo(_uint iAnimIndex, _uint iReturnIndex, 
 
 	m_bIsBlockAnim = bBlockAnimUntilReturnChange;
 	m_KindsOfAnimChange = 1;
+	m_bIsUntill = false;
 
 	return S_OK;
 }
@@ -329,6 +370,7 @@ HRESULT CModel::Change_AnimIndex_ReturnTo_Must(_uint iAnimIndex, _uint iReturnIn
 
 	m_bIsBlockAnim = bBlockAnimUntilReturnChange;
 	m_KindsOfAnimChange = 1;
+	m_bIsUntill = false;
 
 	return S_OK;
 }
@@ -387,7 +429,7 @@ HRESULT CModel::Update_AnimationClip(_double fDeltaTime,_bool IsUpdateAll)
 				}
 				else
 				{
-					m_bIsBlockAnim = false;
+					m_bIsUntill = false;
 					m_iNowAnimIndex = m_iNowAnimIndex;
 					m_TotalAnimExitTime = 0;
 				}
@@ -426,13 +468,13 @@ HRESULT CModel::Update_AnimationClip(_double fDeltaTime,_bool IsUpdateAll)
 				m_AnimExitAcc = 0;
 
 				FAILED_CHECK(m_vecAnimator[m_iNowAnimIndex]->Update_TransformMatrices_byClipBones(&m_bIsChagingAnim, fDeltaTime, &m_NowPlayTimeAcc,
-					&m_vecHierarchyNode, &(m_vecCurrentKeyFrameIndices[m_iNowAnimIndex]),IsUpdateAll));
+					&m_vecHierarchyNode, &(m_vecCurrentKeyFrameIndices[m_iNowAnimIndex]), IsUpdateAll));
 			}
 
 		}
 
 	}
-		break;
+	break;
 
 	case 1: //ReturnTo
 	{
@@ -440,7 +482,7 @@ HRESULT CModel::Update_AnimationClip(_double fDeltaTime,_bool IsUpdateAll)
 		{
 			//해당 애니메이션을 따라서 트렌스폼매트릭스를 갱신해주고
 			FAILED_CHECK(m_vecAnimator[m_iNowAnimIndex]->Update_TransformMatrices_byClipBones(&m_bIsChagingAnim, fDeltaTime, &m_NowPlayTimeAcc,
-				&m_vecHierarchyNode, &(m_vecCurrentKeyFrameIndices[m_iNowAnimIndex])));
+				&m_vecHierarchyNode, &(m_vecCurrentKeyFrameIndices[m_iNowAnimIndex]), IsUpdateAll));
 
 			if (m_bIsChagingAnim)
 			{
@@ -465,8 +507,9 @@ HRESULT CModel::Update_AnimationClip(_double fDeltaTime,_bool IsUpdateAll)
 			if (m_AnimExitAcc <= m_TotalAnimExitTime)
 			{
 
-				FAILED_CHECK(m_vecAnimator[m_iNowAnimIndex]->Update_TransformMatrices_byEasing_OldAnim(m_iNowAnimIndex, m_vecAnimator[m_iOldAnimIndex], m_iOldAnimIndex,
-					m_OldPlayTimeAcc, m_AnimExitAcc / m_TotalAnimExitTime, &m_vecHierarchyNode, &m_vecCurrentKeyFrameIndices));
+				if (IsUpdateAll)
+					FAILED_CHECK(m_vecAnimator[m_iNowAnimIndex]->Update_TransformMatrices_byEasing_OldAnim(m_iNowAnimIndex, m_vecAnimator[m_iOldAnimIndex], m_iOldAnimIndex,
+						m_OldPlayTimeAcc, m_AnimExitAcc / m_TotalAnimExitTime, &m_vecHierarchyNode, &m_vecCurrentKeyFrameIndices));
 
 			}
 			else
@@ -483,7 +526,7 @@ HRESULT CModel::Update_AnimationClip(_double fDeltaTime,_bool IsUpdateAll)
 				m_AnimExitAcc = 0;
 
 				FAILED_CHECK(m_vecAnimator[m_iNowAnimIndex]->Update_TransformMatrices_byClipBones(&m_bIsChagingAnim, fDeltaTime, &m_NowPlayTimeAcc,
-					&m_vecHierarchyNode, &(m_vecCurrentKeyFrameIndices[m_iNowAnimIndex])));
+					&m_vecHierarchyNode, &(m_vecCurrentKeyFrameIndices[m_iNowAnimIndex]), IsUpdateAll));
 
 
 				if (m_bIsChagingAnim)
@@ -502,8 +545,80 @@ HRESULT CModel::Update_AnimationClip(_double fDeltaTime,_bool IsUpdateAll)
 		}
 
 	}
-		break;
+	break;
 
+
+	case 2: // UntilNReturn
+
+	{
+		if (!m_bIsChagingAnim)
+		{
+			//해당 애니메이션을 따라서 트렌스폼매트릭스를 갱신해주고
+			FAILED_CHECK(m_vecAnimator[m_iNowAnimIndex]->Update_TransformMatrices_byClipBones(&m_bIsChagingAnim, fDeltaTime, &m_NowPlayTimeAcc,
+				&m_vecHierarchyNode, &(m_vecCurrentKeyFrameIndices[m_iNowAnimIndex]), IsUpdateAll));
+
+			if (m_bIsChagingAnim)
+			{
+				m_OldPlayTimeAcc = m_NowPlayTimeAcc;
+				m_iOldAnimIndex = m_iNowAnimIndex;
+
+				m_NowPlayTimeAcc = 0;
+
+				if (m_iNowAnimIndex < m_iNextAnimIndex)
+				{
+					m_iNowAnimIndex = m_iNowAnimIndex + 1;
+				}
+				else
+				{
+					m_bIsUntill = false;
+					m_KindsOfAnimChange = 0;
+					m_iNowAnimIndex = m_iReturnIndex;
+					m_iNextAnimIndex = m_iReturnIndex;
+				}
+
+				m_AnimExitAcc = 0;
+			}
+
+		}
+
+
+
+		if (m_bIsChagingAnim)
+		{
+			m_AnimExitAcc += fDeltaTime;
+
+			if (m_AnimExitAcc <= m_TotalAnimExitTime)
+			{
+				if (IsUpdateAll)
+				{
+					FAILED_CHECK(m_vecAnimator[m_iNowAnimIndex]->Update_TransformMatrices_byEasing_OldAnim(m_iNowAnimIndex, m_vecAnimator[m_iOldAnimIndex], m_iOldAnimIndex,
+						m_OldPlayTimeAcc, m_AnimExitAcc / m_TotalAnimExitTime, &m_vecHierarchyNode, &m_vecCurrentKeyFrameIndices));
+				}
+
+			}
+			else
+			{
+
+				//이전 애니메이션 초기화
+				_uint iNumOldAnimKeyFrameIdx = _uint(m_vecCurrentKeyFrameIndices[m_iOldAnimIndex].size());
+				m_vecCurrentKeyFrameIndices[m_iOldAnimIndex].clear();
+				m_vecCurrentKeyFrameIndices[m_iOldAnimIndex].resize(iNumOldAnimKeyFrameIdx);
+
+				m_OldPlayTimeAcc = 0;
+
+				m_bIsChagingAnim = false;
+				m_AnimExitAcc = 0;
+
+				FAILED_CHECK(m_vecAnimator[m_iNowAnimIndex]->Update_TransformMatrices_byClipBones(&m_bIsChagingAnim, fDeltaTime, &m_NowPlayTimeAcc,
+					&m_vecHierarchyNode, &(m_vecCurrentKeyFrameIndices[m_iNowAnimIndex]), IsUpdateAll));
+			}
+
+		}
+
+
+
+	}
+	break;
 	default:
 		break;
 	}

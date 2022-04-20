@@ -24,10 +24,12 @@ public:
 	HRESULT Change_AnimIndex_ReturnTo(_uint iAnimIndex, _uint iReturnIndex, _double ExitTime = 0.15, _bool bBlockAnimUntilReturnChange = false);
 	HRESULT Change_AnimIndex_ReturnTo_Must(_uint iAnimIndex, _uint iReturnIndex, _double ExitTime = 0.15, _bool bBlockAnimUntilReturnChange = false);
 
+	HRESULT Change_AnimIndex_UntilNReturn(_uint iAnimIndex, _uint iUntilIndex, _uint iReturnIndex,_double ExitTime = 0.15, _bool bBlockAnimUntilReturnChange = false);
 	HRESULT Change_AnimIndex_UntilTo(_uint iAnimIndex, _uint iReturnIndex, _double ExitTime = 0.15, _bool bBlockAnimUntilReturnChange = false);
 	_uint	Get_NowAnimIndex() { return m_iNowAnimIndex; };
 	_uint	Get_IsHavetoBlockAnimChange() { return m_bIsBlockAnim; };
 	_double	Get_PlayRate();
+	_bool	Get_IsUntillPlay() { return m_bIsUntill; };
 	void	Set_BlockAnim(_bool IsBlock) { m_bIsBlockAnim = IsBlock; };
 
 	HRESULT Bind_OnShader(class CShader* pShader, _uint iMaterialIndex , _uint eTextureType, const char* pHlslConstValueName);
@@ -61,6 +63,7 @@ private:
 	//i번째 애니메이션이 사용하는 j번째 클립본의 현재 키프레임을 저장
 	vector<vector<_uint>>					m_vecCurrentKeyFrameIndices;
 	//현재 재생되고있는 애니메이션 재생 시간
+	_uint		m_iReturnIndex = 0;
 	_uint		m_iNextAnimIndex = 0;
 	_uint		m_iNowAnimIndex = 0;
 	_uint		m_iOldAnimIndex = 0;
@@ -70,6 +73,7 @@ private:
 	_double		m_TotalAnimExitTime = 0.2;
 	_double		m_AnimExitAcc = 0.0;
 
+	_bool		m_bIsUntill = false;
 	_bool		m_bIsBlockAnim = false;
 	_bool		m_bIsChagingAnim = false;
 	_uint		m_KindsOfAnimChange = 0;

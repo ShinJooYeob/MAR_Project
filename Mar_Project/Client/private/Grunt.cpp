@@ -4,7 +4,7 @@
 
 
 CGrunt::CGrunt(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
-	:CMonster(pDevice,pDeviceContext)
+	:CMonster(pDevice, pDeviceContext)
 {
 }
 
@@ -41,35 +41,35 @@ _int CGrunt::Update(_double fDeltaTime)
 	/*
 	static float testFloat = 1.;
 	if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
-		m_pModel->Change_AnimIndex(2);
+	m_pModel->Change_AnimIndex(2);
 	if (g_pGameInstance->Get_DIKeyState(DIK_2)&DIS_Down)
-		m_pModel->Change_AnimIndex(6);
+	m_pModel->Change_AnimIndex(6);
 	if (g_pGameInstance->Get_DIKeyState(DIK_3)&DIS_Down)
-		m_pModel->Change_AnimIndex(17);
+	m_pModel->Change_AnimIndex(17);
 
 
 	if (m_pInstance->Get_DIKeyState(DIK_UP) & DIS_Down)
 	{
-		testFloat += 0.1f;
-		m_pTransformCom->Set_MoveSpeed(testFloat);
+	testFloat += 0.1f;
+	m_pTransformCom->Set_MoveSpeed(testFloat);
 
 
-		string ttszLog = "Monster Speed: " + to_string(testFloat) + "\n";
-		wstring ttDebugLog;
-		ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+	string ttszLog = "Monster Speed: " + to_string(testFloat) + "\n";
+	wstring ttDebugLog;
+	ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
 
-		OutputDebugStringW(ttDebugLog.c_str());
+	OutputDebugStringW(ttDebugLog.c_str());
 	}
 	else if (m_pInstance->Get_DIKeyState(DIK_DOWN) & DIS_Down)
 	{
-		testFloat -= 0.1f;
-		m_pTransformCom->Set_MoveSpeed(testFloat);
+	testFloat -= 0.1f;
+	m_pTransformCom->Set_MoveSpeed(testFloat);
 
-		string ttszLog = "Monster Speed: " + to_string(testFloat) + "\n";
-		wstring ttDebugLog;
-		ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+	string ttszLog = "Monster Speed: " + to_string(testFloat) + "\n";
+	wstring ttDebugLog;
+	ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
 
-		OutputDebugStringW(ttDebugLog.c_str());
+	OutputDebugStringW(ttDebugLog.c_str());
 
 	}
 	*/
@@ -80,29 +80,35 @@ _int CGrunt::Update(_double fDeltaTime)
 	}
 
 
-	if (Distance_BetweenPlayer(m_pTransformCom) < 3)
+	if (!m_bIsPatternFinished || Distance_BetweenPlayer(m_pTransformCom) < 3)
 	{
-
+		Update_Pattern(fDeltaTime);
 	}
 	else
 	{
-		FAILED_CHECK(__super::Update_WanderAround(m_pTransformCom, fDeltaTime,0.05f));
+		if (!m_pModel->Get_IsUntillPlay())
+		{
+			m_pModel->Change_AnimIndex(2);
+			FAILED_CHECK(__super::Update_WanderAround(m_pTransformCom, fDeltaTime, 0.05f));
+		}
 	}
 
 
+	m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
 
+	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime, m_bIsOnScreen));
 	return _int();
 }
 
 _int CGrunt::LateUpdate(_double fDeltaTime)
 {
 
-	FAILED_CHECK(__super::Set_Monster_On_Terrain(m_pTransformCom,fDeltaTime));
+	FAILED_CHECK(__super::Set_Monster_On_Terrain(m_pTransformCom, fDeltaTime));
 
-	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime));
 
-	if (g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS)))
+	if (m_bIsOnScreen)
 		FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this));
+
 
 	m_vOldPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
 	return _int();
@@ -147,98 +153,99 @@ _int CGrunt::LateRender()
 _int CGrunt::Update_Pattern(_double fDeltaTime)
 {
 
+	m_PatternPassedTime += fDeltaTime;
 	if (m_bIsPatternFinished)
 	{
-		m_ePattern = rand() % 4;
+		m_ePattern += 1;
+		if (m_ePattern > 3) m_ePattern = 0;
 		m_bIsPatternFinished = false;
 		m_PatternPassedTime = 0;
+		//m_pModel->Change_AnimIndex(2);
 	}
-	else
+
+	switch (m_ePattern)
 	{
-		m_PatternPassedTime += fDeltaTime;
-
-		switch (m_ePattern)
+	case 0:
+		if (!m_PatternPassedTime)
 		{
-		case 0:
-			if (m_PatternPassedTime == fDeltaTime)
+			m_pModel->Change_AnimIndex_UntilNReturn(3, 4,0, 0.15, true);
+		}
+		else
+		{
+			if (!m_pModel->Get_IsUntillPlay())
 			{
-				m_pModel->Change_AnimIndex_UntilTo(3, 4, 0.15, true);
+				m_bIsPatternFinished = true;
+				m_PatternPassedTime = 0;
 			}
-			else
-			{
-				if (!m_pModel->Get_IsHavetoBlockAnimChange())
-				{
-					m_bIsPatternFinished = true;
-				}
-			}
-
-
-			break;
-		case 1:
-			if (m_PatternPassedTime == fDeltaTime)
-			{
-				m_pModel->Change_AnimIndex_UntilTo(3, 4, 0.15, true);
-			}
-			else
-			{
-				if (!m_pModel->Get_IsHavetoBlockAnimChange())
-				{
-					m_bIsPatternFinished = true;
-				}
-			}
-
-
-			break;
-		case 2:
-			if (m_PatternPassedTime == fDeltaTime)
-			{
-				m_pModel->Change_AnimIndex_UntilTo(3, 4, 0.15, true);
-			}
-			else
-			{
-				if (!m_pModel->Get_IsHavetoBlockAnimChange())
-				{
-					m_bIsPatternFinished = true;
-				}
-			}
-
-			break;
-		case 3:
-			if (m_PatternPassedTime == fDeltaTime)
-			{
-				m_pModel->Change_AnimIndex_UntilTo(3, 4, 0.15, true);
-			}
-			else
-			{
-				if (!m_pModel->Get_IsHavetoBlockAnimChange())
-				{
-					m_bIsPatternFinished = true;
-				}
-			}
-
-			break;
-		case 4:
-			if (m_PatternPassedTime == fDeltaTime)
-			{
-				m_pModel->Change_AnimIndex_UntilTo(3, 4, 0.15, true);
-			}
-			else
-			{
-				if (!m_pModel->Get_IsHavetoBlockAnimChange())
-				{
-					m_bIsPatternFinished = true;
-				}
-			}
-
-			break;
-
-		default:
-			break;
 		}
 
 
+		break;
+	case 1:
+		if (!m_PatternPassedTime)
+		{
+			m_pModel->Change_AnimIndex_UntilTo(5, 6, 0.15, true);
+			m_pTransformCom->Set_MoveSpeed(6.5);
+		}
+		else
+		{
 
+			if (m_PatternPassedTime < 7)
+			{
+				if (m_pModel->Get_NowAnimIndex() == 6)
+					FAILED_CHECK(__super::Update_WanderAround(m_pTransformCom, fDeltaTime, 0.25f));
+			}
+			else
+			{
+				m_pModel->Change_AnimIndex_UntilNReturn(7, 8, 2, 0.15, true);
+				Add_Force(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 10);
+				m_bIsPatternFinished = true;
+				m_PatternPassedTime = 0;
+				m_pTransformCom->Set_MoveSpeed(0.5);
+			}
+		}
+
+
+		break;
+	case 2:
+		if (!m_PatternPassedTime)
+		{
+			m_pModel->Change_AnimIndex_UntilNReturn(9, 11, 0,0.15, true);
+		}
+		else
+		{
+			if (!m_pModel->Get_IsUntillPlay())
+			{
+				m_bIsPatternFinished = true;
+				m_PatternPassedTime = 0;
+			}
+		}
+
+		break;
+	case 3:
+		if (!m_PatternPassedTime)
+		{
+			m_pModel->Change_AnimIndex_UntilNReturn(12, 13, 0,0.15, true);
+		}
+		else
+		{
+			if (!m_pModel->Get_IsUntillPlay())
+			{
+				m_bIsPatternFinished = true;
+				m_PatternPassedTime = 0;
+			}
+		}
+
+		break;
+
+
+	default:
+		break;
 	}
+
+
+
+
 
 
 	/*
