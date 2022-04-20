@@ -29,17 +29,75 @@ HRESULT CGrunt::Initialize_Clone(void * pArg)
 
 	if (pArg != nullptr)
 		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, *((_float3*)pArg));
+
+
 	return S_OK;
 }
 
 _int CGrunt::Update(_double fDeltaTime)
 {
+
+
+	/*
+	static float testFloat = 1.;
+	if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
+		m_pModel->Change_AnimIndex(2);
+	if (g_pGameInstance->Get_DIKeyState(DIK_2)&DIS_Down)
+		m_pModel->Change_AnimIndex(6);
+	if (g_pGameInstance->Get_DIKeyState(DIK_3)&DIS_Down)
+		m_pModel->Change_AnimIndex(17);
+
+
+	if (m_pInstance->Get_DIKeyState(DIK_UP) & DIS_Down)
+	{
+		testFloat += 0.1f;
+		m_pTransformCom->Set_MoveSpeed(testFloat);
+
+
+		string ttszLog = "Monster Speed: " + to_string(testFloat) + "\n";
+		wstring ttDebugLog;
+		ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+
+		OutputDebugStringW(ttDebugLog.c_str());
+	}
+	else if (m_pInstance->Get_DIKeyState(DIK_DOWN) & DIS_Down)
+	{
+		testFloat -= 0.1f;
+		m_pTransformCom->Set_MoveSpeed(testFloat);
+
+		string ttszLog = "Monster Speed: " + to_string(testFloat) + "\n";
+		wstring ttDebugLog;
+		ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+
+		OutputDebugStringW(ttDebugLog.c_str());
+
+	}
+	*/
+
+	if (g_pGameInstance->Get_DIKeyState(DIK_V)&DIS_Down)
+	{
+		Add_Force(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_UP), 30);
+	}
+
+
+	if (Distance_BetweenPlayer(m_pTransformCom) < 3)
+	{
+
+	}
+	else
+	{
+		FAILED_CHECK(__super::Update_WanderAround(m_pTransformCom, fDeltaTime,0.05f));
+	}
+
+
+
 	return _int();
 }
 
 _int CGrunt::LateUpdate(_double fDeltaTime)
 {
 
+	FAILED_CHECK(__super::Set_Monster_On_Terrain(m_pTransformCom,fDeltaTime));
 
 	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime));
 
@@ -86,6 +144,113 @@ _int CGrunt::LateRender()
 	return _int();
 }
 
+_int CGrunt::Update_Pattern(_double fDeltaTime)
+{
+
+	if (m_bIsPatternFinished)
+	{
+		m_ePattern = rand() % 4;
+		m_bIsPatternFinished = false;
+		m_PatternPassedTime = 0;
+	}
+	else
+	{
+		m_PatternPassedTime += fDeltaTime;
+
+		switch (m_ePattern)
+		{
+		case 0:
+			if (m_PatternPassedTime == fDeltaTime)
+			{
+				m_pModel->Change_AnimIndex_UntilTo(3, 4, 0.15, true);
+			}
+			else
+			{
+				if (!m_pModel->Get_IsHavetoBlockAnimChange())
+				{
+					m_bIsPatternFinished = true;
+				}
+			}
+
+
+			break;
+		case 1:
+			if (m_PatternPassedTime == fDeltaTime)
+			{
+				m_pModel->Change_AnimIndex_UntilTo(3, 4, 0.15, true);
+			}
+			else
+			{
+				if (!m_pModel->Get_IsHavetoBlockAnimChange())
+				{
+					m_bIsPatternFinished = true;
+				}
+			}
+
+
+			break;
+		case 2:
+			if (m_PatternPassedTime == fDeltaTime)
+			{
+				m_pModel->Change_AnimIndex_UntilTo(3, 4, 0.15, true);
+			}
+			else
+			{
+				if (!m_pModel->Get_IsHavetoBlockAnimChange())
+				{
+					m_bIsPatternFinished = true;
+				}
+			}
+
+			break;
+		case 3:
+			if (m_PatternPassedTime == fDeltaTime)
+			{
+				m_pModel->Change_AnimIndex_UntilTo(3, 4, 0.15, true);
+			}
+			else
+			{
+				if (!m_pModel->Get_IsHavetoBlockAnimChange())
+				{
+					m_bIsPatternFinished = true;
+				}
+			}
+
+			break;
+		case 4:
+			if (m_PatternPassedTime == fDeltaTime)
+			{
+				m_pModel->Change_AnimIndex_UntilTo(3, 4, 0.15, true);
+			}
+			else
+			{
+				if (!m_pModel->Get_IsHavetoBlockAnimChange())
+				{
+					m_bIsPatternFinished = true;
+				}
+			}
+
+			break;
+
+		default:
+			break;
+		}
+
+
+
+	}
+
+
+	/*
+	2	=> 0.5
+	6	=>6.5
+	17	=>0.3
+	*/
+
+
+	return _int();
+}
+
 HRESULT CGrunt::SetUp_Components()
 {
 
@@ -94,20 +259,21 @@ HRESULT CGrunt::SetUp_Components()
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Shader_VAM), TAG_COM(Com_Shader), (CComponent**)&m_pShaderCom));
 
 	FAILED_CHECK(Add_Component(m_eNowSceneNum, TAG_CP(Prototype_Mesh_Grunt), TAG_COM(Com_Model), (CComponent**)&m_pModel));
-	FAILED_CHECK(m_pModel->Change_AnimIndex(0));
+	FAILED_CHECK(m_pModel->Change_AnimIndex(2));
 
 
 
 
 	CTransform::TRANSFORMDESC tDesc = {};
 
-	tDesc.fMovePerSec = 5;
+	tDesc.fMovePerSec = 0.5;
 	tDesc.fRotationPerSec = XMConvertToRadians(60);
 	tDesc.fScalingPerSec = 1;
 	tDesc.vPivot = _float3(0, 0, 0);
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Transform), TAG_COM(Com_Transform), (CComponent**)&m_pTransformCom, &tDesc));
 
+	__super::SetUp_WanderLook(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK));
 
 	return S_OK;
 }

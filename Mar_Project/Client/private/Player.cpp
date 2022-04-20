@@ -140,7 +140,7 @@ _int CPlayer::Render()
 		for (_uint j = 0; j < AI_TEXTURE_TYPE_MAX; j++)
 			FAILED_CHECK(m_pModel->Bind_OnShader(m_pShaderCom, i, j, MODLETEXTYPE(j)));
 
-		FAILED_CHECK(m_pModel->Render(m_pShaderCom, 0, i, "g_BoneMatrices"));
+		FAILED_CHECK(m_pModel->Render(m_pShaderCom, 2, i, "g_BoneMatrices"));
 	}
 	
 	return _int();
@@ -449,7 +449,7 @@ void CPlayer::Add_Force(_float3 vDir, _float Power)
 
 	if (!m_bIsActived)
 	{
-		m_bIsActived = false;
+		m_bIsActived = true;
 		g_pGameInstance->PlayThread(Add_Force_Thread, this);
 	}
 

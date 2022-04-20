@@ -136,6 +136,24 @@ _float3 CTerrain::PutOnTerrain(_bool* pbIsObTerrain,_fVector ObjectWorldPos, _fV
 	return ObjectWorldPos;
 }
 
+_bool CTerrain::Check_Movable_Terrain(_bool * pbIsMovable, _fVector ObjectNowPos, _fVector CheckPos, _float fMovableHeight)
+{
+	_Matrix InverMat = m_InverseWorldMat.XMatrix();
+
+	_float NowTerrainHeight = m_pVIBufferCom->Get_TerrainHeight(pbIsMovable, XMVector3TransformCoord(ObjectNowPos, InverMat));
+	_float TargetHeight = m_pVIBufferCom->Get_TerrainHeight(pbIsMovable, XMVector3TransformCoord(CheckPos, InverMat));
+
+	if (*pbIsMovable && abs(NowTerrainHeight - TargetHeight) < fMovableHeight)
+	{
+		*pbIsMovable = true;
+		return true;	
+	}
+	
+	*pbIsMovable = false;
+	return false;
+
+}
+
 HRESULT CTerrain::SetUp_Components()
 {
 

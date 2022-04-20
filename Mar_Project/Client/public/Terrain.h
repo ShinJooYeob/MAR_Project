@@ -24,7 +24,7 @@ public:
 public:
 
 	_float3 PutOnTerrain(_bool* pbIsObTerrain, _fVector ObjectWorldPos, _fVector ObjectOldWorldPos,_float3* vOutPlaneNormalVec = nullptr);
-
+	_bool	Check_Movable_Terrain(_bool* pbIsMovable, _fVector ObjectNowPos, _fVector CheckPos,_float fMovableHeight = 1.f);
 
 private:
 	CShader*			m_pShaderCom = nullptr;

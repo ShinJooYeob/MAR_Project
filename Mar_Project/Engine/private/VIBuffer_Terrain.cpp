@@ -355,6 +355,13 @@ HRESULT CVIBuffer_Terrain::Initialize_Clone(void * pArg)
 	return S_OK;
 }
 
+_float CVIBuffer_Terrain::Get_TerrainHeight(_bool* bIsMovable , _float3 PosOnTerrainLocal)
+{
+	_float fHeight = -FLT_MAX;
+	EquationPlane(bIsMovable, PosOnTerrainLocal, &fHeight);
+	return fHeight;
+}
+
 _Vector CVIBuffer_Terrain::Caculate_TerrainY(_bool* pbIsOnTerrain ,_float3 PosOnTerrainLocal, _float3 OldPosOnTerrainLocal, _float3* vLocalPlaneNormVector)
 {
 	

@@ -222,7 +222,7 @@ HRESULT CModel::Change_AnimIndex(_uint iAnimIndex, _double ExitTime, _bool bBloc
 	return S_OK;
 }
 
-HRESULT CModel::Change_AnimIndex_UntilTo(_uint iAnimIndex, _uint iReturnIndex, _double ExitTime)
+HRESULT CModel::Change_AnimIndex_UntilTo(_uint iAnimIndex, _uint iReturnIndex, _double ExitTime, _bool bBlockAnimUntilReturnChange)
 {
 	if (iAnimIndex >= m_iNumAnimationClip || iReturnIndex >= m_iNumAnimationClip)
 		return E_FAIL;
@@ -253,7 +253,7 @@ HRESULT CModel::Change_AnimIndex_UntilTo(_uint iAnimIndex, _uint iReturnIndex, _
 
 
 	m_iNextAnimIndex = iReturnIndex;
-	m_bIsBlockAnim = false;
+	m_bIsBlockAnim = bBlockAnimUntilReturnChange;
 	m_KindsOfAnimChange = 0;
 
 	return S_OK;
@@ -387,6 +387,7 @@ HRESULT CModel::Update_AnimationClip(_double fDeltaTime,_bool IsUpdateAll)
 				}
 				else
 				{
+					m_bIsBlockAnim = false;
 					m_iNowAnimIndex = m_iNowAnimIndex;
 					m_TotalAnimExitTime = 0;
 				}

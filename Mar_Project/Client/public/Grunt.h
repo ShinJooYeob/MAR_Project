@@ -22,6 +22,8 @@ public:
 	virtual _int Render()override;
 	virtual _int LateRender()override;
 
+	virtual _int Update_Pattern(_double fDeltaTime)override;
+
 private:
 	CShader*			m_pShaderCom = nullptr;
 	CRenderer*			m_pRendererCom = nullptr;
@@ -29,8 +31,12 @@ private:
 	CTransform*			m_pTransformCom = nullptr;
 
 
+
+
 private:
 	HRESULT SetUp_Components();
+
+
 
 public:
 	static CGrunt* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, void* pArg = nullptr);
