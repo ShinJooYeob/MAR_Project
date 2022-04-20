@@ -123,7 +123,7 @@ HRESULT CTextureLayer::Add_Model_Texture(_uint iIndex, const _tchar * pTextureFi
 		if(FAILED(CreateWICTextureFromFile(m_pDevice, ChagedtoPngPath.c_str(), &TexturForRelease, &pSRV)))
 		{
 			IsNotExistPath = true;
-			wstring DebugString = L"\nNot Exist PNG File : " + wstring(szTextureFilePath)+ L"\n";
+			wstring DebugString = L"\nNot Exist PNG File : " + wstring(ChagedtoPngPath) + L"\n";
 			Safe_Release(pSRV);
 			OutputDebugString(DebugString.c_str());
 		}
@@ -135,10 +135,31 @@ HRESULT CTextureLayer::Add_Model_Texture(_uint iIndex, const _tchar * pTextureFi
 	{
 		if (FAILED(CreateWICTextureFromFile(m_pDevice, szTextureFilePath, &TexturForRelease, &pSRV)))
 		{
-			IsNotExistPath = true;
-			wstring DebugString = L"Not Exist WIC File : " + wstring(szTextureFilePath) +L"\n";
+			Safe_Release(TexturForRelease);
 			Safe_Release(pSRV);
-			OutputDebugString(DebugString.c_str());
+
+
+			wstring ChagedtoPngPath = szTextureFilePath;
+
+			auto stExt = ChagedtoPngPath.find(szExt, 0);    // 자를 문자열이 있는 곳 위치를 알아낸다.	//std::wstring::size_type stTmp;
+			ChagedtoPngPath.erase(stExt, lstrlen(szExt));						// 자르기 시작할 곳, 얼마만큼 자를 것인가?
+
+			ChagedtoPngPath += L".dds";
+
+			if (FAILED(CreateDDSTextureFromFile(m_pDevice, ChagedtoPngPath.c_str(), &TexturForRelease, &pSRV)))
+			{
+				IsNotExistPath = true;
+				wstring DebugString = L"\nNot Exist PNG File : " + wstring(ChagedtoPngPath) + L"\n";
+				Safe_Release(pSRV);
+				OutputDebugString(DebugString.c_str());
+			}
+
+
+
+			//IsNotExistPath = true;
+			//wstring DebugString = L"Not Exist WIC File : " + wstring(szTextureFilePath) +L"\n";
+			//Safe_Release(pSRV);
+			//OutputDebugString(DebugString.c_str());
 		}
 
 	}

@@ -131,6 +131,7 @@ PS_OUT PS_MAIN_TERRAIN_DIRECTIONAL(PS_IN In)
 
 		float	fSpecular = pow(max(dot(normalize(vReflect) * -1.f, vLook), 0.f), 30.f);
 
+
 		Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient))
 			+ (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
 

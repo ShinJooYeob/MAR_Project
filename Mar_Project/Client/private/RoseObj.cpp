@@ -100,7 +100,7 @@ _int CRoseObj::Update(_double fDeltaTime)
 		if (abs(fBetweenLength) < 0.3f)
 		{
 			Set_IsDead();
-			FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_LOBY, TAG_LAY(Layer_RoseObj), TAG_OP(Prototype_RoseObj), &m_vReturnPos));
+			FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_RoseObj), TAG_OP(Prototype_RoseObj), &m_vReturnPos));
 
 		}
 		m_pTransformCom->MovetoDir_bySpeed(ToPlayerDir, (m_fRangeRadius - fBetweenLength) * m_fRangeRadius, fDeltaTime);

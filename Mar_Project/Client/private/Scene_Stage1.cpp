@@ -236,7 +236,7 @@ HRESULT CScene_Stage1::Ready_Layer_RoseObj(const _tchar * pLayerTag)
 
 HRESULT CScene_Stage1::Ready_Layer_StaticMapObj(const _tchar * pLayerTag)
 {
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_StaticMapObject)));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_StaticMapObject), &_float3(14, 22, 15)));
 
 	return S_OK;
 }

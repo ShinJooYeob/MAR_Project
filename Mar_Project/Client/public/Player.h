@@ -106,6 +106,7 @@ private:
 	_uint				m_iHP = 32;
 private:
 	HRESULT SetUp_Components();
+	HRESULT SetUp_ConstTable();
 	
 
 	HRESULT Input_Keyboard(_double fDeltaTime);

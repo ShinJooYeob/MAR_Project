@@ -21,7 +21,8 @@ public:
 	virtual _int Render()override;
 	virtual _int LateRender()override;
 
-
+protected:
+	HRESULT SetUp_ConstTable(CShader* pShader);
 public:
 	virtual void Free() override;
 };

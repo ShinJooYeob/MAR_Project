@@ -126,20 +126,14 @@ _int CPlayer::Render()
 	NULL_CHECK_RETURN(m_pModel, E_FAIL);
 
 
+
+
+	FAILED_CHECK(SetUp_ConstTable());
+
+
 	FAILED_CHECK(m_pTransformCom->Bind_OnShader(m_pShaderCom, "g_WorldMatrix"));
-
-	CGameInstance* pInstance = GetSingle(CGameInstance);
-
-	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ViewMatrix", &pInstance->Get_Transform_Float4x4_TP(PLM_VIEW), sizeof(_float4x4)));
-	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ProjMatrix", &pInstance->Get_Transform_Float4x4_TP(PLM_PROJ), sizeof(_float4x4)));
-
 	
-	//FAILED_CHECK(m_pModel->Bind_OnShader(m_pShaderCom, "g_DiffuseTexture"));
-	//FAILED_CHECK(m_pTextureCom->Bind_OnShader_AutoFrame(m_pShaderCom, "g_DiffuseTexture", g_fDeltaTime));
-
-
 	_uint NumMaterial = m_pModel->Get_NumMaterial();
-
 
 	for (_uint i = 0; i < NumMaterial; i++)
 	{
@@ -148,8 +142,7 @@ _int CPlayer::Render()
 
 		FAILED_CHECK(m_pModel->Render(m_pShaderCom, 0, i, "g_BoneMatrices"));
 	}
-	//FAILED_CHECK(m_pVIBufferCom->Render(m_pShaderCom, 0));
-
+	
 	return _int();
 }
 
@@ -540,6 +533,29 @@ HRESULT CPlayer::SetUp_Components()
 	NULL_CHECK_RETURN(m_pMainCamera, E_FAIL);
 
 	ZeroMemory(m_bAtkMoveMentChecker, sizeof(_bool) * 3);
+
+	return S_OK;
+}
+
+HRESULT CPlayer::SetUp_ConstTable()
+{
+	CGameInstance* pInstance = GetSingle(CGameInstance);
+	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ViewMatrix", &pInstance->Get_Transform_Float4x4_TP(PLM_VIEW), sizeof(_float4x4)));
+	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ProjMatrix", &pInstance->Get_Transform_Float4x4_TP(PLM_PROJ), sizeof(_float4x4)));
+
+
+	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_CamPosition", &pInstance->Get_TargetPostion_float4(PLV_CAMERA), sizeof(_float4)));
+	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_CamLookDir", &pInstance->Get_TargetPostion_float4(PLV_CAMLOOK), sizeof(_float4)));
+
+
+	const LIGHTDESC* pLightDesc = pInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0);
+	NULL_CHECK_RETURN(pLightDesc, -1);
+
+	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vLightVector", &(pLightDesc->vVector), sizeof(_float4)));
+	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4)));
+	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4)));
+	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4)));
+
 
 	return S_OK;
 }

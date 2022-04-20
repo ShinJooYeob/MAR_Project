@@ -403,6 +403,69 @@ enum COMPONENTPROTOTYPEID
 	Prototype_Mesh_Kelp_WallFar,
 	Prototype_Mesh_KelpWallBack,
 
+	Prototype_Mesh_GiantToys_Die,
+	Prototype_Mesh_GiantToys_DominoC,
+	Prototype_Mesh_GiantToys_DominoE,
+	Prototype_Mesh_GiantToys_DominoStair,
+	Prototype_Mesh_GiantToys_Jacks,
+	Prototype_Mesh_GiantToys_MarblesA,
+
+	Prototype_Mesh_KeyHole,
+
+	Prototype_Mesh_Moai_Gate,
+	Prototype_Mesh_Moai_Plat,
+
+
+	Prototype_Mesh_QBattleTower,
+	Prototype_Mesh_QBattleTowerBaseDie,
+	Prototype_QBattleTowerParticleA,
+	Prototype_QBattleTowerParticleB,
+	Prototype_QBattleTowerPieceA,
+	Prototype_QBattleTowerPieceB,
+	Prototype_QBattleTowerPieceC,
+	Prototype_SK_QBattleTowerTentacle_Giant,
+	Prototype_SK_QBattleTowerTentacle_Group,
+	Prototype_SK_QBattleTowerTentacle_Thin,
+
+	Prototype_SK_QCannon,
+
+	Prototype_QFleshFloorA,
+	Prototype_QFleshFloorB,
+	Prototype_QFleshFloorC,
+	Prototype_QfleshStairs,
+
+
+	Prototype_QGiantBreakableGate_Broken,
+	Prototype_QGiantBreakableGate_Flesh,
+
+	Prototype_QOuterwall_WallB,
+	Prototype_QOuterwall_WallD,
+	Prototype_QOuterwall_WallE,
+
+
+	Prototype_QRocksB,
+	Prototype_QRocksC,
+	Prototype_QRocksD,
+	Prototype_QRocksE,
+
+	Prototype_TearsRock,
+
+	Prototype_GiantUnderseaRock_Holey,
+	Prototype_UnderseaRock_Ledge,
+	Prototype_UnderseaRock_Pile,
+	Prototype_UnderseaRock_Pillar,
+	Prototype_UnderseaRock_Plat,
+
+	Prototype_WaterLogA,
+	Prototype_WaterLogB,
+	Prototype_WaterLogC,
+
+
+
+
+
+
+
 	Prototype_Mesh_Player,
 	Prototype_Mesh_Executor,
 	Prototype_Mesh_Grunt,
@@ -521,6 +584,146 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 		break;
 	case Prototype_Mesh_KelpWallBack:
 		return TEXT("Mesh_KelpWallBack");
+		break;
+
+	case Prototype_Mesh_GiantToys_Die:
+		return TEXT("Mesh_GiantToys_Die");
+		break;
+	case Prototype_Mesh_GiantToys_DominoC:
+		return TEXT("Mesh_GiantToys_DominoC");
+		break;
+	case Prototype_Mesh_GiantToys_DominoE:
+		return TEXT("Mesh_GiantToys_DominoE");
+		break;
+	case Prototype_Mesh_GiantToys_DominoStair:
+		return TEXT("Mesh_GiantToys_DominoStair");
+		break;
+	case Prototype_Mesh_GiantToys_Jacks:
+		return TEXT("Mesh_GiantToys_Jacks");
+		break;
+	case Prototype_Mesh_GiantToys_MarblesA:
+		return TEXT("Mesh_GiantToys_MarblesA");
+		break;
+
+	case Prototype_Mesh_KeyHole:
+		return TEXT("Mesh_KeyHole");
+		break;
+		
+	case Prototype_Mesh_Moai_Gate:
+		return TEXT("Mesh_Moai_Gate");
+		break;
+	case Prototype_Mesh_Moai_Plat:
+		return TEXT("Mesh_Moai_Plat");
+		break;
+	
+	case Prototype_Mesh_QBattleTower:
+		return TEXT("Mesh_QBattleTower");
+		break;
+	case Prototype_Mesh_QBattleTowerBaseDie:
+		return TEXT("Mesh_QBattleTowerBaseDie");
+		break;
+	case Prototype_QBattleTowerParticleA:
+		return TEXT("QBattleTowerParticleA");
+		break;
+	case Prototype_QBattleTowerParticleB:
+		return TEXT("QBattleTowerParticleB");
+		break;
+	case Prototype_QBattleTowerPieceA:
+		return TEXT("QBattleTowerPieceA");
+		break;
+	case Prototype_QBattleTowerPieceB:
+		return TEXT("QBattleTowerPieceB");
+		break;
+	case Prototype_QBattleTowerPieceC:
+		return TEXT("QBattleTowerPieceC");
+		break;
+	case Prototype_SK_QBattleTowerTentacle_Giant:
+		return TEXT("SK_QBattleTowerTentacle_Giant");
+		break;
+	case Prototype_SK_QBattleTowerTentacle_Group:
+		return TEXT("SK_QBattleTowerTentacle_Group");
+		break;
+	case Prototype_SK_QBattleTowerTentacle_Thin:
+		return TEXT("SK_QBattleTowerTentacle_Thin");
+		break;
+
+	case Prototype_SK_QCannon:
+		return TEXT("SK_QCannon");
+		break;
+
+	case Prototype_QFleshFloorA:
+		return TEXT("QFleshFloorA");
+		break;
+	case Prototype_QFleshFloorB:
+		return TEXT("QFleshFloorB");
+		break;
+	case Prototype_QFleshFloorC:
+		return TEXT("QFleshFloorC");
+		break;
+	case Prototype_QfleshStairs:
+		return TEXT("QfleshStairs");
+		break;
+
+	case Prototype_QGiantBreakableGate_Broken:
+		return TEXT("QGiantBreakableGate_Broken");
+		break;
+	case Prototype_QGiantBreakableGate_Flesh:
+		return TEXT("QGiantBreakableGate_Flesh");
+		break;
+
+	case Prototype_QOuterwall_WallB:
+		return TEXT("QOuterwall_WallB");
+		break;
+	case Prototype_QOuterwall_WallD:
+		return TEXT("QOuterwall_WallD");
+		break;
+	case Prototype_QOuterwall_WallE:
+		return TEXT("QOuterwall_WallE");
+		break;
+
+	case Prototype_QRocksB:
+		return TEXT("QRocksB");
+		break;
+	case Prototype_QRocksC:
+		return TEXT("QRocksC");
+		break;
+	case Prototype_QRocksD:
+		return TEXT("QRocksD");
+		break;
+	case Prototype_QRocksE:
+		return TEXT("QRocksE");
+		break;
+
+	case Prototype_TearsRock:
+		return TEXT("TearsRock");
+		break;
+
+		
+	case Prototype_GiantUnderseaRock_Holey:
+		return TEXT("GiantUnderseaRock_Holey");
+		break;
+	case Prototype_UnderseaRock_Ledge:
+		return TEXT("UnderseaRock_Ledge");
+		break;
+	case Prototype_UnderseaRock_Pile:
+		return TEXT("UnderseaRock_Pile");
+		break;
+	case Prototype_UnderseaRock_Pillar:
+		return TEXT("UnderseaRock_Pillar");
+		break;
+	case Prototype_UnderseaRock_Plat:
+		return TEXT("UnderseaRock_Plat");
+		break;
+
+
+	case Prototype_WaterLogA:
+		return TEXT("WaterLogA");
+		break;
+	case Prototype_WaterLogB:
+		return TEXT("WaterLogB");
+		break;
+	case Prototype_WaterLogC:
+		return TEXT("WaterLogC");
 		break;
 
 
