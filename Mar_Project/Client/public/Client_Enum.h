@@ -472,6 +472,9 @@ enum COMPONENTPROTOTYPEID
 	Prototype_Mesh_WaspArrow,
 	Prototype_Mesh_WaspInk,
 	Prototype_Mesh_Eyepot,
+
+	Prototype_Mesh_JumpPad,
+
 	//////////////////////////////////////////////////////////////////////////
 	Prototype_Texture_Player,
 	Prototype_Texture_SkyBox,
@@ -746,6 +749,10 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 	case Prototype_Mesh_Eyepot:
 		return TEXT("Mesh_Eyepot");
 		break;
+	case Prototype_Mesh_JumpPad:
+		return TEXT("Prototype_Mesh_JumpPad");
+		break;
+		
 		/////////////////≈ÿΩ∫√≥////////////////////////////////////////////////////////
 
 
