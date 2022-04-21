@@ -336,7 +336,7 @@ _int CEyepot::Update_Pattern(_double fDeltaTime)
 
 			_Vector Dir = XMVector3Normalize(XMVectorSetY( m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS)- m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0));
 
-			_float RandFloat = GetSingle(CUtilityMgr)->RandomFloat(-1, 1);
+			_float RandFloat = GetSingle(CUtilityMgr)->RandomFloat(-0.5, 0.5);
 			if (RandFloat < 0)
 			{
 				_Vector Left = XMVector3Cross(XMVectorSet(0, 1, 0, 0), Dir)* -1;
@@ -400,7 +400,7 @@ _int CEyepot::Update_Pattern(_double fDeltaTime)
 
 						_Vector Dir = XMVector3Normalize(XMVectorSetY(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS) - m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0));
 
-						_float RandFloat = GetSingle(CUtilityMgr)->RandomFloat(-1, 1);
+						_float RandFloat = GetSingle(CUtilityMgr)->RandomFloat(-0.5, 0.5);
 						if (RandFloat < 0)
 						{
 							_Vector Left = XMVector3Cross(XMVectorSet(0, 1, 0, 0), Dir)* -1;

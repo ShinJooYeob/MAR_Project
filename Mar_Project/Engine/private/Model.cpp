@@ -154,6 +154,9 @@ HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, const char * pModelFi
 	FAILED_CHECK(Ready_Materials(szFilePath));
 
 
+
+
+
 	if (TYPE_ANIM == m_eModelType)
 	{
 		//뼈 구조가 매쉬의 로컬상태와 맞지 않을 수 있기 떄문에 보정해주는 메트릭스를 계층뼈에 저장
@@ -737,26 +740,6 @@ HRESULT CModel::Ready_OffsetMatrices()
 	}
 
 
-	//for (_uint i = 0; i < m_iNumMeshContainers; ++i)
-	//{
-	//	//각각의 매쉬들이 영향을 받는 모든 뼈들을 순회하면서
-	//	for (_uint j = 0; j < m_pScene->mMeshes[i]->mNumBones; ++j)
-	//	{
-	//		//특정 매쉬가 영향을 받는 뼈들 중 j번째 뼈와 
-	//		//이름이 같은 뼈를 계층뼈에서 찾아서
-	//		aiBone*		pBone = m_pScene->mMeshes[i]->mBones[j];
-	//		CHierarchyNode*		pHierarchyNode = Find_HierarchyNode(pBone->mName.data);
-
-
-	//		NULL_CHECK_RETURN(pHierarchyNode, E_FAIL);
-
-	//		_float4x4		OffsetMatrix;
-	//		memcpy(&OffsetMatrix, &pBone->mOffsetMatrix, sizeof(_float4x4));
-
-	//		//계층뼈에 오프셋 매트릭스를 저장하자
-	//		pHierarchyNode->Set_OffsetMatrix(OffsetMatrix);
-	//	}
-	//}
 
 
 
@@ -782,7 +765,7 @@ HRESULT CModel::Ready_MeshContainers(_fMatrix TransformMatrix)
 
 #ifdef _DEBUG
 		//string Name = m_pScene->mMeshes[i]->mName.data;
-		//string ttszLog = "MeshName: " + Name +" Affecting Bond Num : " + to_string(m_pScene->mMeshes[i]->mNumBones) + "\n";
+		//string ttszLog ="Meterial Index : "+ to_string(m_pScene->mMeshes[i]->mMaterialIndex) + "  MeshName: " + Name + " Affecting Bond Num : " + to_string(m_pScene->mMeshes[i]->mNumBones) + "\n";
 		//wstring ttDebugLog;
 		//ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
 

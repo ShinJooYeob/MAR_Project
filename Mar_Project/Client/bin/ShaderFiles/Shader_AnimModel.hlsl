@@ -189,9 +189,29 @@ technique11		DefaultTechnique
 	{
 		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 		SetDepthStencilState(ZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_ccw);
+
+		VertexShader = compile vs_5_0 VS_MAIN_NOWEIGHTW();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_DEFAULT();
+	}
+	pass Player_CullModeNone
+	{
+		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(ZTestAndWriteState, 0);
 		SetRasterizerState(CullMode_None);
 
 		VertexShader = compile vs_5_0 VS_MAIN_NOWEIGHTW();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_DEFAULT();
+	}
+	pass Monster_CullModeNone
+	{
+		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(ZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_None);
+
+		VertexShader = compile vs_5_0 VS_MAIN_DEFAULT();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN_DEFAULT();
 	}

@@ -202,8 +202,8 @@ HRESULT CMonster::Update_WanderAround(CTransform * pTransform,_double fDeltaTime
 
 	while (!(Check_Movable_Terrain(pTransform, m_vLookDir.XMVector(), 0.1f)))
 	{
-		_float RandFloat = GetSingle(CUtilityMgr)->RandomFloat(-1, 1);
-		_Vector NewLook = m_vLookDir.XMVector();
+		_float RandFloat = GetSingle(CUtilityMgr)->RandomFloat(-0.5, 0.5);
+		_Vector NewLook = m_vLookDir.XMVector() * -1;
 		//_Vector NewLook = pTransform->Get_MatrixState(CTransform::STATE_LOOK) * -1;
 		if (RandFloat < 0)
 		{
