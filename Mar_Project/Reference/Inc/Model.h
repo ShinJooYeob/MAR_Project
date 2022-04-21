@@ -31,6 +31,7 @@ public:
 	_double	Get_PlayRate();
 	_bool	Get_IsUntillPlay() { return m_bIsUntill; };
 	void	Set_BlockAnim(_bool IsBlock) { m_bIsBlockAnim = IsBlock; };
+	void    Set_NextAnim_Must(_uint iAnim) { m_iNextAnimIndex = iAnim; };
 
 	HRESULT Bind_OnShader(class CShader* pShader, _uint iMaterialIndex , _uint eTextureType, const char* pHlslConstValueName);
 	HRESULT Update_AnimationClip(_double fDeltaTime, _bool IsUpdateAll = true);	

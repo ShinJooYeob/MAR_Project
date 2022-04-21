@@ -30,6 +30,8 @@ HRESULT CGrunt::Initialize_Clone(void * pArg)
 	if (pArg != nullptr)
 		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, *((_float3*)pArg));
 
+	ZeroMemory(m_bIsDmgAnimUpdated, sizeof(_bool) * 3);
+	m_fHP = m_fMaxHP = 32;
 
 	return S_OK;
 }
@@ -71,28 +73,45 @@ _int CGrunt::Update(_double fDeltaTime)
 
 	OutputDebugStringW(ttDebugLog.c_str());
 
-	}
-	*/
+	if (g_pGameInstance->Get_DIKeyState(DIK_C)&DIS_Down)
+	Add_Dmg_to_Monster(1);
 
 	if (g_pGameInstance->Get_DIKeyState(DIK_V)&DIS_Down)
 	{
-		Add_Force(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_UP), 30);
+	Add_Force(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_UP), 30);
 	}
 
-
-	if (!m_bIsPatternFinished || Distance_BetweenPlayer(m_pTransformCom) < 3)
-	{
-		Update_Pattern(fDeltaTime);
 	}
-	else
+	*/
+
+
+
+
+
+	_uint AnimIndex = m_pModel->Get_NowAnimIndex();
+
+	if (AnimIndex == 1)
+		m_pModel->Set_NextAnim_Must(2);
+
+	if (!(AnimIndex>= 23 && AnimIndex <=25 || AnimIndex == 1))
 	{
-		if (!m_pModel->Get_IsUntillPlay())
+
+		if (!m_bIsPatternFinished || Distance_BetweenPlayer(m_pTransformCom) < 3)
 		{
-			m_pModel->Change_AnimIndex(2);
-			FAILED_CHECK(__super::Update_WanderAround(m_pTransformCom, fDeltaTime, 0.05f));
+			Update_Pattern(fDeltaTime);
+		}
+		else
+		{
+			if (!m_pModel->Get_IsUntillPlay())
+			{
+				m_pModel->Change_AnimIndex(2);
+				FAILED_CHECK(__super::Update_WanderAround(m_pTransformCom, fDeltaTime, 0.05f));
+			}
 		}
 	}
 
+
+	Update_DmgCalculate(fDeltaTime);
 
 	m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
 
@@ -148,6 +167,44 @@ _int CGrunt::Render()
 _int CGrunt::LateRender()
 {
 	return _int();
+}
+
+_int CGrunt::Update_DmgCalculate(_double fDeltaTime)
+{
+	if (m_DmgPassedTime <= 0)
+	{
+		if (m_fDmgAmount > 0)
+		{
+			ZeroMemory(m_bIsDmgAnimUpdated, sizeof(_bool) * 3);
+			m_fDmgAmount = 0;
+			m_DmgPassedTime = 0;
+		}
+		return 0;
+	}
+	m_DmgPassedTime -= fDeltaTime;
+
+	if (!m_bIsDmgAnimUpdated[0] && m_fMaxHP * 0.1 < m_fDmgAmount)
+	{
+		m_pModel->Change_AnimIndex_ReturnTo_Must(23, 1, 0.15, true);
+		m_bIsPatternFinished = true;
+		m_PatternPassedTime = 0;
+		Add_Force(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK)* -1, 10);
+		m_pTransformCom->Set_MoveSpeed(0.5);
+		m_bIsDmgAnimUpdated[0] = true;
+	}
+	else if (!m_bIsDmgAnimUpdated[1] && m_fMaxHP * 0.2 < m_fDmgAmount)
+	{
+		m_pModel->Change_AnimIndex_ReturnTo_Must(24, 1, 0.15, true);
+		m_bIsPatternFinished = true;
+		m_PatternPassedTime = 0;
+		m_pTransformCom->Set_MoveSpeed(0.5);
+		Add_Force(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK)* -1, 20);
+		m_bIsDmgAnimUpdated[1] = true;
+	}
+
+
+
+	return 0;
 }
 
 _int CGrunt::Update_Pattern(_double fDeltaTime)
@@ -256,6 +313,14 @@ _int CGrunt::Update_Pattern(_double fDeltaTime)
 
 
 	return _int();
+}
+
+void CGrunt::Add_Dmg_to_Monster(_float iDmgAmount)
+{
+	m_DmgPassedTime = MonsterDmgTime;
+	m_fDmgAmount += iDmgAmount;
+	m_fHP -= iDmgAmount;
+
 }
 
 HRESULT CGrunt::SetUp_Components()

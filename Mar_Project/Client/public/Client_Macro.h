@@ -11,3 +11,5 @@
 #define PlayerSmallingSize 0.3f 
 #define PlayerMoveSpeed		5.f 
 #define PlayerMaxHP			32 
+
+#define MonsterDmgTime		1.5

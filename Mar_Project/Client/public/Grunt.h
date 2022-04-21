@@ -22,15 +22,16 @@ public:
 	virtual _int Render()override;
 	virtual _int LateRender()override;
 
+	_int		Update_DmgCalculate(_double fDeltaTime);
 	virtual _int Update_Pattern(_double fDeltaTime)override;
-
+	virtual void Add_Dmg_to_Monster(_float iDmgAmount)override;
 private:
 	CShader*			m_pShaderCom = nullptr;
 	CRenderer*			m_pRendererCom = nullptr;
 	CModel*				m_pModel = nullptr;
 	CTransform*			m_pTransformCom = nullptr;
 
-
+	_bool				m_bIsDmgAnimUpdated[3];
 
 
 private:

@@ -22,6 +22,11 @@ public:
 	virtual _int Render()override;
 	virtual _int LateRender()override;
 
+
+	virtual HRESULT Set_Monster_On_Terrain(CTransform* pTransform, _double fDeltaTime)override;
+	virtual _int Update_Pattern(_double fDeltaTime)override;
+	virtual void Add_Dmg_to_Monster(_float iDmgAmount)override;
+	_int		Update_DmgCalculate(_double fDeltaTime);
 private:
 	CShader*			m_pShaderCom = nullptr;
 	CRenderer*			m_pRendererCom = nullptr;
@@ -29,8 +34,16 @@ private:
 	CTransform*			m_pTransformCom = nullptr;
 
 
+	_bool				m_bIsDmgAnimUpdated[3];
+	_bool				m_bStartPos = false;
+
+	_uint				m_iPatternCount = 0;
+	_bool				m_bIsJumping = false;
+	_bool				m_bIsFarPattern = false;
 private:
 	HRESULT SetUp_Components();
+	HRESULT FarPatternWander(_double fDeltaTime);
+	HRESULT DashPatternWander(_double fDeltaTime);
 
 public:
 	static CEyepot* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, void* pArg = nullptr);

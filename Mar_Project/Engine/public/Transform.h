@@ -37,6 +37,8 @@ public:
 	void Set_ScalingSpeed(_float ScalingSpeed) { m_TransformDesc.fScalingPerSec = ScalingSpeed; };
 	void Set_Pivot(_float3 vPivot) { memcpy( &(m_TransformDesc.fScalingPerSec), &vPivot, sizeof(_float3)); };
 
+	_float Get_MoveSpeed() { return m_TransformDesc.fMovePerSec; };
+
 public:
 	/*Get Set Matrix*/
 	_float3 Get_MatrixState_Float3(TransformState eState) { return *((_float3*)(m_WorldMatrix.m[eState])); };

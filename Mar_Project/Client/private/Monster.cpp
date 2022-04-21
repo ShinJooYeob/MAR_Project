@@ -45,6 +45,19 @@ HRESULT CMonster::Initialize_Clone(void * pArg)
 
 	m_pInstance = g_pGameInstance;
 
+	m_bIsPatternFinished = false;
+	m_ePattern = 0;
+	m_PatternPassedTime = 0;
+
+	m_DmgPassedTime = 0;
+	m_fDmgAmount = 0;
+
+	m_vLookDir;
+	m_LevitationTime = 0;
+	m_bIsAddForceActived = false;
+
+	iWanderCount = 0;
+
 	return S_OK;
 }
 
@@ -129,10 +142,13 @@ HRESULT CMonster::Calculate_Force(_bool * _IsClientQuit, CRITICAL_SECTION * _Cri
 	return S_OK;
 }
 
+
+
 _int CMonster::Update_Pattern(_double fDeltaTime)
 {
 	return _int();
 }
+
 
 _bool CMonster::Check_Movable_Terrain(CTransform * pTransform, _fVector TargetDir, _float fMovalbeHeight)
 {
@@ -144,7 +160,8 @@ _bool CMonster::Check_Movable_Terrain(CTransform * pTransform, _fVector TargetDi
 	_bool bIsMovable = false;
 
 	_Vector MonsterPos = pTransform->Get_MatrixState(CTransform::STATE_POS);
-	_Vector TargetPos = MonsterPos + XMVector3Normalize(TargetDir);
+	_float Dist = max(pTransform->Get_MoveSpeed() * _float(g_fDeltaTime), 1);
+	_Vector TargetPos = MonsterPos + XMVector3Normalize(TargetDir) * Dist;
 
 	bIsMovable = pTerrain->Check_Movable_Terrain(&bIsMovable, pTransform->Get_MatrixState(CTransform::STATE_POS), TargetPos, fMovalbeHeight);
 
@@ -182,21 +199,23 @@ HRESULT CMonster::Set_Monster_On_Terrain(CTransform* pTransform, _double fDeltaT
 HRESULT CMonster::Update_WanderAround(CTransform * pTransform,_double fDeltaTime, _float TurnMixingRate)
 {
 	iWanderCount = 0;
+
 	while (!(Check_Movable_Terrain(pTransform, m_vLookDir.XMVector(), 0.1f)))
 	{
 		_float RandFloat = GetSingle(CUtilityMgr)->RandomFloat(-1, 1);
-		_Vector NewLook = pTransform->Get_MatrixState(CTransform::STATE_LOOK) * -1;
+		_Vector NewLook = m_vLookDir.XMVector();
+		//_Vector NewLook = pTransform->Get_MatrixState(CTransform::STATE_LOOK) * -1;
 		if (RandFloat < 0)
 		{
 			_Vector Left = pTransform->Get_MatrixState(CTransform::STATE_RIGHT)* -1;
 
-			NewLook = XMVector3Normalize(pTransform->Get_MatrixState(CTransform::STATE_LOOK)* (1 + RandFloat) + (Left * -RandFloat));
+			NewLook = XMVector3Normalize(NewLook* (1 + RandFloat) + (Left * -RandFloat));
 		}
 		else
 		{
 			_Vector vRight = pTransform->Get_MatrixState(CTransform::STATE_RIGHT);
 
-			NewLook = XMVector3Normalize(pTransform->Get_MatrixState(CTransform::STATE_LOOK)* (1 - RandFloat) + (vRight  * RandFloat));
+			NewLook = XMVector3Normalize(NewLook* (1 - RandFloat) + (vRight  * RandFloat));
 		}
 
 		m_vLookDir = NewLook;
