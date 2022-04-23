@@ -5,6 +5,9 @@ BEGIN(Client)
 
 class CTeethObj final :public CMapObject
 {
+
+
+
 private:
 	CTeethObj(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	CTeethObj(const CTeethObj& rhs);
@@ -25,16 +28,14 @@ public:
 private:
 	CShader*			m_pShaderCom = nullptr;
 	CRenderer*			m_pRendererCom = nullptr;
-	CVIBuffer_Cube*		m_pVIBufferCom = nullptr;
-	CTexture*			m_pTextureCom = nullptr;
 	CTransform*			m_pTransformCom = nullptr;
+	CModel*				m_pModel = nullptr;
+
 private:
 	class CPlayer*		m_pPlayer= nullptr;
 	CTransform*			m_pPlayerTransform = nullptr;
 	_bool				m_bIsPlayerCloser = false;
 	_float				m_fRangeRadius = 3.f;
-
-	_float3				m_vReturnPos;
 
 	_float				m_fStartTimer = 0;
 	_bool				m_bIsSpout = false;
@@ -43,7 +44,9 @@ private:
 	_float				m_fJumpPower = 0;
 	_float				m_fMaxJumpPower = 0;
 
+	_float				m_fTargetTime = 0;
 
+	_bool				m_bIsGolden = false;
 private:
 	HRESULT SetUp_Components();
 	void Add_JumpPower(_float power);

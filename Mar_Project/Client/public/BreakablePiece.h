@@ -3,12 +3,15 @@
 
 BEGIN(Client)
 
-class CHiddenPad final :public CMapObject
+class CBreakablePiece final :public CMapObject
 {
+
+
+
 private:
-	CHiddenPad(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
-	CHiddenPad(const CHiddenPad& rhs);
-	virtual ~CHiddenPad() = default;
+	CBreakablePiece(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
+	CBreakablePiece(const CBreakablePiece& rhs);
+	virtual ~CBreakablePiece() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype(void* pArg)override;
@@ -28,19 +31,26 @@ private:
 	CTransform*			m_pTransformCom = nullptr;
 	CModel*				m_pModel = nullptr;
 
-
 private:
-	class CPlayer*		m_pPlayer= nullptr;
-	CTransform*			m_pPlayerTransform = nullptr;
-	_bool				m_bIsPlayerCloser = false;
+	_float				m_fStartTimer = 0;
+	_bool				m_bIsSpout = false;
+	_float3				m_vSpoutDir;
+	_float				m_fRandPower = 0;
+	_float				m_fJumpPower = 0;
+	_float				m_fMaxJumpPower = 0;
 
-	_uint				m_iKindsOfHiddenPad = 0;
+	_float3				m_vRotAxis;
+	_double				m_fTurningTime = 0;
+
+	_uint				m_iKindsOfPiece = 0;
+
 private:
 	HRESULT SetUp_Components();
+	void Add_JumpPower(_float power);
 
 
 public:
-	static CHiddenPad* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, void* pArg = nullptr);
+	static CBreakablePiece* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, void* pArg = nullptr);
 	virtual CGameObject* Clone(void* pArg);
 	virtual void Free() override;
 };

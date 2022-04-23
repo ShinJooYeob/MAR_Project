@@ -23,20 +23,26 @@ public:
 
 
 private:
+	CShader*			m_pShaderSubCom = nullptr;
 	CShader*			m_pShaderCom = nullptr;
 	CRenderer*			m_pRendererCom = nullptr;
-	CVIBuffer_Cube*		m_pVIBufferCom = nullptr;
-	CTexture*			m_pTextureCom = nullptr;
 	CTransform*			m_pTransformCom = nullptr;
+	CModel*				m_pModel = nullptr;
+	CVIBuffer_Rect*		m_pVIBufferCom = nullptr;
+
+
 private:
 	class CPlayer*		m_pPlayer= nullptr;
 	CTransform*			m_pPlayerTransform = nullptr;
 	_bool				m_bIsPlayerCloser = false;
-	_float				m_fRangeRadius = 1.414f;
-	_float				m_fMaxHight = 20;
+	_float				m_fRangeRadius = 0.514f;
+	_float				m_fMaxHight = 0;
 
+	_float				m_fAngle = 0;
 private:
 	HRESULT SetUp_Components();
+	HRESULT SetUp_SubConstTable();
+	HRESULT	Set_ProPellaTransform();
 
 
 public:

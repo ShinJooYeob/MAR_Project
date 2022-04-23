@@ -1,7 +1,6 @@
 
 #include "Shader_Define.hpp"
 
-
 texture2D			g_DiffuseTexture;
 texture2D			g_SourTexture;
 
@@ -68,6 +67,30 @@ PS_OUT PS_MAIN_RECT(PS_IN In)
 	return Out;
 }
 
+PS_OUT PS_MAIN_WORLD(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	Out.vColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);//vector(1.f, 0.f, 0.f, 1.f);rgba
+
+	if (Out.vColor.a < 0.1f)
+		discard;
+
+	//if (Out.vColor.a < 0.1f)
+	//{
+	//	Out.vColor = vector(1,0,1,0);
+	//}
+	//else {
+	//	Out.vColor = vector(0, 0, 1, 1) * (In.vTexUV.x * In.vTexUV.y);
+	//}
+
+
+
+
+
+	return Out;
+}
+
 technique11		DefaultTechnique
 {
 	pass Rect
@@ -90,4 +113,15 @@ technique11		DefaultTechnique
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN_RECT();
 	}
+	pass WorldRect
+	{
+		SetBlendState(AlphaBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(ZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_None);
+
+		VertexShader = compile vs_5_0 VS_MAIN_RECT();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_WORLD();
+	}
+
 }

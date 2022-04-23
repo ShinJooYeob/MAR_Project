@@ -56,6 +56,9 @@ enum OBJECTPROTOTYPEID
 	Prototype_HiddenPad,
 	Prototype_TeethObj,
 	Prototype_RoseObj,
+	Prototype_BreakableObj,
+	Prototype_BreakablePiece,
+	Prototype_SlideObj,
 
 
 	Prototype_StaticMapObject,
@@ -109,8 +112,8 @@ static const _tchar* Tag_Object_Prototype(OBJECTPROTOTYPEID eTag)
 	case Prototype_UIGamePlay:
 		return TEXT("UIGamePlay");
 		break;
-		
-		
+
+
 	case Prototype_Rect:
 		return TEXT("Rect");
 		break;
@@ -123,7 +126,7 @@ static const _tchar* Tag_Object_Prototype(OBJECTPROTOTYPEID eTag)
 	case Prototype_WireTerrain:
 		return TEXT("WireTerrain");
 		break;
-		
+
 	case Prototype_Ball:
 		return TEXT("Ball");
 		break;
@@ -167,11 +170,20 @@ static const _tchar* Tag_Object_Prototype(OBJECTPROTOTYPEID eTag)
 	case Prototype_RoseObj:
 		return TEXT("RoseObj");
 		break;
-		
-		
-		
 
-	
+
+	case Prototype_BreakableObj:
+		return TEXT("Prototype_BreakableObj");
+		break;
+	case Prototype_BreakablePiece:
+		return TEXT("Prototype_BreakablePiece");
+		break;
+	case Prototype_SlideObj:
+		return TEXT("Prototype_SlideObj");
+		break;
+
+
+
 
 
 	case Prototype_StaticMapObject:
@@ -273,6 +285,9 @@ enum LAYERID
 	Layer_HiddenPad,
 	Layer_TeethObj,
 	Layer_RoseObj,
+	Layer_Breakable,
+	Layer_BreakablePiece,
+	Layer_SlideObj,
 
 	Layer_StaticMapObj,
 
@@ -298,7 +313,7 @@ static const _tchar* Tag_Layer(LAYERID eTag)
 	case Layer_Camera_Editor:
 		return TEXT("Layer_Camera_Editor");
 		break;
-		
+
 	case Layer_Bullet:
 		return TEXT("Layer_Bullet");
 		break;
@@ -311,7 +326,7 @@ static const _tchar* Tag_Layer(LAYERID eTag)
 	case Layer_WireTerrain:
 		return TEXT("Layer_WireTerrain");
 		break;
-		
+
 	case Layer_Monster:
 		return TEXT("Layer_Monster");
 		break;
@@ -333,7 +348,19 @@ static const _tchar* Tag_Layer(LAYERID eTag)
 	case Layer_RoseObj:
 		return TEXT("Layer_RoseObj");
 		break;
+	case Layer_Breakable:
+		return TEXT("Layer_Breakable");
+		break;
+	case Layer_BreakablePiece:
+		return TEXT("Layer_BreakablePiece");
+		break;
 		
+	case Layer_SlideObj:
+		return TEXT("Layer_SlideObj");
+		break;
+
+
+
 	case Layer_StaticMapObj:
 		return TEXT("Layer_StaticMapObj");
 		break;
@@ -341,7 +368,7 @@ static const _tchar* Tag_Layer(LAYERID eTag)
 	case Layer_UI_GamePlay:
 		return TEXT("Layer_UI_GamePlay");
 		break;
-		
+
 	case Layer_UI_IMG:
 		return TEXT("Layer_UI_IMG");
 		break;
@@ -403,10 +430,7 @@ enum COMPONENTPROTOTYPEID
 	Prototype_Mesh_Kelp_WallFar,
 	Prototype_Mesh_KelpWallBack,
 
-	Prototype_Mesh_GiantToys_Die,
-	Prototype_Mesh_GiantToys_DominoC,
-	Prototype_Mesh_GiantToys_DominoE,
-	Prototype_Mesh_GiantToys_DominoStair,
+
 	Prototype_Mesh_GiantToys_Jacks,
 	Prototype_Mesh_GiantToys_MarblesA,
 
@@ -474,6 +498,31 @@ enum COMPONENTPROTOTYPEID
 	Prototype_Mesh_Eyepot,
 
 	Prototype_Mesh_JumpPad,
+	Prototype_Mesh_HealthRose,
+	Prototype_Mesh_Tooth,
+	Prototype_Mesh_GoldenTooth,
+	Prototype_Mesh_SteamPad,
+
+	Prototype_Mesh_GiantToys_Die,
+	Prototype_Mesh_GiantToys_DominoC,
+	Prototype_Mesh_GiantToys_DominoE,
+	Prototype_Mesh_GiantToys_DominoStair,
+
+	Prototype_Mesh_BreakableBox,
+	Prototype_Mesh_BreakableBoxPiece1,
+	Prototype_Mesh_BreakableBoxPiece2,
+	Prototype_Mesh_BreakableBoxPiece3,
+	Prototype_Mesh_BreakableBoxPiece4,
+	Prototype_Mesh_BreakableBoxPiece5,
+	Prototype_Mesh_BreakableBoxPiece6,
+	Prototype_Mesh_BreakableBarrel,
+	Prototype_Mesh_BreakableBarrelPiece1,
+	Prototype_Mesh_BreakableBarrelPiece2,
+	Prototype_Mesh_BreakableBarrelPiece3,
+	Prototype_Mesh_BreakableBarrelPiece4,
+	Prototype_Mesh_BreakableBarrelPiece5,
+	Prototype_Mesh_GiftBasket,
+
 
 	//////////////////////////////////////////////////////////////////////////
 	Prototype_Texture_Player,
@@ -501,7 +550,7 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 		break;
 	case Prototype_Collision:
 		return TEXT("Prototype_Component_Collision");
-		break;		
+		break;
 
 
 	case Prototype_Shader_VT:
@@ -537,7 +586,7 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 
 
 		//메쉬////////////////////////////////////////////////////////////////////////
-		
+
 	case Prototype_Mesh_None:
 		return TEXT("Mesh_None");
 		break;
@@ -611,14 +660,14 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 	case Prototype_Mesh_KeyHole:
 		return TEXT("Mesh_KeyHole");
 		break;
-		
+
 	case Prototype_Mesh_Moai_Gate:
 		return TEXT("Mesh_Moai_Gate");
 		break;
 	case Prototype_Mesh_Moai_Plat:
 		return TEXT("Mesh_Moai_Plat");
 		break;
-	
+
 	case Prototype_Mesh_QBattleTower:
 		return TEXT("Mesh_QBattleTower");
 		break;
@@ -701,7 +750,7 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 		return TEXT("TearsRock");
 		break;
 
-		
+
 	case Prototype_GiantUnderseaRock_Holey:
 		return TEXT("GiantUnderseaRock_Holey");
 		break;
@@ -749,10 +798,75 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 	case Prototype_Mesh_Eyepot:
 		return TEXT("Mesh_Eyepot");
 		break;
+
+
 	case Prototype_Mesh_JumpPad:
 		return TEXT("Prototype_Mesh_JumpPad");
 		break;
-		
+
+	case Prototype_Mesh_HealthRose:
+		return TEXT("Prototype_Mesh_HealthRose");
+		break;
+
+	case Prototype_Mesh_Tooth:
+		return TEXT("Prototype_Mesh_Tooth");
+		break;
+
+	case Prototype_Mesh_GoldenTooth:
+		return TEXT("Prototype_Mesh_GoldenTooth");
+		break;
+
+	case Prototype_Mesh_SteamPad:
+		return TEXT("Prototype_Mesh_SteamPad");
+		break;
+
+
+	case Prototype_Mesh_BreakableBox:
+		return TEXT("Prototype_Mesh_BreakableBox");
+		break;
+	case Prototype_Mesh_BreakableBoxPiece1:
+		return TEXT("Prototype_Mesh_BreakableBoxPiece1");
+		break;
+	case Prototype_Mesh_BreakableBoxPiece2:
+		return TEXT("Prototype_Mesh_BreakableBoxPiece2");
+		break;
+	case Prototype_Mesh_BreakableBoxPiece3:
+		return TEXT("Prototype_Mesh_BreakableBoxPiece3");
+		break;
+	case Prototype_Mesh_BreakableBoxPiece4:
+		return TEXT("Prototype_Mesh_BreakableBoxPiece4");
+		break;
+	case Prototype_Mesh_BreakableBoxPiece5:
+		return TEXT("Prototype_Mesh_BreakableBoxPiece5");
+		break;
+	case Prototype_Mesh_BreakableBoxPiece6:
+		return TEXT("Prototype_Mesh_BreakableBoxPiece6");
+		break;
+
+	case Prototype_Mesh_BreakableBarrel:
+		return TEXT("Prototype_Mesh_BreakableBarrel");
+		break;
+	case Prototype_Mesh_BreakableBarrelPiece1:
+		return TEXT("Prototype_Mesh_BreakableBarrelPiece1");
+		break;
+	case Prototype_Mesh_BreakableBarrelPiece2:
+		return TEXT("Prototype_Mesh_BreakableBarrelPiece2");
+		break;
+	case Prototype_Mesh_BreakableBarrelPiece3:
+		return TEXT("Prototype_Mesh_BreakableBarrelPiece3");
+		break;
+	case Prototype_Mesh_BreakableBarrelPiece4:
+		return TEXT("Prototype_Mesh_BreakableBarrelPiece4");
+		break;
+	case Prototype_Mesh_BreakableBarrelPiece5:
+		return TEXT("Prototype_Mesh_BreakableBarrelPiece5");
+		break;
+	case Prototype_Mesh_GiftBasket:
+		return TEXT("Prototype_Mesh_GiftBasket");
+		break;
+
+
+
 		/////////////////텍스처////////////////////////////////////////////////////////
 
 
@@ -794,37 +908,37 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 		case
 			Prototype_Texture_SettingScene:
 				return TEXT("Prototype_Texture_SettingScene");
-		break;
+				break;
 
-		//메쉬////////////////////////////////////////////////////////////////////////
-
-
-		
+				//메쉬////////////////////////////////////////////////////////////////////////
 
 
 
 
-		break;
-	case 	Prototype_VIBuffer_Terrain:
-		return TEXT("Prototype_Component_VIBuffer_Terrain");
-		break;
-	case 	Prototype_VIBuffer_Terrain_2:
-		return TEXT("Prototype_Component_VIBuffer_Terrain_2");
-		break;
-	case 	Prototype_VIBuffer_Terrain_3:
-		return TEXT("Prototype_Component_VIBuffer_Terrain_3");
-		break;
-	case 	Prototype_VIBuffer_Terrain_Edit:
-		return TEXT("Prototype_Component_VIBuffer_Terrain_Edit");
-		break;
 
-		
 
-		//////////////////////////////////////////////////////////////////////////
-	default:
-		MSGBOX("Wrong Type Layer");
-		return nullptr;
-		break;
+
+				break;
+		case 	Prototype_VIBuffer_Terrain:
+			return TEXT("Prototype_Component_VIBuffer_Terrain");
+			break;
+		case 	Prototype_VIBuffer_Terrain_2:
+			return TEXT("Prototype_Component_VIBuffer_Terrain_2");
+			break;
+		case 	Prototype_VIBuffer_Terrain_3:
+			return TEXT("Prototype_Component_VIBuffer_Terrain_3");
+			break;
+		case 	Prototype_VIBuffer_Terrain_Edit:
+			return TEXT("Prototype_Component_VIBuffer_Terrain_Edit");
+			break;
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+		default:
+			MSGBOX("Wrong Type Layer");
+			return nullptr;
+			break;
 	}
 
 
@@ -841,6 +955,7 @@ enum COMPONENTID
 	Com_Collision,
 	Com_Inventory,
 	Com_Shader,
+	Com_ShaderSub,
 	Com_Model,
 
 };
@@ -869,9 +984,14 @@ static const _tchar* Tag_Component(COMPONENTID eTag)
 	case Com_Shader:
 		return TEXT("Com_Shader");
 		break;
+	case Com_ShaderSub:
+		return TEXT("Com_ShaderSub");
+		break;
 	case Com_Model:
 		return TEXT("Com_Model");
 		break;
+
+
 
 		//////////////////////////////////////////////////////////////////////////
 	default:

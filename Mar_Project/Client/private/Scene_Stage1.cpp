@@ -38,6 +38,7 @@ HRESULT CScene_Stage1::Initialize()
 	FAILED_CHECK(Ready_Layer_HiddenPad(TAG_LAY(Layer_HiddenPad)));
 	FAILED_CHECK(Ready_Layer_TeethObj(TAG_LAY(Layer_TeethObj)));
 	FAILED_CHECK(Ready_Layer_RoseObj(TAG_LAY(Layer_RoseObj)));
+	FAILED_CHECK(Ready_Layer_BreakableObj(TAG_LAY(Layer_Breakable)))
 	
 	
 	FAILED_CHECK(Ready_Layer_StaticMapObj(TAG_LAY(Layer_StaticMapObj)));
@@ -65,7 +66,8 @@ _int CScene_Stage1::Update(_double fDeltaTime)
 	if (__super::Update(fDeltaTime) < 0)
 		return -1;
 
-
+	if (g_pGameInstance->Get_DIKeyState(DIK_P)&DIS_Down)
+		FAILED_CHECK(Ready_Layer_BreakableObj(TAG_LAY(Layer_Breakable)));
 
 	
 
@@ -201,28 +203,34 @@ HRESULT CScene_Stage1::Ready_Layer_UI(const _tchar * pLayerTag)
 
 HRESULT CScene_Stage1::Ready_Layer_JumpPad(const _tchar * pLayerTag)
 {
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_JumpPad),&_float3(7, 22, 7) ));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_JumpPad),&_float3(7, 20, 7) ));
 
 	return S_OK;
 }
 
 HRESULT CScene_Stage1::Ready_Layer_SteamPad(const _tchar * pLayerTag)
 {
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_SteamPad), &_float3(9, 22, 7)));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_SteamPad), &_float4(9, 22.5, 7, 10)));
 
 	return S_OK;
 }
 
 HRESULT CScene_Stage1::Ready_Layer_HiddenPad(const _tchar * pLayerTag)
 {
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_HiddenPad), &_float3(11, 22, 7)));
+	for (_uint i = 0 ;i < 4 ; i ++)
+	{
+		FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_HiddenPad), &_float4(_float(11 + i), 20, _float(7 +i), _float(0 +i))));
+	}
 
 	return S_OK;
 }
 
 HRESULT CScene_Stage1::Ready_Layer_TeethObj(const _tchar * pLayerTag)
 {
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_TeethObj), &_float3(13, 22, 7)));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_TeethObj), &_float4(13, 22, 7,0)));
+
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_TeethObj), &_float4(13, 22, 9, 1)));
+
 
 	return S_OK;
 }
@@ -230,6 +238,16 @@ HRESULT CScene_Stage1::Ready_Layer_TeethObj(const _tchar * pLayerTag)
 HRESULT CScene_Stage1::Ready_Layer_RoseObj(const _tchar * pLayerTag)
 {
 	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_RoseObj), &_float3(14, 22, 7)));
+
+	return S_OK;
+}
+
+HRESULT CScene_Stage1::Ready_Layer_BreakableObj(const _tchar * pLayerTag)
+{
+
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_BreakableObj), &_float4(16, 21, 7, _float(Prototype_Mesh_BreakableBox))));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_BreakableObj), &_float4(19, 21, 7, _float(Prototype_Mesh_BreakableBarrel))));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_BreakableObj), &_float4(22, 21, 7, _float(Prototype_Mesh_GiftBasket))));
 
 	return S_OK;
 }

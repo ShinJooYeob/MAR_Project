@@ -20,10 +20,11 @@ enum ParticleID
 
 typedef struct tagParticleDesc
 {
-	ParticleID eParticleID;
+	ParticleID eParticleTypeID;
 
-	_float3 FixedTarget = _float3(9999.f, 9999.f, 9999.f);
 	CTransform* FollowingTarget = nullptr;
+	_float3 FixedTarget = _float3(9999.f, 9999.f, 9999.f);
+
 	const _tchar* szTextureProtoTypeTag = nullptr;
 	const _tchar* szTextureLayerTag = nullptr;
 	_bool  m_bIsTextureAutoFrame = false;
@@ -41,30 +42,23 @@ typedef struct tagParticleDesc
 
 	_float3 vUp = _float3(0, 1, 0);
 
-	_float3 MaxBoundary =_float3(10,10,10);
+	_float MaxBoundaryRadius = 10;
 
-	_bool	ParticleColorChage = false;
+	_float	ColorChageFrequency = 0;
 	_float3 TargetColor = _float3(255.f, 255.f, 255.f);
 	_float3 TargetColor2 = _float3(255.f, 255.f, 255.f);
 
 
 	_bool  m_bIsUI = false;
 	_float  m_bUIDepth = 0;
-	//_bool	ParticleAlphaChage = false;
-	//_float TargetAlpha = 255.f;
 
 	_float3 ParticleStartRandomPosMin = _float3(-5.0f, -5.0f, -5.0f);
 	_float3 ParticleStartRandomPosMax= _float3(5.f, 5.f, 5.f);
 
-	_bool	MustDraw = false;
-	_bool	IsParticleFameEndtoDie = false;
+	_bool	DepthTestON = true;
+	_bool	AlphaBlendON = true;
 
-
-	_bool	AlphaBlendON = false;
-
-	_bool	bSubPraticle = false;
-
-	_float		m_fAlphaTestValue = 100.f;
+	_float		m_fAlphaTestValue = 0.1f;
 
 }PARTICLEDESC;
 

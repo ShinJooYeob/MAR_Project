@@ -17,6 +17,8 @@ CJumpPad::CJumpPad(const CJumpPad & rhs)
 HRESULT CJumpPad::Initialize_Prototype(void * pArg)
 {
 	FAILED_CHECK(__super::Initialize_Prototype(pArg));
+
+
 	return S_OK;
 }
 
@@ -32,7 +34,8 @@ HRESULT CJumpPad::Initialize_Clone(void * pArg)
 		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, Pos);
 	}
 	
-
+	m_pModel->Change_AnimIndex(0);
+	m_fRangeRadius = 0.707f;
 	return S_OK;
 }
 
@@ -41,18 +44,55 @@ _int CJumpPad::Update(_double fDeltaTime)
 	if (__super::Update(fDeltaTime) < 0)
 		return -1;
 
+
+	
+// 	if (g_pGameInstance->Get_DIKeyState(DIK_UP) & DIS_Down)
+// 	{
+// 		m_fRangeRadius += 0.1f;
+// 
+// 
+// 	string ttszLog = "Radius: " + to_string(m_fRangeRadius) + "\n";
+// 	wstring ttDebugLog;
+// 	ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+// 
+// 	OutputDebugStringW(ttDebugLog.c_str());
+// 	}
+// 	else if (g_pGameInstance->Get_DIKeyState(DIK_DOWN) & DIS_Down)
+// 	{
+// 		m_fRangeRadius -= 0.1f;
+// 
+// 	string ttszLog = "Radius: " + to_string(m_fRangeRadius) + "\n";
+// 	wstring ttDebugLog;
+// 	ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+// 
+// 	OutputDebugStringW(ttDebugLog.c_str());
+// 
+// 
+// 	}
+	
+
+
+
 	if (XMVectorGetX(XMVector3Length(m_pTransformCom->Get_MatrixState(CTransform::STATE_POS)
 		- m_pPlayerTransform->Get_MatrixState(CTransform::STATE_POS))) > m_fRangeRadius)
 	{
 		m_bIsPlayerCloser = false;
-		return _int();
+		//return _int();
+	}
+	else
+	{
+
+		m_pPlayerTransform->MovetoDir(XMVectorSet(0, 1, 0, 0), fDeltaTime);
+		m_pPlayer->Add_JumpForce(10,1);
+		m_pModel->Change_AnimIndex_ReturnTo_Must(2,  0, 0.08, true);
 	}
 
 
-	m_pPlayer->Add_JumpForce(30);
 
 
-		
+
+	m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
+	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime, m_bIsOnScreen));
 	return _int();
 }
 
@@ -64,8 +104,10 @@ _int CJumpPad::LateUpdate(_double fDeltaTime)
 	//if (!m_bIsPlayerCloser) return _int();
 
 
-	if (g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS)))
+	if (m_bIsOnScreen)
 		FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this));
+
+	m_vOldPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
 	return _int();
 }
 
@@ -113,7 +155,7 @@ HRESULT CJumpPad::SetUp_Components()
 {
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Renderer), TAG_COM(Com_Renderer), (CComponent**)&m_pRendererCom));
 
-	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Shader_VCT), TAG_COM(Com_Shader), (CComponent**)&m_pShaderCom));
+	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Shader_VAM), TAG_COM(Com_Shader), (CComponent**)&m_pShaderCom));
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Transform), TAG_COM(Com_Transform), (CComponent**)&m_pTransformCom));
 

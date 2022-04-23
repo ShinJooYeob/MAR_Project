@@ -34,10 +34,12 @@ public:
 
 	void Set_MoveSpeed(_float fMoveSpeed) { m_TransformDesc.fMovePerSec = fMoveSpeed; };
 	void Set_TurnSpeed(_float TurnSpeed) { m_TransformDesc.fRotationPerSec = TurnSpeed; };
-	void Set_ScalingSpeed(_float ScalingSpeed) { m_TransformDesc.fScalingPerSec = ScalingSpeed; };
-	void Set_Pivot(_float3 vPivot) { memcpy( &(m_TransformDesc.fScalingPerSec), &vPivot, sizeof(_float3)); };
+	void Set_ScalingSpeed(_float ScalingSpeed) { m_TransformDesc.fScalingPerSec = ScalingSpeed; };	
+	void Set_Pivot(_float3 vPivot) { memcpy(&(m_TransformDesc.vPivot), &vPivot, sizeof(_float3)); };
+
 
 	_float Get_MoveSpeed() { return m_TransformDesc.fMovePerSec; };
+	_Vector Get_Pivot() {return m_TransformDesc.vPivot.XMVector(); };
 
 public:
 	/*Get Set Matrix*/
@@ -97,6 +99,7 @@ public:
 public:
 	//쉐이더에 월드 행렬을 연결시키는 함수
 	HRESULT Bind_OnShader(class CShader* pShader, const char* pValueName);
+	HRESULT Bind_OnShader_ApplyPivot(class CShader* pShader, const char* pValueName);
 //	HRESULT Bind_WorldMatrix_Look_Camera();
 //
 //

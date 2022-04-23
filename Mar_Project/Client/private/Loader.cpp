@@ -18,6 +18,8 @@
 #include "HiddenPad.h"
 #include "TeethObj.h"
 #include "RoseObj.h"
+#include "BreakableObj.h"
+#include "BreakablePiece.h"
 
 #include "StaticMapObject.h"
 
@@ -187,17 +189,80 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_JumpPad),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "JumpPad", "JumpPad.FBX", TransformMatrix)));
 
+	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_HealthRose),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "HealthRose", "Health.FBX", TransformMatrix)));
+
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_Tooth),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "Tooth", "Tooth.FBX", TransformMatrix)));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_GoldenTooth),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "ToothGolden", "Tooth.FBX", TransformMatrix)));
+
+
+	TransformMatrix = XMMatrixScaling(0.0001f, 0.0001f, 0.0001f);
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_SteamPad),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "SteamPad", "SteamPad.FBX", TransformMatrix)));
+
+
+	/*히든 패드*/
+	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_GiantToys_Die),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "GiantToys", "GiantToys_Die.FBX", TransformMatrix)));
+
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_GiantToys_DominoC),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "GiantToys", "GiantToys_DominoC.FBX", TransformMatrix)));
+
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_GiantToys_DominoE),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "GiantToys", "GiantToys_DominoE.FBX", TransformMatrix)));
+
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_GiantToys_DominoStair),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "GiantToys", "GiantToys_DominoStair.FBX", TransformMatrix)));
+
+	/*BreakableObj & Piece*/
+
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_BreakableBox),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "BreakableBox", "HatterBox.FBX", TransformMatrix)));
+
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_BreakableBoxPiece1),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "BreakableBox", "HatterBoxA.FBX", TransformMatrix)));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_BreakableBoxPiece2),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "BreakableBox", "HatterBoxB.FBX", TransformMatrix)));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_BreakableBoxPiece3),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "BreakableBox", "HatterBoxC.FBX", TransformMatrix)));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_BreakableBoxPiece4),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "BreakableBox", "HatterBoxD.FBX", TransformMatrix)));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_BreakableBoxPiece5),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "BreakableBox", "HatterBoxG.FBX", TransformMatrix)));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_BreakableBoxPiece6),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "BreakableBox", "HatterBoxK.FBX", TransformMatrix)));
+	
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_BreakableBarrel),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "BreakableBarrel", "HatterBarrel.FBX", TransformMatrix)));
+
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_BreakableBarrelPiece1),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "BreakableBarrel", "HatterBarrelA.FBX", TransformMatrix)));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_BreakableBarrelPiece2),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "BreakableBarrel", "HatterBarrelB.FBX", TransformMatrix)));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_BreakableBarrelPiece3),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "BreakableBarrel", "HatterBarrelC.FBX", TransformMatrix)));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_BreakableBarrelPiece4),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "BreakableBarrel", "HatterBarrelD.FBX", TransformMatrix)));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_BreakableBarrelPiece5),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "BreakableBarrel", "HatterBarrelE.FBX", TransformMatrix)));
+
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_GiftBasket),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "GiftBasket", "GiftBasket.FBX", TransformMatrix)));
 
 
 	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
 	/* 테스트 알게락 */
-	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_AlgaeRock_Ledge),
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_AlgaeRock_Ledge),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "AlgaeRock", "AlgaeRock_Ledge.FBX", TransformMatrix)));
 
-	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_AlgaeRock_Pillar),
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_AlgaeRock_Pillar),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "AlgaeRock", "AlgaeRock_Pillar.FBX", TransformMatrix)));
 
-	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_AlgaeRock_Wall),
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_AlgaeRock_Wall),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "AlgaeRock", "AlgaeRock_Wall.FBX", TransformMatrix)));
 
 
@@ -291,8 +356,18 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_RoseObj),
 		CRoseObj::Create(m_pDevice, m_pDeviceContext)));
 
+
+
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_BreakableObj),
+		CBreakableObj::Create(m_pDevice, m_pDeviceContext)));
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_BreakablePiece),
+		CBreakablePiece::Create(m_pDevice, m_pDeviceContext)));
+	
+
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_StaticMapObject),
 		CStaticMapObject::Create(m_pDevice, m_pDeviceContext)));
+
+
 
 	//몬스터
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_Executor),
@@ -416,17 +491,6 @@ HRESULT CLoader::Load_Scene_Edit(_bool * _IsClientQuit, CRITICAL_SECTION * _CriS
 
 
 	//////////////////////////*자이언트 토이*/
-	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_GiantToys_Die),
-		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "GiantToys", "GiantToys_Die.FBX", TransformMatrix)));
-
-	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_GiantToys_DominoC),
-		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "GiantToys", "GiantToys_DominoC.FBX", TransformMatrix)));
-
-	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_GiantToys_DominoE),
-		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "GiantToys", "GiantToys_DominoE.FBX", TransformMatrix)));
-
-	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_GiantToys_DominoStair),
-		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "GiantToys", "GiantToys_DominoStair.FBX", TransformMatrix)));
 
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_GiantToys_Jacks),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "GiantToys", "GiantToys_Jacks.FBX", TransformMatrix)));

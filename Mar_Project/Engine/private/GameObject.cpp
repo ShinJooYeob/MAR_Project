@@ -86,7 +86,7 @@ HRESULT CGameObject::Add_Component(_uint iScenenNum, const _tchar* tagPrototype,
 
 	 if (pCloneComponent == nullptr)
 	 {
-		 CComponent* pCloneComponent = GetSingle(CGameInstance)->Clone_Component(0, tagPrototype, pArg);
+		 pCloneComponent = GetSingle(CGameInstance)->Clone_Component(0, tagPrototype, pArg);
 		 NULL_CHECK_BREAK(pCloneComponent);
 	 }
 

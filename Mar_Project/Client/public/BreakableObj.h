@@ -1,14 +1,15 @@
 #pragma once
+
 #include "MapObject.h"
 
 BEGIN(Client)
-
-class CHiddenPad final :public CMapObject
+class CBreakableObj final :public CMapObject
 {
 private:
-	CHiddenPad(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
-	CHiddenPad(const CHiddenPad& rhs);
-	virtual ~CHiddenPad() = default;
+	CBreakableObj(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
+	CBreakableObj(const CBreakableObj& rhs);
+	virtual ~CBreakableObj() = default;
+
 
 public:
 	virtual HRESULT Initialize_Prototype(void* pArg)override;
@@ -28,21 +29,19 @@ private:
 	CTransform*			m_pTransformCom = nullptr;
 	CModel*				m_pModel = nullptr;
 
+	_float				m_fHP = 3;
 
-private:
-	class CPlayer*		m_pPlayer= nullptr;
-	CTransform*			m_pPlayerTransform = nullptr;
-	_bool				m_bIsPlayerCloser = false;
-
-	_uint				m_iKindsOfHiddenPad = 0;
+	_uint				m_iKindsOfMesh = 0;
+	_uint				m_iPieceNum = 0;
 private:
 	HRESULT SetUp_Components();
 
 
 public:
-	static CHiddenPad* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, void* pArg = nullptr);
+	static CBreakableObj* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, void* pArg = nullptr);
 	virtual CGameObject* Clone(void* pArg);
 	virtual void Free() override;
 };
 
 END
+

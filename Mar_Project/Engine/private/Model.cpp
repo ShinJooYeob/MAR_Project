@@ -264,6 +264,43 @@ HRESULT CModel::Change_AnimIndex_UntilNReturn(_uint iAnimIndex, _uint iUntilInde
 	return S_OK;
 }
 
+HRESULT CModel::Change_AnimIndex_UntilNReturn_Must(_uint iAnimIndex, _uint iUntilIndex, _uint iReturnIndex, _double ExitTime, _bool bBlockAnimUntilReturnChange)
+{
+	if (iAnimIndex >= m_iNumAnimationClip || iReturnIndex >= m_iNumAnimationClip)
+		return E_FAIL;
+
+
+	if (m_bIsChagingAnim || m_AnimExitAcc) // m_AnimExitAcc 변환 중이였다면
+	{
+		_uint iNumOldAnimKeyFrameIdx = _uint(m_vecCurrentKeyFrameIndices[m_iOldAnimIndex].size());
+		m_vecCurrentKeyFrameIndices[m_iOldAnimIndex].clear();
+		m_vecCurrentKeyFrameIndices[m_iOldAnimIndex].resize(iNumOldAnimKeyFrameIdx);
+	}
+
+	m_bIsChagingAnim = true;
+
+
+	m_AnimExitAcc = 0;
+	m_TotalAnimExitTime = ExitTime;
+
+
+	m_OldPlayTimeAcc = m_NowPlayTimeAcc;
+	m_iOldAnimIndex = m_iNowAnimIndex;
+
+
+	m_NowPlayTimeAcc = 0;
+	m_iNowAnimIndex = iAnimIndex;
+
+
+	m_iNextAnimIndex = iUntilIndex;
+	m_iReturnIndex = iReturnIndex;
+	m_bIsBlockAnim = bBlockAnimUntilReturnChange;
+	m_KindsOfAnimChange = 2;
+	m_bIsUntill = true;
+
+	return S_OK;
+}
+
 HRESULT CModel::Change_AnimIndex_UntilTo(_uint iAnimIndex, _uint iReturnIndex, _double ExitTime, _bool bBlockAnimUntilReturnChange)
 {
 	if (iAnimIndex >= m_iNumAnimationClip || iReturnIndex >= m_iNumAnimationClip)

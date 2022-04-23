@@ -38,7 +38,7 @@ public:
 	void  Change_Weapon(_uint WeaponIndex);
 
 
-	void Add_JumpForce(_float JumpPower);
+	void Add_JumpForce(_float JumpPower,_uint IsKindsOfJump = false);
 	void Add_Force(_float3 vDir, _float Power);
 	HRESULT Calculate_Force(_bool* _IsClientQuit, CRITICAL_SECTION* _CriSec);
 

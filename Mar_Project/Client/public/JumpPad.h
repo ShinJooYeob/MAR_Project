@@ -33,7 +33,7 @@ private:
 	class CPlayer*		m_pPlayer= nullptr;
 	CTransform*			m_pPlayerTransform = nullptr;
 	_bool				m_bIsPlayerCloser = false;
-	_float				m_fRangeRadius = 1.414f;
+	_float				m_fRangeRadius = 0.707f;
 
 private:
 	HRESULT SetUp_Components();

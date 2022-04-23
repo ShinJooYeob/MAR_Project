@@ -38,6 +38,12 @@ cbuffer MtrlDesc
 	float4		g_vMtrlSpecular = float4(1.f, 1.f, 1.f, 1.f);
 };
 
+cbuffer HiddenPad
+{
+	float	g_fVisualValue;
+};
+
+
 
 struct VS_IN
 {
@@ -132,11 +138,35 @@ PS_OUT PS_MAIN_ZTESTALLMOST(PS_IN In)
 	return Out;
 }
 
+PS_OUT PS_MAIN_HIDDENPAD(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	vector		vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
+
+	if ((vDiffuse.r + vDiffuse.g + vDiffuse.b) / 3 > g_fVisualValue)
+		discard;
+
+	float		fShade = saturate(dot(normalize(g_vLightVector) * -1.f, In.vNormal));
+
+	float4		vReflect = reflect(normalize(g_vLightVector), In.vNormal);
+	float4		vLook = normalize(In.vWorldPos - g_CamPosition);
+
+	float		fSpecular = pow(saturate(dot(normalize(vReflect) * -1.f, vLook)), 30.f);
+
+	Out.vColor = (g_vLightDiffuse * vDiffuse) * (fShade + (g_vLightAmbient * g_vMtrlAmbient)) +
+		(g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
+
+
+
+	return Out;
+}
+
 
 
 technique11		DefaultTechnique
 {
-	pass Default
+	pass Default		//0
 	{
 		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 		SetDepthStencilState(ZTestAndWriteState, 0);
@@ -146,7 +176,7 @@ technique11		DefaultTechnique
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN_DEFAULT();
 	}	
-	pass UnderAllDiscard
+	pass UnderAllDiscard		//1
 	{
 		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 		SetDepthStencilState(ZTestAndWriteState, 0);
@@ -156,5 +186,34 @@ technique11		DefaultTechnique
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN_ZTESTALLMOST();
 	}
+	pass CullModeNone		//2
+	{
+		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(ZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_None);
 
+		VertexShader = compile vs_5_0 VS_MAIN_DEFAULT();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_DEFAULT();
+	}
+	pass UnderAllDiscard_CullModeNone		//3
+	{
+		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(ZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_None);
+
+		VertexShader = compile vs_5_0 VS_MAIN_DEFAULT();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_ZTESTALLMOST();
+	}
+	pass HiddenPad		//4
+	{
+		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(ZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_None);
+
+		VertexShader = compile vs_5_0 VS_MAIN_DEFAULT();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_HIDDENPAD();
+	}
 }

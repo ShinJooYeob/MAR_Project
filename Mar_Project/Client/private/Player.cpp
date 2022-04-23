@@ -445,10 +445,26 @@ void CPlayer::Change_Weapon(_uint WeaponIndex)
 
 }
 
-void CPlayer::Add_JumpForce(_float JumpPower)
+void CPlayer::Add_JumpForce(_float JumpPower, _uint IsKindsOfJump)
 {
 	m_fJumpPower = m_fMaxJumpPower = JumpPower;
 	m_LevitationTime = 0.0000000001f;
+
+	if (IsKindsOfJump)
+	{
+		ZeroMemory(m_bAtkMoveMentChecker, sizeof(_bool) * 3);
+		m_bIsAttackClicked = false;
+		m_iAttackCount = 0;
+		m_bIsZoom = false;
+		m_bIsCharged = false;
+		m_fCharedGauge = 0;
+		m_bIsCoolTime = false;
+		m_fUmbrellaIntro = 0;
+		m_pModel->Set_BlockAnim(false);
+
+		m_pModel->Change_AnimIndex(29);
+
+	}
 }
 
 void CPlayer::Add_Force(_float3 vDir, _float Power)

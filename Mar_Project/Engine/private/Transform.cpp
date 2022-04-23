@@ -279,6 +279,23 @@ HRESULT CTransform::Bind_OnShader(CShader * pShader, const char * pValueName)
 	return S_OK;
 }
 
+HRESULT CTransform::Bind_OnShader_ApplyPivot(CShader * pShader, const char * pValueName)
+{
+
+	_float4x4		ShaderWorldMatrix = m_WorldMatrix;
+
+	ShaderWorldMatrix._41 += m_TransformDesc.vPivot.x;
+	ShaderWorldMatrix._42 += m_TransformDesc.vPivot.y;
+	ShaderWorldMatrix._43 += m_TransformDesc.vPivot.z;
+
+	ShaderWorldMatrix = ShaderWorldMatrix.TransposeXMatrix();
+
+	//XMStoreFloat4x4(&ShaderWorldMatrix, m_WorldMatrix.TransposeXMatrix());
+
+	return pShader->Set_RawValue(pValueName, &ShaderWorldMatrix, sizeof(_float4x4));
+
+}
+
 
 
 
