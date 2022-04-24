@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "..\public\UtilityMgr.h"
+#include "ParticleObject.h"
 #include "MainApp.h"
 
 IMPLEMENT_SINGLETON(CUtilityMgr);
@@ -51,10 +52,76 @@ _float3 CUtilityMgr::RandomFloat3(_float Min, _float Max)
 	return _float3(RandomFloat(Min,Max), RandomFloat(Min, Max), RandomFloat(Min, Max));
 }
 
+_float3 CUtilityMgr::RandomFloat3(_float3 Min, _float3 Max)
+{
+	if (Min.x >= Max.x) // bad input
+	{
+		_float temp = Min.x;
+		Min.x = Max.x;
+		Max.x = temp;
+	}
+	if (Min.y >= Max.y) // bad input
+	{
+		_float temp = Min.y;
+		Min.y = Max.y;
+		Max.y = temp;
+	}
+
+	if (Min.z >= Max.z) // bad input
+	{
+		_float temp = Min.z;
+		Min.z = Max.z;
+		Max.z = temp;
+	}
+
+	return _float3(RandomFloat(Min.x, Max.x), RandomFloat(Min.y, Max.y), RandomFloat(Min.z, Max.z));
+}
+
 void CUtilityMgr::SlowMotionStart(_float fTargetTime, _float TargetSpeed)
 {
 	NULL_CHECK_BREAK(m_pMainApp);
 	m_pMainApp->SlowMotionStart(fTargetTime, TargetSpeed);
+}
+
+HRESULT CUtilityMgr::Create_ParticleObject(_uint eSceneID, PARTICLEDESC tParticleDesc)
+{
+
+	switch (tParticleDesc.eParticleTypeID)
+	{
+	case Client::Particle_Straight:
+		FAILED_CHECK(GetSingle(CGameInstance)->Add_GameObject_To_Layer(eSceneID, TAG_LAY(Layer_Particle), TEXT("ProtoType_GameObject_Object_particle_Straight"), &tParticleDesc));
+		break;
+
+	case Client::Particle_Ball:
+		FAILED_CHECK(GetSingle(CGameInstance)->Add_GameObject_To_Layer(eSceneID, TAG_LAY(Layer_Particle), TEXT("ProtoType_GameObject_Object_particle_Ball"), &tParticleDesc));
+		break;
+
+	case Client::Particle_Fixed:
+		FAILED_CHECK(GetSingle(CGameInstance)->Add_GameObject_To_Layer(eSceneID, TAG_LAY(Layer_Particle), TEXT("ProtoType_GameObject_Object_particle_Fixed"), &tParticleDesc));
+		break;
+
+	case Client::Particle_Suck:
+		FAILED_CHECK(GetSingle(CGameInstance)->Add_GameObject_To_Layer(eSceneID, TAG_LAY(Layer_Particle), TEXT("ProtoType_GameObject_Object_particle_Suck"), &tParticleDesc));
+		break;
+
+		/*
+		case Client::Particle_Cone:
+		FAILED_CHECK(GetSingle(CGameInstance)->Add_GameObject_To_Layer(eSceneID, TEXT("Layer_Particle"), TEXT("ProtoType_GameObject_Object_particle_Cone"), &tParticleDesc));
+		break;
+
+		case Client::Particle_Fountain:
+		FAILED_CHECK(GetSingle(CGameInstance)->Add_GameObject_To_Layer(eSceneID, TEXT("Layer_Particle"), TEXT("ProtoType_GameObject_Object_particle_Fountain"), &tParticleDesc));
+		break;
+
+		case Client::Particle_Spread:
+		FAILED_CHECK(GetSingle(CGameInstance)->Add_GameObject_To_Layer(eSceneID, TEXT("Layer_Particle"), TEXT("ProtoType_GameObject_Object_particle_Spread"), &tParticleDesc));
+		break;
+		*/
+	default:
+		return E_FAIL;
+		break;
+	}
+	return S_OK;
 }
 
 HRESULT CUtilityMgr::Clear_RenderGroup_forSceneChange()

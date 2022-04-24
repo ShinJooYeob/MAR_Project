@@ -296,6 +296,41 @@ HRESULT CTransform::Bind_OnShader_ApplyPivot(CShader * pShader, const char * pVa
 
 }
 
+HRESULT CTransform::Bind_OnShader_BillBoard(CShader * pShader, const char * pValueName, _fMatrix ViewMatrix)
+{
+	_Matrix vCamWorldMat = XMMatrixInverse(nullptr,ViewMatrix);
+
+	_Matrix TempWorldMat = m_WorldMatrix.XMatrix();
+
+	_Matrix vScaleMat = Get_MatrixScale_All();
+
+	TempWorldMat.r[0] = vCamWorldMat.r[0] * vScaleMat.r[0];
+	TempWorldMat.r[1] = vCamWorldMat.r[1] * vScaleMat.r[1];
+	TempWorldMat.r[2] = vCamWorldMat.r[2] * vScaleMat.r[2];
+
+	_float4x4 ShaderMat = XMMatrixTranspose(TempWorldMat);
+
+	return pShader->Set_RawValue(pValueName, &ShaderMat, sizeof(_float4x4));
+}
+
+HRESULT CTransform::Bind_OnShader_BillBoard_ApplyPivot(CShader * pShader, const char * pValueName, _fMatrix ViewMatrix)
+{
+	_Matrix vCamWorldMat = XMMatrixInverse(nullptr, ViewMatrix);
+
+	_Matrix TempWorldMat = m_WorldMatrix.XMatrix();
+
+	_Matrix vScaleMat = Get_MatrixScale_All();
+
+	TempWorldMat.r[0] = vCamWorldMat.r[0] * vScaleMat.r[0];
+	TempWorldMat.r[1] = vCamWorldMat.r[1] * vScaleMat.r[1];
+	TempWorldMat.r[2] = vCamWorldMat.r[2] * vScaleMat.r[2];
+	TempWorldMat.r[3] = TempWorldMat.r[3] + XMVectorSetW(m_TransformDesc.vPivot.XMVector(),0);
+
+	_float4x4 ShaderMat = XMMatrixTranspose(TempWorldMat);
+
+	return pShader->Set_RawValue(pValueName, &ShaderMat, sizeof(_float4x4));
+}
+
 
 
 

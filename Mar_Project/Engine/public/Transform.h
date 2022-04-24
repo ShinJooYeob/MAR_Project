@@ -100,6 +100,9 @@ public:
 	//쉐이더에 월드 행렬을 연결시키는 함수
 	HRESULT Bind_OnShader(class CShader* pShader, const char* pValueName);
 	HRESULT Bind_OnShader_ApplyPivot(class CShader* pShader, const char* pValueName);
+	HRESULT Bind_OnShader_BillBoard(class CShader* pShader, const char* pValueName, _fMatrix ViewMatrix);
+	HRESULT Bind_OnShader_BillBoard_ApplyPivot(class CShader* pShader, const char* pValueName, _fMatrix ViewMatrix);
+	
 //	HRESULT Bind_WorldMatrix_Look_Camera();
 //
 //

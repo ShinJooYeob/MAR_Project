@@ -275,6 +275,7 @@ enum LAYERID
 	Layer_Bullet,
 
 	Layer_Monster,
+	Layer_Particle,
 
 	Layer_Terrain,
 	Layer_WireTerrain,
@@ -326,6 +327,10 @@ static const _tchar* Tag_Layer(LAYERID eTag)
 	case Layer_WireTerrain:
 		return TEXT("Layer_WireTerrain");
 		break;
+	case Layer_Particle:
+		return TEXT("Layer_Particle");
+		break;
+		
 
 	case Layer_Monster:
 		return TEXT("Layer_Monster");
@@ -531,6 +536,7 @@ enum COMPONENTPROTOTYPEID
 	Prototype_Texture_Terrain,
 	Prototype_Texture_Edit_Terrain,
 	Prototype_Texture_DefaultUI,
+	Prototype_Texture_PlayerEffect,
 	Prototype_Texture_GamePlayScene,
 	Prototype_Texture_LoadingScene,
 	Prototype_Texture_LobyScene,
@@ -873,6 +879,10 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 	case Prototype_Texture_Player:
 		return TEXT("Prototype_Component_Texture_Player");
 		break;
+	case Prototype_Texture_PlayerEffect:
+		return TEXT("Prototype_Texture_PlayerEffect");
+		break;
+		
 	case Prototype_Texture_SkyBox:
 		return TEXT("Prototype_Component_Texture_SkyBox");
 		break;
@@ -951,6 +961,7 @@ enum COMPONENTID
 	Com_Renderer,
 	Com_VIBuffer,
 	Com_Transform,
+	Com_SubTransform,
 	Com_Texture,
 	Com_Collision,
 	Com_Inventory,
@@ -972,6 +983,10 @@ static const _tchar* Tag_Component(COMPONENTID eTag)
 	case Com_Transform:
 		return TEXT("Com_Transform");
 		break;
+	case Com_SubTransform:
+		return TEXT("Com_SubTransform");
+		break;
+		
 	case Com_Texture:
 		return TEXT("Com_Texture");
 		break;

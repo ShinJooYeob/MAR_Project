@@ -61,6 +61,103 @@ _int CPlayer::Update(_double fDeltaTime)
 
 	FAILED_CHECK(Input_Keyboard(fDeltaTime));
 
+	if (g_pGameInstance->Get_DIKeyState(DIK_X) & DIS_Down)
+	{
+		//PARTICLEDESC tDesc;
+		//
+		//tDesc.eParticleTypeID = Particle_Ball;
+		//
+		//tDesc.FollowingTarget = m_pTransformCom;
+		//
+		//tDesc.szTextureProtoTypeTag = TAG_CP(Prototype_Texture_PlayerEffect);
+		//tDesc.szTextureLayerTag = L"ButterFly";
+		//tDesc.iSimilarLayerNum = 12;
+		//
+		//tDesc.TextureChageFrequency = 1;
+		//tDesc.vTextureXYNum = _float2(8, 2);
+		//
+		//tDesc.TotalParticleTime = 2;
+		//tDesc.EachParticleLifeTime = 0.34f;
+		//tDesc.MaxParticleCount = 15;
+		//
+		//tDesc.SizeChageFrequency = 0;
+		//tDesc.ParticleSize = _float3(0.5, 0.5, 0.5);
+		//tDesc.ParticleSize2 = _float3(0.5, 0.5, 0.5);
+		//
+		//tDesc.ColorChageFrequency = 0;
+		//tDesc.TargetColor = _float3(255.f, 255.f, 255.f);
+		//tDesc.TargetColor2 = _float3(255.f, 255.f, 255.f);
+		//
+		//
+		//tDesc.Particle_Power = 1;
+		//tDesc.PowerRandomRange = _float2(0.5f, 1.5f);
+		//
+		//tDesc.vUp = _float3(0, 1, 0);
+		//
+		//tDesc.MaxBoundaryRadius = 5;
+		//
+		//tDesc.m_bIsUI = false;
+		//tDesc.m_bUIDepth = 0;
+		//
+		//tDesc.ParticleStartRandomPosMin = _float3(-1.0f, 0.0f, -1.0f);
+		//tDesc.ParticleStartRandomPosMax = _float3(1.f, 1.5f, 1.f);
+		//
+		//tDesc.DepthTestON = true;
+		//tDesc.AlphaBlendON = true;
+		//
+		//tDesc.m_fAlphaTestValue = 0.1f;
+
+		//////////////////////////////////////////////////////////////////////////
+
+		//PARTICLEDESC tDesc;
+		//
+		//tDesc.eParticleTypeID = Particle_Ball;
+		//
+		//tDesc.FollowingTarget = m_pTransformCom;
+		//
+		//tDesc.szTextureProtoTypeTag = TAG_CP(Prototype_Texture_PlayerEffect);
+		//tDesc.szTextureLayerTag = L"Dust";
+		//tDesc.iSimilarLayerNum = 6;
+		//
+		//tDesc.TextureChageFrequency = 1;
+		//tDesc.vTextureXYNum = _float2(2, 2);
+		//
+		//tDesc.TotalParticleTime = 2;
+		//tDesc.EachParticleLifeTime = 0.34f;
+		//tDesc.MaxParticleCount = 10;
+		//
+		//tDesc.SizeChageFrequency = 0;
+		//tDesc.ParticleSize = _float3(1, 1, 1);
+		//tDesc.ParticleSize2 = _float3(0.5, 0.5, 0.5);
+		//
+		//tDesc.ColorChageFrequency = 0;
+		//tDesc.TargetColor = _float3(255.f, 255.f, 255.f);
+		//tDesc.TargetColor2 = _float3(255.f, 255.f, 255.f);
+		//
+		//
+		//tDesc.Particle_Power = 1;
+		//tDesc.PowerRandomRange = _float2(0.5f, 1.5f);
+		//
+		//tDesc.vUp = _float3(0, 1, 0);
+		//
+		//tDesc.MaxBoundaryRadius = 3;
+		//
+		//tDesc.m_bIsUI = false;
+		//tDesc.m_bUIDepth = 0;
+		//
+		//tDesc.ParticleStartRandomPosMin = _float3(-1.0f, 0.5f, -1.0f);
+		//tDesc.ParticleStartRandomPosMax = _float3(1.f, 1.f, 1.f);
+		//
+		//tDesc.DepthTestON = true;
+		//tDesc.AlphaBlendON = true;
+		//
+		//tDesc.m_fAlphaTestValue = 0.1f;
+
+		GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, tDesc);
+
+	}
+
+
 	if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
 		Add_Dmg_to_Player(1);
 	if (g_pGameInstance->Get_DIKeyState(DIK_2)&DIS_Down)

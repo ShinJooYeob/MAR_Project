@@ -36,6 +36,13 @@ BlendState	NonBlending
 {
 	BlendEnable[0] = false;
 };
+BlendState	ParticleBlending
+{
+	BlendEnable[0] = true;
+BlendOp = Add;
+SrcBlend = Src_Alpha;
+DestBlend = Inv_Src_Alpha;
+};
 
 /*
 BOOL DepthEnable;

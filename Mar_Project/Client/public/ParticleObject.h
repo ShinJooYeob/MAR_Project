@@ -21,12 +21,15 @@ typedef struct tag_ParticleAttribute
 	_float	_force;
 
 	// 시간 크기 색
-	_float       _lifeTime;								
-	_float       _age;	
+	_double       _lifeTime;								
+	_double       _age;	
 	_bool        _isAlive;			
+	_float3		_color = _float3(1, 1, 1);
+	_float3		_size = _float3(1, 1, 1);
+	_float2		_TextureUV = _float2(1, 1);
+	_uint		_TextureIndex = 0;
 
 	_float3		_NowparantPos;
-	class CParticleObject* SubParticle = nullptr;
 }PARTICLEATT;
 
 
@@ -58,11 +61,12 @@ public:
 
 
 	virtual void ResetParticle(PARTICLEATT* attribute);
-
 	virtual void Reset_Velocity(_float3& fAttVlocity)PURE;
-	virtual void Update_Position_by_Velocity(PARTICLEATT* tParticleAtt, _float fTimeDelta)PURE;
-	virtual void Update_SizeChange(PARTICLEATT* tParticleAtt, _float fTimeDelta);
-	virtual void Update_ColorChange(PARTICLEATT* tParticleAtt, _float fTimeDelta);
+
+	virtual void Update_SizeChange(PARTICLEATT* tParticleAtt, _double fTimeDelta);
+	virtual void Update_TextureChange(PARTICLEATT* tParticleAtt, _double fTimeDelta);
+	virtual void Update_ColorChange(PARTICLEATT* tParticleAtt, _double fTimeDelta);
+	virtual void Update_Position_by_Velocity(PARTICLEATT* tParticleAtt, _double fTimeDelta)PURE;
 
 
 	virtual _float Get_RenderSortValue() override { return m_ParticleDesc.m_bUIDepth; }
@@ -74,18 +78,20 @@ public:
 
 protected:
 	HRESULT SetUp_Components();
+	HRESULT SetUp_Texture();
 	HRESULT SetUp_ParticleDesc(void* pArg);
 	// 랜더스테이트 재정의 할 수 있게 
 	virtual HRESULT SetUp_ConstTable();
 	virtual HRESULT SetUp_OnShader();
 
+
 protected:
 	CTransform*				m_pParentTransformCom = nullptr;
 	CTransform*				m_pParticleTransformCom = nullptr;
 
-	CRenderer*				m_ComRendererCom = nullptr;
-	CTexture*				m_ComTextureCom = nullptr;
-	CVIBuffer_Rect*			m_ComVIBufferCom = nullptr;
+	CRenderer*				m_pRendererCom = nullptr;
+	CTexture*				m_pTextureCom = nullptr;
+	CVIBuffer_Rect*			m_pVIBufferCom = nullptr;
 	CShader*				m_pShaderCom = nullptr;
 
 
@@ -109,3 +115,41 @@ public:
 
 
 END
+
+
+
+#pragma region BallParticle
+
+BEGIN(Client)
+
+///////////구 형태 파티클///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class CParticleeObj_Ball final : public CParticleObject
+{
+private:
+	explicit CParticleeObj_Ball(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
+	explicit CParticleeObj_Ball(const CParticleeObj_Ball& rhs);
+	virtual ~CParticleeObj_Ball() = default;
+
+private:
+
+	virtual void Reset_Velocity(_float3& fAttVlocity)override;
+	virtual void Update_Position_by_Velocity(PARTICLEATT* tParticleAtt, _double fTimeDelta)override;
+
+
+	virtual HRESULT Initialize_Child_Clone() override;
+	//	virtual void ResetParticle(PARTICLEATT* attribute);
+
+	virtual _int Update(_double fTimeDelta)override;
+	virtual _int LateUpdate(_double fTimeDelta)override;
+	// 랜더는 부모 것 사용
+
+
+public:
+
+	static CParticleeObj_Ball* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, void* pArg = nullptr);
+	virtual CGameObject * Clone(void * pArg) override;
+};
+END
+
+#pragma endregion

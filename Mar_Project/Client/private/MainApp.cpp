@@ -7,6 +7,7 @@
 #include "UIImage.h"
 #include "SkyBox.h"
 #include "Model.h"
+#include "ParticleObject.h"
 
 
 #ifdef USE_IMGUI
@@ -278,6 +279,9 @@ HRESULT CMainApp::Ready_Static_Component_Prototype()
 	FAILED_CHECK(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Texture_DefaultUI),
 		CTexture::Create(m_pDevice, m_pDeviceContext, L"UI_Default.txt" )));
 
+	FAILED_CHECK(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Texture_PlayerEffect),
+		CTexture::Create(m_pDevice, m_pDeviceContext, L"PlayerEffect.txt")));
+
 	FAILED_CHECK(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Texture_LoadingScene),
 		CTexture::Create(m_pDevice, m_pDeviceContext, L"UI_Loading.txt")));
 
@@ -320,6 +324,15 @@ HRESULT CMainApp::Ready_Static_GameObject_Prototype()
 	FAILED_CHECK(m_pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_SkyBox), CSkyBox::Create(m_pDevice, m_pDeviceContext)));
 
 	FAILED_CHECK(m_pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_UILoading), CLoadingUI::Create(m_pDevice, m_pDeviceContext)));
+
+
+	FAILED_CHECK(m_pGameInstance->Add_GameObject_Prototype(TEXT("ProtoType_GameObject_Object_particle_Ball"), CParticleeObj_Ball::Create(m_pDevice, m_pDeviceContext)));
+	//FAILED_CHECK(m_pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_UILoading), CLoadingUI::Create(m_pDevice, m_pDeviceContext)));
+	//FAILED_CHECK(m_pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_UILoading), CLoadingUI::Create(m_pDevice, m_pDeviceContext)));
+	//FAILED_CHECK(m_pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_UILoading), CLoadingUI::Create(m_pDevice, m_pDeviceContext)));
+
+
+
 
 	//FAILED_CHECK(m_pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_Terrain), CSkyBox::Create(m_pDevice, m_pDeviceContext)));
 

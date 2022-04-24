@@ -27,19 +27,21 @@ typedef struct tagParticleDesc
 
 	const _tchar* szTextureProtoTypeTag = nullptr;
 	const _tchar* szTextureLayerTag = nullptr;
+	_uint		iSimilarLayerNum = 1;
 
-	_float2  vTextureUVSize = _float2(1,1);
+
+	_uint	 TextureChageFrequency = 0;
 	_float2	 vTextureXYNum = _float2(1, 1);
 
 	_float	TotalParticleTime = 0;
 	_float	EachParticleLifeTime = 0;
 	_uint	MaxParticleCount = 0;
 
-	_float	SizeChageFrequency = 0;
+	_uint	SizeChageFrequency = 0;
 	_float3 ParticleSize = _float3(1, 1, 1);
 	_float3 ParticleSize2 = _float3(0, 0, 0);
 
-	_float	ColorChageFrequency = 0;
+	_uint  ColorChageFrequency = 0;
 	_float3 TargetColor = _float3(255.f, 255.f, 255.f);
 	_float3 TargetColor2 = _float3(255.f, 255.f, 255.f);
 
@@ -96,23 +98,7 @@ typedef struct tagEditSceneUI {
 
 
 // 전역화함
-static float GetRandomFloat(float lowBound, float highBound)
-{
-	if (lowBound >= highBound) // bad input
-		return lowBound;
-	float f = (rand() % 10000) * 0.0001f;
-	return (f * (highBound - lowBound)) + lowBound;
-}
 
-static void GetRandomVector(
-	_float3* out,
-	_float3* min,
-	_float3* max)
-{
-	out->x = GetRandomFloat(min->x, max->x);
-	out->y = GetRandomFloat(min->y, max->y);
-	out->z = GetRandomFloat(min->z, max->z);
-}
 static bool GetRandomBool()
 {
 	int random = (rand() % 10000) + 1;
