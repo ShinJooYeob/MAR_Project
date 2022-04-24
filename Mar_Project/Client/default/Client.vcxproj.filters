@@ -369,8 +369,8 @@
     <ClInclude Include="..\public\BreakablePiece.h">
       <Filter>01.GameObject\07.MapObject\01.DynamicObj\05.BreakableObj</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\PlayerParticle.h">
-      <Filter>01.GameObject\00.Player</Filter>
+    <ClInclude Include="..\public\ParticleObject.h">
+      <Filter>01.GameObject\98.Particle</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -524,8 +524,8 @@
     <ClCompile Include="..\private\BreakablePiece.cpp">
       <Filter>01.GameObject\07.MapObject\01.DynamicObj\05.BreakableObj</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\PlayerParticle.cpp">
-      <Filter>01.GameObject\00.Player</Filter>
+    <ClCompile Include="..\private\ParticleObject.cpp">
+      <Filter>01.GameObject\98.Particle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

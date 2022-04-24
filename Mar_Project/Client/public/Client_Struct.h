@@ -7,49 +7,51 @@ BEGIN(Client)
 
 enum ParticleID
 {
-	Particle_Straight,
-	Particle_Ball,
-	Particle_Cone,
-	Particle_Fountain,
-	Particle_Spread,
 	Particle_Fixed,
+	Particle_Ball,
 	Particle_Suck,
+	Particle_Straight,
+	//Particle_Cone,
+	//Particle_Fountain,
+	//Particle_Spread,
 
 	Particle_End
 };
 
 typedef struct tagParticleDesc
 {
-	ParticleID eParticleTypeID;
+	ParticleID eParticleTypeID = Particle_Fixed;
 
 	CTransform* FollowingTarget = nullptr;
-	_float3 FixedTarget = _float3(9999.f, 9999.f, 9999.f);
+	_float3 FixedTarget = _float3(0, 0, 0);
 
 	const _tchar* szTextureProtoTypeTag = nullptr;
 	const _tchar* szTextureLayerTag = nullptr;
-	_bool  m_bIsTextureAutoFrame = false;
-	_float	fAutoFrameMul = 1.f;
 
-	_float3 ParticleSize;
+	_float2  vTextureUVSize = _float2(1,1);
+	_float2	 vTextureXYNum = _float2(1, 1);
 
-	_float	TotalParticleTime;
-	_float	EachParticleLifeTime;
-	_uint	MaxParticleCount;
+	_float	TotalParticleTime = 0;
+	_float	EachParticleLifeTime = 0;
+	_uint	MaxParticleCount = 0;
 
-
-	_float Particle_Power;
-	_float2 PowerRandomRange = _float2(0.5f, 1.5f);
-
-	_float3 vUp = _float3(0, 1, 0);
-
-	_float MaxBoundaryRadius = 10;
+	_float	SizeChageFrequency = 0;
+	_float3 ParticleSize = _float3(1, 1, 1);
+	_float3 ParticleSize2 = _float3(0, 0, 0);
 
 	_float	ColorChageFrequency = 0;
 	_float3 TargetColor = _float3(255.f, 255.f, 255.f);
 	_float3 TargetColor2 = _float3(255.f, 255.f, 255.f);
 
 
-	_bool  m_bIsUI = false;
+	_float Particle_Power = 0;
+	_float2 PowerRandomRange = _float2(0.5f, 1.5f);
+
+	_float3 vUp = _float3(0, 1, 0);
+
+	_float MaxBoundaryRadius = 10;
+
+	_bool   m_bIsUI = false;
 	_float  m_bUIDepth = 0;
 
 	_float3 ParticleStartRandomPosMin = _float3(-5.0f, -5.0f, -5.0f);
@@ -58,20 +60,12 @@ typedef struct tagParticleDesc
 	_bool	DepthTestON = true;
 	_bool	AlphaBlendON = true;
 
-	_float		m_fAlphaTestValue = 0.1f;
+	_float	m_fAlphaTestValue = 0.1f;
 
 }PARTICLEDESC;
 
 
-typedef struct tagLoginDesc
-{
-	wstring szID = L"";
-	wstring szPassword =L"";
 
-	_int iArrStageBestClear[SCENE_END] = {};
-	_int iGold = 0;
-
-}LOGINDESC;
 
 typedef struct tagUIDesc
 {
