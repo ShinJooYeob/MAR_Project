@@ -25,12 +25,14 @@ HRESULT CNormalBullet::Initialize_Clone(void * pArg)
 {
 	FAILED_CHECK(__super::Initialize_Clone(pArg));
 
+	FAILED_CHECK(Add_Component(m_eNowSceneNum, TAG_CP(Prototype_Mesh_TeaBullet), TAG_COM(Com_Model), (CComponent**)&m_pModel));
+
+
 
 	CUtilityMgr* pUtilMgr = GetSingle(CUtilityMgr);
-	m_fTotalLifeTime = pUtilMgr->RandomFloat(2.f, 3.f);
+	m_fTotalLifeTime = pUtilMgr->RandomFloat(1.f, 1.5f);
 	m_vTargetDir = m_vTargetDir.XMVector() + pUtilMgr->RandomFloat3(-0.1f, 0.1f).XMVector();
 
-	m_pTransformCom->Scaled_All(_float3(0.3f, 0.3f, 0.3f));
 
 
 	return S_OK;
@@ -42,9 +44,12 @@ _int CNormalBullet::Update(_double fDeltaTime)
 		return -1;
 	if (m_bIsDead) return 0;
 	
+
 	//_float EasedValue = g_pGameInstance->Easing(TYPE_Linear, 20, -100, m_fLifeTime, m_fTotalLifeTime);
 	_float EasedValue = g_pGameInstance->Easing(TYPE_QuinticIn, 0, -5, m_fLifeTime, m_fTotalLifeTime);
 
+	_Vector vNewLook = (m_vTargetDir.XMVector() + XMVectorSet(0, 1, 0, 0) * EasedValue);
+	m_pTransformCom->LookDir(vNewLook);
 	m_pTransformCom->MovetoDir_bySpeed(XMVectorSet(0, 1, 0, 0), EasedValue, fDeltaTime);
 
 	return _int();

@@ -535,6 +535,12 @@ enum COMPONENTPROTOTYPEID
 	Prototype_Mesh_Tornado2,
 	Prototype_Mesh_Tornado3,
 	Prototype_Mesh_Tornado4,
+
+	Prototype_Mesh_TeaBullet,
+	Prototype_Mesh_OilBullet,
+
+		Prototype_Mesh_SkyBox,
+
 	//////////////////////////////////////////////////////////////////////////
 	Prototype_Texture_Player,
 	Prototype_Texture_SkyBox,
@@ -891,6 +897,16 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 		return TEXT("Prototype_Mesh_Tornado4");
 		break;
 
+	case Prototype_Mesh_TeaBullet:
+		return TEXT("Prototype_Mesh_TeaBullet");
+		break;
+	case Prototype_Mesh_OilBullet:
+		return TEXT("Prototype_Mesh_OilBullet");
+		break;
+	case Prototype_Mesh_SkyBox:
+		return TEXT("Prototype_Mesh_SkyBox");
+		break;
+		
 		/////////////////≈ÿΩ∫√≥////////////////////////////////////////////////////////
 
 

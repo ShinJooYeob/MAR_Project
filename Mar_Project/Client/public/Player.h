@@ -15,7 +15,7 @@ public:
 	enum eWeaponState
 	{
 		Weapon_None = 0, Weapon_Knife = 47, Weapon_Grinder = 73, Weapon_Horse = 89, Weapon_Teapot = 113, Weapon_Umbrella = 134, Weapon_End
-		//Weapon_None = 0, Weapon_Knife = 1, Weapon_Grinder = 2, Weapon_Horse = 3, Weapon_Teapot = 4, Weapon_Umbrella = 47, Weapon_End
+		//Weapon_None = 0, Weapon_Knife = 1, Weapon_Grinder = 2, Weapon_Horse = 3, Weapon_Teapot = 47, Weapon_Umbrella = 99999999, Weapon_End
 	};
 
 

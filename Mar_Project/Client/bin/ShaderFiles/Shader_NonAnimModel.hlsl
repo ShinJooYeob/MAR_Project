@@ -190,6 +190,15 @@ PS_OUT PS_MAIN_PARTICLEREMOVEALPHA(PS_IN In)
 
 	return Out;
 }
+PS_OUT PS_MAIN_SKYBOX(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	Out.vColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
+
+
+	return Out;
+}
 
 
 
@@ -255,5 +264,17 @@ technique11		DefaultTechnique
 		VertexShader = compile vs_5_0 VS_MAIN_DEFAULT();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN_PARTICLEREMOVEALPHA();
+	}
+
+	pass SkyBox		//6
+	{
+		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(NonZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_ccw);
+		//SetRasterizerState(CullMode_cw);
+
+		VertexShader = compile vs_5_0 VS_MAIN_DEFAULT();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_SKYBOX();
 	}
 }

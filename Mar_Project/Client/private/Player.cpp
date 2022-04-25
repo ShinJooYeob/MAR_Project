@@ -1881,8 +1881,7 @@ HRESULT CPlayer::Attack_Update_Teapot(_double fDeltaTime, CGameInstance * pInsta
 
 					CTransform* pCamTransform = m_pMainCamera->Get_Camera_Transform();
 					_float3 vBulletDir = XMVector3Normalize(XMVector3TransformNormal(XMVectorSet(0, 0, 300, 0), pCamTransform->Get_WorldMatrix()));
-					pInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Bullet), TAG_OP(Prototype_Bullet_Grenade),
-						&vBulletDir);
+					FAILED_CHECK(pInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Bullet), TAG_OP(Prototype_Bullet_Grenade),&vBulletDir));
 
 				}
 
@@ -1896,8 +1895,7 @@ HRESULT CPlayer::Attack_Update_Teapot(_double fDeltaTime, CGameInstance * pInsta
 					_float3 vBulletDir = XMVector3Normalize(XMVector3TransformNormal(XMVectorSet(0, 0, 300, 0), pCamTransform->Get_WorldMatrix()));
 
 
-					pInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Bullet), TAG_OP(Prototype_Bullet_Grenade),
-						&vBulletDir);
+					FAILED_CHECK(pInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Bullet), TAG_OP(Prototype_Bullet_Grenade),&vBulletDir));
 
 
 					Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * -1, 25);
