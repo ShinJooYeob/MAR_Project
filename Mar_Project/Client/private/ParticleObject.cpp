@@ -267,10 +267,10 @@ void CParticleObject::Update_SizeChange(PARTICLEATT * tParticleAtt, _double fTim
 		_double FrequencyAge = tParticleAtt->_age - (TimeInterver * iFrequencyIndex); // =>7.5초 주기에 3.4초를 지나고있으면 3.4 10초를 지나고있으면 2.5
 
 		if (iFrequencyIndex % 2)
-			tParticleAtt->_size = pInstance->Easing_Vector(TYPE_Linear, m_ParticleDesc.ParticleSize, m_ParticleDesc.ParticleSize2, _float(FrequencyAge), _float(TimeInterver));
+			tParticleAtt->_size = pInstance->Easing_Vector(TYPE_Linear, m_ParticleDesc.ParticleSize2, m_ParticleDesc.ParticleSize, _float(FrequencyAge), _float(TimeInterver));
 		
 		else
-			tParticleAtt->_size = pInstance->Easing_Vector(TYPE_Linear, m_ParticleDesc.ParticleSize2, m_ParticleDesc.ParticleSize, _float(FrequencyAge), _float(TimeInterver));
+			tParticleAtt->_size = pInstance->Easing_Vector(TYPE_Linear, m_ParticleDesc.ParticleSize, m_ParticleDesc.ParticleSize2, _float(FrequencyAge), _float(TimeInterver));
 		
 
 		if (tParticleAtt->_size.x < 0) tParticleAtt->_size.x = 0;
@@ -321,13 +321,13 @@ void CParticleObject::Update_ColorChange(PARTICLEATT * tParticleAtt, _double fTi
 
 		if (iFrequencyIndex % 2)
 		{
-			tParticleAtt->_color = pInstance->Easing_Vector(TYPE_Linear, m_ParticleDesc.TargetColor, m_ParticleDesc.TargetColor2, _float(FrequencyAge), _float(TimeInterver));
-			tParticleAtt->_color.w = pInstance->Easing(TYPE_Linear, m_ParticleDesc.TargetColor.w, m_ParticleDesc.TargetColor2.w, _float(FrequencyAge), _float(TimeInterver));
+			tParticleAtt->_color = pInstance->Easing_Vector(TYPE_Linear, m_ParticleDesc.TargetColor2, m_ParticleDesc.TargetColor, _float(FrequencyAge), _float(TimeInterver));
+			tParticleAtt->_color.w = pInstance->Easing(TYPE_Linear, m_ParticleDesc.TargetColor2.w, m_ParticleDesc.TargetColor.w, _float(FrequencyAge), _float(TimeInterver));
 		}
 		else
 		{
-			tParticleAtt->_color = pInstance->Easing_Vector(TYPE_Linear, m_ParticleDesc.TargetColor2, m_ParticleDesc.TargetColor, _float(FrequencyAge), _float(TimeInterver));
-			tParticleAtt->_color.w = pInstance->Easing(TYPE_Linear, m_ParticleDesc.TargetColor2.w, m_ParticleDesc.TargetColor.w, _float(FrequencyAge), _float(TimeInterver));
+			tParticleAtt->_color = pInstance->Easing_Vector(TYPE_Linear, m_ParticleDesc.TargetColor, m_ParticleDesc.TargetColor2, _float(FrequencyAge), _float(TimeInterver));
+			tParticleAtt->_color.w = pInstance->Easing(TYPE_Linear, m_ParticleDesc.TargetColor.w, m_ParticleDesc.TargetColor2.w, _float(FrequencyAge), _float(TimeInterver));
 
 		}
 

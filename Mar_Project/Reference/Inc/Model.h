@@ -31,6 +31,7 @@ public:
 	_uint	Get_IsHavetoBlockAnimChange() { return m_bIsBlockAnim; };
 	_double	Get_PlayRate();
 	_bool	Get_IsUntillPlay() { return m_bIsUntill; };
+	_bool	Get_IsAnimChanging() { return m_bIsChagingAnim; }
 	void	Set_BlockAnim(_bool IsBlock) { m_bIsBlockAnim = IsBlock; };
 	void    Set_NextAnim_Must(_uint iAnim) { m_iNextAnimIndex = iAnim; };
 

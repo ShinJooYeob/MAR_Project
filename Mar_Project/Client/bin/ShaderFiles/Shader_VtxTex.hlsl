@@ -138,7 +138,8 @@ PS_OUT PS_MAIN_PARTICLEREMOVEALPHA(PS_IN In)
 	if (Alpha < g_fAlphaTestValue)
 		discard;
 
-	Out.vColor += (Out.vColor*0.3 + g_vColor*0.7) ;
+	//Out.vColor += (Out.vColor*g_vColor*0.2 + g_vColor*0.8) ;
+	Out.vColor *= g_vColor;
 	Out.vColor.a = Alpha * 0.5f;
 	return Out;
 }
