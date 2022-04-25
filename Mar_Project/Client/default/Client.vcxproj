@@ -191,6 +191,7 @@
     <ClInclude Include="..\public\RendererEditSceneUI.h" />
     <ClInclude Include="..\public\Scene_Stage1.h" />
     <ClInclude Include="..\public\BreakablePiece.h" />
+    <ClInclude Include="..\public\TornadoSwirl.h" />
     <ClInclude Include="..\public\WaspArrow.h" />
     <ClInclude Include="..\public\WaspInk.h" />
     <ClInclude Include="..\public\Eyepot.h" />
@@ -239,6 +240,7 @@
     <ClCompile Include="..\private\RendererEditSceneUI.cpp" />
     <ClCompile Include="..\private\Scene_Stage1.cpp" />
     <ClCompile Include="..\private\BreakablePiece.cpp" />
+    <ClCompile Include="..\private\TornadoSwirl.cpp" />
     <ClCompile Include="..\private\WaspArrow.cpp" />
     <ClCompile Include="..\private\WaspInk.cpp" />
     <ClCompile Include="..\private\Eyepot.cpp" />

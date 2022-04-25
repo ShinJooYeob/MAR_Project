@@ -5,6 +5,7 @@
 #include "WireTerrain.h"
 #include "UIImage.h"
 #include "RendererEditSceneUI.h"
+#include "ParticleObject.h"
 
 CScene_Edit::CScene_Edit(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
 	:CScene(pDevice, pDeviceContext)
@@ -23,7 +24,7 @@ HRESULT CScene_Edit::Initialize()
 	FAILED_CHECK(Ready_Layer_Player(TAG_LAY(Layer_Player)));
 	FAILED_CHECK(Ready_Layer_MainCamera(TAG_LAY(Layer_Camera_Main)));
 	FAILED_CHECK(Ready_Layer_RendererEditUI(TAG_LAY(Layer_UI_IMG)));
-	
+	FAILED_CHECK(Ready_ParticleDesc());
 	
 
 
@@ -2473,6 +2474,209 @@ HRESULT CScene_Edit::LoadTextureByAssimp(const _tchar * FileFullPath)
 
 HRESULT CScene_Edit::Update_ParticleTab(_double fDeltatime)
 {
+
+	FAILED_CHECK(Widget_SettingParticleDesc(fDeltatime));
+	return S_OK;
+}
+
+HRESULT CScene_Edit::Widget_SettingParticleDesc(_double fDeltatime)
+{
+	//m_tParticleDesc.eParticleTypeID = Particle_Ball;
+	//
+	//m_tParticleDesc.FollowingTarget = nullptr;
+	//
+	//tDesc.szTextureProtoTypeTag = TAG_CP(Prototype_Texture_PlayerEffect);
+
+	_float TempFloatArr[4];
+	_int TempIntArr[4];
+	ZeroMemory(TempIntArr, sizeof(_int) * 4);
+	ZeroMemory(TempFloatArr, sizeof(_float) * 4);
+
+	TempFloatArr[0] = m_tParticleDesc.FixedTarget.x;
+	TempFloatArr[1] = m_tParticleDesc.FixedTarget.y;
+	TempFloatArr[2] = m_tParticleDesc.FixedTarget.z;
+	ImGui::InputFloat3("SwpanPosition", TempFloatArr);
+	m_tParticleDesc.FixedTarget.x = TempFloatArr[0];
+	m_tParticleDesc.FixedTarget.y = TempFloatArr[1];
+	m_tParticleDesc.FixedTarget.z = TempFloatArr[2];
+
+
+	static ImGuiTextFilter filter = "Prototype_Texture_PlayerEffect";
+	filter.Draw("Input TextureProtoTypeTag");
+
+	string Temp = string(filter.InputBuf);
+	wstring wtemp;
+	wtemp.assign(Temp.begin(), Temp.end());
+	m_tParticleDesc.szTextureProtoTypeTag = wtemp.c_str();
+
+	static ImGuiTextFilter filter2 = "ButterFly";
+	filter2.Draw("Input TextureLayer");
+
+	string Temp2 = string(filter2.InputBuf);
+	wstring wtemp2;
+	wtemp2.assign(Temp2.begin(), Temp2.end());
+	m_tParticleDesc.szTextureLayerTag = wtemp2.c_str();
+
+
+
+	ZeroMemory(TempIntArr, sizeof(_int) * 4);
+	TempIntArr[0] = _int(m_tParticleDesc.iSimilarLayerNum);
+	ImGui::InputInt("iSimilarLayerNum", &TempIntArr[0]);
+	m_tParticleDesc.iSimilarLayerNum = TempIntArr[0];
+
+	TempIntArr[1] = (_int)m_tParticleDesc.TextureChageFrequency;
+	ImGui::InputInt("TextureChageFrequency", &TempIntArr[1]);
+	m_tParticleDesc.TextureChageFrequency = TempIntArr[1];
+
+
+	ZeroMemory(TempFloatArr, sizeof(_float) * 4);
+	TempFloatArr[0] = m_tParticleDesc.vTextureXYNum.x;
+	TempFloatArr[1] = m_tParticleDesc.vTextureXYNum.y;
+	ImGui::InputFloat2("TextureXYSizeNum", TempFloatArr);
+	m_tParticleDesc.vTextureXYNum.x = TempFloatArr[0];
+	m_tParticleDesc.vTextureXYNum.y = TempFloatArr[1];
+
+	TempFloatArr[2] = m_tParticleDesc.TotalParticleTime;
+	ImGui::DragFloat("Total PaticleLifeTime", &TempFloatArr[2]);
+	m_tParticleDesc.TotalParticleTime = TempFloatArr[2];
+
+
+	TempFloatArr[3] = m_tParticleDesc.EachParticleLifeTime;
+	ImGui::DragFloat("Each PaticleLifeTime", &TempFloatArr[3]);
+	m_tParticleDesc.EachParticleLifeTime = TempFloatArr[3];
+
+	TempIntArr[2] = (_int)m_tParticleDesc.MaxParticleCount;
+	ImGui::InputInt("MaxParticleCount", &TempIntArr[2]);
+	m_tParticleDesc.MaxParticleCount = TempIntArr[2];
+
+
+
+
+
+	TempIntArr[3] = (_int)m_tParticleDesc.SizeChageFrequency;
+	ImGui::InputInt("SizeChageFrequency", &TempIntArr[3]);
+	m_tParticleDesc.SizeChageFrequency = TempIntArr[3];
+
+
+	ZeroMemory(TempFloatArr, sizeof(_float) * 4);
+	TempFloatArr[0] = m_tParticleDesc.ParticleSize.x;
+	TempFloatArr[1] = m_tParticleDesc.ParticleSize.y;
+	TempFloatArr[2] = m_tParticleDesc.ParticleSize.z;
+	ImGui::InputFloat3("ParticleSize1", TempFloatArr);
+	m_tParticleDesc.ParticleSize.x = TempFloatArr[0];
+	m_tParticleDesc.ParticleSize.y = TempFloatArr[1];
+	m_tParticleDesc.ParticleSize.z = TempFloatArr[2];
+
+	ZeroMemory(TempFloatArr, sizeof(_float) * 4);
+	TempFloatArr[0] = m_tParticleDesc.ParticleSize2.x;
+	TempFloatArr[1] = m_tParticleDesc.ParticleSize2.y;
+	TempFloatArr[2] = m_tParticleDesc.ParticleSize2.z;
+	ImGui::InputFloat3("ParticleSize2", TempFloatArr);
+	m_tParticleDesc.ParticleSize2.x = TempFloatArr[0];
+	m_tParticleDesc.ParticleSize2.y = TempFloatArr[1];
+	m_tParticleDesc.ParticleSize2.z = TempFloatArr[2];
+
+
+	ZeroMemory(TempIntArr, sizeof(_int) * 4);
+	TempIntArr[0] = _int(m_tParticleDesc.ColorChageFrequency);
+	ImGui::InputInt("ColorChageFrequency", &TempIntArr[0]);
+	m_tParticleDesc.ColorChageFrequency = TempIntArr[0];
+
+	ZeroMemory(TempFloatArr, sizeof(_float) * 4);
+	TempFloatArr[0] = m_tParticleDesc.TargetColor.x;
+	TempFloatArr[1] = m_tParticleDesc.TargetColor.y;
+	TempFloatArr[2] = m_tParticleDesc.TargetColor.z;
+	TempFloatArr[3] = m_tParticleDesc.TargetColor.w;
+	ImGui::InputFloat4("TargetColor1", TempFloatArr);
+	m_tParticleDesc.TargetColor.x = TempFloatArr[0];
+	m_tParticleDesc.TargetColor.y = TempFloatArr[1];
+	m_tParticleDesc.TargetColor.z = TempFloatArr[2];
+	m_tParticleDesc.TargetColor.w = TempFloatArr[3];
+
+	ZeroMemory(TempFloatArr, sizeof(_float) * 4);
+	TempFloatArr[0] = m_tParticleDesc.TargetColor2.x;
+	TempFloatArr[1] = m_tParticleDesc.TargetColor2.y;
+	TempFloatArr[2] = m_tParticleDesc.TargetColor2.z;
+	TempFloatArr[3] = m_tParticleDesc.TargetColor2.w;
+	ImGui::InputFloat4("TargetColor2", TempFloatArr);
+	m_tParticleDesc.TargetColor2.x = TempFloatArr[0];
+	m_tParticleDesc.TargetColor2.y = TempFloatArr[1];
+	m_tParticleDesc.TargetColor2.z = TempFloatArr[2];
+	m_tParticleDesc.TargetColor2.w = TempFloatArr[3];
+
+	ZeroMemory(TempFloatArr, sizeof(_float) * 4);
+	TempFloatArr[3] = m_tParticleDesc.Particle_Power;
+	ImGui::DragFloat("Particle_Power", &TempFloatArr[3]);
+	m_tParticleDesc.Particle_Power = TempFloatArr[3];
+
+
+	TempFloatArr[0] = m_tParticleDesc.PowerRandomRange.x;
+	TempFloatArr[1] = m_tParticleDesc.PowerRandomRange.y;
+	ImGui::InputFloat2("PowerRandomRange", TempFloatArr);
+	m_tParticleDesc.PowerRandomRange.x = TempFloatArr[0];
+	m_tParticleDesc.PowerRandomRange.y = TempFloatArr[1];
+
+
+	ZeroMemory(TempFloatArr, sizeof(_float) * 4);
+	TempFloatArr[0] = m_tParticleDesc.vUp.x;
+	TempFloatArr[1] = m_tParticleDesc.vUp.y;
+	TempFloatArr[2] = m_tParticleDesc.vUp.z;
+	ImGui::InputFloat3("Force Direct", TempFloatArr);
+	m_tParticleDesc.vUp.x = TempFloatArr[0];
+	m_tParticleDesc.vUp.y = TempFloatArr[1];
+	m_tParticleDesc.vUp.z = TempFloatArr[2];
+
+
+	TempFloatArr[3] = m_tParticleDesc.MaxBoundaryRadius;
+	ImGui::DragFloat("MaxBoundaryRadius", &TempFloatArr[3]);
+	m_tParticleDesc.MaxBoundaryRadius = TempFloatArr[3];
+
+
+	ZeroMemory(TempFloatArr, sizeof(_float) * 4);
+	TempFloatArr[0] = m_tParticleDesc.ParticleStartRandomPosMin.x;
+	TempFloatArr[1] = m_tParticleDesc.ParticleStartRandomPosMin.y;
+	TempFloatArr[2] = m_tParticleDesc.ParticleStartRandomPosMin.z;
+	ImGui::InputFloat3("StartRandomPos  Min", TempFloatArr);
+	m_tParticleDesc.ParticleStartRandomPosMin.x = TempFloatArr[0];
+	m_tParticleDesc.ParticleStartRandomPosMin.y = TempFloatArr[1];
+	m_tParticleDesc.ParticleStartRandomPosMin.z = TempFloatArr[2];
+
+
+	ZeroMemory(TempFloatArr, sizeof(_float) * 4);
+	TempFloatArr[0] = m_tParticleDesc.ParticleStartRandomPosMax.x;
+	TempFloatArr[1] = m_tParticleDesc.ParticleStartRandomPosMax.y;
+	TempFloatArr[2] = m_tParticleDesc.ParticleStartRandomPosMax.z;
+	ImGui::InputFloat3("StartRandomPos  Max", TempFloatArr);
+	m_tParticleDesc.ParticleStartRandomPosMax.x = TempFloatArr[0];
+	m_tParticleDesc.ParticleStartRandomPosMax.y = TempFloatArr[1];
+	m_tParticleDesc.ParticleStartRandomPosMax.z = TempFloatArr[2];
+
+	ImGui::Checkbox("DepthTestOn", &m_tParticleDesc.DepthTestON);
+	ImGui::Checkbox("AlphaBlendON", &m_tParticleDesc.AlphaBlendON);
+
+	TempFloatArr[3] = m_tParticleDesc.m_fAlphaTestValue;
+	ImGui::DragFloat("AlphaTestValue", &TempFloatArr[3]);
+	m_tParticleDesc.m_fAlphaTestValue = TempFloatArr[3];
+
+	ZeroMemory(TempIntArr, sizeof(_int) * 4);
+	TempIntArr[0] = _int(m_tParticleDesc.m_iPassIndex);
+	ImGui::InputInt("PassIndex", &TempIntArr[0]);
+	m_tParticleDesc.m_iPassIndex = TempIntArr[0];
+
+	ImGui::Checkbox("IsUI Particle", &m_tParticleDesc.m_bIsUI);
+
+	TempFloatArr[3] = m_tParticleDesc.m_bUIDepth;
+	ImGui::DragFloat("UIDepth", &TempFloatArr[3]);
+	m_tParticleDesc.m_bUIDepth = TempFloatArr[3];
+
+
+
+	if (ImGui::Button("Play Partlcle", ImVec2(-FLT_MIN, 30)))
+	{
+		GetSingle(CUtilityMgr)->Create_ParticleObject(SCENE_EDIT, m_tParticleDesc);
+	}
+
+
 	return S_OK;
 }
 
@@ -3314,6 +3518,53 @@ HRESULT CScene_Edit::Ready_Layer_Player(const _tchar * pLayerTag)
 		PlayerList->clear();
 	}
 
+	return S_OK;
+}
+
+HRESULT CScene_Edit::Ready_ParticleDesc()
+{
+	m_tParticleDesc.eParticleTypeID = Particle_Ball;
+
+	m_tParticleDesc.FollowingTarget = nullptr;
+
+	m_tParticleDesc.szTextureProtoTypeTag = TAG_CP(Prototype_Texture_PlayerEffect);
+	m_tParticleDesc.szTextureLayerTag = L"ButterFly";
+	m_tParticleDesc.iSimilarLayerNum = 12;
+
+	m_tParticleDesc.TextureChageFrequency = 1;
+	m_tParticleDesc.vTextureXYNum = _float2(8, 2);
+
+	m_tParticleDesc.TotalParticleTime = 2;
+	m_tParticleDesc.EachParticleLifeTime = 0.34f;
+	m_tParticleDesc.MaxParticleCount = 15;
+
+	m_tParticleDesc.SizeChageFrequency = 0;
+	m_tParticleDesc.ParticleSize = _float3(0.5, 0.5, 0.5);
+	m_tParticleDesc.ParticleSize2 = _float3(0.5, 0.5, 0.5);
+
+	m_tParticleDesc.ColorChageFrequency = 0;
+	m_tParticleDesc.TargetColor = _float4(1.f, 1.f, 1.f, 1.f);
+	m_tParticleDesc.TargetColor2 = _float4(1.f, 1.f, 1.f, 1.f);
+
+
+	m_tParticleDesc.Particle_Power = 1;
+	m_tParticleDesc.PowerRandomRange = _float2(0.5f, 1.5f);
+
+	m_tParticleDesc.vUp = _float3(0, 1, 0);
+
+	m_tParticleDesc.MaxBoundaryRadius = 5;
+
+	m_tParticleDesc.m_bIsUI = false;
+	m_tParticleDesc.m_bUIDepth = 0;
+
+	m_tParticleDesc.ParticleStartRandomPosMin = _float3(-1.0f, 0.0f, -1.0f);
+	m_tParticleDesc.ParticleStartRandomPosMax = _float3(1.f, 1.5f, 1.f);
+
+	m_tParticleDesc.DepthTestON = true;
+	m_tParticleDesc.AlphaBlendON = false;
+
+	m_tParticleDesc.m_fAlphaTestValue = 0.1f;
+	m_tParticleDesc.m_iPassIndex = 3;
 	return S_OK;
 }
 

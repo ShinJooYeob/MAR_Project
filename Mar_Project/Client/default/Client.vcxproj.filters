@@ -193,6 +193,9 @@
     <Filter Include="01.GameObject\99.UI\UsedUI\GamePlayUI">
       <UniqueIdentifier>{dd5bb2f8-fc13-4571-9bb8-3255bccc9ae4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.GameObject\00.Player\EffectMesh">
+      <UniqueIdentifier>{7cac079b-276d-468f-bf1a-06f2f901bfdb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -372,6 +375,9 @@
     <ClInclude Include="..\public\ParticleObject.h">
       <Filter>01.GameObject\98.Particle</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\TornadoSwirl.h">
+      <Filter>01.GameObject\00.Player\EffectMesh</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -526,6 +532,9 @@
     </ClCompile>
     <ClCompile Include="..\private\ParticleObject.cpp">
       <Filter>01.GameObject\98.Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\TornadoSwirl.cpp">
+      <Filter>01.GameObject\00.Player\EffectMesh</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -24,11 +24,12 @@ typedef struct tag_ParticleAttribute
 	_double       _lifeTime;								
 	_double       _age;	
 	_bool        _isAlive;			
-	_float3		_color = _float3(1, 1, 1);
+	_float4		_color = _float4(1.f, 1.f, 1.f, 1.f);
 	_float3		_size = _float3(1, 1, 1);
 	_float2		_TextureUV = _float2(1, 1);
 	_uint		_TextureIndex = 0;
 
+	_float		_CamDist = 0;
 	_float3		_NowparantPos;
 }PARTICLEATT;
 
@@ -101,7 +102,7 @@ protected:
 	_float3					m_vLook = _float3(0, 0, 1);
 	_float3					m_vUp = _float3(0, 1, 0);
 
-
+	_float3					m_vPivot = _float3(0, 0, 0);
 
 	list<PARTICLEATT>		m_ParticleList;
 

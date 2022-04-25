@@ -46,11 +46,11 @@ _int CParticleObject::Update(_double fTimeDelta)
 
 
 
-	_float3 vParentPos;
-	if (m_ParticleDesc.FollowingTarget == nullptr)
-		vParentPos = m_ParticleDesc.FixedTarget;
-	else
-		vParentPos = m_ParticleDesc.FollowingTarget->Get_MatrixState_Float3(CTransform::STATE_POS);
+	//_float3 vParentPos;
+	//if (m_ParticleDesc.FollowingTarget == nullptr)
+	//	vParentPos = m_ParticleDesc.FixedTarget;
+	//else
+	//	vParentPos = m_ParticleDesc.FollowingTarget->Get_MatrixState_Float3(CTransform::STATE_POS);
 
 
 	std::list<PARTICLEATT>::iterator iter;
@@ -66,8 +66,13 @@ _int CParticleObject::Update(_double fTimeDelta)
 
 			Update_Position_by_Velocity(&(*iter), fTimeDelta);
 
-			if ((iter->_position).Get_Distance(iter->_NowparantPos.XMVector()) > m_ParticleDesc.MaxBoundaryRadius || (iter->_age > iter->_lifeTime))
+
+			if ((iter->_position).Get_Distance(iter->_NowparantPos.XMVector() + m_vPivot.XMVector()) > m_ParticleDesc.MaxBoundaryRadius 
+				|| (iter->_age > iter->_lifeTime))
 				ResetParticle(&(*iter));
+
+			if (m_ParticleDesc.AlphaBlendON)
+				iter->_CamDist = iter->_position.Get_Distance(g_pGameInstance->Get_TargetPostion_Vector(PLV_CAMERA));
 
 			if (m_ParticleDesc.ColorChageFrequency)
 				Update_ColorChange(&(*iter), fTimeDelta);
@@ -89,6 +94,9 @@ _int CParticleObject::Update(_double fTimeDelta)
 			Update_Position_by_Velocity(&(*iter), fTimeDelta);
 
 
+			if (m_ParticleDesc.AlphaBlendON)
+				iter->_CamDist = iter->_position.Get_Distance(g_pGameInstance->Get_TargetPostion_Vector(PLV_CAMERA));
+
 			if (m_ParticleDesc.ColorChageFrequency)
 				Update_ColorChange(&(*iter), fTimeDelta);
 
@@ -97,7 +105,8 @@ _int CParticleObject::Update(_double fTimeDelta)
 
 			Update_TextureChange(&(*iter), fTimeDelta);
 
-			if ((iter->_position).Get_Distance(iter->_NowparantPos.XMVector()) > m_ParticleDesc.MaxBoundaryRadius || (iter->_age > iter->_lifeTime))
+			if ((iter->_position).Get_Distance(iter->_NowparantPos.XMVector() + m_vPivot.XMVector()) > m_ParticleDesc.MaxBoundaryRadius 
+				|| (iter->_age > iter->_lifeTime))
 				iter = m_ParticleList.erase(iter);
 			else
 				iter++;
@@ -143,12 +152,26 @@ _int CParticleObject::Render()
 
 	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vUVSize", &UVSize, sizeof(_float2)));
 
+	if(m_ParticleDesc.m_fAlphaTestValue != 0.1f)
+		FAILED_CHECK(m_pShaderCom->Set_RawValue("g_fAlphaTestValue", &m_ParticleDesc.m_fAlphaTestValue, sizeof(_float)));
+
 	
 
 	_Matrix vViewMat = pInstance->Get_Transform_Matrix(PLM_VIEW);
 
 	if (!m_ParticleList.empty())
 	{
+		if (m_ParticleDesc.AlphaBlendON)
+		{
+			m_ParticleList.sort([](PARTICLEATT tSrc, PARTICLEATT tDest) ->_bool
+			{
+				return tSrc._CamDist > tDest._CamDist;
+			});
+		}
+
+
+
+
 		for (auto iter : m_ParticleList)
 		{
 			if (iter._isAlive)
@@ -173,9 +196,10 @@ _int CParticleObject::Render()
 				}
 
 				FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vUVPos", &iter._TextureUV, sizeof(_float2)));
+				FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vColor", &iter._color, sizeof(_float4)));
 				FAILED_CHECK(m_pTextureCom->Bind_OnShader(m_pShaderCom, "g_DiffuseTexture", iter._TextureIndex));
 				FAILED_CHECK(m_pParticleTransformCom->Bind_OnShader_BillBoard(m_pShaderCom,"g_WorldMatrix", vViewMat));
-				FAILED_CHECK(m_pVIBufferCom->Render(m_pShaderCom,3));
+				FAILED_CHECK(m_pVIBufferCom->Render(m_pShaderCom, m_ParticleDesc.m_iPassIndex));
 			}
 
 		}
@@ -203,9 +227,9 @@ void CParticleObject::ResetParticle(PARTICLEATT * attribute)
 	RandomPos = pUtil->RandomFloat3(m_ParticleDesc.ParticleStartRandomPosMin, m_ParticleDesc.ParticleStartRandomPosMax);
 
 	if (m_ParticleDesc.FollowingTarget == nullptr)
-		RandomPos = RandomPos.XMVector() + m_ParticleDesc.FixedTarget.XMVector();
+		RandomPos = RandomPos.XMVector()+ m_vPivot.XMVector() + m_ParticleDesc.FixedTarget.XMVector();
 	else
-		RandomPos = RandomPos.XMVector() + m_ParticleDesc.FollowingTarget->Get_MatrixState(CTransform::STATE_POS);
+		RandomPos = RandomPos.XMVector() + m_vPivot.XMVector() + m_ParticleDesc.FollowingTarget->Get_MatrixState(CTransform::STATE_POS);
 
 	if (m_ParticleDesc.m_bIsUI)RandomPos.z = 0;
 
@@ -223,9 +247,9 @@ void CParticleObject::ResetParticle(PARTICLEATT * attribute)
 	attribute->_TextureIndex = rand() % (m_ParticleDesc.iSimilarLayerNum);
 
 	if (m_ParticleDesc.FollowingTarget == nullptr)
-		attribute->_NowparantPos = m_ParticleDesc.FixedTarget;
+		attribute->_NowparantPos = m_ParticleDesc.FixedTarget.XMVector() + m_vPivot.XMVector();
 	else
-		attribute->_NowparantPos = m_ParticleDesc.FollowingTarget->Get_MatrixState_Float3(CTransform::STATE_POS);
+		attribute->_NowparantPos = m_ParticleDesc.FollowingTarget->Get_MatrixState(CTransform::STATE_POS) + m_vPivot.XMVector();
 
 	//자식들의 Velocity를 초기화하는 과정
 	Reset_Velocity(attribute->_velocity);
@@ -296,16 +320,25 @@ void CParticleObject::Update_ColorChange(PARTICLEATT * tParticleAtt, _double fTi
 		_double FrequencyAge = tParticleAtt->_age - (TimeInterver * iFrequencyIndex); // =>7.5초 주기에 3.4초를 지나고있으면 3.4 10초를 지나고있으면 2.5
 
 		if (iFrequencyIndex % 2)
-			tParticleAtt->_size = pInstance->Easing_Vector(TYPE_Linear, m_ParticleDesc.TargetColor, m_ParticleDesc.TargetColor2, _float(FrequencyAge), _float(TimeInterver));
-
+		{
+			tParticleAtt->_color = pInstance->Easing_Vector(TYPE_Linear, m_ParticleDesc.TargetColor, m_ParticleDesc.TargetColor2, _float(FrequencyAge), _float(TimeInterver));
+			tParticleAtt->_color.w = pInstance->Easing(TYPE_Linear, m_ParticleDesc.TargetColor.w, m_ParticleDesc.TargetColor2.w, _float(FrequencyAge), _float(TimeInterver));
+		}
 		else
-			tParticleAtt->_size = pInstance->Easing_Vector(TYPE_Linear, m_ParticleDesc.TargetColor2, m_ParticleDesc.TargetColor, _float(FrequencyAge), _float(TimeInterver));
+		{
+			tParticleAtt->_color = pInstance->Easing_Vector(TYPE_Linear, m_ParticleDesc.TargetColor2, m_ParticleDesc.TargetColor, _float(FrequencyAge), _float(TimeInterver));
+			tParticleAtt->_color.w = pInstance->Easing(TYPE_Linear, m_ParticleDesc.TargetColor2.w, m_ParticleDesc.TargetColor.w, _float(FrequencyAge), _float(TimeInterver));
+
+		}
 
 		tParticleAtt->_color.x = min(max(tParticleAtt->_color.x, 0), 1);
 		tParticleAtt->_color.y = min(max(tParticleAtt->_color.y, 0), 1);
 		tParticleAtt->_color.z = min(max(tParticleAtt->_color.z, 0), 1);
+		tParticleAtt->_color.w = min(max(tParticleAtt->_color.w, 0), 1);
 	}
 }
+
+
 
 HRESULT CParticleObject::SetUp_Components()
 {
@@ -350,6 +383,9 @@ HRESULT CParticleObject::SetUp_ParticleDesc(void * pArg)
 
 	if (m_ParticleDesc.PowerRandomRange.y - m_ParticleDesc.PowerRandomRange.x < 0.1f)
 		m_ParticleDesc.PowerRandomRange.y += 0.1f;
+
+
+	m_vPivot = (m_ParticleDesc.ParticleStartRandomPosMax.XMVector() + m_ParticleDesc.ParticleStartRandomPosMin.XMVector()) *0.5f;
 
 	return S_OK;
 }

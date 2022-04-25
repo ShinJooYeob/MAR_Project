@@ -32,6 +32,7 @@ enum OBJECTPROTOTYPEID
 
 	Prototype_SkyBox,
 	Prototype_Player,
+	Prototype_PlayerTornado,
 
 	Prototype_Executor,
 	Prototype_Grunt,
@@ -80,7 +81,9 @@ static const _tchar* Tag_Object_Prototype(OBJECTPROTOTYPEID eTag)
 	case Prototype_Bullet_Grenade:
 		return TEXT("Bullet_Grenade");
 		break;
-
+	case Prototype_PlayerTornado:
+		return TEXT("Prototype_PlayerTornado");
+		break;
 	case Prototype_UILoading:
 		return TEXT("Prototype_UILoading");
 		break;
@@ -91,7 +94,8 @@ static const _tchar* Tag_Object_Prototype(OBJECTPROTOTYPEID eTag)
 	case Prototype_UISetting:
 		return TEXT("Prototype_UISetting");
 		break;
-
+	
+		
 
 
 	case Prototype_Camera_Editor:
@@ -493,8 +497,6 @@ enum COMPONENTPROTOTYPEID
 
 
 
-
-
 	Prototype_Mesh_Player,
 	Prototype_Mesh_Executor,
 	Prototype_Mesh_Grunt,
@@ -529,6 +531,10 @@ enum COMPONENTPROTOTYPEID
 	Prototype_Mesh_GiftBasket,
 
 
+	Prototype_Mesh_Tornado1,
+	Prototype_Mesh_Tornado2,
+	Prototype_Mesh_Tornado3,
+	Prototype_Mesh_Tornado4,
 	//////////////////////////////////////////////////////////////////////////
 	Prototype_Texture_Player,
 	Prototype_Texture_SkyBox,
@@ -872,6 +878,18 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 		break;
 
 
+	case Prototype_Mesh_Tornado1:
+		return TEXT("Prototype_Mesh_Tornado1");
+		break;
+	case Prototype_Mesh_Tornado2:
+		return TEXT("Prototype_Mesh_Tornado2");
+		break;
+	case Prototype_Mesh_Tornado3:
+		return TEXT("Prototype_Mesh_Tornado3");
+		break;
+	case Prototype_Mesh_Tornado4:
+		return TEXT("Prototype_Mesh_Tornado4");
+		break;
 
 		/////////////////≈ÿΩ∫√≥////////////////////////////////////////////////////////
 

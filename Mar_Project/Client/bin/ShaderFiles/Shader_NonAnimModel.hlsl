@@ -42,7 +42,10 @@ cbuffer HiddenPad
 {
 	float	g_fVisualValue;
 };
-
+cbuffer MixColor
+{
+	float4			g_vMixColor = float4(1,0.6f,1,1);
+};
 
 
 struct VS_IN
@@ -161,6 +164,32 @@ PS_OUT PS_MAIN_HIDDENPAD(PS_IN In)
 
 	return Out;
 }
+PS_OUT PS_MAIN_PARTICLEREMOVEALPHA(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	vector		vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
+	float Alpha = (vDiffuse.r);
+
+	if (Alpha < 0.3f)
+		discard;
+
+	vDiffuse = vDiffuse*0.3 +  g_vMixColor*0.7;
+	vDiffuse.a = Alpha*0.5;
+
+	float		fShade = saturate(dot(normalize(g_vLightVector) * -1.f, In.vNormal));
+
+	//float4		vReflect = reflect(normalize(g_vLightVector), In.vNormal);
+	//float4		vLook = normalize(In.vWorldPos - g_CamPosition);
+
+	//float		fSpecular = pow(saturate(dot(normalize(vReflect) * -1.f, vLook)), 30.f);
+
+	Out.vColor = (g_vLightDiffuse * vDiffuse) * (fShade + (g_vLightAmbient * g_vMtrlAmbient));
+	//+(g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
+
+
+	return Out;
+}
 
 
 
@@ -215,5 +244,16 @@ technique11		DefaultTechnique
 		VertexShader = compile vs_5_0 VS_MAIN_DEFAULT();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN_HIDDENPAD();
+	}
+
+	pass ParticleRemoveAlpha		//5
+	{
+		SetBlendState(ParticleBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(ZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_None);
+
+		VertexShader = compile vs_5_0 VS_MAIN_DEFAULT();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_PARTICLEREMOVEALPHA();
 	}
 }

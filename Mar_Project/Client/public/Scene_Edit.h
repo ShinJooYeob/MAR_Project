@@ -148,7 +148,9 @@ private:
 #pragma region ParticleTab
 
 	HRESULT Update_ParticleTab(_double fDeltatime);
+	HRESULT Widget_SettingParticleDesc(_double fDeltatime);
 
+	PARTICLEDESC m_tParticleDesc;
 
 #pragma endregion ParticleTab
 
@@ -202,6 +204,7 @@ private:
 private:
 	HRESULT Ready_Layer_MainCamera(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_Player(const _tchar* pLayerTag);
+	HRESULT Ready_ParticleDesc();
 
 
 public:

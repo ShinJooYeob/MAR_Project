@@ -43,6 +43,8 @@ HRESULT CPlayer::Initialize_Clone(void * pArg)
 
 	FAILED_CHECK(SetUp_Components());
 
+	FAILED_CHECK(Ready_ParticleDesc());
+
 	if (pArg != nullptr)
 		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, *((_float3*)pArg));
 
@@ -63,97 +65,10 @@ _int CPlayer::Update(_double fDeltaTime)
 
 	if (g_pGameInstance->Get_DIKeyState(DIK_X) & DIS_Down)
 	{
-		//PARTICLEDESC tDesc;
-		//
-		//tDesc.eParticleTypeID = Particle_Ball;
-		//
-		//tDesc.FollowingTarget = m_pTransformCom;
-		//
-		//tDesc.szTextureProtoTypeTag = TAG_CP(Prototype_Texture_PlayerEffect);
-		//tDesc.szTextureLayerTag = L"ButterFly";
-		//tDesc.iSimilarLayerNum = 12;
-		//
-		//tDesc.TextureChageFrequency = 1;
-		//tDesc.vTextureXYNum = _float2(8, 2);
-		//
-		//tDesc.TotalParticleTime = 2;
-		//tDesc.EachParticleLifeTime = 0.34f;
-		//tDesc.MaxParticleCount = 15;
-		//
-		//tDesc.SizeChageFrequency = 0;
-		//tDesc.ParticleSize = _float3(0.5, 0.5, 0.5);
-		//tDesc.ParticleSize2 = _float3(0.5, 0.5, 0.5);
-		//
-		//tDesc.ColorChageFrequency = 0;
-		//tDesc.TargetColor = _float3(255.f, 255.f, 255.f);
-		//tDesc.TargetColor2 = _float3(255.f, 255.f, 255.f);
-		//
-		//
-		//tDesc.Particle_Power = 1;
-		//tDesc.PowerRandomRange = _float2(0.5f, 1.5f);
-		//
-		//tDesc.vUp = _float3(0, 1, 0);
-		//
-		//tDesc.MaxBoundaryRadius = 5;
-		//
-		//tDesc.m_bIsUI = false;
-		//tDesc.m_bUIDepth = 0;
-		//
-		//tDesc.ParticleStartRandomPosMin = _float3(-1.0f, 0.0f, -1.0f);
-		//tDesc.ParticleStartRandomPosMax = _float3(1.f, 1.5f, 1.f);
-		//
-		//tDesc.DepthTestON = true;
-		//tDesc.AlphaBlendON = true;
-		//
-		//tDesc.m_fAlphaTestValue = 0.1f;
 
-		//////////////////////////////////////////////////////////////////////////
 
-		//PARTICLEDESC tDesc;
-		//
-		//tDesc.eParticleTypeID = Particle_Ball;
-		//
-		//tDesc.FollowingTarget = m_pTransformCom;
-		//
-		//tDesc.szTextureProtoTypeTag = TAG_CP(Prototype_Texture_PlayerEffect);
-		//tDesc.szTextureLayerTag = L"Dust";
-		//tDesc.iSimilarLayerNum = 6;
-		//
-		//tDesc.TextureChageFrequency = 1;
-		//tDesc.vTextureXYNum = _float2(2, 2);
-		//
-		//tDesc.TotalParticleTime = 2;
-		//tDesc.EachParticleLifeTime = 0.34f;
-		//tDesc.MaxParticleCount = 10;
-		//
-		//tDesc.SizeChageFrequency = 0;
-		//tDesc.ParticleSize = _float3(1, 1, 1);
-		//tDesc.ParticleSize2 = _float3(0.5, 0.5, 0.5);
-		//
-		//tDesc.ColorChageFrequency = 0;
-		//tDesc.TargetColor = _float3(255.f, 255.f, 255.f);
-		//tDesc.TargetColor2 = _float3(255.f, 255.f, 255.f);
-		//
-		//
-		//tDesc.Particle_Power = 1;
-		//tDesc.PowerRandomRange = _float2(0.5f, 1.5f);
-		//
-		//tDesc.vUp = _float3(0, 1, 0);
-		//
-		//tDesc.MaxBoundaryRadius = 3;
-		//
-		//tDesc.m_bIsUI = false;
-		//tDesc.m_bUIDepth = 0;
-		//
-		//tDesc.ParticleStartRandomPosMin = _float3(-1.0f, 0.5f, -1.0f);
-		//tDesc.ParticleStartRandomPosMax = _float3(1.f, 1.f, 1.f);
-		//
-		//tDesc.DepthTestON = true;
-		//tDesc.AlphaBlendON = true;
-		//
-		//tDesc.m_fAlphaTestValue = 0.1f;
-
-		GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, tDesc);
+		GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[1]);
+		GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[0]);
 
 	}
 
@@ -681,6 +596,259 @@ HRESULT CPlayer::SetUp_ConstTable()
 	return S_OK;
 }
 
+HRESULT CPlayer::Ready_ParticleDesc()
+{
+	m_vecParticleDesc.clear();
+	m_vecParticleDesc.reserve(5);
+
+	PARTICLEDESC tDesc;
+
+	tDesc.eParticleTypeID = Particle_Ball;
+
+	tDesc.FollowingTarget = m_pTransformCom;
+
+	tDesc.szTextureProtoTypeTag = TAG_CP(Prototype_Texture_PlayerEffect);
+	tDesc.szTextureLayerTag = L"ButterFly";
+	tDesc.iSimilarLayerNum = 12;
+
+	tDesc.TextureChageFrequency = 1;
+	tDesc.vTextureXYNum = _float2(8, 2);
+
+	tDesc.TotalParticleTime = 2;
+	tDesc.EachParticleLifeTime = 0.34f;
+	tDesc.MaxParticleCount = 15;
+
+	tDesc.SizeChageFrequency = 0;
+	tDesc.ParticleSize = _float3(0.5, 0.5, 0.5);
+	tDesc.ParticleSize2 = _float3(0.5, 0.5, 0.5);
+
+	tDesc.ColorChageFrequency = 0;
+	tDesc.TargetColor = _float4(1.f, 1.f, 1.f, 1.f);
+	tDesc.TargetColor2 = _float4(1.f, 1.f, 1.f, 1.f);
+
+
+	tDesc.Particle_Power = 1;
+	tDesc.PowerRandomRange = _float2(0.5f, 1.5f);
+
+	tDesc.vUp = _float3(0, 1, 0);
+
+	tDesc.MaxBoundaryRadius = 5;
+
+	tDesc.m_bIsUI = false;
+	tDesc.m_bUIDepth = 0;
+
+	tDesc.ParticleStartRandomPosMin = _float3(-1.0f, 0.0f, -1.0f);
+	tDesc.ParticleStartRandomPosMax = _float3(1.f, 1.5f, 1.f);
+
+	tDesc.DepthTestON = true;
+	tDesc.AlphaBlendON = false;
+
+	tDesc.m_fAlphaTestValue = 0.1f;
+	tDesc.m_iPassIndex = 3;
+
+	m_vecParticleDesc.push_back(tDesc);
+
+	////////////////////////////////////////////////////////////////////////
+
+	tDesc = PARTICLEDESC();
+
+	tDesc.eParticleTypeID = Particle_Ball;
+
+	tDesc.FollowingTarget = m_pTransformCom;
+
+	tDesc.szTextureProtoTypeTag = TAG_CP(Prototype_Texture_PlayerEffect);
+	tDesc.szTextureLayerTag = L"Dust2";
+	tDesc.iSimilarLayerNum = 1;
+
+	tDesc.TextureChageFrequency = 3;
+	tDesc.vTextureXYNum = _float2(2, 2);
+
+	tDesc.TotalParticleTime = 2;
+	tDesc.EachParticleLifeTime = 0.68f;
+	tDesc.MaxParticleCount = 10;
+
+	tDesc.SizeChageFrequency = 0;
+	tDesc.ParticleSize = _float3(1.7f, 1.7f, 1.7f);
+	tDesc.ParticleSize2 = _float3(0.5, 0.5, 0.5);
+
+	tDesc.ColorChageFrequency = 1;
+	tDesc.TargetColor = _float4(0.4156862f, 0.352941f, 0.803921f, 1.f);
+	tDesc.TargetColor2 = _float4(0.1803921f, 1.f, 1.f, 1.f);
+
+
+	tDesc.Particle_Power = 2;
+	tDesc.PowerRandomRange = _float2(0.5f, 1.5f);
+
+	tDesc.vUp = _float3(0, 1, 0);
+
+	tDesc.MaxBoundaryRadius = 5;
+
+	tDesc.m_bIsUI = false;
+	tDesc.m_bUIDepth = 0;
+
+	tDesc.ParticleStartRandomPosMin = _float3(-1.0f, 0.5f, -1.0f);
+	tDesc.ParticleStartRandomPosMax = _float3(1.f, 1.f, 1.f);
+
+	tDesc.DepthTestON = true;
+	tDesc.AlphaBlendON = true;
+
+	tDesc.m_fAlphaTestValue = 0.05f;
+	tDesc.m_iPassIndex = 4;
+
+	m_vecParticleDesc.push_back(tDesc);
+
+
+	////////////////////////////////////////////////////////////////////////	 
+	tDesc = PARTICLEDESC();
+
+	tDesc.eParticleTypeID = Particle_Ball;
+
+	tDesc.FollowingTarget = m_pTransformCom;
+
+	tDesc.szTextureProtoTypeTag = TAG_CP(Prototype_Texture_PlayerEffect);
+	tDesc.szTextureLayerTag = L"Dust2";
+	tDesc.iSimilarLayerNum = 1;
+
+	tDesc.TextureChageFrequency = 2;
+	tDesc.vTextureXYNum = _float2(2, 2);
+
+	tDesc.TotalParticleTime = 0.1f;
+	tDesc.EachParticleLifeTime = 0.34f;
+	tDesc.MaxParticleCount = 10;
+
+	tDesc.SizeChageFrequency = 0;
+	tDesc.ParticleSize = _float3(0.7f, 0.7f, 0.7f);
+	tDesc.ParticleSize2 = _float3(0.5, 0.5, 0.5);
+
+	tDesc.ColorChageFrequency = 0;
+	tDesc.TargetColor = _float4(1.f, 1.f, 1.f, 1.f);
+	//tDesc.TargetColor = _float4(0.4156862f, 0.352941f, 0.803921f, 1.f);
+	tDesc.TargetColor2 = _float4(0.1803921f, 1.f, 1.f, 1.f);
+
+
+	tDesc.Particle_Power = 2;
+	tDesc.PowerRandomRange = _float2(0.5f, 1.5f);
+
+	tDesc.vUp = _float3(0, 1, 0);
+
+	tDesc.MaxBoundaryRadius = 5;
+
+	tDesc.m_bIsUI = false;
+	tDesc.m_bUIDepth = 0;
+
+	tDesc.ParticleStartRandomPosMin = _float3(-1.0f, -0.2f, -1.0f);
+	tDesc.ParticleStartRandomPosMax = _float3(1.f, 0.2f, 1.f);
+
+	tDesc.DepthTestON = true;
+	tDesc.AlphaBlendON = true;
+
+	tDesc.m_fAlphaTestValue = 0.2f;
+	tDesc.m_iPassIndex = 4;
+
+	m_vecParticleDesc.push_back(tDesc);
+
+	////////////////////////////////////////////////////////////////////////
+	tDesc = PARTICLEDESC();
+
+	tDesc.eParticleTypeID = Particle_Ball;
+
+	tDesc.FollowingTarget = m_pTransformCom;
+
+	tDesc.szTextureProtoTypeTag = TAG_CP(Prototype_Texture_PlayerEffect);
+	tDesc.szTextureLayerTag = L"Explosion";
+	tDesc.iSimilarLayerNum = 2;
+
+	tDesc.TextureChageFrequency = 1;
+	tDesc.vTextureXYNum = _float2(5, 4);
+
+	tDesc.TotalParticleTime = 2;
+	tDesc.EachParticleLifeTime = 0.34f;
+	tDesc.MaxParticleCount = 10;
+
+	tDesc.SizeChageFrequency = 0;
+	tDesc.ParticleSize = _float3(1, 1, 1);
+	tDesc.ParticleSize2 = _float3(0.5, 0.5, 0.5);
+
+	tDesc.ColorChageFrequency = 0;
+	tDesc.TargetColor = _float4(1.f, 1.f, 1.f, 1.f);
+	tDesc.TargetColor2 = _float4(1.f, 1.f, 1.f, 1.f);
+
+
+	tDesc.Particle_Power = 1;
+	tDesc.PowerRandomRange = _float2(0.5f, 1.5f);
+
+	tDesc.vUp = _float3(0, 1, 0);
+
+	tDesc.MaxBoundaryRadius = 3;
+
+	tDesc.m_bIsUI = false;
+	tDesc.m_bUIDepth = 0;
+
+	tDesc.ParticleStartRandomPosMin = _float3(-1.0f, 0.5f, -1.0f);
+	tDesc.ParticleStartRandomPosMax = _float3(1.f, 1.f, 1.f);
+
+	tDesc.DepthTestON = true;
+	tDesc.AlphaBlendON = true;
+
+	tDesc.m_fAlphaTestValue = 0.1f;
+	tDesc.m_iPassIndex = 3;
+
+
+	m_vecParticleDesc.push_back(tDesc);
+
+
+	////////////////////////////////////////////////////////////////////////
+	tDesc = PARTICLEDESC();
+
+	tDesc.eParticleTypeID = Particle_Ball;
+
+	tDesc.FollowingTarget = m_pTransformCom;
+
+	tDesc.szTextureProtoTypeTag = TAG_CP(Prototype_Texture_PlayerEffect);
+	tDesc.szTextureLayerTag = L"Petal";
+	tDesc.iSimilarLayerNum = 3;
+
+	tDesc.TextureChageFrequency = 1;
+	tDesc.vTextureXYNum = _float2(8, 4);
+
+	tDesc.TotalParticleTime = 1;
+	tDesc.EachParticleLifeTime = 0.34f;
+	tDesc.MaxParticleCount = 10;
+
+	tDesc.SizeChageFrequency = 0;
+	tDesc.ParticleSize = _float3(0.15f, 0.15f, 0.15f);
+	tDesc.ParticleSize2 = _float3(0.5f, 0.5f, 0.5f);
+
+	tDesc.ColorChageFrequency = 0;
+	tDesc.TargetColor = _float4(1.f, 1.f, 1.f, 1.f);
+	tDesc.TargetColor2 = _float4(1.f, 1.f, 1.f, 1.f);
+
+
+	tDesc.Particle_Power = 1;
+	tDesc.PowerRandomRange = _float2(0.5f, 1.5f);
+
+	tDesc.vUp = _float3(0, 1, 0);
+
+	tDesc.MaxBoundaryRadius = 3;
+
+	tDesc.m_bIsUI = false;
+	tDesc.m_bUIDepth = 0;
+
+	tDesc.ParticleStartRandomPosMin = _float3(-1.0f, 0.2f, -1.0f);
+	tDesc.ParticleStartRandomPosMax = _float3(1.f, 0.7f, 1.f);
+
+	tDesc.DepthTestON = true;
+	tDesc.AlphaBlendON = false;
+
+	tDesc.m_fAlphaTestValue = 0.1f;
+	tDesc.m_iPassIndex = 3;
+
+
+	m_vecParticleDesc.push_back(tDesc);
+
+	return S_OK;
+}
+
 HRESULT CPlayer::Input_Keyboard(_double fDeltaTime)
 {
 
@@ -930,7 +1098,17 @@ HRESULT CPlayer::Jump_Update(_double fDeltaTime, CGameInstance* pInstance)
 
 			m_pModel->Change_AnimIndex_UntilTo(15 + m_iJumpCount * 5, 17 + m_iJumpCount * 5, 0.08);
 
-
+			if (m_iJumpCount == 1)
+			{
+				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[2]);
+				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[4]);
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerTornado),
+					&_float4(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS), 1));
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerTornado),
+					&_float4(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS), 1));
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerTornado),
+					&_float4(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS), 1));
+			}
 			m_iJumpCount++;
 
 		}
@@ -1185,6 +1363,17 @@ HRESULT CPlayer::Jump_Update_Horse(_double fDeltaTime, CGameInstance * pInstance
 			m_pModel->Change_AnimIndex_UntilTo(15 + m_iJumpCount * 5, 17 + m_iJumpCount * 5, 0.08);
 
 
+			if (m_iJumpCount == 1)
+			{
+				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[2]);
+				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[4]);
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerTornado),
+					&_float4(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS), 1));
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerTornado),
+					&_float4(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS), 1));
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerTornado),
+					&_float4(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS), 1));
+			}
 			m_iJumpCount++;
 
 		}
@@ -1503,6 +1692,17 @@ HRESULT CPlayer::Jump_Update_Teapot(_double fDeltaTime, CGameInstance * pInstanc
 
 			m_pModel->Change_AnimIndex_UntilTo(15 + m_iJumpCount * 5, 17 + m_iJumpCount * 5, 0.08);
 
+			if (m_iJumpCount == 1)
+			{
+				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[2]);
+				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[4]);
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerTornado),
+					&_float4(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS), 1));
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerTornado),
+					&_float4(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS), 1));
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerTornado),
+					&_float4(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS), 1));
+			}
 
 			m_iJumpCount++;
 
@@ -1801,6 +2001,17 @@ HRESULT CPlayer::Jump_Update_Knife(_double fDeltaTime, CGameInstance * pInstance
 			m_pModel->Change_AnimIndex_UntilTo(15 + m_iJumpCount * 5, 17 + m_iJumpCount * 5, 0.08);
 
 
+			if (m_iJumpCount == 1)
+			{
+				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[2]);
+				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[4]);
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerTornado),
+					&_float4(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS), 1));
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerTornado),
+					&_float4(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS), 1));
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerTornado),
+					&_float4(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS), 1));
+			}
 			m_iJumpCount++;
 
 		}
@@ -2105,6 +2316,17 @@ HRESULT CPlayer::Jump_Update_Grinder(_double fDeltaTime, CGameInstance * pInstan
 
 			m_pModel->Change_AnimIndex_UntilTo(15 + m_iJumpCount * 5, 17 + m_iJumpCount * 5, 0.08);
 
+			if (m_iJumpCount == 1)
+			{
+				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[2]);
+				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[4]);
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerTornado),
+					&_float4(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS), 1));
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerTornado),
+					&_float4(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS), 1));
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerTornado),
+					&_float4(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS), 1));
+			}
 
 			m_iJumpCount++;
 

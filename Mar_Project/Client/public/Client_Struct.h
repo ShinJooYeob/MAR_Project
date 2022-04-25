@@ -42,8 +42,8 @@ typedef struct tagParticleDesc
 	_float3 ParticleSize2 = _float3(0, 0, 0);
 
 	_uint  ColorChageFrequency = 0;
-	_float3 TargetColor = _float3(255.f, 255.f, 255.f);
-	_float3 TargetColor2 = _float3(255.f, 255.f, 255.f);
+	_float4 TargetColor = _float4(1.f, 1.f, 1.f,1.f);
+	_float4 TargetColor2 = _float4(1.f, 1.f, 1.f, 1.f);
 
 
 	_float Particle_Power = 0;
@@ -63,6 +63,7 @@ typedef struct tagParticleDesc
 	_bool	AlphaBlendON = true;
 
 	_float	m_fAlphaTestValue = 0.1f;
+	_uint	m_iPassIndex = 3;
 
 }PARTICLEDESC;
 
