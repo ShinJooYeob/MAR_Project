@@ -196,6 +196,9 @@
     <Filter Include="01.GameObject\00.Player\EffectMesh">
       <UniqueIdentifier>{7cac079b-276d-468f-bf1a-06f2f901bfdb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.Scene\00.Scene_Loby\LobyAlice">
+      <UniqueIdentifier>{48a5d59c-ff13-4b56-a546-a919d68aade2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -378,6 +381,9 @@
     <ClInclude Include="..\public\TornadoSwirl.h">
       <Filter>01.GameObject\00.Player\EffectMesh</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\LobyAlice.h">
+      <Filter>02.Scene\00.Scene_Loby\LobyAlice</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -535,6 +541,9 @@
     </ClCompile>
     <ClCompile Include="..\private\TornadoSwirl.cpp">
       <Filter>01.GameObject\00.Player\EffectMesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\LobyAlice.cpp">
+      <Filter>02.Scene\00.Scene_Loby\LobyAlice</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

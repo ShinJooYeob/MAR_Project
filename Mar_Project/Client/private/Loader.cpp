@@ -2,6 +2,7 @@
 #include "..\Public\Loader.h"
 
 #include "Player.h"
+#include "LobyAlice.h"
 #include "NormalBullet.h"
 #include "GrenadeBullet.h"
 #include "TornadoSwirl.h"
@@ -98,13 +99,17 @@ HRESULT CLoader::Load_Scene_Loby(_bool * _IsClientQuit, CRITICAL_SECTION * _CriS
 
 #pragma region PROTOTYPE_COMPONENT
 
-
+	_Matrix			TransformMatrix;
+	TransformMatrix = XMMatrixScaling(0.0001f, 0.0001f, 0.0001f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_LOBY, TAG_CP(Prototype_Mesh_PlayerLoby),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Alice", "Alice.FBX", TransformMatrix, 1)));
 
 
 
 #pragma endregion
 
 #pragma  region PROTOTYPE_GAMEOBJECT
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_PlayerLoby), CLobyAlice::Create(m_pDevice, m_pDeviceContext)));
 
 
 

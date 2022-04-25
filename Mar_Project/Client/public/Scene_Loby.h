@@ -20,7 +20,8 @@ public:
 
 private:
 	HRESULT Ready_Light();
-
+	HRESULT Ready_Camera(const _tchar* pLayerTag);;
+	HRESULT Ready_Alice(const _tchar* pLayerTag);
 
 private:
 	class CCamera_Main*				m_pMainCam = nullptr;

@@ -23,9 +23,13 @@ HRESULT CScene_Loby::Initialize()
 
 
 	FAILED_CHECK(Ready_Light());
+	FAILED_CHECK(Ready_Camera(TAG_LAY(Layer_Camera_Main)));
+	FAILED_CHECK(Ready_Alice(TAG_LAY(Layer_Player)));
 
 
 
+	
+		
 			
 
 	return S_OK;
@@ -116,6 +120,47 @@ HRESULT CScene_Loby::Ready_Light()
 	return S_OK;
 }
 
+HRESULT CScene_Loby::Ready_Camera(const _tchar* pLayerTag)
+{
+	CCamera::CAMERADESC CameraDesc;
+	CameraDesc.vWorldRotAxis = _float3(0, 0, 0);
+	CameraDesc.vEye = _float3(0.1, 1.5f, -1.f);
+	CameraDesc.vAt = _float3(0.3, 1.2f, 0);
+	CameraDesc.vAxisY = _float3(0, 1, 0);
+
+	CameraDesc.fFovy = XMConvertToRadians(60.f);
+	CameraDesc.fAspect = _float(g_iWinCX) / g_iWinCY;
+	CameraDesc.fNear = 0.2f;
+	CameraDesc.fFar = 300.f;
+
+	CameraDesc.iWinCX = g_iWinCX;
+	CameraDesc.iWinCY = g_iWinCY;
+
+	CameraDesc.TransformDesc.fMovePerSec = 5.f;
+	CameraDesc.TransformDesc.fRotationPerSec = XMConvertToRadians(60.0f);
+	CameraDesc.TransformDesc.fScalingPerSec = 1.f;
+
+
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENEID::SCENE_LOBY, pLayerTag, TAG_OP(Prototype_Camera_Main), &CameraDesc));
+
+	m_pMainCam = (CCamera_Main*)(g_pGameInstance->Get_GameObject_By_LayerIndex(SCENE_LOBY, TAG_LAY(Layer_Camera_Main)));
+
+	NULL_CHECK_RETURN(m_pMainCam, E_FAIL);
+
+	
+
+
+	return S_OK;
+}
+
+HRESULT CScene_Loby::Ready_Alice(const _tchar* pLayerTag)
+{
+
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENEID::SCENE_LOBY, pLayerTag, TAG_OP(Prototype_PlayerLoby)));
+
+	return S_OK;
+}
+
 
 CScene_Loby * CScene_Loby::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
 {
@@ -127,7 +172,6 @@ CScene_Loby * CScene_Loby::Create(ID3D11Device * pDevice, ID3D11DeviceContext * 
 		MSGBOX("Failed to Creating CScene_Loby");
 		return nullptr;
 	}
-
 	return pTempLoby;
 
 }

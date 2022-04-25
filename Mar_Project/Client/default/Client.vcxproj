@@ -187,6 +187,7 @@
     <ClInclude Include="..\public\GamePlayUI.h" />
     <ClInclude Include="..\public\Grunt.h" />
     <ClInclude Include="..\public\LoadingUI.h" />
+    <ClInclude Include="..\public\LobyAlice.h" />
     <ClInclude Include="..\public\ParticleObject.h" />
     <ClInclude Include="..\public\RendererEditSceneUI.h" />
     <ClInclude Include="..\public\Scene_Stage1.h" />
@@ -236,6 +237,7 @@
     <ClCompile Include="..\private\GamePlayUI.cpp" />
     <ClCompile Include="..\private\Grunt.cpp" />
     <ClCompile Include="..\private\LoadingUI.cpp" />
+    <ClCompile Include="..\private\LobyAlice.cpp" />
     <ClCompile Include="..\private\ParticleObject.cpp" />
     <ClCompile Include="..\private\RendererEditSceneUI.cpp" />
     <ClCompile Include="..\private\Scene_Stage1.cpp" />

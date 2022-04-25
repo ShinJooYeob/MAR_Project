@@ -31,6 +31,7 @@ enum OBJECTPROTOTYPEID
 
 
 	Prototype_SkyBox,
+	Prototype_PlayerLoby,
 	Prototype_Player,
 	Prototype_PlayerTornado,
 
@@ -137,8 +138,10 @@ static const _tchar* Tag_Object_Prototype(OBJECTPROTOTYPEID eTag)
 	case Prototype_Player:
 		return TEXT("Player");
 		break;
-
-
+	case Prototype_PlayerLoby:
+		return TEXT("Prototype_PlayerLoby");
+		break;
+		
 	case Prototype_Executor:
 		return TEXT("Prototype_Executor");
 		break;
@@ -498,6 +501,7 @@ enum COMPONENTPROTOTYPEID
 
 
 	Prototype_Mesh_Player,
+	Prototype_Mesh_PlayerLoby,
 	Prototype_Mesh_Executor,
 	Prototype_Mesh_Grunt,
 	Prototype_Mesh_WaspArrow,
@@ -800,6 +804,10 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 
 	case Prototype_Mesh_Player:
 		return TEXT("Mesh_Player");
+		break;
+		
+	case Prototype_Mesh_PlayerLoby:
+		return TEXT("Prototype_Mesh_PlayerLoby");
 		break;
 	case Prototype_Mesh_Executor:
 		return TEXT("Mesh_Executor");

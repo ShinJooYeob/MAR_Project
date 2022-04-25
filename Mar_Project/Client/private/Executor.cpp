@@ -36,6 +36,7 @@ HRESULT CExecutor::Initialize_Clone(void * pArg)
 
 _int CExecutor::Update(_double fDeltaTime)
 {
+	if (__super::Update(fDeltaTime) < 0)return -1;
 
 	if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
 		m_pModel->Change_AnimIndex(0);
@@ -64,6 +65,7 @@ _int CExecutor::Update(_double fDeltaTime)
 
 _int CExecutor::LateUpdate(_double fDeltaTime)
 {
+	if (__super::LateUpdate(fDeltaTime) < 0)return -1;
 
 
 
@@ -78,8 +80,7 @@ _int CExecutor::LateUpdate(_double fDeltaTime)
 
 _int CExecutor::Render()
 {
-	if (__super::Render() < 0)
-		return -1;
+	if (__super::Render() < 0)		return -1;
 
 
 	NULL_CHECK_RETURN(m_pModel, E_FAIL);
