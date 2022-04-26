@@ -19,6 +19,7 @@ public:
 
 	void Update_Transform(_uint iIndex, _fMatrix Transform);
 	_int Add_ColliderBuffer(COLLIDERTYPE eColliderType, COLLIDERDESC* pColliderDesc = nullptr);
+	_uint Get_NumColliderBuffer() { return _uint(m_vecColliderBuffer.size()); };
 
 #ifdef _DEBUG
 public:

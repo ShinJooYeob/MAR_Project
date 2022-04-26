@@ -63,13 +63,10 @@ _int CPlayer::Update(_double fDeltaTime)
 
 	FAILED_CHECK(Input_Keyboard(fDeltaTime));
 
-	if (g_pGameInstance->Get_DIKeyState(DIK_X) & DIS_Down)
+	for (_uint i = 0 ; i < m_pColliderCom->Get_NumColliderBuffer(); i++)
 	{
-
-
-
+		m_pColliderCom->Update_Transform(i, m_pTransformCom->Get_WorldMatrix());
 	}
-
 
 	if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
 		Add_Dmg_to_Player(1);
@@ -133,6 +130,7 @@ _int CPlayer::Render()
 	if (__super::Render() < 0)
 		return -1;
 
+	m_pColliderCom->Render();
 
 	NULL_CHECK_RETURN(m_pModel, E_FAIL);
 
@@ -552,6 +550,32 @@ HRESULT CPlayer::SetUp_Components()
 	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
 	ColliderDesc.vPosition = _float4(0.f, 0.7f, 0.f, 1.f);
 	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_AABB, &ColliderDesc));
+	ColliderDesc.vScale = _float3(1.f, 1.4f, 0.6f);
+
+	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_AABB, &ColliderDesc));
+	ColliderDesc.vScale = _float3(2.f, 1.4f, 0.6f);
+
+	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_AABB, &ColliderDesc));
+	ColliderDesc.vScale = _float3(3.f, 1.4f, 0.6f);
+
+	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_AABB, &ColliderDesc));
+
+
+
+	ZeroMemory(&ColliderDesc, sizeof(COLLIDERDESC));
+	ColliderDesc.vScale = _float3(1.f, 1.f, 1.0f);
+	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
+	ColliderDesc.vPosition = _float4(0.f, 0.5f, 0.f, 1.f);
+	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_OBB, &ColliderDesc));
+
+
+	/* For.Com_SPHERE */	
+	ZeroMemory(&ColliderDesc, sizeof(COLLIDERDESC));
+	ColliderDesc.vScale = _float3(1.f, 1.f, 1.0f);
+	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
+	ColliderDesc.vPosition = _float4(0.f, 0.5f, 0.f, 1.f);
+	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
+
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Mesh_Player), TAG_COM(Com_Model), (CComponent**)&m_pModel));
 	FAILED_CHECK(m_pModel->Change_AnimIndex(0));

@@ -19,6 +19,7 @@ CColliderBuffer::CColliderBuffer(const CColliderBuffer & rhs)
 	:m_pDevice(rhs.m_pDevice),
 	m_pBasicEffect(rhs.m_pBasicEffect),
 	m_pBatch(rhs.m_pBatch),
+	m_pInputLayout(rhs.m_pInputLayout),
 	m_pDeviceContext(rhs.m_pDeviceContext),
 	m_eColliderType(rhs.m_eColliderType),
 	m_bIsClone(true),
