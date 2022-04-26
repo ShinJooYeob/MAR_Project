@@ -47,9 +47,8 @@ private:
 	CShader*			m_pShaderCom = nullptr;
 	CRenderer*			m_pRendererCom = nullptr;
 	CModel*				m_pModel = nullptr;
-	//CVIBuffer_Cube*		m_pVIBufferCom = nullptr;
-	//CTexture*			m_pTextureCom = nullptr;
 	CTransform*			m_pTransformCom = nullptr;
+	CCollider*			m_pColliderCom = nullptr;
 
 private:
 	CCamera*			m_pMainCamera = nullptr;

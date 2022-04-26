@@ -58,9 +58,6 @@
     <Filter Include="01.Utility\01.ComponentMgr\01.Component\05.Texture">
       <UniqueIdentifier>{98570067-dfb9-4a41-b110-f2959838a62c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Utility\01.ComponentMgr\01.Component\06.Collision">
-      <UniqueIdentifier>{861e8344-00c9-4996-99d5-6e9f37e1b511}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.Utility\01.ComponentMgr\01.Component\03.Model\02.VIBuffer">
       <UniqueIdentifier>{c4fbe5dd-6bbb-4a1f-8084-ac5558607b0f}</UniqueIdentifier>
     </Filter>
@@ -129,6 +126,15 @@
     </Filter>
     <Filter Include="01.Utility\01.ComponentMgr\01.Component\03.Model\01.Model\MeshContainer\Animator\AnimationClip\AnimBone">
       <UniqueIdentifier>{7955b3eb-4dac-4d4f-b5d7-eb6a82b39739}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\01.ComponentMgr\01.Component\06.Collider">
+      <UniqueIdentifier>{861e8344-00c9-4996-99d5-6e9f37e1b511}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\01.ComponentMgr\01.Component\06.Collider\00.ColliderBuffer">
+      <UniqueIdentifier>{6ce0e400-ba85-4b11-b04f-fbeb27c7ab54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\01.ComponentMgr\01.Component\06.Collider\01.DebugDraw">
+      <UniqueIdentifier>{4afce424-0dbe-44bf-86be-01584dab493e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -261,6 +267,15 @@
     <ClInclude Include="..\public\ClipBone.h">
       <Filter>01.Utility\01.ComponentMgr\01.Component\03.Model\01.Model\MeshContainer\Animator\AnimationClip\AnimBone</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Collider.h">
+      <Filter>01.Utility\01.ComponentMgr\01.Component\06.Collider</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\DebugDraw.h">
+      <Filter>01.Utility\01.ComponentMgr\01.Component\06.Collider\01.DebugDraw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\ColliderBuffer.h">
+      <Filter>01.Utility\01.ComponentMgr\01.Component\06.Collider\00.ColliderBuffer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">
@@ -373,6 +388,15 @@
     </ClCompile>
     <ClCompile Include="..\private\ClipBone.cpp">
       <Filter>01.Utility\01.ComponentMgr\01.Component\03.Model\01.Model\MeshContainer\Animator\AnimationClip\AnimBone</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Collider.cpp">
+      <Filter>01.Utility\01.ComponentMgr\01.Component\06.Collider</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\DebugDraw.cpp">
+      <Filter>01.Utility\01.ComponentMgr\01.Component\06.Collider\01.DebugDraw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\ColliderBuffer.cpp">
+      <Filter>01.Utility\01.ComponentMgr\01.Component\06.Collider\00.ColliderBuffer</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

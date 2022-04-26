@@ -409,7 +409,7 @@ enum COMPONENTPROTOTYPEID
 {
 	Prototype_Renderer,
 	Prototype_Transform,
-	Prototype_Collision,
+	Prototype_Collider,
 	Prototype_Shader_VT,
 	Prototype_Shader_VCT,
 	Prototype_Shader_VNT,
@@ -424,6 +424,7 @@ enum COMPONENTPROTOTYPEID
 	Prototype_VIBuffer_Terrain_3,
 	Prototype_VIBuffer_Terrain_Edit,
 	//////////////////////////////////////////////////////////////////////////
+
 	Prototype_Mesh_None,
 	Prototype_Mesh_AlgaeRock_Ledge,
 	Prototype_Mesh_AlgaeRock_Pillar,
@@ -570,8 +571,8 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 	case Prototype_Transform:
 		return TEXT("Prototype_Component_Transform");
 		break;
-	case Prototype_Collision:
-		return TEXT("Prototype_Component_Collision");
+	case Prototype_Collider:
+		return TEXT("Prototype_Component_Collider");
 		break;
 
 
@@ -1010,6 +1011,7 @@ enum COMPONENTID
 	Com_Shader,
 	Com_ShaderSub,
 	Com_Model,
+	Com_Collider,
 
 };
 static const _tchar* Tag_Component(COMPONENTID eTag)
@@ -1047,8 +1049,11 @@ static const _tchar* Tag_Component(COMPONENTID eTag)
 	case Com_Model:
 		return TEXT("Com_Model");
 		break;
+	case Com_Collider:
+		return TEXT("Com_Collider");
+		break;
 
-
+		
 
 		//////////////////////////////////////////////////////////////////////////
 	default:

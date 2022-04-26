@@ -3520,6 +3520,9 @@ HRESULT CScene_Edit::Ready_Layer_Player(const _tchar * pLayerTag)
 
 	return S_OK;
 }
+#ifdef USE_IMGUI
+
+
 
 HRESULT CScene_Edit::Ready_ParticleDesc()
 {
@@ -3569,6 +3572,7 @@ HRESULT CScene_Edit::Ready_ParticleDesc()
 }
 
 
+#endif // USE_IMGUI
 
 
 

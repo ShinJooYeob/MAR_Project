@@ -10,7 +10,7 @@
 #include "Renderer.h"
 #include "Texture.h"
 #include "Shader.h"
-
+#include "Collider.h"
 //#include "Collision.h"
 
 BEGIN(Engine)

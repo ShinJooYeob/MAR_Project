@@ -143,8 +143,11 @@
     <ClInclude Include="..\public\ClipBone.h" />
     <ClInclude Include="..\public\Base.h" />
     <ClInclude Include="..\public\Camera.h" />
+    <ClInclude Include="..\public\Collider.h" />
+    <ClInclude Include="..\public\ColliderBuffer.h" />
     <ClInclude Include="..\public\Component.h" />
     <ClInclude Include="..\public\ComponentMgr.h" />
+    <ClInclude Include="..\public\DebugDraw.h" />
     <ClInclude Include="..\public\EasingMgr.h" />
     <ClInclude Include="..\public\Engine_Define.h" />
     <ClInclude Include="..\public\Engine_Description.h" />
@@ -188,8 +191,11 @@
     <ClCompile Include="..\private\ClipBone.cpp" />
     <ClCompile Include="..\private\Base.cpp" />
     <ClCompile Include="..\private\Camera.cpp" />
+    <ClCompile Include="..\private\Collider.cpp" />
+    <ClCompile Include="..\private\ColliderBuffer.cpp" />
     <ClCompile Include="..\private\Component.cpp" />
     <ClCompile Include="..\private\ComponentMgr.cpp" />
+    <ClCompile Include="..\private\DebugDraw.cpp" />
     <ClCompile Include="..\private\EasingMgr.cpp" />
     <ClCompile Include="..\private\Engine_Struct.cpp" />
     <ClCompile Include="..\private\HierarchyNode.cpp" />

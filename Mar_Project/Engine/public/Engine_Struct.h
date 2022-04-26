@@ -2,6 +2,13 @@
 
 namespace Engine
 {
+	typedef struct tagColliderDesc
+	{
+		_float3 vScale; /* ¹è¼ö */
+		_float4 vRotation;
+		_float4 vPosition;
+	} COLLIDERDESC;
+
 	typedef struct tagKeyFrame
 	{
 		_float3		vScale;
