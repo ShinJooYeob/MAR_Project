@@ -199,6 +199,9 @@
     <Filter Include="02.Scene\00.Scene_Loby\LobyAlice">
       <UniqueIdentifier>{48a5d59c-ff13-4b56-a546-a919d68aade2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.GameObject\99.UI\UsedUI\LobyUI">
+      <UniqueIdentifier>{cb881261-62d6-49a3-93fc-21af958417ce}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -384,6 +387,9 @@
     <ClInclude Include="..\public\LobyAlice.h">
       <Filter>02.Scene\00.Scene_Loby\LobyAlice</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\LobyUI.h">
+      <Filter>01.GameObject\99.UI\UsedUI\LobyUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -544,6 +550,9 @@
     </ClCompile>
     <ClCompile Include="..\private\LobyAlice.cpp">
       <Filter>02.Scene\00.Scene_Loby\LobyAlice</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\LobyUI.cpp">
+      <Filter>01.GameObject\99.UI\UsedUI\LobyUI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

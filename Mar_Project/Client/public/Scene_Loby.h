@@ -16,12 +16,13 @@ public:
 	virtual _int Render()override;
 	virtual _int LateRender()override;
 
-
+	virtual _int Change_to_NextScene()override;
 
 private:
 	HRESULT Ready_Light();
-	HRESULT Ready_Camera(const _tchar* pLayerTag);;
+	HRESULT Ready_Camera(const _tchar* pLayerTag);
 	HRESULT Ready_Alice(const _tchar* pLayerTag);
+	HRESULT Ready_Layer_UI(const _tchar* pLayerTag);
 
 private:
 	class CCamera_Main*				m_pMainCam = nullptr;

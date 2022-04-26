@@ -29,7 +29,7 @@ HRESULT CLobyAlice::Initialize_Clone(void * pArg)
 	if (pArg != nullptr)
 		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, *((_float3*)pArg));
 
-	m_pTransformCom->Rotation_CW(XMVectorSet(0, 1, 0, 0), XMConvertToRadians(180));
+	m_pTransformCom->Rotation_CW(XMVectorSet(0, 1, 0, 0), XMConvertToRadians(170));
 
 	return S_OK;
 }
@@ -90,11 +90,11 @@ _int CLobyAlice::Render()
 
 		if (i <= 1)
 		{
-			FAILED_CHECK(m_pModel->Render(m_pShaderCom, 3, i, "g_BoneMatrices"));
+			FAILED_CHECK(m_pModel->Render(m_pShaderCom, 5, i, "g_BoneMatrices"));
 		}
 		else
 		{
-			FAILED_CHECK(m_pModel->Render(m_pShaderCom, 2, i, "g_BoneMatrices"));
+			FAILED_CHECK(m_pModel->Render(m_pShaderCom, 5, i, "g_BoneMatrices"));
 		}
 
 	}

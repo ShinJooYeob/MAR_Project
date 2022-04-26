@@ -26,7 +26,7 @@ HRESULT CScene_Loby::Initialize()
 	FAILED_CHECK(Ready_Camera(TAG_LAY(Layer_Camera_Main)));
 	FAILED_CHECK(Ready_Alice(TAG_LAY(Layer_Player)));
 
-
+	FAILED_CHECK(Ready_Layer_UI(TAG_LAY(Layer_UI_IMG)));
 
 	
 		
@@ -52,22 +52,27 @@ _int CScene_Loby::LateUpdate(_double fDeltaTime)
 	if (__super::LateUpdate(fDeltaTime) < 0)
 		return -1;
 
-#ifdef USE_IMGUI
-	if (GetKeyState(VK_F1) & 0x8000)
-	{
-		FAILED_CHECK(GetSingle(CUtilityMgr)->Clear_RenderGroup_forSceneChange());
-		FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Loading::Create(m_pDevice, m_pDeviceContext, SCENEID::SCENE_EDIT), SCENEID::SCENE_LOADING));
-	}
-#endif // USE_IMGUI
+	if (m_bIsNeedToSceneChange)	return Change_to_NextScene();
 
 
 
-	if (GetKeyState(VK_F2) & 0x8000)
-	{
-		FAILED_CHECK(GetSingle(CUtilityMgr)->Clear_RenderGroup_forSceneChange());
-		FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Loading::Create(m_pDevice, m_pDeviceContext, SCENEID::SCENE_STAGE1), SCENEID::SCENE_LOADING));
-	}
 
+//#ifdef USE_IMGUI
+//	if (GetKeyState(VK_F1) & 0x8000)
+//	{
+//		FAILED_CHECK(GetSingle(CUtilityMgr)->Clear_RenderGroup_forSceneChange());
+//		FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Loading::Create(m_pDevice, m_pDeviceContext, SCENEID::SCENE_EDIT), SCENEID::SCENE_LOADING));
+//	}
+//#endif // USE_IMGUI
+//
+//
+//
+//	if (GetKeyState(VK_F2) & 0x8000)
+//	{
+//		FAILED_CHECK(GetSingle(CUtilityMgr)->Clear_RenderGroup_forSceneChange());
+//		FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Loading::Create(m_pDevice, m_pDeviceContext, SCENEID::SCENE_STAGE1), SCENEID::SCENE_LOADING));
+//	}
+//
 	return 0;
 }
 
@@ -89,6 +94,33 @@ _int CScene_Loby::LateRender()
 		return -1;
 
 	return 0;
+}
+
+_int CScene_Loby::Change_to_NextScene()
+{
+
+
+	switch (m_eNextScene)
+	{
+	case  SCENE_STAGE1:
+		FAILED_CHECK(GetSingle(CUtilityMgr)->Clear_RenderGroup_forSceneChange());
+		FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Loading::Create(m_pDevice, m_pDeviceContext, SCENEID::SCENE_STAGE1), SCENEID::SCENE_LOADING));
+		break;
+
+
+	case  SCENE_EDIT:
+#ifdef USE_IMGUI
+			FAILED_CHECK(GetSingle(CUtilityMgr)->Clear_RenderGroup_forSceneChange());
+			FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Loading::Create(m_pDevice, m_pDeviceContext, SCENEID::SCENE_EDIT), SCENEID::SCENE_LOADING));
+		
+#endif // USE_IMGUI
+		break;
+
+	default:
+		break;
+	}
+
+	return _int();
 }
 
 
@@ -124,8 +156,8 @@ HRESULT CScene_Loby::Ready_Camera(const _tchar* pLayerTag)
 {
 	CCamera::CAMERADESC CameraDesc;
 	CameraDesc.vWorldRotAxis = _float3(0, 0, 0);
-	CameraDesc.vEye = _float3(0.1, 1.5f, -1.f);
-	CameraDesc.vAt = _float3(0.3, 1.2f, 0);
+	CameraDesc.vEye = _float3(0.125f, 1.3f, -0.8f);
+	CameraDesc.vAt = _float3(0.225f, 1.3f, 0);
 	CameraDesc.vAxisY = _float3(0, 1, 0);
 
 	CameraDesc.fFovy = XMConvertToRadians(60.f);
@@ -159,6 +191,13 @@ HRESULT CScene_Loby::Ready_Alice(const _tchar* pLayerTag)
 	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENEID::SCENE_LOBY, pLayerTag, TAG_OP(Prototype_PlayerLoby)));
 
 	return S_OK;
+}
+
+HRESULT CScene_Loby::Ready_Layer_UI(const _tchar * pLayerTag)
+{
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENEID::SCENE_LOBY, pLayerTag, TAG_OP(Prototype_UILoby)));
+
+	return S_OK	;
 }
 
 

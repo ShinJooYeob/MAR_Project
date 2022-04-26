@@ -1,8 +1,10 @@
 #include "stdafx.h"
 #include "..\Public\Loader.h"
 
-#include "Player.h"
 #include "LobyAlice.h"
+#include "LobyUI.h"
+
+#include "Player.h"
 #include "NormalBullet.h"
 #include "GrenadeBullet.h"
 #include "TornadoSwirl.h"
@@ -104,11 +106,14 @@ HRESULT CLoader::Load_Scene_Loby(_bool * _IsClientQuit, CRITICAL_SECTION * _CriS
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_LOBY, TAG_CP(Prototype_Mesh_PlayerLoby),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Alice", "Alice.FBX", TransformMatrix, 1)));
 
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_LOBY, TAG_CP(Prototype_Texture_LobyScene),
+		CTexture::Create(m_pDevice, m_pDeviceContext, L"UI_Loby.txt")));
 
 
 #pragma endregion
 
 #pragma  region PROTOTYPE_GAMEOBJECT
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_UILoby), CLobyUI::Create(m_pDevice, m_pDeviceContext)));
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_PlayerLoby), CLobyAlice::Create(m_pDevice, m_pDeviceContext)));
 
 

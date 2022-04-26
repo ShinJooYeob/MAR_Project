@@ -186,6 +186,7 @@
     <ClInclude Include="..\public\Client_Struct.h" />
     <ClInclude Include="..\public\GamePlayUI.h" />
     <ClInclude Include="..\public\Grunt.h" />
+    <ClInclude Include="..\public\LobyUI.h" />
     <ClInclude Include="..\public\LoadingUI.h" />
     <ClInclude Include="..\public\LobyAlice.h" />
     <ClInclude Include="..\public\ParticleObject.h" />
@@ -236,6 +237,7 @@
     <ClCompile Include="..\private\Camera_Main.cpp" />
     <ClCompile Include="..\private\GamePlayUI.cpp" />
     <ClCompile Include="..\private\Grunt.cpp" />
+    <ClCompile Include="..\private\LobyUI.cpp" />
     <ClCompile Include="..\private\LoadingUI.cpp" />
     <ClCompile Include="..\private\LobyAlice.cpp" />
     <ClCompile Include="..\private\ParticleObject.cpp" />

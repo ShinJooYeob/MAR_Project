@@ -25,6 +25,10 @@ public:
 	void Set_Angle(_float DegreeAngle);
 	_float Get_Angle() { return m_fAngle; };
 
+	void Set_UIDescX(_float fX) { m_UIDesc.fX = fX; };
+	void Set_UIDescY(_float fY) { m_UIDesc.fY = fY; };
+	UIDESC Get_UIDesc() { return m_UIDesc; };
+
 	void Set_TextureLayerIndex(_uint iIndex);
 	void Set_TextureLayerIndex_UntilTo(_uint iIndex, _uint iTargetIndex,_double ChangingTime = 1);
 

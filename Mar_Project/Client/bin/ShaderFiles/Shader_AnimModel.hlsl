@@ -163,6 +163,29 @@ PS_OUT PS_MAIN_DEFAULT(PS_IN In)
 	return Out;
 }
 
+PS_OUT PS_MAIN_LOBYALICE(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	vector		vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
+
+	if (vDiffuse.a < 0.1f)
+		discard;
+
+	float		fShade = saturate(dot(normalize(g_vLightVector) * -1.f, In.vNormal));
+
+	float4		vReflect = reflect(normalize(g_vLightVector), In.vNormal);
+	float4		vLook = normalize(In.vWorldPos - g_CamPosition);
+
+	float		fSpecular = pow(saturate(dot(normalize(vReflect) * -1.f, vLook)), 30.f);
+
+	Out.vColor = (g_vLightDiffuse * vDiffuse) + (g_vLightSpecular * g_vMtrlSpecular) * fSpecular; //* (fShade + (g_vLightAmbient * g_vMtrlAmbient));
+		//;
+	//Out.vColor = vDiffuse;
+
+	return Out;
+}
+
 
 technique11		DefaultTechnique
 {
@@ -216,6 +239,15 @@ technique11		DefaultTechnique
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN_DEFAULT();
 	}
+	pass LobyAlice //5
+	{
+		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(ZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_ccw);
 
+		VertexShader = compile vs_5_0 VS_MAIN_NOWEIGHTW();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_LOBYALICE();
+	}
 
 }
