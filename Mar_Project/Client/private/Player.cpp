@@ -90,7 +90,7 @@ _int CPlayer::Update(_double fDeltaTime)
 	//
 
 
-#define TestWeapon 4
+#define TestWeapon 3
 
 	m_vecWeapon[TestWeapon]->Update(fDeltaTime);
 

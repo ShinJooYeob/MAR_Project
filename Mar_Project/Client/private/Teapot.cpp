@@ -39,13 +39,14 @@ _int CTeapot::Update(_double fDeltaTime)
 	if (m_bIsDead) return 0;
 	
 
+/*
 	{
-	//rot: -27.030010, -10.069997, -201.929626,
 
-	//Pivot: -0.610000, 0.020000, -1.290000,
+	//Pivot: -0.640000, 0.020000, -1.260000,
+		//Rot: -193.979645, 9.009996, -129.319794,
 
-		static _float3 testFloat3 = _float3(-0.610000, 0.020000, -1.290000);
-		static _float3 RotFloat3 = _float3(-27.030010, -10.069997, -201.929626);
+		static _float3 testFloat3 = _float3(0);
+		static _float3 RotFloat3 = _float3(0);
 		static _float value = 0.03f;
 		static _int kind = 0;
 
@@ -261,6 +262,8 @@ _int CTeapot::Update(_double fDeltaTime)
 		}
 
 	}
+*/
+
 
 
 

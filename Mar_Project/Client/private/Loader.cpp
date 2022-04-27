@@ -173,7 +173,7 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 
 
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Player),
-		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Alice", "Alice.FBX", TransformMatrix, 3)));
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Alice", "Alice.FBX", TransformMatrix, 2)));
 
 	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Tornado1),
@@ -224,18 +224,27 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Weapon/Grinder", "Grinder.FBX", TransformMatrix)));
 
 
+	//-0.640000, 0.020000, -1.260000);
+	//-193.979645, 9.009996, -129.319794);
 
-
-	TransformMatrix = XMMatrixScaling(0.0001f, 0.0001f, 0.0001f);
+	TransformMatrix = XMMatrixScaling(0.0001f, 0.0001f, 0.0001f)*
+		XMMatrixRotationX(XMConvertToRadians(-193.979645f))*
+		XMMatrixRotationY(XMConvertToRadians(9.009996f))*
+		XMMatrixRotationZ(XMConvertToRadians(-129.319794f))*
+		XMMatrixTranslation(-0.640f, 0.02f, -1.26f);
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Teapot),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Weapon/Teapot", "Teapot.FBX", TransformMatrix)));
 
 
 
+	//-0.584000, -0.032000, -1.333000,
+	//	-20.713932, 205.632385, 68.354744,
 
-
-
-	TransformMatrix = XMMatrixScaling(0.0001f, 0.0001f, 0.0001f);
+	TransformMatrix = XMMatrixScaling(0.00015f, 0.00015f, 0.00015f)*
+		XMMatrixRotationX(XMConvertToRadians(-20.713932f))*
+		XMMatrixRotationY(XMConvertToRadians(205.632385f))*
+		XMMatrixRotationZ(XMConvertToRadians(68.354744f))*
+		XMMatrixTranslation(-0.584000f, -0.032000f, -1.333000f);
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Umbrella),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Weapon/Umbrella", "Umbrella.FBX", TransformMatrix)));
 	

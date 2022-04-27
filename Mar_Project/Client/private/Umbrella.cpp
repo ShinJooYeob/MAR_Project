@@ -38,16 +38,19 @@ _int CUmbrella::Update(_double fDeltaTime)
 		return -1;
 	if (m_bIsDead) return 0;
 	
+/*
 
 	{
-
-	//Rot: -22.039982, 212.210632, 71.058846,
-
+		//1.0
 	//Pivot: -0.688000, 0.033000, -1.294000,
+	//Rot:  -22.039982 , 210.910583 , 71.058846 , ,
+		//1.5
+	//Pivot: -0.584000, -0.032000, -1.333000,
+	//Rot:	-20.713932, 205.632385, 68.354744,
 
 
-		static _float3 testFloat3 = _float3(-0.688000, 0.033000, -1.294000);
-		static _float3 RotFloat3 = _float3(-22.039982, 212.210632, 71.058846);
+		static _float3 testFloat3 = _float3(0);
+		static _float3 RotFloat3 =  _float3(0);
 		static _float value = 0.013f;
 		static _int kind = 0;
 		_Matrix tt = XMMatrixRotationX(XMConvertToRadians(RotFloat3.x))*
@@ -261,6 +264,7 @@ _int CUmbrella::Update(_double fDeltaTime)
 		}
 
 	}
+*/
 
 
 
@@ -273,6 +277,8 @@ _int CUmbrella::Update(_double fDeltaTime)
 	TransformMatrix.r[1] = XMVector3Normalize(TransformMatrix.r[1]);
 	TransformMatrix.r[2] = XMVector3Normalize(TransformMatrix.r[2]);
 
+	//m_BoneMatrix = TransformMatrix * m_tWeaponDesc.pParantTransform->Get_WorldMatrix();
+	//TransformMatrix = m_pTransformCom->Get_WorldMatrix()* TransformMatrix * m_tWeaponDesc.pParantTransform->Get_WorldMatrix();
 	m_BoneMatrix = TransformMatrix = m_pTransformCom->Get_WorldMatrix()* TransformMatrix * m_tWeaponDesc.pParantTransform->Get_WorldMatrix();
 
 
@@ -355,31 +361,12 @@ HRESULT CUmbrella::SetUp_Components()
 	/* For.Com_AABB */
 	ZeroMemory(&ColliderDesc, sizeof(COLLIDERDESC));
 
-	ColliderDesc.vScale = _float3(1.4f, 1.4f, 1.4f);
+	ColliderDesc.vScale = _float3(1.6f, 1.6f, 1.6f);
 	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);	
-	ColliderDesc.vPosition = _float4(-0.85f, 0.08f, -1.305f, 1.f);
+	ColliderDesc.vPosition = _float4(-1.604f, 0.587f, -0.915f, 1.f);
 	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
 
-	ColliderDesc.vScale = _float3(0.3f, 0.3f, 0.3f);
-	ColliderDesc.vPosition = _float4(-0.61f, -0.01f, -1.32f, 1.f);
-	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
-	m_pColliderCom->Set_ParantBuffer();
-
-	ColliderDesc.vScale = _float3(0.5f, 0.5f, 0.5f);
-	ColliderDesc.vPosition = _float4(-0.85f, 0.08f, -1.305f, 1.f);
-	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
-	m_pColliderCom->Set_ParantBuffer();
-
-
-	ColliderDesc.vScale = _float3(0.8f, 0.8f, 0.8f);
-	ColliderDesc.vPosition = _float4(0,0,0, 1.f);
-	//-0.180000, 0.210000, 0.150000,
-	ColliderDesc.vPosition = _float4(-1.03f, 0.29f, -1.155f, 1.f);
-	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
-	m_pColliderCom->Set_ParantBuffer();
-
-	//Pivot: -0.180000, 0.120000, 0.030000,
-	//Pivot: -0.480000, 0.180000, 0.030000,
+	
 
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Transform), TAG_COM(Com_Transform), (CComponent**)&m_pTransformCom));
