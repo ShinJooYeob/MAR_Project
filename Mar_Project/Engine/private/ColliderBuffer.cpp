@@ -249,6 +249,11 @@ _bool CColliderBuffer::Collision_All(CColliderBuffer * pTargetColliderBuffer)
 	return false;
 }
 
+void CColliderBuffer::Add_ChildBufferIndex(_uint iIndex)
+{
+	m_ChildNodeIndexList.push_back(iIndex);
+}
+
 _int CColliderBuffer::Render()
 {
 	m_pDeviceContext->IASetInputLayout(m_pInputLayout);

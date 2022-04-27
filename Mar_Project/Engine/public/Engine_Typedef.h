@@ -23,6 +23,10 @@ namespace Engine
 
 
 
+	typedef XMUINT2						_uint2;
+	typedef XMUINT3						_uint3;
+	typedef XMINT2						_int2;
+	typedef XMINT3						_int3;
 
 	typedef struct tagMyFloat4  _float4;
 	typedef struct tagMyFloat3  _float3;

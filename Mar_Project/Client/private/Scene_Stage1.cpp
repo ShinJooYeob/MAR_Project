@@ -45,7 +45,7 @@ HRESULT CScene_Stage1::Initialize()
 
 
 
-	//FAILED_CHECK(Ready_Layer_Grunt(TAG_LAY(Layer_Monster)));
+	FAILED_CHECK(Ready_Layer_Grunt(TAG_LAY(Layer_Monster)));
 	//FAILED_CHECK(Ready_Layer_Eyepot(TAG_LAY(Layer_Monster)));
 	//FAILED_CHECK(Ready_Layer_WaspInk(TAG_LAY(Layer_Monster)));
 	//FAILED_CHECK(Ready_Layer_WaspArrow(TAG_LAY(Layer_Monster)));

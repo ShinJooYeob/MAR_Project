@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "..\public\Monster.h"
 #include "Terrain.h"
-#include "Player.h"
 
 _uint CALLBACK Monster_Add_Force_Thread(void* _Prameter)
 {

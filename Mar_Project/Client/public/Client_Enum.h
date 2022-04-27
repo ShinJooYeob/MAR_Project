@@ -1006,7 +1006,6 @@ enum COMPONENTID
 	Com_Transform,
 	Com_SubTransform,
 	Com_Texture,
-	Com_Collision,
 	Com_Inventory,
 	Com_Shader,
 	Com_ShaderSub,
@@ -1033,9 +1032,6 @@ static const _tchar* Tag_Component(COMPONENTID eTag)
 		
 	case Com_Texture:
 		return TEXT("Com_Texture");
-		break;
-	case Com_Collision:
-		return TEXT("Com_Collision");
 		break;
 	case Com_Inventory:
 		return TEXT("Com_Inventory");

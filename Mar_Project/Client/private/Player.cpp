@@ -130,10 +130,13 @@ _int CPlayer::Render()
 	if (__super::Render() < 0)
 		return -1;
 
-	m_pColliderCom->Render();
 
 	NULL_CHECK_RETURN(m_pModel, E_FAIL);
 
+
+#ifdef _DEBUG
+	m_pColliderCom->Render();
+#endif // _DEBUG
 
 
 
@@ -542,39 +545,34 @@ HRESULT CPlayer::SetUp_Components()
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Shader_VAM), TAG_COM(Com_Shader), (CComponent**)&m_pShaderCom));
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Collider), TAG_COM(Com_Collider), (CComponent**)&m_pColliderCom));
+
+
+
 	COLLIDERDESC			ColliderDesc;
+	/* For.Com_SPHERE */
+	ZeroMemory(&ColliderDesc, sizeof(COLLIDERDESC));
+	ColliderDesc.vScale = _float3(1.7f, 1.7f, 1.7f);
+	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
+	ColliderDesc.vPosition = _float4(0.f, 0.85f, 0.f, 1.f);
+	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
+
+
+	ZeroMemory(&ColliderDesc, sizeof(COLLIDERDESC));
+	ColliderDesc.vScale = _float3(1.f, 1.f, 1.0f);
+	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
+	ColliderDesc.vPosition = _float4(2.f, 0.5f, 0.f, 1.f);
+	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_OBB, &ColliderDesc));
+	m_pColliderCom->Set_ParantBuffer();
+
 	/* For.Com_AABB */
 	ZeroMemory(&ColliderDesc, sizeof(COLLIDERDESC));
 
-	ColliderDesc.vScale = _float3(0.6f, 1.4f, 0.6f);
+	ColliderDesc.vScale = _float3(0.5f, 0.5f, 0.5f);
 	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
-	ColliderDesc.vPosition = _float4(0.f, 0.7f, 0.f, 1.f);
+	ColliderDesc.vPosition = _float4(0.f, 0.7f, 1.f, 1.f);
 	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_AABB, &ColliderDesc));
-	ColliderDesc.vScale = _float3(1.f, 1.4f, 0.6f);
+	m_pColliderCom->Set_ParantBuffer(1);
 
-	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_AABB, &ColliderDesc));
-	ColliderDesc.vScale = _float3(2.f, 1.4f, 0.6f);
-
-	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_AABB, &ColliderDesc));
-	ColliderDesc.vScale = _float3(3.f, 1.4f, 0.6f);
-
-	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_AABB, &ColliderDesc));
-
-
-
-	ZeroMemory(&ColliderDesc, sizeof(COLLIDERDESC));
-	ColliderDesc.vScale = _float3(1.f, 1.f, 1.0f);
-	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
-	ColliderDesc.vPosition = _float4(0.f, 0.5f, 0.f, 1.f);
-	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_OBB, &ColliderDesc));
-
-
-	/* For.Com_SPHERE */	
-	ZeroMemory(&ColliderDesc, sizeof(COLLIDERDESC));
-	ColliderDesc.vScale = _float3(1.f, 1.f, 1.0f);
-	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
-	ColliderDesc.vPosition = _float4(0.f, 0.5f, 0.f, 1.f);
-	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
 
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Mesh_Player), TAG_COM(Com_Model), (CComponent**)&m_pModel));

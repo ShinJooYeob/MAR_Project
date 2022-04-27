@@ -20,11 +20,16 @@ public:
 	virtual HRESULT Initialize_Clone(COLLIDERDESC* pArg);
 
 	void Update_Transform(_fMatrix TransformMatrix);
+	
 public:
 	_bool Collision_AABB(CColliderBuffer* pTargetColliderBuffer);
 	_bool Collision_OBB(CColliderBuffer* pTargetColliderBuffer);
 	_bool Collision_Sphere(CColliderBuffer* pTargetColliderBuffer);
 	_bool Collision_All(CColliderBuffer* pTargetColliderBuffer);
+
+	void Add_ChildBufferIndex(_uint iIndex);
+	list<_uint>* Get_ChildIndexList() { return &m_ChildNodeIndexList; };
+	_uint Get_NumChildBuffer() { return _uint(m_ChildNodeIndexList.size()); };
 
 #ifdef _DEBUG
 public:
@@ -39,7 +44,6 @@ private:
 	COLLIDERDESC				m_ColliderDesc;
 
 	_bool						m_bIsConflicted = false;
-
 
 #ifdef _DEBUG
 private:
@@ -56,7 +60,7 @@ private:
 
 private:
 	_Matrix Remove_Rotation(_fMatrix TransformMatrix);
-
+	list<_uint>	m_ChildNodeIndexList;
 
 
 

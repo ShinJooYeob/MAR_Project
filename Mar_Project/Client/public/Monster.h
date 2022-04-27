@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GameObject.h"
+#include "Player.h"
 
 BEGIN(Client)
 class CMonster abstract : public CGameObject
@@ -39,7 +40,7 @@ protected:
 	_float	Distance_BetweenPlayer(CTransform* pTransform);
 
 protected:
-	class CPlayer*		m_pPlayer = nullptr;
+	CPlayer*		m_pPlayer = nullptr;
 	CTransform*			m_pPlayerTransfrom = nullptr;
 	CGameInstance*		m_pInstance = nullptr;
 	_bool				m_bIsPatternFinished = false;

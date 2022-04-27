@@ -53,6 +53,36 @@ void CCollider::Update_Transform(_uint iIndex, _fMatrix Transform)
 
 }
 
+_bool CCollider::Inspect_Collision(CCollider* pTargetCollider, _uint iBufferIndex, _uint iTargetIndex, _uint2* pOutIndex)
+{
+
+	if (iBufferIndex >= m_vecColliderBuffer.size() || iTargetIndex >= pTargetCollider->m_vecColliderBuffer.size())
+	{
+		__debugbreak();
+		return false;
+	}
+
+	return Inspect_ChildBuffer(iBufferIndex, pTargetCollider, iTargetIndex, pOutIndex);
+}
+
+HRESULT CCollider::Set_ParantBuffer(_uint iParantIndex, _int iIndex)
+{
+	if (iIndex == -1) iIndex = _int(_int(m_vecColliderBuffer.size()) - 1);
+
+	if (iIndex >= m_vecColliderBuffer.size() || iParantIndex >= m_vecColliderBuffer.size())
+	{
+		__debugbreak();
+		return E_FAIL;
+	}
+
+	m_vecColliderBuffer[iParantIndex]->Add_ChildBufferIndex(iIndex);
+
+	return S_OK;
+}
+
+
+
+
 _int CCollider::Add_ColliderBuffer(COLLIDERTYPE eColliderType, COLLIDERDESC * pColliderDesc)
 {
 
@@ -79,6 +109,54 @@ _int CCollider::Render()
 
 
 	return 0;
+}
+
+_bool CCollider::Inspect_ChildBuffer(_uint iBufferIndex, CCollider* pTargetCollider, _uint iTargetIndex, _uint2* pOutIndex)
+{
+
+	if (m_vecColliderBuffer[iBufferIndex]->Collision_All(pTargetCollider->m_vecColliderBuffer[iTargetIndex]))
+	{
+		if (m_vecColliderBuffer[iBufferIndex]->Get_NumChildBuffer())
+		{
+			list<_uint>* ChildList = m_vecColliderBuffer[iBufferIndex]->Get_ChildIndexList();
+
+			for (auto iChildIndex : *ChildList)
+			{
+				if (Inspect_ChildBuffer(iChildIndex, pTargetCollider, iTargetIndex, pOutIndex))
+					return true;
+			}
+
+		}
+		else
+		{
+			if (pTargetCollider->m_vecColliderBuffer[iTargetIndex]->Get_NumChildBuffer())
+			{
+				list<_uint>* TargetChildList = pTargetCollider->m_vecColliderBuffer[iTargetIndex]->Get_ChildIndexList();
+
+
+				for (auto iTargetChildIndex : *TargetChildList)
+				{
+					if (Inspect_ChildBuffer(iBufferIndex, pTargetCollider, iTargetChildIndex, pOutIndex))
+						return true;
+				}
+
+			}
+			else
+			{
+				if (pOutIndex != nullptr)
+				{
+					*pOutIndex = _uint2(iBufferIndex, iTargetIndex);
+				}
+				return true;
+			}
+
+		}
+
+	}
+	else
+		return false;
+
+	return  false;
 }
 
 CCollider * CCollider::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)

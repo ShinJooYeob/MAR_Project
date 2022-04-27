@@ -18,9 +18,13 @@ public:
 	virtual HRESULT Initialize_Clone(void* pArg)override;
 
 	void Update_Transform(_uint iIndex, _fMatrix Transform);
-	_int Add_ColliderBuffer(COLLIDERTYPE eColliderType, COLLIDERDESC* pColliderDesc = nullptr);
-	_uint Get_NumColliderBuffer() { return _uint(m_vecColliderBuffer.size()); };
 
+	_bool Inspect_Collision( CCollider* pTargetCollider, _uint iBufferIndex = 0, _uint iTargetIndex = 0, _uint2* pOutIndex = nullptr);
+
+	HRESULT Set_ParantBuffer(_uint iParantIndex = 0, _int iIndex = -1);
+
+	_uint Get_NumColliderBuffer() { return _uint(m_vecColliderBuffer.size()); };
+	_int Add_ColliderBuffer(COLLIDERTYPE eColliderType, COLLIDERDESC* pColliderDesc = nullptr);
 #ifdef _DEBUG
 public:
 	virtual _int Render();
@@ -30,6 +34,8 @@ private:
 	vector<CColliderBuffer*>    m_vecColliderBuffer;
 	vector<CColliderBuffer*>	m_vecPrototypeCollideBuffer;
 
+private:
+	_bool Inspect_ChildBuffer(_uint iBufferIndex, CCollider* pTargetCollider, _uint iTargetIndex,_uint2* pOutIndex);
 
 public:
 	static CCollider* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
