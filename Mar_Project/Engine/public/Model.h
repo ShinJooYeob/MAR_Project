@@ -39,6 +39,7 @@ public:
 	HRESULT Update_AnimationClip(_double fDeltaTime, _bool IsUpdateAll = true);	
 	HRESULT Render(class CShader* pShader, _uint iPassIndex, _uint iMaterialIndex, const char* szBoneValueName = nullptr);
 
+	ATTACHBONEMATRIX_PTR Find_AttachMatrix_InHirarchyNode(const char* pName);
 public:
 	_uint	Get_NumMaterial() { return m_iNumMaterials; };
 private:

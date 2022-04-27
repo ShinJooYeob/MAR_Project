@@ -130,6 +130,7 @@ _int CGrunt::LateUpdate(_double fDeltaTime)
 
 	m_pColliderCom->Inspect_Collision((CCollider*)(m_pPlayer->Get_Component(TAG_COM(Com_Collider))));
 
+
 	if (m_bIsOnScreen)
 		FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this));
 

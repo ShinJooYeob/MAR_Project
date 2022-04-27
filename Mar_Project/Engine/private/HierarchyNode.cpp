@@ -37,8 +37,8 @@ void CHierarchyNode::Update_CombinedMatrix()
 	}
 
 	m_matUpdatedTransform = m_matOffset.XMatrix() * m_matCombinedTransformation.XMatrix();
-
 }
+
 
 CHierarchyNode * CHierarchyNode::Create(CHierarchyNode* pParent, const char * pName, _float4x4* TransformationMatrix, _uint iDepth)
 {

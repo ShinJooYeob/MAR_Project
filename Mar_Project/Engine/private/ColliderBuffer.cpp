@@ -269,6 +269,7 @@ _int CColliderBuffer::Render()
 
 
 	_Vector		vColliderColor = (m_bIsConflicted) ? XMVectorSet(1.f, 0.f, 0.f, 1.f) : XMVectorSet(0.f, 1.f, 0.f, 1.f);
+	if(m_ChildNodeIndexList.size()) vColliderColor =  XMVectorSet(1.f, 1.f, 1.f, 1.f);
 
 	m_pBatch->Begin();
 

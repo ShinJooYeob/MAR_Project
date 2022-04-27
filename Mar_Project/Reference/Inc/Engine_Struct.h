@@ -2,6 +2,14 @@
 
 namespace Engine
 {
+
+	typedef struct tagAttachBoneMatrixPtr
+	{
+		_float4x4*			pUpdatedNodeMat;
+		_float4x4*			pDefaultPivotMat;
+	}ATTACHBONEMATRIX_PTR;
+
+
 	typedef struct tagColliderDesc
 	{
 		_float3 vScale; /* ¹è¼ö */

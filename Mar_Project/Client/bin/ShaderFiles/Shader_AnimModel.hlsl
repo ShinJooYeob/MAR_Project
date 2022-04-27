@@ -11,6 +11,12 @@ cbuffer Matrices
 	BoneMatrixArray		g_BoneMatrices;
 };
 
+
+cbuffer AttechMatrix
+{
+	matrix g_AttechMatrix;
+};
+
 texture2D			g_DiffuseTexture;
 texture2D			g_SpecularTexture;
 //texture2D			g_AmbientTexture;
@@ -122,6 +128,37 @@ VS_OUT VS_MAIN_NOWEIGHTW(VS_IN In)
 	Out.vNormal = normalize(mul(vLocalNormal, matWVP));
 	Out.vTexUV = In.vTexUV;
 	Out.vWorldPos = mul(vLocalPosition, g_WorldMatrix);
+
+
+	return Out;
+}
+
+VS_OUT VS_MAIN_ATTACHEDNOWEIGHTW(VS_IN In)
+{
+	VS_OUT			Out = (VS_OUT)0;
+
+	matrix			matWV, matWVP;
+
+
+	float		fWeightX = 1.f - (In.vBlendWeight.y + In.vBlendWeight.z + In.vBlendWeight.w);
+
+	matrix		BoneMatrix = g_BoneMatrices.BoneMatrices[In.vBlendIndex.x] * In.vBlendWeight.x +
+		g_BoneMatrices.BoneMatrices[In.vBlendIndex.y] * In.vBlendWeight.y +
+		g_BoneMatrices.BoneMatrices[In.vBlendIndex.z] * In.vBlendWeight.z +
+		g_BoneMatrices.BoneMatrices[In.vBlendIndex.w] * In.vBlendWeight.w;
+
+	vector		vLocalPosition = mul(vector(In.vModelDataPosition, 1.f), BoneMatrix);
+	vector		vLocalNormal = mul(vector(In.vModelDataNormal, 0.f), BoneMatrix);
+
+	matrix			WorldMatrix = g_AttechMatrix;
+
+	matWV = mul(WorldMatrix, g_ViewMatrix);
+	matWVP = mul(matWV, g_ProjMatrix);
+
+	Out.vPosition = mul(vLocalPosition, matWVP);
+	Out.vNormal = normalize(mul(vLocalNormal, matWVP));
+	Out.vTexUV = In.vTexUV;
+	Out.vWorldPos = mul(vLocalPosition, WorldMatrix);
 
 
 	return Out;
@@ -248,6 +285,17 @@ technique11		DefaultTechnique
 		VertexShader = compile vs_5_0 VS_MAIN_NOWEIGHTW();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN_LOBYALICE();
+	}
+
+	pass AttachedWeapon //6
+	{
+		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(ZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_ccw);
+
+		VertexShader = compile vs_5_0 VS_MAIN_ATTACHEDNOWEIGHTW();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_DEFAULT();
 	}
 
 }

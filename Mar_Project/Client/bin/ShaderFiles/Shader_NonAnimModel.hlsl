@@ -19,6 +19,11 @@ texture2D			g_OpacityTexture;
 //texture2D			g_DiffuseRoughTexture;
 //texture2D			g_AmbientOcculusionTexture;
 
+cbuffer AttechMatrix
+{
+	matrix g_AttechMatrix;
+};
+
 cbuffer LightDesc
 {
 	float4		g_vLightVector;
@@ -84,6 +89,31 @@ VS_OUT VS_MAIN_DEFAULT(VS_IN In)
 	
 	return Out;
 }
+
+VS_OUT VS_MAIN_ATTACHBONE(VS_IN In)
+{
+
+
+	VS_OUT			Out = (VS_OUT)0;
+
+	matrix			matWV, matWVP;
+
+	matrix			WorldMatrix = g_AttechMatrix;
+
+	matWV = mul(WorldMatrix, g_ViewMatrix);
+	matWVP = mul(matWV, g_ProjMatrix);
+
+	Out.vPosition = mul(vector(In.vPosition, 1.f), matWVP);
+	Out.vNormal = normalize(mul(vector(In.vNormal, 0.f), WorldMatrix));
+	Out.vTexUV = In.vTexUV;
+	Out.vWorldPos = mul(vector(In.vPosition, 1.f), WorldMatrix);
+	Out.vTexUV = In.vTexUV;
+
+	return Out;
+}
+
+
+
 
 struct PS_IN
 {
@@ -276,5 +306,17 @@ technique11		DefaultTechnique
 		VertexShader = compile vs_5_0 VS_MAIN_DEFAULT();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN_SKYBOX();
+	}
+
+	pass AttachBone		//7
+	{
+		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(ZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_cw);
+		//SetRasterizerState(CullMode_cw);
+
+		VertexShader = compile vs_5_0 VS_MAIN_ATTACHBONE();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_DEFAULT();
 	}
 }

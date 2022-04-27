@@ -8,6 +8,11 @@
 #include "NormalBullet.h"
 #include "GrenadeBullet.h"
 #include "TornadoSwirl.h"
+#include "Knife.h"
+#include "Horse.h"
+#include "Grinder.h"
+#include "Teapot.h"
+#include "Umbrella.h"
 
 //Editor
 #include "ESCursor.h"
@@ -168,7 +173,7 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 
 
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Player),
-		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Alice", "Alice.FBX", TransformMatrix, 1)));
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Alice", "Alice.FBX", TransformMatrix, 3)));
 
 	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Tornado1),
@@ -179,6 +184,61 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "Tornado", "TornadoMesh01.FBX", TransformMatrix)));
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Tornado4),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "Tornado", "TornadoSwirl01.FBX", TransformMatrix)));
+
+
+
+
+
+
+
+
+	//Pivot  :-0.61f, -0.01, -1.32f
+	////////////////*무기*/
+	TransformMatrix = XMMatrixScaling(0.0001f, 0.0001f, 0.0001f)*
+		XMMatrixRotationX(XMConvertToRadians(-83.7f))*
+		XMMatrixRotationY(XMConvertToRadians(-83.1f))*
+		XMMatrixRotationZ(XMConvertToRadians(-30))*
+		XMMatrixTranslation(-0.61f, -0.01f, -1.32f);
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_KnifeUg),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "Weapon/Knife", "KnifeUg.FBX", TransformMatrix)));
+
+	TransformMatrix = XMMatrixScaling(0.0001f, 0.0001f, 0.0001f)*
+		XMMatrixRotationX(XMConvertToRadians(-20.479946f))*
+		XMMatrixRotationY(XMConvertToRadians(211.469604f))*
+		XMMatrixRotationZ(XMConvertToRadians(71.019928f))*
+		XMMatrixTranslation(-0.61f, 0.02f, -1.32f);
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Horse),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Weapon/Horse", "Horse.FBX", TransformMatrix)));
+
+
+	//_float3(-0.610000, 0.020000, -1.290000);
+	//_float3(-27.030010, -10.069997, -201.929626);
+
+	TransformMatrix = XMMatrixScaling(0.0001f, 0.0001f, 0.0001f)*
+		XMMatrixRotationX(XMConvertToRadians(-27.03f))*
+		XMMatrixRotationY(XMConvertToRadians(-10.069997f))*
+		XMMatrixRotationZ(XMConvertToRadians(-201.929626f))*
+		XMMatrixTranslation(-0.61f, 0.0200f, -1.290f);
+
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Grinder),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Weapon/Grinder", "Grinder.FBX", TransformMatrix)));
+
+
+
+
+	TransformMatrix = XMMatrixScaling(0.0001f, 0.0001f, 0.0001f);
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Teapot),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Weapon/Teapot", "Teapot.FBX", TransformMatrix)));
+
+
+
+
+
+
+	TransformMatrix = XMMatrixScaling(0.0001f, 0.0001f, 0.0001f);
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Umbrella),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Weapon/Umbrella", "Umbrella.FBX", TransformMatrix)));
+	
 
 
 	TransformMatrix = XMMatrixScaling(0.0001f, 0.0001f, 0.0001f) * XMMatrixRotationY(XMConvertToRadians(90.0f));
@@ -201,8 +261,8 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 
 
 	
-	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_Grunt),
-		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Grunt", "Grunt.FBX", TransformMatrix)));
+	//FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_Grunt),
+	//	CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Grunt", "Grunt.FBX", TransformMatrix)));
 	////
 	//
 	//FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_Eyepot),
@@ -368,6 +428,13 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_Bullet_Normal), CNormalBullet::Create(m_pDevice, m_pDeviceContext)));
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_Bullet_Grenade), CGrenadeBullet::Create(m_pDevice, m_pDeviceContext)));
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_PlayerTornado), CTornadoSwirl::Create(m_pDevice, m_pDeviceContext)));
+
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_WeaponKnife), CKnife::Create(m_pDevice, m_pDeviceContext)));
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_WeaponHorse), CHorse::Create(m_pDevice, m_pDeviceContext)));
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_WeaponGrinder), CGrinder::Create(m_pDevice, m_pDeviceContext)));
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_WeaponTeapot), CTeapot::Create(m_pDevice, m_pDeviceContext)));
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_WeaponUmbrella), CUmbrella::Create(m_pDevice, m_pDeviceContext)));
+	//FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_WeaponClockBomb), CTornadoSwirl::Create(m_pDevice, m_pDeviceContext)));
 
 
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_UIGamePlay),

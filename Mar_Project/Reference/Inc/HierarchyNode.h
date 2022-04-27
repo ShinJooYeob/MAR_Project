@@ -20,10 +20,12 @@ public:/*GetSet*/
 
 
 	_fMatrix Get_UpdatedMatrix() { return m_matUpdatedTransform.XMatrix(); };
+	_float4x4* Get_UpdatedTransformMat() { return &m_matUpdatedTransform; };
 	void Set_OffsetMatrix(_float4x4* matOffSet) { 	XMStoreFloat4x4(&m_matOffset, XMMatrixTranspose(XMLoadFloat4x4(matOffSet)));};
 	void Set_Transformation(_fMatrix matTransformation) { m_matTransformation = matTransformation; };
 	void Update_CombinedMatrix();
 
+	
 
 	_float4x4	Get_OffsetMatrix() { return m_matOffset.TransposeXMatrix(); }
 private:
@@ -33,6 +35,7 @@ private:
 	_float4x4					m_matTransformation;
 	_float4x4					m_matCombinedTransformation;
 	_float4x4					m_matUpdatedTransform;
+
 
 	_uint						m_iDepth;
 public:

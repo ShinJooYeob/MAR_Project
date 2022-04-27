@@ -35,6 +35,13 @@ enum OBJECTPROTOTYPEID
 	Prototype_Player,
 	Prototype_PlayerTornado,
 
+	Prototype_WeaponKnife,
+	Prototype_WeaponGrinder,
+	Prototype_WeaponHorse,
+	Prototype_WeaponTeapot,
+	Prototype_WeaponUmbrella,
+	Prototype_WeaponClockBomb,
+
 	Prototype_Executor,
 	Prototype_Grunt,
 	Prototype_Eyepot,
@@ -95,8 +102,26 @@ static const _tchar* Tag_Object_Prototype(OBJECTPROTOTYPEID eTag)
 	case Prototype_UISetting:
 		return TEXT("Prototype_UISetting");
 		break;
-	
-		
+
+	case Prototype_WeaponKnife:
+		return TEXT("Prototype_WeaponKnife");
+		break;
+	case Prototype_WeaponGrinder:
+		return TEXT("Prototype_WeaponGrinder");
+		break;
+	case Prototype_WeaponHorse:
+		return TEXT("Prototype_WeaponHorse");
+		break;
+	case Prototype_WeaponTeapot:
+		return TEXT("Prototype_WeaponTeapot");
+		break;
+	case Prototype_WeaponUmbrella:
+		return TEXT("Prototype_WeaponUmbrella");
+		break;
+	case Prototype_WeaponClockBomb:
+		return TEXT("Prototype_WeaponClockBomb");
+		break;
+
 
 
 	case Prototype_Camera_Editor:
@@ -544,7 +569,16 @@ enum COMPONENTPROTOTYPEID
 	Prototype_Mesh_TeaBullet,
 	Prototype_Mesh_OilBullet,
 
-		Prototype_Mesh_SkyBox,
+		Prototype_Mesh_Knife,
+		Prototype_Mesh_KnifeUg,
+		Prototype_Mesh_Grinder,
+		Prototype_Mesh_Horse,
+		Prototype_Mesh_Teapot,
+		Prototype_Mesh_Umbrella,
+		Prototype_Mesh_ClockBomb,
+
+
+	Prototype_Mesh_SkyBox,
 
 	//////////////////////////////////////////////////////////////////////////
 	Prototype_Texture_Player,
@@ -806,7 +840,31 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 	case Prototype_Mesh_Player:
 		return TEXT("Mesh_Player");
 		break;
-		
+
+	case Prototype_Mesh_Knife:
+		return TEXT("Prototype_Mesh_Knife");
+		break;
+	case Prototype_Mesh_KnifeUg:
+		return TEXT("Prototype_Mesh_KnifeUg");
+		break;
+	case Prototype_Mesh_Grinder:
+		return TEXT("Prototype_Mesh_Grinder");
+		break;
+	case Prototype_Mesh_Horse:
+		return TEXT("Prototype_Mesh_Horse");
+		break;
+	case Prototype_Mesh_Teapot:
+		return TEXT("Prototype_Mesh_Teapot");
+		break;
+	case Prototype_Mesh_Umbrella:
+		return TEXT("Prototype_Mesh_Umbrella");
+		break;
+	case Prototype_Mesh_ClockBomb:
+		return TEXT("Prototype_Mesh_ClockBomb");
+		break;
+
+
+
 	case Prototype_Mesh_PlayerLoby:
 		return TEXT("Prototype_Mesh_PlayerLoby");
 		break;

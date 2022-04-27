@@ -5,6 +5,13 @@
 BEGIN(Client)
 class CWeapon abstract : public CGameObject
 {
+public:
+	typedef struct tagWeaponDesc
+	{
+		CModel*			pModel = nullptr;
+		CTransform*		pParantTransform = nullptr;
+		const char*		szHirarchyNodeName = nullptr;
+	}WEAPONDESC;
 
 protected:
 	CWeapon(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
@@ -21,6 +28,10 @@ public:
 	virtual _int Render()override;
 	virtual _int LateRender()override;
 
+protected:
+	WEAPONDESC				m_tWeaponDesc;
+	ATTACHBONEMATRIX_PTR	m_tATBMat;
+	_float4x4				m_BoneMatrix;
 
 public:
 	virtual void Free() override;

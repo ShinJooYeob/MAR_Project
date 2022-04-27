@@ -23,6 +23,13 @@ HRESULT CWeapon::Initialize_Clone(void * pArg)
 {
 	FAILED_CHECK(__super::Initialize_Clone(pArg));
 
+	NULL_CHECK_RETURN(pArg, E_FAIL);
+
+	memcpy(&m_tWeaponDesc, pArg, sizeof(WEAPONDESC));
+
+	m_tATBMat = m_tWeaponDesc.pModel->Find_AttachMatrix_InHirarchyNode(m_tWeaponDesc.szHirarchyNodeName);
+	
+
 
 	return S_OK;
 }

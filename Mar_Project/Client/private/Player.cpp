@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "..\public\Player.h"
+#include "Weapon.h"
 #include "Camera.h"
 #include "Terrain.h"
 #include "GamePlayUI.h"
@@ -88,6 +89,11 @@ _int CPlayer::Update(_double fDeltaTime)
 	//	m_pModel->Change_AnimIndex(8);
 	//
 
+
+#define TestWeapon 4
+
+	m_vecWeapon[TestWeapon]->Update(fDeltaTime);
+
 	return _int();
 }
 
@@ -117,9 +123,15 @@ _int CPlayer::LateUpdate(_double fDeltaTime)
 
 	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime));
 
+
+
 	//if (g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS)))
 	if (!m_fDashPassedTime)
+	{
 		FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this));
+		m_vecWeapon[TestWeapon]->LateUpdate(fDeltaTime);
+
+	}
 
 	m_vOldPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
 	return _int();
@@ -539,7 +551,6 @@ HRESULT CPlayer::Calculate_Force(_bool * _IsClientQuit, CRITICAL_SECTION * _CriS
 HRESULT CPlayer::SetUp_Components()
 {
 
-
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Renderer), TAG_COM(Com_Renderer), (CComponent**)&m_pRendererCom));
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Shader_VAM), TAG_COM(Com_Shader), (CComponent**)&m_pShaderCom));
@@ -557,21 +568,21 @@ HRESULT CPlayer::SetUp_Components()
 	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
 
 
-	ZeroMemory(&ColliderDesc, sizeof(COLLIDERDESC));
-	ColliderDesc.vScale = _float3(1.f, 1.f, 1.0f);
-	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
-	ColliderDesc.vPosition = _float4(2.f, 0.5f, 0.f, 1.f);
-	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_OBB, &ColliderDesc));
-	m_pColliderCom->Set_ParantBuffer();
+	//ZeroMemory(&ColliderDesc, sizeof(COLLIDERDESC));
+	//ColliderDesc.vScale = _float3(1.f, 1.f, 1.0f);
+	//ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
+	//ColliderDesc.vPosition = _float4(2.f, 0.5f, 0.f, 1.f);
+	//FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_OBB, &ColliderDesc));
+	//m_pColliderCom->Set_ParantBuffer();
 
-	/* For.Com_AABB */
-	ZeroMemory(&ColliderDesc, sizeof(COLLIDERDESC));
+	///* For.Com_AABB */
+	//ZeroMemory(&ColliderDesc, sizeof(COLLIDERDESC));
 
-	ColliderDesc.vScale = _float3(0.5f, 0.5f, 0.5f);
-	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
-	ColliderDesc.vPosition = _float4(0.f, 0.7f, 1.f, 1.f);
-	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_AABB, &ColliderDesc));
-	m_pColliderCom->Set_ParantBuffer(1);
+	//ColliderDesc.vScale = _float3(0.5f, 0.5f, 0.5f);
+	//ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
+	//ColliderDesc.vPosition = _float4(0.f, 0.7f, 1.f, 1.f);
+	//FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_AABB, &ColliderDesc));
+	//m_pColliderCom->Set_ParantBuffer(1);
 
 
 
@@ -600,6 +611,8 @@ HRESULT CPlayer::SetUp_Components()
 
 	ZeroMemory(m_bAtkMoveMentChecker, sizeof(_bool) * 3);
 
+
+	FAILED_CHECK(SetUp_Weapon());
 	return S_OK;
 }
 
@@ -622,6 +635,52 @@ HRESULT CPlayer::SetUp_ConstTable()
 	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4)));
 	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4)));
 
+
+	return S_OK;
+}
+
+HRESULT CPlayer::SetUp_Weapon()
+{
+	m_vecWeapon.reserve(6);
+
+	CGameInstance* pInstance = GetSingle(CGameInstance);
+
+	NULL_CHECK_RETURN(m_pModel, E_FAIL);
+	NULL_CHECK_RETURN(m_pTransformCom, E_FAIL);
+
+	CWeapon::WEAPONDESC tWeaponDesc;
+	tWeaponDesc.pModel = m_pModel;
+	tWeaponDesc.pParantTransform = m_pTransformCom;
+	tWeaponDesc.szHirarchyNodeName = "Bip01-Prop1";
+
+	CWeapon* pWeapon = nullptr;
+	pInstance->Add_GameObject_Out_of_Manager((CGameObject**)&pWeapon, SCENE_STATIC, TAG_OP(Prototype_WeaponKnife),&tWeaponDesc);
+	NULL_CHECK_RETURN(pWeapon, E_FAIL);
+	m_vecWeapon.push_back(pWeapon);
+
+	pWeapon = nullptr;
+	pInstance->Add_GameObject_Out_of_Manager((CGameObject**)&pWeapon, SCENE_STATIC, TAG_OP(Prototype_WeaponGrinder), &tWeaponDesc);
+	NULL_CHECK_RETURN(pWeapon, E_FAIL);
+	m_vecWeapon.push_back(pWeapon);
+
+	pWeapon = nullptr;
+	pInstance->Add_GameObject_Out_of_Manager((CGameObject**)&pWeapon, SCENE_STATIC, TAG_OP(Prototype_WeaponHorse), &tWeaponDesc);
+	NULL_CHECK_RETURN(pWeapon, E_FAIL);
+	m_vecWeapon.push_back(pWeapon);
+
+
+	pWeapon = nullptr;
+	pInstance->Add_GameObject_Out_of_Manager((CGameObject**)&pWeapon, SCENE_STATIC, TAG_OP(Prototype_WeaponTeapot), &tWeaponDesc);
+	NULL_CHECK_RETURN(pWeapon, E_FAIL);
+	m_vecWeapon.push_back(pWeapon);
+
+
+
+	pWeapon = nullptr;
+	pInstance->Add_GameObject_Out_of_Manager((CGameObject**)&pWeapon, SCENE_STATIC, TAG_OP(Prototype_WeaponUmbrella), &tWeaponDesc);
+	NULL_CHECK_RETURN(pWeapon, E_FAIL);
+	m_vecWeapon.push_back(pWeapon);
+	
 
 	return S_OK;
 }
@@ -2957,5 +3016,8 @@ void CPlayer::Free()
 	
 	Safe_Release(m_pRockOnMonster);
 	
+	for (auto& pWeapon : m_vecWeapon)
+		Safe_Release(pWeapon);
 
+	
 }

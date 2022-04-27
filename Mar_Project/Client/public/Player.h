@@ -8,14 +8,15 @@ END
 
 
 BEGIN(Client)
+class CWeapon;
 
 class CPlayer final : public CGameObject
 {
 public:
 	enum eWeaponState
 	{
-		Weapon_None = 0, Weapon_Knife = 47, Weapon_Grinder = 73, Weapon_Horse = 89, Weapon_Teapot = 113, Weapon_Umbrella = 134, Weapon_End
-		//Weapon_None = 0, Weapon_Knife = 1, Weapon_Grinder = 2, Weapon_Horse = 3, Weapon_Teapot = 47, Weapon_Umbrella = 99999999, Weapon_End
+		//Weapon_None = 0, Weapon_Knife = 47, Weapon_Grinder = 73, Weapon_Horse = 89, Weapon_Teapot = 113, Weapon_Umbrella = 134, Weapon_End
+		Weapon_None = 0, Weapon_Knife =88888888, Weapon_Grinder = 3212313, Weapon_Horse = 777777777, Weapon_Teapot = 213213, Weapon_Umbrella = 47, Weapon_End
 	};
 
 
@@ -106,11 +107,13 @@ private:
 
 	/*For Particle*/
 	vector<PARTICLEDESC>		m_vecParticleDesc;
+	vector<CWeapon*>			m_vecWeapon;
 
 
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ConstTable();
+	HRESULT SetUp_Weapon();
 	HRESULT Ready_ParticleDesc();
 
 	

@@ -710,6 +710,19 @@ HRESULT CModel::Render(CShader * pShader, _uint iPassIndex,_uint iMaterialIndex,
 	return S_OK;
 }
 
+ATTACHBONEMATRIX_PTR CModel::Find_AttachMatrix_InHirarchyNode(const char * pName)
+{
+	ATTACHBONEMATRIX_PTR tReturn;
+
+	CHierarchyNode* pNode = Find_HierarchyNode(pName);
+
+	NULL_CHECK_BREAK(pNode);
+
+	tReturn.pUpdatedNodeMat = pNode->Get_UpdatedTransformMat();
+	tReturn.pDefaultPivotMat = &m_DefaultPivotMatrix;
+	return tReturn;
+}
+
 HRESULT CModel::Ready_HierarchyNodes(aiNode * pNode, CHierarchyNode * pParent, _uint iDepth)
 {
 	NULL_CHECK_RETURN(pNode, E_FAIL);

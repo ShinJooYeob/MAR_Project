@@ -172,9 +172,6 @@
     <Filter Include="01.GameObject\08.Weapon\04.Teapot">
       <UniqueIdentifier>{4ed92d57-7cdd-4539-8da9-ec50406f738e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.GameObject\08.Weapon\05.Chess">
-      <UniqueIdentifier>{694ccd0e-563a-44b5-9639-89a8b09e0e58}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.GameObject\08.Weapon\99.Bullet">
       <UniqueIdentifier>{248bdb4a-1299-401c-adae-6958d65e1266}</UniqueIdentifier>
     </Filter>
@@ -201,6 +198,9 @@
     </Filter>
     <Filter Include="01.GameObject\99.UI\UsedUI\LobyUI">
       <UniqueIdentifier>{cb881261-62d6-49a3-93fc-21af958417ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\08.Weapon\05.Horse">
+      <UniqueIdentifier>{694ccd0e-563a-44b5-9639-89a8b09e0e58}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -390,6 +390,21 @@
     <ClInclude Include="..\public\LobyUI.h">
       <Filter>01.GameObject\99.UI\UsedUI\LobyUI</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Knife.h">
+      <Filter>01.GameObject\08.Weapon\01.Knife</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Horse.h">
+      <Filter>01.GameObject\08.Weapon\05.Horse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Grinder.h">
+      <Filter>01.GameObject\08.Weapon\03.PepperGrinder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Teapot.h">
+      <Filter>01.GameObject\08.Weapon\04.Teapot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Umbrella.h">
+      <Filter>01.GameObject\08.Weapon\06.Umbrella</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -553,6 +568,21 @@
     </ClCompile>
     <ClCompile Include="..\private\LobyUI.cpp">
       <Filter>01.GameObject\99.UI\UsedUI\LobyUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Knife.cpp">
+      <Filter>01.GameObject\08.Weapon\01.Knife</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Horse.cpp">
+      <Filter>01.GameObject\08.Weapon\05.Horse</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Grinder.cpp">
+      <Filter>01.GameObject\08.Weapon\03.PepperGrinder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Teapot.cpp">
+      <Filter>01.GameObject\08.Weapon\04.Teapot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Umbrella.cpp">
+      <Filter>01.GameObject\08.Weapon\06.Umbrella</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
