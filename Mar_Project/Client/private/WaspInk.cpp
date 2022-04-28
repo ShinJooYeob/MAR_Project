@@ -49,25 +49,27 @@ _int CWaspInk::Update(_double fDeltaTime)
 	m_pTransformCom->Set_MoveSpeed(4.8f);
 
 
-	if (!m_bIsPatternFinished || Distance_BetweenPlayer(m_pTransformCom) < 10)
-	{
-		Update_Pattern(fDeltaTime);
-	}
-	else
-	{
-		if (!m_pModel->Get_IsUntillPlay() && !m_pModel->Get_IsHavetoBlockAnimChange())
-		{
-			m_pModel->Change_AnimIndex(2);
-			FAILED_CHECK(__super::Update_WanderAround(m_pTransformCom, fDeltaTime, 0.2f));
-		}
-	}
+	//if (!m_bIsPatternFinished || Distance_BetweenPlayer(m_pTransformCom) < 10)
+	//{
+	//	Update_Pattern(fDeltaTime);
+	//}
+	//else
+	//{
+	//	if (!m_pModel->Get_IsUntillPlay() && !m_pModel->Get_IsHavetoBlockAnimChange())
+	//	{
+	//		m_pModel->Change_AnimIndex(2);
+	//		FAILED_CHECK(__super::Update_WanderAround(m_pTransformCom, fDeltaTime, 0.2f));
+	//	}
+	//}
 
 
 	Update_DmgCalculate(fDeltaTime);
 
 	m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
 
+
 	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime, m_bIsOnScreen));
+	
 
 	return _int();
 }
@@ -93,6 +95,9 @@ _int CWaspInk::Render()
 
 
 	NULL_CHECK_RETURN(m_pModel, E_FAIL);
+#ifdef _DEBUG
+	m_pColliderCom->Render();
+#endif // _DEBUG
 
 
 	FAILED_CHECK(m_pTransformCom->Bind_OnShader(m_pShaderCom, "g_WorldMatrix"));
@@ -221,6 +226,17 @@ HRESULT CWaspInk::SetUp_Components()
 	FAILED_CHECK(m_pModel->Change_AnimIndex(0));
 
 
+	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Collider), TAG_COM(Com_Collider), (CComponent**)&m_pColliderCom));
+
+	COLLIDERDESC			ColliderDesc;
+	/* For.Com_AABB */
+	ZeroMemory(&ColliderDesc, sizeof(COLLIDERDESC));
+
+	//Pivot  : 0.000000f , 0.800000f , 0.000000f , 1
+	ColliderDesc.vScale = _float3(1);
+	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
+	ColliderDesc.vPosition = _float4(0.000000f, 0.800000f, 0.000000f, 1);
+	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
 
 
 	CTransform::TRANSFORMDESC tDesc = {};
@@ -333,5 +349,6 @@ void CWaspInk::Free()
 	Safe_Release(m_pRendererCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModel);
+	Safe_Release(m_pColliderCom);
 
 }

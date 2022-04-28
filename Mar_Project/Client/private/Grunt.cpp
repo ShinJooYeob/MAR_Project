@@ -111,15 +111,195 @@ _int CGrunt::Update(_double fDeltaTime)
 	//}
 
 
+
+	{
+		//size: -27.030010, -10.069997, -201.929626,
+
+		//Pivot: -0.610000, 0.020000, -1.290000,
+
+		static _float3 testFloat3 = _float3(0, 0, 0);
+		static _float3 RotFloat3 = _float3(1, 1, 1);
+		static _float value = 0.01f;
+		static _int kind = 0;
+
+
+
+		CGameInstance* m_pInstance = g_pGameInstance;
+		if (m_pInstance->Get_DIKeyState(DIK_UP) & DIS_Press)
+		{
+			testFloat3.z += value;
+
+			string ttszLog = "//Pivot  : " + to_string(testFloat3.x) + "f , " + to_string(testFloat3.y) + "f , " + to_string(testFloat3.z) + "f , 1" + "\n";
+
+			wstring ttDebugLog;
+			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+
+			OutputDebugStringW(ttDebugLog.c_str());
+		}
+
+		else if (m_pInstance->Get_DIKeyState(DIK_DOWN) & DIS_Press)
+		{
+			testFloat3.z -= value;
+
+			string ttszLog = "//Pivot  : " + to_string(testFloat3.x) + "f , " + to_string(testFloat3.y) + "f , " + to_string(testFloat3.z) + "f , 1" + "\n";
+
+			wstring ttDebugLog;
+			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+
+			OutputDebugStringW(ttDebugLog.c_str());
+
+
+
+		}
+		else if (m_pInstance->Get_DIKeyState(DIK_LEFT) & DIS_Press)
+		{
+			testFloat3.x -= value;
+
+			string ttszLog = "//Pivot  : " + to_string(testFloat3.x) + "f , " + to_string(testFloat3.y) + "f , " + to_string(testFloat3.z) + "f , 1" + "\n";
+
+			wstring ttDebugLog;
+			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+
+			OutputDebugStringW(ttDebugLog.c_str());
+
+
+
+		}
+
+		else if (m_pInstance->Get_DIKeyState(DIK_RIGHT) & DIS_Press)
+		{
+			testFloat3.x += value;
+
+			string ttszLog = "//Pivot  : " + to_string(testFloat3.x) + "f , " + to_string(testFloat3.y) + "f , " + to_string(testFloat3.z) + "f , 1" + "\n";
+
+			wstring ttDebugLog;
+			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+
+			OutputDebugStringW(ttDebugLog.c_str());
+
+
+
+		}
+
+		else if (m_pInstance->Get_DIKeyState(DIK_DELETE) & DIS_Press)
+		{
+			testFloat3.y += value;
+			string ttszLog = "//Pivot  : " + to_string(testFloat3.x) + "f , " + to_string(testFloat3.y) + "f , " + to_string(testFloat3.z) + "f , 1" + "\n";
+
+			wstring ttDebugLog;
+			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+
+			OutputDebugStringW(ttDebugLog.c_str());
+
+
+
+		}
+
+		else if (m_pInstance->Get_DIKeyState(DIK_END) & DIS_Press)
+		{
+			testFloat3.y -= value;
+			string ttszLog = "//Pivot  : " + to_string(testFloat3.x) + "f , " + to_string(testFloat3.y) + "f , " + to_string(testFloat3.z) + "f , 1" + "\n";
+
+			wstring ttDebugLog;
+			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+
+			OutputDebugStringW(ttDebugLog.c_str());
+
+
+
+		}
+		else if (m_pInstance->Get_DIKeyState(DIK_PGUP) & DIS_Press)
+		{
+			switch (kind)
+			{
+			case 0:
+				RotFloat3.x += value;
+				break;
+			case 1:
+				RotFloat3.y += value;
+				break;
+			case 2:
+				RotFloat3.z += value;
+				break;
+
+			default:
+				break;
+			}
+
+	
+			string ttszLog = "//size  : " + to_string(RotFloat3.x) + "f , " + to_string(RotFloat3.y) + "f , " + to_string(RotFloat3.z) + "f , " + "\n";
+
+			wstring ttDebugLog;
+			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+
+			OutputDebugStringW(ttDebugLog.c_str());
+
+
+
+		}
+		else if (m_pInstance->Get_DIKeyState(DIK_PGDN) & DIS_Press)
+		{
+			switch (kind)
+			{
+			case 0:
+				RotFloat3.x -= value;
+				break;
+			case 1:
+				RotFloat3.y -= value;
+				break;
+			case 2:
+				RotFloat3.z -= value;
+				break;
+
+			default:
+				break;
+			}
+
+
+			string ttszLog = "//size  : " + to_string(RotFloat3.x) + "f , " + to_string(RotFloat3.y) + "f , " + to_string(RotFloat3.z) + "f , " + "\n";
+
+			wstring ttDebugLog;
+			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+
+			OutputDebugStringW(ttDebugLog.c_str());
+
+
+
+		}
+		else if (m_pInstance->Get_DIKeyState(DIK_TAB) & DIS_Down)
+		{
+			kind++;
+			if (kind > 2)kind = 0;
+
+			string ttszLog = "kind  : " + to_string(kind) + "\n";
+
+			wstring ttDebugLog;
+			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+
+			OutputDebugStringW(ttDebugLog.c_str());
+		}
+
+		
+		_Matrix tt = XMMatrixScaling(RotFloat3.x, RotFloat3.y, RotFloat3.z) *XMMatrixTranslation(testFloat3.x, testFloat3.y, testFloat3.z);
+
+		//tt.r[3] = XMVectorSetW(testFloat3.XMVector(), 1);
+		//m_pTransformCom->Set_Matrix(tt);
+
+	}
+	
+
+
 	Update_DmgCalculate(fDeltaTime);
 
 	m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
 
-	for (_uint i =0; i< m_pColliderCom->Get_NumColliderBuffer(); i++)
-		m_pColliderCom->Update_Transform(i, m_pTransformCom->Get_WorldMatrix());
+	//for (_uint i =0; i< m_pColliderCom->Get_NumColliderBuffer(); i++)
+	//	m_pColliderCom->Update_Transform(i, m_pTransformCom->Get_WorldMatrix());
 	
 
 	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime, m_bIsOnScreen));
+		for (_uint i =0; i< m_pColliderCom->Get_NumColliderBuffer(); i++)
+			m_pColliderCom->Update_Transform(i, m_pTransformCom->Get_WorldMatrix());
 	return _int();
 }
 
@@ -349,16 +529,20 @@ HRESULT CGrunt::SetUp_Components()
 	/* For.Com_AABB */
 	ZeroMemory(&ColliderDesc, sizeof(COLLIDERDESC));
 
-	ColliderDesc.vScale = _float3(5.f, 5.f, 5.f);
-	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
-	ColliderDesc.vPosition = _float4(0.f, 0.1f, 0.f, 1.f);
-	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
-
-
+//Pivot: -0.150000, 1.099999, 0.250000,
 	ColliderDesc.vScale = _float3(3.f, 3.f, 3.f);
 	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
-	ColliderDesc.vPosition = _float4(0.f, 0.1f, 0.f, 1.f);
+	ColliderDesc.vPosition = _float4(-0.150000f, 1.099999f, 0.250000f,1);
 	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
+
+//Pivot: -0.020000, 0.780000, 0.250000,
+	//size : 1.240000, 1.859999, 1.000000,
+	ColliderDesc.vScale = _float3(1.240000f, 1.859999f, 1.000000f);
+	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
+	ColliderDesc.vPosition = _float4(-0.020000f, 0.930000f, 0.250000f,1);
+	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_AABB, &ColliderDesc));
+
+
 	m_pColliderCom->Set_ParantBuffer();
 
 	CTransform::TRANSFORMDESC tDesc = {};
@@ -407,5 +591,6 @@ void CGrunt::Free()
 	Safe_Release(m_pRendererCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModel);
+	Safe_Release(m_pColliderCom);
 
 }

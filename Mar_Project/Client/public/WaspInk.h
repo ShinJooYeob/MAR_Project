@@ -34,6 +34,7 @@ private:
 	CRenderer*			m_pRendererCom = nullptr;
 	CModel*				m_pModel = nullptr;
 	CTransform*			m_pTransformCom = nullptr;
+	CCollider*			m_pColliderCom = nullptr;
 
 
 	_bool				m_bIsDmgAnimUpdated[3];

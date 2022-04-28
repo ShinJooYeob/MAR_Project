@@ -114,6 +114,8 @@ private:
 	_uint						m_iWeaponModelIndex = 10;
 
 	_float3					m_vBulletFirePos;
+	ATTACHBONEMATRIX_PTR m_tCollisionAttachPtr[2];
+
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ConstTable();

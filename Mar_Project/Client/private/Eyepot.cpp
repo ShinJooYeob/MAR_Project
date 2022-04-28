@@ -143,6 +143,13 @@ _int CEyepot::Update(_double fDeltaTime)
 	m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
 
 	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime, m_bIsOnScreen));
+
+
+
+
+	for (_uint i = 0; i < m_pColliderCom->Get_NumColliderBuffer(); i++)
+		m_pColliderCom->Update_Transform(i,  m_pTransformCom->Get_WorldMatrix());
+
 	return _int();
 }
 
@@ -168,6 +175,9 @@ _int CEyepot::Render()
 
 
 	NULL_CHECK_RETURN(m_pModel, E_FAIL);
+#ifdef _DEBUG
+	m_pColliderCom->Render();
+#endif // _DEBUG
 
 
 	FAILED_CHECK(m_pTransformCom->Bind_OnShader(m_pShaderCom, "g_WorldMatrix"));
@@ -511,6 +521,33 @@ HRESULT CEyepot::SetUp_Components()
 	FAILED_CHECK(m_pModel->Change_AnimIndex(0));
 
 
+	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Collider), TAG_COM(Com_Collider), (CComponent**)&m_pColliderCom));
+
+	COLLIDERDESC			ColliderDesc;
+	/* For.Com_AABB */
+	ZeroMemory(&ColliderDesc, sizeof(COLLIDERDESC));
+
+	//Pivot  : 0.000000f , 1.189999f , 0.000000f , 1
+	//size  : 2.969998f , 1.000000f , 1.000000f , 
+	ColliderDesc.vScale = _float3(2.969998f, 1.000000f, 1.000000f);
+	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
+	ColliderDesc.vPosition = _float4(0.000000f, 1.189999f, 0.000000f, 1);
+	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
+
+	//size  : 1.529999f , 1.000000f , 1.000000f , 
+	ColliderDesc.vScale = _float3(1.529999f, 1.000000f, 1.000000f);
+	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);	
+	ColliderDesc.vPosition = _float4(0.000000f, 1.189999f, 0.000000f, 1);
+	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
+	m_pColliderCom->Set_ParantBuffer();
+
+	//size  : 1.210000f , 0.710000f , 1.180000f , 
+	//Pivot  : 0.000000f , 0.500000f , -0.100000f , 1
+	ColliderDesc.vScale = _float3(1.210000f, 0.710000f, 1.180000f);
+	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
+	ColliderDesc.vPosition = _float4(0.000000f, 0.500000f, -0.100000f, 1);
+	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_OBB, &ColliderDesc));
+	m_pColliderCom->Set_ParantBuffer();
 
 
 	CTransform::TRANSFORMDESC tDesc = {};
@@ -600,5 +637,6 @@ void CEyepot::Free()
 	Safe_Release(m_pRendererCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModel);
+	Safe_Release(m_pColliderCom);
 
 }

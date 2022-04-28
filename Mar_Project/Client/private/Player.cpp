@@ -85,11 +85,11 @@ _int CPlayer::Update(_double fDeltaTime)
 	//if (g_pGameInstance->Get_DIKeyState(DIK_9)&DIS_Down)
 	//	m_pModel->Change_AnimIndex(8);
 	//
-	for (_uint i = 0; i < m_pColliderCom->Get_NumColliderBuffer(); i++)
-	{
-		m_pColliderCom->Update_Transform(i, m_pTransformCom->Get_WorldMatrix());
-	}
 
+	//for (_uint i = 0; i < m_pColliderCom->Get_NumColliderBuffer(); i++)
+	//{
+	//	m_pColliderCom->Update_Transform(i, m_pTransformCom->Get_WorldMatrix());
+	//}
 	if (m_iWeaponModelIndex != 10)
 	{
 		m_vecWeapon[m_iWeaponModelIndex]->Update(fDeltaTime);
@@ -126,6 +126,20 @@ _int CPlayer::LateUpdate(_double fDeltaTime)
 
 	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime));
 
+
+	
+	m_pColliderCom->Update_Transform(0, m_pTransformCom->Get_WorldMatrix());
+	for (_uint i = 1; i < m_pColliderCom->Get_NumColliderBuffer(); i++)
+	{
+
+		_Matrix			TransformMatrix = XMLoadFloat4x4(m_tCollisionAttachPtr[i - 1].pUpdatedNodeMat) * XMLoadFloat4x4(m_tCollisionAttachPtr[i - 1].pDefaultPivotMat);
+
+		TransformMatrix.r[0] = XMVector3Normalize(TransformMatrix.r[0]);
+		TransformMatrix.r[1] = XMVector3Normalize(TransformMatrix.r[1]);
+		TransformMatrix.r[2] = XMVector3Normalize(TransformMatrix.r[2]);
+
+		m_pColliderCom->Update_Transform(i, TransformMatrix * m_pTransformCom->Get_WorldMatrix());
+	}
 
 
 	//if (g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS)))
@@ -568,6 +582,9 @@ HRESULT CPlayer::SetUp_Components()
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Shader_VAM), TAG_COM(Com_Shader), (CComponent**)&m_pShaderCom));
 
+	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Mesh_Player), TAG_COM(Com_Model), (CComponent**)&m_pModel));
+	FAILED_CHECK(m_pModel->Change_AnimIndex(0));
+
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Collider), TAG_COM(Com_Collider), (CComponent**)&m_pColliderCom));
 
 
@@ -575,35 +592,43 @@ HRESULT CPlayer::SetUp_Components()
 	COLLIDERDESC			ColliderDesc;
 	/* For.Com_SPHERE */
 	ZeroMemory(&ColliderDesc, sizeof(COLLIDERDESC));
-	ColliderDesc.vScale = _float3(1.7f, 1.7f, 1.7f);
+	ColliderDesc.vScale = _float3(2.0f, 2.f, 2.f);
 	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
-	ColliderDesc.vPosition = _float4(0.f, 0.85f, 0.f, 1.f);
+	ColliderDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
 	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
 
 
+	//Pivot  : 0.000000f , 0.000000f , -1.379999f , 1
+	//size  : 0.630000f , 0.740000f , 0.270001f  
 	ZeroMemory(&ColliderDesc, sizeof(COLLIDERDESC));
-	ColliderDesc.vScale = _float3(0.6f, 1.7f, 0.6f);
+	//(x,z,y)
+	//ColliderDesc.vScale = _float3(0.630000f, 0.740000f, 0.270001f);
+	ColliderDesc.vScale = _float3(0.315000f, 0.270001f,0.740000f);
 	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
-	ColliderDesc.vPosition = _float4(0.f, 0.85f, 0.f, 1.f);
+	ColliderDesc.vPosition = _float4(0.000000f, 0.000000f, -1.379999f, 1);
 	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_OBB, &ColliderDesc));
 	m_pColliderCom->Set_ParantBuffer();
 
-	///* For.Com_AABB */
-	//ZeroMemory(&ColliderDesc, sizeof(COLLIDERDESC));
-
-	//ColliderDesc.vScale = _float3(0.5f, 0.5f, 0.5f);
-	//ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
-	//ColliderDesc.vPosition = _float4(0.f, 0.7f, 1.f, 1.f);
-	//FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_AABB, &ColliderDesc));
-	//m_pColliderCom->Set_ParantBuffer(1);
+	 m_tCollisionAttachPtr[0]= m_pModel->Find_AttachMatrix_InHirarchyNode("Bip01-Spine2");
+	 NULL_CHECK_RETURN(m_tCollisionAttachPtr[0].pDefaultPivotMat, E_FAIL);
 
 
 
-	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Mesh_Player), TAG_COM(Com_Model), (CComponent**)&m_pModel));
-	FAILED_CHECK(m_pModel->Change_AnimIndex(0));
+	 //Pivot  : 0.000000f , 0.000000f , -0.620000f , 1
+	 //size  : 0.960000f , 0.860000f , 0.550000f  
+	 ZeroMemory(&ColliderDesc, sizeof(COLLIDERDESC));
+	 ColliderDesc.vScale = _float3(0.480000f, 0.550000f,0.860000f);
+	 ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
+	 ColliderDesc.vPosition = _float4(0.000000f, 0.000000f, -0.620000f, 1);
+	 FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_OBB, &ColliderDesc));
+	 m_pColliderCom->Set_ParantBuffer();
+
+	 m_tCollisionAttachPtr[1] = m_pModel->Find_AttachMatrix_InHirarchyNode("Bip01-Pelvis");
+	 NULL_CHECK_RETURN(m_tCollisionAttachPtr[1].pDefaultPivotMat, E_FAIL);
 
 
-	
+
+
 
 	CTransform::TRANSFORMDESC tDesc = {};
 

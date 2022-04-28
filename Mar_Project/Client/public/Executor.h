@@ -27,7 +27,9 @@ private:
 	CRenderer*			m_pRendererCom = nullptr;
 	CModel*				m_pModel = nullptr;
 	CTransform*			m_pTransformCom = nullptr;
+	CCollider*			m_pColliderCom = nullptr;
 
+	ATTACHBONEMATRIX_PTR m_tCollisionAttachPtr;
 
 private:
 	HRESULT SetUp_Components();
