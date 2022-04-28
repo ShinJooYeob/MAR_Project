@@ -1,27 +1,27 @@
 #include "stdafx.h"
-#include "..\public\Horse.h"
+#include "..\public\ClockBomb.h"
 
 
 
 
-CHorse::CHorse(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
+CClockBomb::CClockBomb(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
 	:CWeapon(pDevice,pDeviceContext)
 {
 }
 
-CHorse::CHorse(const CHorse & rhs)
+CClockBomb::CClockBomb(const CClockBomb & rhs)
 	: CWeapon(rhs)
 {
 }
 
-HRESULT CHorse::Initialize_Prototype(void * pArg)
+HRESULT CClockBomb::Initialize_Prototype(void * pArg)
 {
 	__super::Initialize_Prototype(pArg);
 
 	return S_OK;
 }
 
-HRESULT CHorse::Initialize_Clone(void * pArg)
+HRESULT CClockBomb::Initialize_Clone(void * pArg)
 {
 	FAILED_CHECK(__super::Initialize_Clone(pArg));
 
@@ -32,15 +32,12 @@ HRESULT CHorse::Initialize_Clone(void * pArg)
 	return S_OK;
 }
 
-_int CHorse::Update(_double fDeltaTime)
+_int CClockBomb::Update(_double fDeltaTime)
 {
 	if (__super::Update(fDeltaTime) < 0)
 		return -1;
 	if (m_bIsDead) return 0;
 	
-
-
-
 	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime, m_bIsOnScreen));
 
 
@@ -50,6 +47,8 @@ _int CHorse::Update(_double fDeltaTime)
 	TransformMatrix.r[1] = XMVector3Normalize(TransformMatrix.r[1]);
 	TransformMatrix.r[2] = XMVector3Normalize(TransformMatrix.r[2]);
 
+	//m_BoneMatrix = TransformMatrix * m_tWeaponDesc.pParantTransform->Get_WorldMatrix();
+	//TransformMatrix = m_pTransformCom->Get_WorldMatrix()* TransformMatrix * m_tWeaponDesc.pParantTransform->Get_WorldMatrix();
 	m_BoneMatrix = TransformMatrix = m_pTransformCom->Get_WorldMatrix()* TransformMatrix * m_tWeaponDesc.pParantTransform->Get_WorldMatrix();
 
 
@@ -61,7 +60,7 @@ _int CHorse::Update(_double fDeltaTime)
 	return _int();
 }
 
-_int CHorse::LateUpdate(_double fDeltaTime)
+_int CClockBomb::LateUpdate(_double fDeltaTime)
 {
 	if (__super::LateUpdate(fDeltaTime) < 0)
 		return -1;
@@ -75,7 +74,7 @@ _int CHorse::LateUpdate(_double fDeltaTime)
 	return _int();
 }
 
-_int CHorse::Render()
+_int CClockBomb::Render()
 {
 
 	NULL_CHECK_RETURN(m_pModel, E_FAIL);
@@ -97,6 +96,7 @@ _int CHorse::Render()
 	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ProjMatrix", &pInstance->Get_Transform_Float4x4_TP(PLM_PROJ), sizeof(_float4x4)));
 
 
+	FAILED_CHECK(m_pTextureCom->Bind_OnShader(m_pShaderCom, "g_MskingTextrue", 0));
 	_uint NumMaterial = m_pModel->Get_NumMaterial();
 
 	for (_uint i = 0; i < NumMaterial; i++)
@@ -105,26 +105,29 @@ _int CHorse::Render()
 		for (_uint j = 0; j < AI_TEXTURE_TYPE_MAX; j++)
 			FAILED_CHECK(m_pModel->Bind_OnShader(m_pShaderCom, i, j, MODLETEXTYPE(j)));
 
-		FAILED_CHECK(m_pModel->Render(m_pShaderCom, 6, i, "g_BoneMatrices"));
+		FAILED_CHECK(m_pModel->Render(m_pShaderCom, 7, i, "g_BoneMatrices"));
 	}
 
 
 	return _int();
 }
 
-_int CHorse::LateRender()
+_int CClockBomb::LateRender()
 {
 
 	return _int();
 }
 
-HRESULT CHorse::SetUp_Components()
+HRESULT CClockBomb::SetUp_Components()
 {
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Renderer), TAG_COM(Com_Renderer), (CComponent**)&m_pRendererCom));
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Shader_VAM), TAG_COM(Com_Shader), (CComponent**)&m_pShaderCom));
 
-	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Mesh_Horse), TAG_COM(Com_Model), (CComponent**)&m_pModel));
+	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Mesh_ClockBomb), TAG_COM(Com_Model), (CComponent**)&m_pModel));
+
+	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Texture_MskTex), TAG_COM(Com_Texture), (CComponent**)&m_pTextureCom));
+	m_pTextureCom->Change_TextureLayer(L"ClockBomb");
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Collider), TAG_COM(Com_Collider), (CComponent**)&m_pColliderCom));
 
@@ -132,31 +135,12 @@ HRESULT CHorse::SetUp_Components()
 	/* For.Com_AABB */
 	ZeroMemory(&ColliderDesc, sizeof(COLLIDERDESC));
 
-	ColliderDesc.vScale = _float3(1.4f, 1.4f, 1.4f);
+	ColliderDesc.vScale = _float3(1.f, 1.f, 1.f);
 	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);	
-	ColliderDesc.vPosition = _float4(-0.85f, 0.08f, -1.305f, 1.f);
+	ColliderDesc.vPosition = _float4(-1.065f, 0.306f, -1.229f,1);
 	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
 
-	ColliderDesc.vScale = _float3(0.3f, 0.3f, 0.3f);
-	ColliderDesc.vPosition = _float4(-0.61f, -0.01f, -1.32f, 1.f);
-	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
-	m_pColliderCom->Set_ParantBuffer();
-
-	ColliderDesc.vScale = _float3(0.5f, 0.5f, 0.5f);
-	ColliderDesc.vPosition = _float4(-0.85f, 0.08f, -1.305f, 1.f);
-	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
-	m_pColliderCom->Set_ParantBuffer();
-
-
-	ColliderDesc.vScale = _float3(0.8f, 0.8f, 0.8f);
-	ColliderDesc.vPosition = _float4(0,0,0, 1.f);
-	//-0.180000, 0.210000, 0.150000,
-	ColliderDesc.vPosition = _float4(-1.03f, 0.29f, -1.155f, 1.f);
-	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
-	m_pColliderCom->Set_ParantBuffer();
-
-	//Pivot: -0.180000, 0.120000, 0.030000,
-	//Pivot: -0.480000, 0.180000, 0.030000,
+	
 
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Transform), TAG_COM(Com_Transform), (CComponent**)&m_pTransformCom));
@@ -165,31 +149,31 @@ HRESULT CHorse::SetUp_Components()
 	return S_OK;
 }
 
-CHorse * CHorse::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
+CClockBomb * CClockBomb::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
 {
-	CHorse*	pInstance = new CHorse(pDevice, pDeviceContext);
+	CClockBomb*	pInstance = new CClockBomb(pDevice, pDeviceContext);
 
 	if (FAILED(pInstance->Initialize_Prototype(nullptr)))
 	{
-		MSGBOX("Failed to Created CHorse");
+		MSGBOX("Failed to Created CClockBomb");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-CGameObject * CHorse::Clone(void * pArg)
+CGameObject * CClockBomb::Clone(void * pArg)
 {
-	CHorse*	pInstance = new CHorse(*this);
+	CClockBomb*	pInstance = new CClockBomb(*this);
 
 	if (FAILED(pInstance->Initialize_Clone(pArg)))
 	{
-		MSGBOX("Failed to Created CHorse");
+		MSGBOX("Failed to Created CClockBomb");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-void CHorse::Free()
+void CClockBomb::Free()
 {
 	__super::Free();
 
@@ -198,5 +182,6 @@ void CHorse::Free()
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModel);
 	Safe_Release(m_pColliderCom);
+	Safe_Release(m_pTextureCom);
 	
 }

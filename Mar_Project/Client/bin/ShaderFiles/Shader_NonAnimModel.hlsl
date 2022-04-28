@@ -8,7 +8,7 @@ texture2D			g_SpecularTexture;
 //texture2D			g_HeightTexture;
 texture2D			g_NormalTexture;
 //texture2D			g_ShininessTexture;
-texture2D			g_OpacityTexture;
+//texture2D			g_OpacityTexture;
 //texture2D			g_DisplaceTexture;
 //texture2D			g_LightMapTexture;
 //texture2D			g_ReflectTexture;

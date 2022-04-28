@@ -21,6 +21,7 @@ protected:
 public:
 	virtual HRESULT Initialize_Prototype(void* pArg)override;
 	virtual HRESULT Initialize_Clone(void* pArg)override;
+	virtual HRESULT Initialize_Clone_Bullet(void* pArg);
 
 public:
 	virtual _int Update(_double fDeltaTime)override;
@@ -29,6 +30,8 @@ public:
 	virtual _int LateRender()override;
 
 protected:
+	class CPlayer*			m_pPlayer = nullptr;
+
 	WEAPONDESC				m_tWeaponDesc;
 	ATTACHBONEMATRIX_PTR	m_tATBMat;
 	_float4x4				m_BoneMatrix;

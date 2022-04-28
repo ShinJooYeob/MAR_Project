@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "..\public\Teapot.h"
+#include "Player.h"
 
 
 
@@ -39,230 +40,230 @@ _int CTeapot::Update(_double fDeltaTime)
 	if (m_bIsDead) return 0;
 	
 
-/*
-	{
 
-	//Pivot: -0.640000, 0.020000, -1.260000,
-		//Rot: -193.979645, 9.009996, -129.319794,
+	//{
 
-		static _float3 testFloat3 = _float3(0);
-		static _float3 RotFloat3 = _float3(0);
-		static _float value = 0.03f;
-		static _int kind = 0;
+	////Pivot: -0.640000, 0.020000, -1.260000,
+	//	//Rot: -193.979645, 9.009996, -129.319794,
 
-		_Matrix tt = XMMatrixRotationX(XMConvertToRadians(RotFloat3.x))*
-			XMMatrixRotationY(XMConvertToRadians(RotFloat3.y))*
-			XMMatrixRotationZ(XMConvertToRadians(RotFloat3.z));
+	//	static _float3 testFloat3 = _float3(-0.640000, 0.020000, -1.260000);
+	//	static _float3 RotFloat3 = _float3(-193.979645, 9.009996, -129.319794);
+	//	static _float value = 0.03f;
+	//	static _int kind = 0;
 
-		tt.r[3] = XMVectorSetW(testFloat3.XMVector(), 1);
-		m_pTransformCom->Set_Matrix(tt);
+	//	_Matrix tt = XMMatrixRotationX(XMConvertToRadians(RotFloat3.x))*
+	//		XMMatrixRotationY(XMConvertToRadians(RotFloat3.y))*
+	//		XMMatrixRotationZ(XMConvertToRadians(RotFloat3.z));
 
-		CGameInstance* m_pInstance = g_pGameInstance;
-		if (m_pInstance->Get_DIKeyState(DIK_UP) & DIS_Down)
-		{
-			testFloat3.x -= value;
+	//	tt.r[3] = XMVectorSetW(testFloat3.XMVector(), 1);
+	//	m_pTransformCom->Set_Matrix(tt);
 
+	//	CGameInstance* m_pInstance = g_pGameInstance;
+	//	if (m_pInstance->Get_DIKeyState(DIK_UP) & DIS_Down)
+	//	{
+	//		testFloat3.x -= value;
 
-			_Matrix tt = XMMatrixRotationX(XMConvertToRadians(RotFloat3.x))*
-				XMMatrixRotationY(XMConvertToRadians(RotFloat3.y))*
-				XMMatrixRotationZ(XMConvertToRadians(RotFloat3.z));
 
-			tt.r[3] = XMVectorSetW(testFloat3.XMVector(), 1);
-			m_pTransformCom->Set_Matrix(tt);
-			string ttszLog = "Pivot  : " + to_string(testFloat3.x) + " , " + to_string(testFloat3.y) + " , " + to_string(testFloat3.z) + " , " + "\n";
+	//		_Matrix tt = XMMatrixRotationX(XMConvertToRadians(RotFloat3.x))*
+	//			XMMatrixRotationY(XMConvertToRadians(RotFloat3.y))*
+	//			XMMatrixRotationZ(XMConvertToRadians(RotFloat3.z));
 
-			wstring ttDebugLog;
-			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+	//		tt.r[3] = XMVectorSetW(testFloat3.XMVector(), 1);
+	//		m_pTransformCom->Set_Matrix(tt);
+	//		string ttszLog = "Pivot  : " + to_string(testFloat3.x) + " , " + to_string(testFloat3.y) + " , " + to_string(testFloat3.z) + " , " + "\n";
 
-			OutputDebugStringW(ttDebugLog.c_str());
-		}
+	//		wstring ttDebugLog;
+	//		ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
 
-		else if (m_pInstance->Get_DIKeyState(DIK_DOWN) & DIS_Down)
-		{
-			testFloat3.x += value;
+	//		OutputDebugStringW(ttDebugLog.c_str());
+	//	}
 
-			_Matrix tt = XMMatrixRotationX(XMConvertToRadians(RotFloat3.x))*
-				XMMatrixRotationY(XMConvertToRadians(RotFloat3.y))*
-				XMMatrixRotationZ(XMConvertToRadians(RotFloat3.z));
+	//	else if (m_pInstance->Get_DIKeyState(DIK_DOWN) & DIS_Down)
+	//	{
+	//		testFloat3.x += value;
 
-			tt.r[3] = XMVectorSetW(testFloat3.XMVector(), 1);
-			m_pTransformCom->Set_Matrix(tt);
-			string ttszLog = "Pivot  : " + to_string(testFloat3.x) + " , " + to_string(testFloat3.y) + " , " + to_string(testFloat3.z) + " , " + "\n";
+	//		_Matrix tt = XMMatrixRotationX(XMConvertToRadians(RotFloat3.x))*
+	//			XMMatrixRotationY(XMConvertToRadians(RotFloat3.y))*
+	//			XMMatrixRotationZ(XMConvertToRadians(RotFloat3.z));
 
-			wstring ttDebugLog;
-			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+	//		tt.r[3] = XMVectorSetW(testFloat3.XMVector(), 1);
+	//		m_pTransformCom->Set_Matrix(tt);
+	//		string ttszLog = "Pivot  : " + to_string(testFloat3.x) + " , " + to_string(testFloat3.y) + " , " + to_string(testFloat3.z) + " , " + "\n";
 
-			OutputDebugStringW(ttDebugLog.c_str());
+	//		wstring ttDebugLog;
+	//		ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
 
+	//		OutputDebugStringW(ttDebugLog.c_str());
 
 
-		}
-		else if (m_pInstance->Get_DIKeyState(DIK_LEFT) & DIS_Down)
-		{
-			testFloat3.z += value;
 
-			_Matrix tt = XMMatrixRotationX(XMConvertToRadians(RotFloat3.x))*
-				XMMatrixRotationY(XMConvertToRadians(RotFloat3.y))*
-				XMMatrixRotationZ(XMConvertToRadians(RotFloat3.z));
+	//	}
+	//	else if (m_pInstance->Get_DIKeyState(DIK_LEFT) & DIS_Down)
+	//	{
+	//		testFloat3.z += value;
 
-			tt.r[3] = XMVectorSetW(testFloat3.XMVector(), 1);
-			m_pTransformCom->Set_Matrix(tt);
-			string ttszLog = "Pivot  : " + to_string(testFloat3.x) + " , " + to_string(testFloat3.y) + " , " + to_string(testFloat3.z) + " , " + "\n";
+	//		_Matrix tt = XMMatrixRotationX(XMConvertToRadians(RotFloat3.x))*
+	//			XMMatrixRotationY(XMConvertToRadians(RotFloat3.y))*
+	//			XMMatrixRotationZ(XMConvertToRadians(RotFloat3.z));
 
-			wstring ttDebugLog;
-			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+	//		tt.r[3] = XMVectorSetW(testFloat3.XMVector(), 1);
+	//		m_pTransformCom->Set_Matrix(tt);
+	//		string ttszLog = "Pivot  : " + to_string(testFloat3.x) + " , " + to_string(testFloat3.y) + " , " + to_string(testFloat3.z) + " , " + "\n";
 
-			OutputDebugStringW(ttDebugLog.c_str());
+	//		wstring ttDebugLog;
+	//		ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
 
+	//		OutputDebugStringW(ttDebugLog.c_str());
 
 
-		}
 
-		else if (m_pInstance->Get_DIKeyState(DIK_RIGHT) & DIS_Down)
-		{
-			testFloat3.z -= value;
+	//	}
 
-			_Matrix tt = XMMatrixRotationX(XMConvertToRadians(RotFloat3.x))*
-				XMMatrixRotationY(XMConvertToRadians(RotFloat3.y))*
-				XMMatrixRotationZ(XMConvertToRadians(RotFloat3.z));
+	//	else if (m_pInstance->Get_DIKeyState(DIK_RIGHT) & DIS_Down)
+	//	{
+	//		testFloat3.z -= value;
 
-			tt.r[3] = XMVectorSetW(testFloat3.XMVector(), 1);
-			m_pTransformCom->Set_Matrix(tt);
-			string ttszLog = "Pivot  : " + to_string(testFloat3.x) + " , " + to_string(testFloat3.y) + " , " + to_string(testFloat3.z) + " , " + "\n";
+	//		_Matrix tt = XMMatrixRotationX(XMConvertToRadians(RotFloat3.x))*
+	//			XMMatrixRotationY(XMConvertToRadians(RotFloat3.y))*
+	//			XMMatrixRotationZ(XMConvertToRadians(RotFloat3.z));
 
-			wstring ttDebugLog;
-			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+	//		tt.r[3] = XMVectorSetW(testFloat3.XMVector(), 1);
+	//		m_pTransformCom->Set_Matrix(tt);
+	//		string ttszLog = "Pivot  : " + to_string(testFloat3.x) + " , " + to_string(testFloat3.y) + " , " + to_string(testFloat3.z) + " , " + "\n";
 
-			OutputDebugStringW(ttDebugLog.c_str());
+	//		wstring ttDebugLog;
+	//		ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
 
+	//		OutputDebugStringW(ttDebugLog.c_str());
 
 
-		}
 
-		else if (m_pInstance->Get_DIKeyState(DIK_DELETE) & DIS_Down)
-		{
-			testFloat3.y += value;
-			_Matrix tt = XMMatrixRotationX(XMConvertToRadians(RotFloat3.x))*
-				XMMatrixRotationY(XMConvertToRadians(RotFloat3.y))*
-				XMMatrixRotationZ(XMConvertToRadians(RotFloat3.z));
+	//	}
 
-			tt.r[3] = XMVectorSetW(testFloat3.XMVector(), 1);
-			m_pTransformCom->Set_Matrix(tt);
-			string ttszLog = "Pivot  : " + to_string(testFloat3.x) + " , " + to_string(testFloat3.y) + " , " + to_string(testFloat3.z) + " , " + "\n";
+	//	else if (m_pInstance->Get_DIKeyState(DIK_DELETE) & DIS_Down)
+	//	{
+	//		testFloat3.y += value;
+	//		_Matrix tt = XMMatrixRotationX(XMConvertToRadians(RotFloat3.x))*
+	//			XMMatrixRotationY(XMConvertToRadians(RotFloat3.y))*
+	//			XMMatrixRotationZ(XMConvertToRadians(RotFloat3.z));
 
-			wstring ttDebugLog;
-			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+	//		tt.r[3] = XMVectorSetW(testFloat3.XMVector(), 1);
+	//		m_pTransformCom->Set_Matrix(tt);
+	//		string ttszLog = "Pivot  : " + to_string(testFloat3.x) + " , " + to_string(testFloat3.y) + " , " + to_string(testFloat3.z) + " , " + "\n";
 
-			OutputDebugStringW(ttDebugLog.c_str());
+	//		wstring ttDebugLog;
+	//		ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
 
+	//		OutputDebugStringW(ttDebugLog.c_str());
 
 
-		}
 
-		else if (m_pInstance->Get_DIKeyState(DIK_END) & DIS_Down)
-		{
-			testFloat3.y -= value;
-			_Matrix tt = XMMatrixRotationX(XMConvertToRadians(RotFloat3.x))*
-				XMMatrixRotationY(XMConvertToRadians(RotFloat3.y))*
-				XMMatrixRotationZ(XMConvertToRadians(RotFloat3.z));
+	//	}
 
-			tt.r[3] = XMVectorSetW(testFloat3.XMVector(), 1);
-			m_pTransformCom->Set_Matrix(tt);
-			string ttszLog = "Pivot  : " + to_string(testFloat3.x) + " , " + to_string(testFloat3.y) + " , " + to_string(testFloat3.z) + " , " + "\n";
+	//	else if (m_pInstance->Get_DIKeyState(DIK_END) & DIS_Down)
+	//	{
+	//		testFloat3.y -= value;
+	//		_Matrix tt = XMMatrixRotationX(XMConvertToRadians(RotFloat3.x))*
+	//			XMMatrixRotationY(XMConvertToRadians(RotFloat3.y))*
+	//			XMMatrixRotationZ(XMConvertToRadians(RotFloat3.z));
 
-			wstring ttDebugLog;
-			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+	//		tt.r[3] = XMVectorSetW(testFloat3.XMVector(), 1);
+	//		m_pTransformCom->Set_Matrix(tt);
+	//		string ttszLog = "Pivot  : " + to_string(testFloat3.x) + " , " + to_string(testFloat3.y) + " , " + to_string(testFloat3.z) + " , " + "\n";
 
-			OutputDebugStringW(ttDebugLog.c_str());
+	//		wstring ttDebugLog;
+	//		ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
 
+	//		OutputDebugStringW(ttDebugLog.c_str());
 
 
-		}
-		else if (m_pInstance->Get_DIKeyState(DIK_PGUP) & DIS_Press)
-		{
-			switch (kind)
-			{
-			case 0:
-				RotFloat3.x += value;
-				break;
-			case 1:
-				RotFloat3.y += value;
-				break;
-			case 2:
-				RotFloat3.z += value;
-				break;
 
-			default:
-				break;
-			}
+	//	}
+	//	else if (m_pInstance->Get_DIKeyState(DIK_PGUP) & DIS_Press)
+	//	{
+	//		switch (kind)
+	//		{
+	//		case 0:
+	//			RotFloat3.x += value;
+	//			break;
+	//		case 1:
+	//			RotFloat3.y += value;
+	//			break;
+	//		case 2:
+	//			RotFloat3.z += value;
+	//			break;
 
-			_Matrix tt = XMMatrixRotationX(XMConvertToRadians(RotFloat3.x))*
-				XMMatrixRotationY(XMConvertToRadians(RotFloat3.y))*
-				XMMatrixRotationZ(XMConvertToRadians(RotFloat3.z));
+	//		default:
+	//			break;
+	//		}
 
-			tt.r[3] = XMVectorSetW(testFloat3.XMVector(), 1);
-			m_pTransformCom->Set_Matrix(tt);
+	//		_Matrix tt = XMMatrixRotationX(XMConvertToRadians(RotFloat3.x))*
+	//			XMMatrixRotationY(XMConvertToRadians(RotFloat3.y))*
+	//			XMMatrixRotationZ(XMConvertToRadians(RotFloat3.z));
 
-			string ttszLog = "rot  : " + to_string(RotFloat3.x) + " , " + to_string(RotFloat3.y) + " , " + to_string(RotFloat3.z) + " , " + "\n";
+	//		tt.r[3] = XMVectorSetW(testFloat3.XMVector(), 1);
+	//		m_pTransformCom->Set_Matrix(tt);
 
-			wstring ttDebugLog;
-			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+	//		string ttszLog = "rot  : " + to_string(RotFloat3.x) + " , " + to_string(RotFloat3.y) + " , " + to_string(RotFloat3.z) + " , " + "\n";
 
-			OutputDebugStringW(ttDebugLog.c_str());
+	//		wstring ttDebugLog;
+	//		ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
 
+	//		OutputDebugStringW(ttDebugLog.c_str());
 
 
-		}
-		else if (m_pInstance->Get_DIKeyState(DIK_PGDN) & DIS_Press)
-		{
-			switch (kind)
-			{
-			case 0:
-				RotFloat3.x -= value;
-				break;
-			case 1:
-				RotFloat3.y -= value;
-				break;
-			case 2:
-				RotFloat3.z -= value;
-				break;
 
-			default:
-				break;
-			}
+	//	}
+	//	else if (m_pInstance->Get_DIKeyState(DIK_PGDN) & DIS_Press)
+	//	{
+	//		switch (kind)
+	//		{
+	//		case 0:
+	//			RotFloat3.x -= value;
+	//			break;
+	//		case 1:
+	//			RotFloat3.y -= value;
+	//			break;
+	//		case 2:
+	//			RotFloat3.z -= value;
+	//			break;
 
-			_Matrix tt = XMMatrixRotationX(XMConvertToRadians(RotFloat3.x))*
-				XMMatrixRotationY(XMConvertToRadians(RotFloat3.y))*
-				XMMatrixRotationZ(XMConvertToRadians(RotFloat3.z));
+	//		default:
+	//			break;
+	//		}
 
-			tt.r[3] = XMVectorSetW(testFloat3.XMVector(), 1);
-			m_pTransformCom->Set_Matrix(tt);
+	//		_Matrix tt = XMMatrixRotationX(XMConvertToRadians(RotFloat3.x))*
+	//			XMMatrixRotationY(XMConvertToRadians(RotFloat3.y))*
+	//			XMMatrixRotationZ(XMConvertToRadians(RotFloat3.z));
 
-			string ttszLog = "Rot  : " + to_string(RotFloat3.x) + " , " + to_string(RotFloat3.y) + " , " + to_string(RotFloat3.z) + " , " + "\n";
+	//		tt.r[3] = XMVectorSetW(testFloat3.XMVector(), 1);
+	//		m_pTransformCom->Set_Matrix(tt);
 
-			wstring ttDebugLog;
-			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+	//		string ttszLog = "Rot  : " + to_string(RotFloat3.x) + " , " + to_string(RotFloat3.y) + " , " + to_string(RotFloat3.z) + " , " + "\n";
 
-			OutputDebugStringW(ttDebugLog.c_str());
+	//		wstring ttDebugLog;
+	//		ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
 
+	//		OutputDebugStringW(ttDebugLog.c_str());
 
 
-		}
-		else if (m_pInstance->Get_DIKeyState(DIK_TAB) & DIS_Down)
-		{
-			kind++;
-			if (kind > 2)kind = 0;
 
-			string ttszLog = "kind  : " + to_string(kind) + "\n";
+	//	}
+	//	else if (m_pInstance->Get_DIKeyState(DIK_TAB) & DIS_Down)
+	//	{
+	//		kind++;
+	//		if (kind > 2)kind = 0;
 
-			wstring ttDebugLog;
-			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+	//		string ttszLog = "kind  : " + to_string(kind) + "\n";
 
-			OutputDebugStringW(ttDebugLog.c_str());
-		}
+	//		wstring ttDebugLog;
+	//		ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
 
-	}
-*/
+	//		OutputDebugStringW(ttDebugLog.c_str());
+	//	}
+
+	//}
+
 
 
 
@@ -273,6 +274,15 @@ _int CTeapot::Update(_double fDeltaTime)
 
 
 
+	_Matrix			TransformMatrix = XMLoadFloat4x4(m_tATBMat.pUpdatedNodeMat) * XMLoadFloat4x4(m_tATBMat.pDefaultPivotMat);
+
+	TransformMatrix.r[0] = XMVector3Normalize(TransformMatrix.r[0]);
+	TransformMatrix.r[1] = XMVector3Normalize(TransformMatrix.r[1]);
+	TransformMatrix.r[2] = XMVector3Normalize(TransformMatrix.r[2]);
+
+	//m_BoneMatrix = TransformMatrix * m_tWeaponDesc.pParantTransform->Get_WorldMatrix();
+	//TransformMatrix = m_pTransformCom->Get_WorldMatrix()* TransformMatrix * m_tWeaponDesc.pParantTransform->Get_WorldMatrix();
+	m_BoneMatrix = TransformMatrix = m_pTransformCom->Get_WorldMatrix()* TransformMatrix * m_tWeaponDesc.pParantTransform->Get_WorldMatrix();
 
 
 	m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
@@ -299,15 +309,10 @@ _int CTeapot::Render()
 
 	NULL_CHECK_RETURN(m_pModel, E_FAIL);
 
-	_Matrix			TransformMatrix = XMLoadFloat4x4(m_tATBMat.pUpdatedNodeMat) * XMLoadFloat4x4(m_tATBMat.pDefaultPivotMat);
 
-	TransformMatrix.r[0] = XMVector3Normalize(TransformMatrix.r[0]);
-	TransformMatrix.r[1] = XMVector3Normalize(TransformMatrix.r[1]);
-	TransformMatrix.r[2] = XMVector3Normalize(TransformMatrix.r[2]);
 
-	TransformMatrix = XMMatrixTranspose(m_pTransformCom->Get_WorldMatrix()* TransformMatrix * m_tWeaponDesc.pParantTransform->Get_WorldMatrix());
 
-	_float4x4 ShaderMat = TransformMatrix;
+	_float4x4 ShaderMat = m_BoneMatrix.TransposeXMatrix();
 	m_pShaderCom->Set_RawValue("g_AttechMatrix", &ShaderMat, sizeof(_float4x4));
 
 
@@ -345,10 +350,13 @@ HRESULT CTeapot::SetUp_Components()
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Shader_VAM), TAG_COM(Com_Shader), (CComponent**)&m_pShaderCom));
 
+	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Transform), TAG_COM(Com_Transform), (CComponent**)&m_pTransformCom));
+
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Mesh_Teapot), TAG_COM(Com_Model), (CComponent**)&m_pModel));
 
 
-	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Transform), TAG_COM(Com_Transform), (CComponent**)&m_pTransformCom));
+	
+
 
 
 	return S_OK;
@@ -386,5 +394,7 @@ void CTeapot::Free()
 	Safe_Release(m_pRendererCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModel);
+
+
 	
 }

@@ -32,7 +32,6 @@ private:
 	HRESULT SetUp_Components();
 
 protected:
-	class CPlayer*			m_pPlayer = nullptr;
 	_float					m_fLifeTime = 0;
 	_float					m_fTotalLifeTime = 0;
 

@@ -405,6 +405,9 @@
     <ClInclude Include="..\public\Umbrella.h">
       <Filter>01.GameObject\08.Weapon\06.Umbrella</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\ClockBomb.h">
+      <Filter>01.GameObject\08.Weapon\02.ClockBomb</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -583,6 +586,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Umbrella.cpp">
       <Filter>01.GameObject\08.Weapon\06.Umbrella</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\ClockBomb.cpp">
+      <Filter>01.GameObject\08.Weapon\02.ClockBomb</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

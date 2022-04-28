@@ -15,8 +15,8 @@ class CPlayer final : public CGameObject
 public:
 	enum eWeaponState
 	{
-		//Weapon_None = 0, Weapon_Knife = 47, Weapon_Grinder = 73, Weapon_Horse = 89, Weapon_Teapot = 113, Weapon_Umbrella = 134, Weapon_End
-		Weapon_None = 0, Weapon_Knife =88888888, Weapon_Grinder = 3212313, Weapon_Horse = 777777777, Weapon_Teapot = 47, Weapon_Umbrella = 213137, Weapon_End
+		Weapon_None = 0, Weapon_Knife = 47, Weapon_Grinder = 73, Weapon_Horse = 89, Weapon_Teapot = 113, Weapon_Umbrella = 134, Weapon_End
+		//Weapon_None = 0, Weapon_Knife =88888888, Weapon_Grinder = 47, Weapon_Horse = 777777777, Weapon_Teapot = 165561156, Weapon_Umbrella = 213137, Weapon_End
 	};
 
 
@@ -28,6 +28,7 @@ private:
 public:
 	virtual HRESULT Initialize_Prototype(void* pArg)override;
 	virtual HRESULT Initialize_Clone(void* pArg)override;
+	HRESULT SetUp_Weapon();
 
 public:
 	virtual _int Update(_double fDeltaTime)override;
@@ -38,6 +39,8 @@ public:
 	void	Add_Dmg_to_Player(_uint iDmgAmount);
 	void  Change_Weapon(_uint WeaponIndex);
 
+	_float3	Get_FirePos() { return m_vBulletFirePos; };
+	void		Set_FirePos(_float3 vPos) { m_vBulletFirePos = vPos; };
 
 	void Add_JumpForce(_float JumpPower,_uint IsKindsOfJump = false);
 	void Add_Force(_float3 vDir, _float Power);
@@ -108,12 +111,12 @@ private:
 	/*For Particle*/
 	vector<PARTICLEDESC>		m_vecParticleDesc;
 	vector<CWeapon*>			m_vecWeapon;
+	_uint						m_iWeaponModelIndex = 10;
 
-
+	_float3					m_vBulletFirePos;
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ConstTable();
-	HRESULT SetUp_Weapon();
 	HRESULT Ready_ParticleDesc();
 
 	

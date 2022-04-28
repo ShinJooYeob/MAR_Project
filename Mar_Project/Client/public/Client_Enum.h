@@ -592,6 +592,7 @@ enum COMPONENTPROTOTYPEID
 	Prototype_Texture_LoadingScene,
 	Prototype_Texture_LobyScene,
 	Prototype_Texture_SettingScene,
+	Prototype_Texture_MskTex,
 
 
 };
@@ -1021,6 +1022,10 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 				return TEXT("Prototype_Texture_SettingScene");
 				break;
 
+		case Prototype_Texture_MskTex:
+			return TEXT("Prototype_Texture_MskTex");
+			break;
+				
 				//¸Þ½¬////////////////////////////////////////////////////////////////////////
 
 

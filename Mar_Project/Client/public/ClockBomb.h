@@ -3,12 +3,12 @@
 
 BEGIN(Client)
 
-class CTeapot final : public CWeapon
+class CClockBomb final : public CWeapon
 {
 private:
-	CTeapot(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
-	CTeapot(const CTeapot& rhs);
-	virtual ~CTeapot() = default;
+	CClockBomb(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
+	CClockBomb(const CClockBomb& rhs);
+	virtual ~CClockBomb() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype(void* pArg)override;
@@ -25,15 +25,15 @@ private:
 	CRenderer*			m_pRendererCom = nullptr;
 	CTransform*			m_pTransformCom = nullptr;
 	CModel*				m_pModel = nullptr;
-
-
+	CCollider*			m_pColliderCom = nullptr;
+	CTexture*			m_pTextureCom = nullptr;
 
 private:
 	HRESULT SetUp_Components();
 
 
 public:
-	static CTeapot* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
+	static CClockBomb* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	virtual CGameObject* Clone(void* pArg);
 	virtual void Free() override;
 };

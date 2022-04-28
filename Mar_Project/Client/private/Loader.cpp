@@ -13,6 +13,7 @@
 #include "Grinder.h"
 #include "Teapot.h"
 #include "Umbrella.h"
+#include "ClockBomb.h"
 
 //Editor
 #include "ESCursor.h"
@@ -173,7 +174,7 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 
 
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Player),
-		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Alice", "Alice.FBX", TransformMatrix, 2)));
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Alice", "Alice.FBX", TransformMatrix, 7)));
 
 	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Tornado1),
@@ -232,6 +233,7 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 		XMMatrixRotationY(XMConvertToRadians(9.009996f))*
 		XMMatrixRotationZ(XMConvertToRadians(-129.319794f))*
 		XMMatrixTranslation(-0.640f, 0.02f, -1.26f);
+
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Teapot),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Weapon/Teapot", "Teapot.FBX", TransformMatrix)));
 
@@ -250,17 +252,30 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 	
 
 
+	TransformMatrix = XMMatrixScaling(0.0001f, 0.0001f, 0.0001f)*
+		XMMatrixRotationX(XMConvertToRadians(-48.203003f))*
+		XMMatrixRotationY(XMConvertToRadians(255.028625f))*
+		XMMatrixRotationZ(XMConvertToRadians(103.890877f))*
+		XMMatrixTranslation(-0.597f, 0.033f, -1.281f);
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_ClockBomb),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Weapon/ClockBomb", "ClockBomb.FBX", TransformMatrix)));
+
+
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Texture_MskTex),
+		CTexture::Create(m_pDevice, m_pDeviceContext, L"MSK_TEX.txt")));
+
+
 	TransformMatrix = XMMatrixScaling(0.0001f, 0.0001f, 0.0001f) * XMMatrixRotationY(XMConvertToRadians(90.0f));
 
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_SkyBox),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "SkyBox", "SkyBox_0.FBX", TransformMatrix)));
 
 
-	TransformMatrix = XMMatrixScaling(0.0003f, 0.0003f, 0.0003f) * XMMatrixRotationY(XMConvertToRadians(90.0f));
+	TransformMatrix = XMMatrixScaling(0.00015f, 0.00015f, 0.00015f) * XMMatrixRotationY(XMConvertToRadians(90.0f));
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_OilBullet),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "OilBullet", "OilBullet.FBX", TransformMatrix)));
 
-	TransformMatrix = XMMatrixScaling(0.0001f, 0.0001f, 0.0001f) * XMMatrixRotationY(XMConvertToRadians(90.0f));
+	TransformMatrix = XMMatrixScaling(0.00005f, 0.00005f, 0.00005f) * XMMatrixRotationY(XMConvertToRadians(90.0f));
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_TeaBullet),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "TeaBullet", "TeaBullet.FBX", TransformMatrix)));
 	
@@ -443,7 +458,7 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_WeaponGrinder), CGrinder::Create(m_pDevice, m_pDeviceContext)));
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_WeaponTeapot), CTeapot::Create(m_pDevice, m_pDeviceContext)));
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_WeaponUmbrella), CUmbrella::Create(m_pDevice, m_pDeviceContext)));
-	//FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_WeaponClockBomb), CTornadoSwirl::Create(m_pDevice, m_pDeviceContext)));
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_WeaponClockBomb), CClockBomb::Create(m_pDevice, m_pDeviceContext)));
 
 
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_UIGamePlay),

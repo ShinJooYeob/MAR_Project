@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "..\Public\Scene_Stage1.h"
 #include "Scene_Loading.h"
+#include "Player.h"
 
 #include "Camera_Main.h"
 
@@ -191,6 +192,9 @@ HRESULT CScene_Stage1::Ready_Layer_Terrain(const _tchar * pLayerTag)
 HRESULT CScene_Stage1::Ready_Layer_Player(const _tchar * pLayerTag)
 {
 	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STATIC, pLayerTag, TAG_OP(Prototype_Player),&_float3(4,20,4)));
+	CPlayer* pPlayer = (CPlayer*)(g_pGameInstance->Get_GameObject_By_LayerIndex(SCENE_STATIC, TAG_LAY(Layer_Player)));
+	NULL_CHECK_RETURN(pPlayer, E_FAIL);
+	FAILED_CHECK(pPlayer->SetUp_Weapon());
 
 	return S_OK;
 }

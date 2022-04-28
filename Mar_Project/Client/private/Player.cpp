@@ -89,10 +89,12 @@ _int CPlayer::Update(_double fDeltaTime)
 	//	m_pModel->Change_AnimIndex(8);
 	//
 
-
-#define TestWeapon 3
-
-	m_vecWeapon[TestWeapon]->Update(fDeltaTime);
+	if (m_iWeaponModelIndex != 10)
+	{
+		m_vecWeapon[m_iWeaponModelIndex]->Update(fDeltaTime);
+		m_vBulletFirePos = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS) + (m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * 0.8f)
+			+ (m_pTransformCom->Get_MatrixState(CTransform::STATE_UP));
+	}
 
 	return _int();
 }
@@ -129,7 +131,11 @@ _int CPlayer::LateUpdate(_double fDeltaTime)
 	if (!m_fDashPassedTime)
 	{
 		FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this));
-		m_vecWeapon[TestWeapon]->LateUpdate(fDeltaTime);
+		if (m_iWeaponModelIndex != 10)
+		{
+			m_vecWeapon[m_iWeaponModelIndex]->LateUpdate(fDeltaTime);
+		}
+
 
 	}
 
@@ -372,7 +378,7 @@ void CPlayer::Change_Weapon(_uint WeaponIndex)
 	{
 	case 0:
 
-
+		m_iWeaponModelIndex = 0;
 		m_eNowWeapon = CPlayer::Weapon_Knife;
 		m_pModel->Change_AnimIndex(Weapon_Knife + 0);
 		ZeroMemory(m_bAtkMoveMentChecker, sizeof(_bool) * 3);
@@ -388,6 +394,8 @@ void CPlayer::Change_Weapon(_uint WeaponIndex)
 
 		break;
 	case 1:
+		m_iWeaponModelIndex = 1;
+
 		m_eNowWeapon = CPlayer::Weapon_Grinder;
 		m_pModel->Change_AnimIndex(Weapon_Grinder + 0);
 		ZeroMemory(m_bAtkMoveMentChecker, sizeof(_bool) * 3);
@@ -401,6 +409,7 @@ void CPlayer::Change_Weapon(_uint WeaponIndex)
 		m_fUmbrellaIntro = 0;
 		break;
 	case 2:
+		m_iWeaponModelIndex = 2;
 
 		m_eNowWeapon = CPlayer::Weapon_Horse;
 		m_pModel->Change_AnimIndex(Weapon_Horse + 0);
@@ -418,6 +427,7 @@ void CPlayer::Change_Weapon(_uint WeaponIndex)
 		break;
 	case 3:
 
+		m_iWeaponModelIndex = 3;
 		m_eNowWeapon = CPlayer::Weapon_Teapot;
 
 		m_pModel->Change_AnimIndex(Weapon_Teapot + 0);
@@ -433,6 +443,7 @@ void CPlayer::Change_Weapon(_uint WeaponIndex)
 
 		break;
 	case 4:
+		m_iWeaponModelIndex = 4;
 		m_eNowWeapon = CPlayer::Weapon_Umbrella;
 		ZeroMemory(m_bAtkMoveMentChecker, sizeof(_bool) * 3);
 		m_bIsAttackClicked = false;
@@ -446,6 +457,7 @@ void CPlayer::Change_Weapon(_uint WeaponIndex)
 		m_pModel->Set_BlockAnim(true);
 		break;
 	case 5:
+		m_iWeaponModelIndex = 10;
 		m_eNowWeapon = CPlayer::Weapon_None;
 		ZeroMemory(m_bAtkMoveMentChecker, sizeof(_bool) * 3);
 		m_bIsAttackClicked = false;
@@ -612,7 +624,7 @@ HRESULT CPlayer::SetUp_Components()
 	ZeroMemory(m_bAtkMoveMentChecker, sizeof(_bool) * 3);
 
 
-	FAILED_CHECK(SetUp_Weapon());
+	//FAILED_CHECK(SetUp_Weapon());
 	return S_OK;
 }
 
@@ -678,6 +690,11 @@ HRESULT CPlayer::SetUp_Weapon()
 
 	pWeapon = nullptr;
 	pInstance->Add_GameObject_Out_of_Manager((CGameObject**)&pWeapon, SCENE_STATIC, TAG_OP(Prototype_WeaponUmbrella), &tWeaponDesc);
+	NULL_CHECK_RETURN(pWeapon, E_FAIL);
+	m_vecWeapon.push_back(pWeapon);
+
+	pWeapon = nullptr;
+	pInstance->Add_GameObject_Out_of_Manager((CGameObject**)&pWeapon, SCENE_STATIC, TAG_OP(Prototype_WeaponClockBomb), &tWeaponDesc);
 	NULL_CHECK_RETURN(pWeapon, E_FAIL);
 	m_vecWeapon.push_back(pWeapon);
 	

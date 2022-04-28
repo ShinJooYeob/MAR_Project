@@ -22,21 +22,19 @@ HRESULT CBullet::Initialize_Prototype(void * pArg)
 
 HRESULT CBullet::Initialize_Clone(void * pArg)
 {
-	FAILED_CHECK(__super::Initialize_Clone(pArg));
+	FAILED_CHECK(__super::Initialize_Clone_Bullet(pArg));
+
+
 
 	FAILED_CHECK(SetUp_Components());
 
 	if (pArg != nullptr)
 		memcpy(&m_vTargetDir, pArg, sizeof(_float3));
 
-	m_pPlayer = (CPlayer*)(g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Player)));
+	_float3 t = m_pPlayer->Get_FirePos();
+	_float3 tt = ((CTransform*)(m_pPlayer->Get_Component(TAG_COM(Com_Transform))))->Get_MatrixState(CTransform::STATE_POS);
 
-	NULL_CHECK_RETURN(m_pPlayer, E_FAIL);
-
-	Safe_AddRef(m_pPlayer);
-
-	m_pTransformCom->Set_MatrixState(CTransform::STATE_POS,
-		((CTransform*)(m_pPlayer->Get_Component(TAG_COM(Com_Transform))))->Get_MatrixState(CTransform::STATE_POS));
+	m_pTransformCom->Set_MatrixState(CTransform::STATE_POS,	m_pPlayer->Get_FirePos());
 
 	return S_OK;
 }
@@ -101,7 +99,6 @@ void CBullet::Free()
 {
 	__super::Free();
 
-	Safe_Release(m_pPlayer);
 
 	Safe_Release(m_pTransformCom);
 	Safe_Release(m_pRendererCom);
