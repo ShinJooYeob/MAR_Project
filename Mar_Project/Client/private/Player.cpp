@@ -64,10 +64,7 @@ _int CPlayer::Update(_double fDeltaTime)
 
 	FAILED_CHECK(Input_Keyboard(fDeltaTime));
 
-	for (_uint i = 0 ; i < m_pColliderCom->Get_NumColliderBuffer(); i++)
-	{
-		m_pColliderCom->Update_Transform(i, m_pTransformCom->Get_WorldMatrix());
-	}
+
 
 	if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
 		Add_Dmg_to_Player(1);
@@ -88,6 +85,10 @@ _int CPlayer::Update(_double fDeltaTime)
 	//if (g_pGameInstance->Get_DIKeyState(DIK_9)&DIS_Down)
 	//	m_pModel->Change_AnimIndex(8);
 	//
+	for (_uint i = 0; i < m_pColliderCom->Get_NumColliderBuffer(); i++)
+	{
+		m_pColliderCom->Update_Transform(i, m_pTransformCom->Get_WorldMatrix());
+	}
 
 	if (m_iWeaponModelIndex != 10)
 	{
@@ -580,12 +581,12 @@ HRESULT CPlayer::SetUp_Components()
 	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
 
 
-	//ZeroMemory(&ColliderDesc, sizeof(COLLIDERDESC));
-	//ColliderDesc.vScale = _float3(1.f, 1.f, 1.0f);
-	//ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
-	//ColliderDesc.vPosition = _float4(2.f, 0.5f, 0.f, 1.f);
-	//FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_OBB, &ColliderDesc));
-	//m_pColliderCom->Set_ParantBuffer();
+	ZeroMemory(&ColliderDesc, sizeof(COLLIDERDESC));
+	ColliderDesc.vScale = _float3(0.6f, 1.7f, 0.6f);
+	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
+	ColliderDesc.vPosition = _float4(0.f, 0.85f, 0.f, 1.f);
+	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_OBB, &ColliderDesc));
+	m_pColliderCom->Set_ParantBuffer();
 
 	///* For.Com_AABB */
 	//ZeroMemory(&ColliderDesc, sizeof(COLLIDERDESC));

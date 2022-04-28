@@ -30,7 +30,6 @@ HRESULT CWeapon::Initialize_Clone(void * pArg)
 
 	NULL_CHECK_RETURN(m_pPlayer, E_FAIL);
 
-	Safe_AddRef(m_pPlayer);
 
 
 	if (pArg != nullptr)
@@ -53,7 +52,6 @@ HRESULT CWeapon::Initialize_Clone_Bullet(void * pArg)
 
 	NULL_CHECK_RETURN(m_pPlayer, E_FAIL);
 
-	Safe_AddRef(m_pPlayer);
 
 
 	return S_OK;
@@ -86,6 +84,5 @@ _int CWeapon::LateRender()
 void CWeapon::Free()
 {
 	__super::Free();
-	Safe_Release(m_pPlayer);
 
 }

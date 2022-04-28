@@ -104,4 +104,5 @@ void CBullet::Free()
 	Safe_Release(m_pRendererCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModel);
+	Safe_Release(m_pColliderCom);
 }

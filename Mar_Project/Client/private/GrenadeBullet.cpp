@@ -28,6 +28,15 @@ HRESULT CGrenadeBullet::Initialize_Clone(void * pArg)
 
 	FAILED_CHECK(Add_Component(m_eNowSceneNum, TAG_CP(Prototype_Mesh_OilBullet), TAG_COM(Com_Model), (CComponent**)&m_pModel));
 
+	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Collider), TAG_COM(Com_Collider), (CComponent**)&m_pColliderCom));
+	COLLIDERDESC			ColliderDesc;
+	/* For.Com_AABB */
+	ZeroMemory(&ColliderDesc, sizeof(COLLIDERDESC));
+
+	ColliderDesc.vScale = _float3(0.6f, 0.6f, 0.6f);
+	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
+	ColliderDesc.vPosition = _float4(0, 0, 0, 1);
+	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
 
 	CUtilityMgr* pUtilMgr = GetSingle(CUtilityMgr);
 	m_fTotalLifeTime = pUtilMgr->RandomFloat(2.f, 3.f);
@@ -48,6 +57,14 @@ _int CGrenadeBullet::Update(_double fDeltaTime)
 
 	m_pTransformCom->LookDir(m_vTargetDir.XMVector() + XMVectorSet(0, 1, 0, 0)* EasedValue);
 
+
+	m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
+	if (m_bIsOnScreen)
+	{
+		for (_uint i = 0; i < m_pColliderCom->Get_NumColliderBuffer(); i++)
+			m_pColliderCom->Update_Transform(i, m_pTransformCom->Get_WorldMatrix());
+	}
+
 	return _int();
 }
 
@@ -58,7 +75,7 @@ _int CGrenadeBullet::LateUpdate(_double fDeltaTime)
 
 	if (m_bIsDead) return 0;
 
-	if (g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS)))
+	if (m_bIsOnScreen)
 		FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this));
 
 	m_vOldPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
@@ -70,6 +87,9 @@ _int CGrenadeBullet::Render()
 
 	NULL_CHECK_RETURN(m_pModel, E_FAIL);
 
+#ifdef _DEBUG
+	m_pColliderCom->Render();
+#endif // _DEBUG
 
 	FAILED_CHECK(m_pTransformCom->Bind_OnShader(m_pShaderCom, "g_WorldMatrix"));
 

@@ -26,6 +26,7 @@ protected:
 	CRenderer*			m_pRendererCom = nullptr;
 	CTransform*			m_pTransformCom = nullptr;
 	CModel*				m_pModel = nullptr;
+	CCollider*			m_pColliderCom = nullptr;
 
 	_float3				m_vTargetDir;
 private:

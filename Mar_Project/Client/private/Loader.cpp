@@ -174,7 +174,7 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 
 
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Player),
-		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Alice", "Alice.FBX", TransformMatrix, 7)));
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Alice", "Alice.FBX", TransformMatrix, 1)));
 
 	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Tornado1),
@@ -225,14 +225,14 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Weapon/Grinder", "Grinder.FBX", TransformMatrix)));
 
 
-	//-0.640000, 0.020000, -1.260000);
+	//-0.625000, 0.020000, -1.290000
 	//-193.979645, 9.009996, -129.319794);
 
 	TransformMatrix = XMMatrixScaling(0.0001f, 0.0001f, 0.0001f)*
 		XMMatrixRotationX(XMConvertToRadians(-193.979645f))*
 		XMMatrixRotationY(XMConvertToRadians(9.009996f))*
 		XMMatrixRotationZ(XMConvertToRadians(-129.319794f))*
-		XMMatrixTranslation(-0.640f, 0.02f, -1.26f);
+		XMMatrixTranslation(-0.625f, 0.02f, -1.29f);
 
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Teapot),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Weapon/Teapot", "Teapot.FBX", TransformMatrix)));
