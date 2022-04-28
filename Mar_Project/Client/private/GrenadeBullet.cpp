@@ -63,6 +63,9 @@ _int CGrenadeBullet::Update(_double fDeltaTime)
 	{
 		for (_uint i = 0; i < m_pColliderCom->Get_NumColliderBuffer(); i++)
 			m_pColliderCom->Update_Transform(i, m_pTransformCom->Get_WorldMatrix());
+
+		g_pGameInstance->Add_CollisionGroup(CollisionType_PlayerWeapon, this, m_pColliderCom);
+
 	}
 
 	return _int();

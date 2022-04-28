@@ -127,7 +127,7 @@ HRESULT CUtilityMgr::Create_ParticleObject(_uint eSceneID, PARTICLEDESC tParticl
 HRESULT CUtilityMgr::Clear_RenderGroup_forSceneChange()
 {
 	NULL_CHECK_RETURN(m_pRenderer, E_FAIL);
-	
+	g_pGameInstance->Clear_CollisionGroup();
 	return m_pRenderer->Clear_RenderGroup_forSceneChaging();
 }
 

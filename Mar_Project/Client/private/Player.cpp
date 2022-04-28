@@ -97,6 +97,24 @@ _int CPlayer::Update(_double fDeltaTime)
 			+ (m_pTransformCom->Get_MatrixState(CTransform::STATE_UP));
 	}
 
+
+
+
+
+	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime));
+
+	m_pColliderCom->Update_Transform(0, m_pTransformCom->Get_WorldMatrix());
+	for (_uint i = 1; i < m_pColliderCom->Get_NumColliderBuffer(); i++)
+	{
+		_Matrix			TransformMatrix = XMLoadFloat4x4(m_tCollisionAttachPtr[i - 1].pUpdatedNodeMat) * XMLoadFloat4x4(m_tCollisionAttachPtr[i - 1].pDefaultPivotMat);
+		TransformMatrix.r[0] = XMVector3Normalize(TransformMatrix.r[0]);
+		TransformMatrix.r[1] = XMVector3Normalize(TransformMatrix.r[1]);
+		TransformMatrix.r[2] = XMVector3Normalize(TransformMatrix.r[2]);
+		m_pColliderCom->Update_Transform(i, TransformMatrix * m_pTransformCom->Get_WorldMatrix());
+	}
+
+	g_pGameInstance->Add_CollisionGroup(CollisionType_Player, this, m_pColliderCom);
+
 	return _int();
 }
 
@@ -124,25 +142,7 @@ _int CPlayer::LateUpdate(_double fDeltaTime)
 
 
 
-	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime));
 
-
-	
-	m_pColliderCom->Update_Transform(0, m_pTransformCom->Get_WorldMatrix());
-	for (_uint i = 1; i < m_pColliderCom->Get_NumColliderBuffer(); i++)
-	{
-
-		_Matrix			TransformMatrix = XMLoadFloat4x4(m_tCollisionAttachPtr[i - 1].pUpdatedNodeMat) * XMLoadFloat4x4(m_tCollisionAttachPtr[i - 1].pDefaultPivotMat);
-
-		TransformMatrix.r[0] = XMVector3Normalize(TransformMatrix.r[0]);
-		TransformMatrix.r[1] = XMVector3Normalize(TransformMatrix.r[1]);
-		TransformMatrix.r[2] = XMVector3Normalize(TransformMatrix.r[2]);
-
-		m_pColliderCom->Update_Transform(i, TransformMatrix * m_pTransformCom->Get_WorldMatrix());
-	}
-
-
-	//if (g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS)))
 	if (!m_fDashPassedTime)
 	{
 		FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this));

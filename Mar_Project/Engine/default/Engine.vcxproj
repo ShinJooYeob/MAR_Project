@@ -158,6 +158,7 @@
     <ClInclude Include="..\public\Engine_Typedef.h" />
     <ClInclude Include="..\public\HierarchyNode.h" />
     <ClInclude Include="..\public\Light.h" />
+    <ClInclude Include="..\public\CollisionMgr.h" />
     <ClInclude Include="..\public\LightMgr.h" />
     <ClInclude Include="..\public\MeshContainer.h" />
     <ClInclude Include="..\public\Model.h" />
@@ -200,6 +201,7 @@
     <ClCompile Include="..\private\Engine_Struct.cpp" />
     <ClCompile Include="..\private\HierarchyNode.cpp" />
     <ClCompile Include="..\private\Light.cpp" />
+    <ClCompile Include="..\private\CollisionMgr.cpp" />
     <ClCompile Include="..\private\LightMgr.cpp" />
     <ClCompile Include="..\private\MeshContainer.cpp" />
     <ClCompile Include="..\private\Model.cpp" />

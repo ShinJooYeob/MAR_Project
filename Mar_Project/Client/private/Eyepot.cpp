@@ -144,12 +144,15 @@ _int CEyepot::Update(_double fDeltaTime)
 
 	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime, m_bIsOnScreen));
 
+	if (m_bIsOnScreen)
+	{
 
+		for (_uint i = 0; i < m_pColliderCom->Get_NumColliderBuffer(); i++)
+			m_pColliderCom->Update_Transform(i, m_pTransformCom->Get_WorldMatrix());
 
+		g_pGameInstance->Add_CollisionGroup(CollisionType_Monster, this, m_pColliderCom);
 
-	for (_uint i = 0; i < m_pColliderCom->Get_NumColliderBuffer(); i++)
-		m_pColliderCom->Update_Transform(i,  m_pTransformCom->Get_WorldMatrix());
-
+	}
 	return _int();
 }
 

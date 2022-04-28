@@ -19,6 +19,8 @@ public:
 	virtual _int Render();
 	virtual _int LateRender();
 
+	virtual void CollisionTriger(_uint iMyColliderIndex, CGameObject* pConflictedObj,_uint iConflictedObjColliderIndex,CollisionTypeID eConflictedObjCollisionType) {};
+
 	virtual void Set_NowSceneNum(_uint eNowSceneNum) {	m_eNowSceneNum = eNowSceneNum; };
 
 	void Set_NameTag(const _tchar* szNameTag) {	m_szNameTag = szNameTag;};

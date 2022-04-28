@@ -43,22 +43,25 @@ _int CWaspArrow::Update(_double fDeltaTime)
 
 	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime, m_bIsOnScreen));
 
-
-	m_pColliderCom->Update_Transform(0, m_pTransformCom->Get_WorldMatrix());
-
-	for (_uint i = 1; i < m_pColliderCom->Get_NumColliderBuffer(); i++)
+	if (m_bIsOnScreen)
 	{
+		m_pColliderCom->Update_Transform(0, m_pTransformCom->Get_WorldMatrix());
 
-		_Matrix			TransformMatrix = XMLoadFloat4x4(m_tCollisionAttachPtr[i - 1].pUpdatedNodeMat) * XMLoadFloat4x4(m_tCollisionAttachPtr[i - 1].pDefaultPivotMat);
+		for (_uint i = 1; i < m_pColliderCom->Get_NumColliderBuffer(); i++)
+		{
 
-		TransformMatrix.r[0] = XMVector3Normalize(TransformMatrix.r[0]);
-		TransformMatrix.r[1] = XMVector3Normalize(TransformMatrix.r[1]);
-		TransformMatrix.r[2] = XMVector3Normalize(TransformMatrix.r[2]);
+			_Matrix			TransformMatrix = XMLoadFloat4x4(m_tCollisionAttachPtr[i - 1].pUpdatedNodeMat) * XMLoadFloat4x4(m_tCollisionAttachPtr[i - 1].pDefaultPivotMat);
 
-		m_pColliderCom->Update_Transform(i, TransformMatrix * m_pTransformCom->Get_WorldMatrix());
+			TransformMatrix.r[0] = XMVector3Normalize(TransformMatrix.r[0]);
+			TransformMatrix.r[1] = XMVector3Normalize(TransformMatrix.r[1]);
+			TransformMatrix.r[2] = XMVector3Normalize(TransformMatrix.r[2]);
+
+			m_pColliderCom->Update_Transform(i, TransformMatrix * m_pTransformCom->Get_WorldMatrix());
+		}
+
+
+		g_pGameInstance->Add_CollisionGroup(CollisionType_Monster, this, m_pColliderCom);
 	}
-
-
 	return _int();
 }
 
@@ -207,5 +210,7 @@ void CWaspArrow::Free()
 	Safe_Release(m_pRendererCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModel);
+	Safe_Release(m_pColliderCom);
+	
 
 }

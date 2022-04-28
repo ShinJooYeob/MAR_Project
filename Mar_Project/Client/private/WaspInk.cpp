@@ -49,27 +49,32 @@ _int CWaspInk::Update(_double fDeltaTime)
 	m_pTransformCom->Set_MoveSpeed(4.8f);
 
 
-	//if (!m_bIsPatternFinished || Distance_BetweenPlayer(m_pTransformCom) < 10)
-	//{
-	//	Update_Pattern(fDeltaTime);
-	//}
-	//else
-	//{
-	//	if (!m_pModel->Get_IsUntillPlay() && !m_pModel->Get_IsHavetoBlockAnimChange())
-	//	{
-	//		m_pModel->Change_AnimIndex(2);
-	//		FAILED_CHECK(__super::Update_WanderAround(m_pTransformCom, fDeltaTime, 0.2f));
-	//	}
-	//}
+	if (!m_bIsPatternFinished || Distance_BetweenPlayer(m_pTransformCom) < 10)
+	{
+		Update_Pattern(fDeltaTime);
+	}
+	else
+	{
+		if (!m_pModel->Get_IsUntillPlay() && !m_pModel->Get_IsHavetoBlockAnimChange())
+		{
+			m_pModel->Change_AnimIndex(2);
+			FAILED_CHECK(__super::Update_WanderAround(m_pTransformCom, fDeltaTime, 0.2f));
+		}
+	}
 
 
 	Update_DmgCalculate(fDeltaTime);
 
 	m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
 
-
 	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime, m_bIsOnScreen));
-	
+
+	if (m_bIsOnScreen)
+	{
+		for (_uint i = 0; i < m_pColliderCom->Get_NumColliderBuffer(); i++)
+			m_pColliderCom->Update_Transform(i, m_pTransformCom->Get_WorldMatrix());
+		g_pGameInstance->Add_CollisionGroup(CollisionType_Monster, this, m_pColliderCom);
+	}
 
 	return _int();
 }

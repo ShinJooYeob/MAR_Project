@@ -113,8 +113,8 @@ _int CCollider::Render()
 
 _bool CCollider::Inspect_ChildBuffer(_uint iBufferIndex, CCollider* pTargetCollider, _uint iTargetIndex, _uint2* pOutIndex)
 {
-
-	if (m_vecColliderBuffer[iBufferIndex]->Collision_All(pTargetCollider->m_vecColliderBuffer[iTargetIndex]))
+	_bool IsFinalNode = (m_vecColliderBuffer[iBufferIndex]->Get_NumChildBuffer() + pTargetCollider->m_vecColliderBuffer[iTargetIndex]->Get_NumChildBuffer())?false:true;
+	if (m_vecColliderBuffer[iBufferIndex]->Collision_All(pTargetCollider->m_vecColliderBuffer[iTargetIndex], IsFinalNode))
 	{
 		if (m_vecColliderBuffer[iBufferIndex]->Get_NumChildBuffer())
 		{
@@ -146,6 +146,7 @@ _bool CCollider::Inspect_ChildBuffer(_uint iBufferIndex, CCollider* pTargetColli
 				if (pOutIndex != nullptr)
 				{
 					*pOutIndex = _uint2(iBufferIndex, iTargetIndex);
+					pTargetCollider->m_vecColliderBuffer[iTargetIndex]->Set_IsConflicted(true);
 				}
 				return true;
 			}

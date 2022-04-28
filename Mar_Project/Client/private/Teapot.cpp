@@ -272,9 +272,7 @@ _int CTeapot::Update(_double fDeltaTime)
 
 
 
-	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime, m_bIsOnScreen));
-
-
+	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime));
 
 
 	_Matrix			TransformMatrix = XMLoadFloat4x4(m_tATBMat.pUpdatedNodeMat) * XMLoadFloat4x4(m_tATBMat.pDefaultPivotMat);
@@ -288,7 +286,6 @@ _int CTeapot::Update(_double fDeltaTime)
 	m_BoneMatrix = TransformMatrix = m_pTransformCom->Get_WorldMatrix()* TransformMatrix * m_tWeaponDesc.pParantTransform->Get_WorldMatrix();
 
 
-	m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
 
 	return _int();
 }

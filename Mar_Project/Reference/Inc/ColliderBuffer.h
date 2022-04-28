@@ -22,14 +22,15 @@ public:
 	void Update_Transform(_fMatrix TransformMatrix);
 	
 public:
-	_bool Collision_AABB(CColliderBuffer* pTargetColliderBuffer);
-	_bool Collision_OBB(CColliderBuffer* pTargetColliderBuffer);
-	_bool Collision_Sphere(CColliderBuffer* pTargetColliderBuffer);
-	_bool Collision_All(CColliderBuffer* pTargetColliderBuffer);
+	_bool Collision_AABB(CColliderBuffer* pTargetColliderBuffer, _bool IsFinialBuffer = false);
+	_bool Collision_OBB(CColliderBuffer* pTargetColliderBuffer, _bool IsFinialBuffer = false);
+	_bool Collision_Sphere(CColliderBuffer* pTargetColliderBuffer, _bool IsFinialBuffer = false);
+	_bool Collision_All(CColliderBuffer* pTargetColliderBuffer,_bool IsFinialBuffer = false);
 
 	void Add_ChildBufferIndex(_uint iIndex);
 	list<_uint>* Get_ChildIndexList() { return &m_ChildNodeIndexList; };
 	_uint Get_NumChildBuffer() { return _uint(m_ChildNodeIndexList.size()); };
+	void Set_IsConflicted(_bool bBool) { m_bIsConflicted = bBool; };
 
 #ifdef _DEBUG
 public:

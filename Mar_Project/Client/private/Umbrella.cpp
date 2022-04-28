@@ -40,7 +40,7 @@ _int CUmbrella::Update(_double fDeltaTime)
 	
 
 
-	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime, m_bIsOnScreen));
+	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime));
 
 
 	_Matrix			TransformMatrix = XMLoadFloat4x4(m_tATBMat.pUpdatedNodeMat) * XMLoadFloat4x4(m_tATBMat.pDefaultPivotMat);
@@ -57,7 +57,7 @@ _int CUmbrella::Update(_double fDeltaTime)
 	for (_uint i = 0; i < m_pColliderCom->Get_NumColliderBuffer(); i++)
 		m_pColliderCom->Update_Transform(i, TransformMatrix);
 
-	m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
+	g_pGameInstance->Add_CollisionGroup(CollisionType_Player, this, m_pColliderCom);
 
 	return _int();
 }

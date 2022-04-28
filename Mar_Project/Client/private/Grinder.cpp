@@ -265,14 +265,13 @@ _int CGrinder::Update(_double fDeltaTime)
 
 
 
-	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime, m_bIsOnScreen));
 
 
 
 
 
 
-	m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
+	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime));
 
 	return _int();
 }

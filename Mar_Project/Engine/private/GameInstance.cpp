@@ -9,6 +9,7 @@
 #include "SoundMgr.h"
 #include "PipeLineMgr.h"
 #include "LightMgr.h"
+#include "CollisionMgr.h"
 
 IMPLEMENT_SINGLETON(CGameInstance);
 
@@ -25,7 +26,8 @@ CGameInstance::CGameInstance()
 	m_pFrustumMgr(GetSingle(CFrustumMgr)),
 	m_pSoundMgr(GetSingle(CSoundMgr)),
 	m_pPipeLineMgr(GetSingle(CPipeLineMgr)),
-	m_pLightMgr(GetSingle(CLightMgr))
+	m_pLightMgr(GetSingle(CLightMgr)),
+	m_pCollisionMgr(GetSingle(CCollisionMgr))
 
 {
 
@@ -41,6 +43,7 @@ CGameInstance::CGameInstance()
 	Safe_AddRef(m_pSoundMgr);
 	Safe_AddRef(m_pPipeLineMgr);
 	Safe_AddRef(m_pLightMgr);
+	Safe_AddRef(m_pCollisionMgr);
 	
 }
 
@@ -49,7 +52,7 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInst, const CGraphic_Device:
 	ID3D11RenderTargetView** ppBackBufferRTV, ID3D11DepthStencilView** ppDepthStencilView, IDXGISwapChain**	ppSwapChain, _double fDoubleInterver)
 {
 	if (m_pGraphicDevice == nullptr || m_pObjectMgr == nullptr || m_pComponenetMgr == nullptr ||
-		m_pSceneMgr == nullptr || m_pFrustumMgr == nullptr || m_pSoundMgr == nullptr|| m_pLightMgr==nullptr)
+		m_pSceneMgr == nullptr || m_pFrustumMgr == nullptr || m_pSoundMgr == nullptr|| m_pLightMgr==nullptr || m_pCollisionMgr == nullptr)
 	{
 		__debugbreak();
 		return E_FAIL;
@@ -74,7 +77,10 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInst, const CGraphic_Device:
 
 	FAILED_CHECK(m_pLightMgr->Initialize_LightMgr(*ppDeviceOut, *ppDeviceContextOut));
 
+	FAILED_CHECK(m_pCollisionMgr->Initialize_CollisionMgr(*ppDeviceOut, *ppDeviceContextOut));
+
 	FAILED_CHECK(m_pSoundMgr->Initialize_FMOD());
+
 
 
 
@@ -112,6 +118,8 @@ _int CGameInstance::Update_Engine(_double fDeltaTime)
 
 _int CGameInstance::LateUpdate_Engine(_double fDeltaTime)
 {
+	FAILED_CHECK(m_pCollisionMgr->Inspect_Collision());
+
 	if (m_pObjectMgr->LateUpdate(fDeltaTime) < 0)
 	{
 		__debugbreak();
@@ -586,6 +594,19 @@ HRESULT CGameInstance::EasingDiffuseLightDesc(LIGHTDESC::TYPE eLightType, _uint 
 	return m_pLightMgr->EasingDiffuseLightDesc(eLightType, iIndex, vTargetDiffuse, MixRate);
 }
 
+HRESULT CGameInstance::Add_CollisionGroup(CollisionTypeID eType, CGameObject * pCollisionObject, CCollider * pCollider)
+{
+	NULL_CHECK_RETURN(m_pCollisionMgr,E_FAIL);
+
+	return m_pCollisionMgr->Add_CollisionGroup(eType,pCollisionObject,pCollider);
+}
+
+void CGameInstance::Clear_CollisionGroup()
+{
+	NULL_CHECK_BREAK(m_pCollisionMgr);
+	m_pCollisionMgr->Clear_CollisionGroup();
+}
+
 
 
 
@@ -629,6 +650,8 @@ void CGameInstance::Release_Engine()
 	if (0 != GetSingle(CLightMgr)->DestroyInstance())
 		MSGBOX("Failed to Release CLightMgr ");
 
+	if (0 != GetSingle(CCollisionMgr)->DestroyInstance())
+		MSGBOX("Failed to Release CCollisionMgr ");
 
 	if (0 != GetSingle(CGraphic_Device)->DestroyInstance())
 		MSGBOX("Failed to Release Com Graphic_Device ");
@@ -649,5 +672,7 @@ void CGameInstance::Free()
 	Safe_Release(m_pFrustumMgr);
 	Safe_Release(m_pPipeLineMgr);
 	Safe_Release(m_pLightMgr);
+	Safe_Release(m_pCollisionMgr);
+	
 	
 }

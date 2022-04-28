@@ -256,27 +256,24 @@ _int CExecutor::Update(_double fDeltaTime)
 
 	}*/
 
-	m_pColliderCom->Update_Transform(0, m_pTransformCom->Get_WorldMatrix());
+	if (m_bIsOnScreen)
+	{
+		m_pColliderCom->Update_Transform(0, m_pTransformCom->Get_WorldMatrix());
 
-	_Matrix			TransformMatrix = XMLoadFloat4x4(m_tCollisionAttachPtr.pUpdatedNodeMat) * XMLoadFloat4x4(m_tCollisionAttachPtr.pDefaultPivotMat);
+		_Matrix			TransformMatrix = XMLoadFloat4x4(m_tCollisionAttachPtr.pUpdatedNodeMat) * XMLoadFloat4x4(m_tCollisionAttachPtr.pDefaultPivotMat);
 
-	TransformMatrix.r[0] = XMVector3Normalize(TransformMatrix.r[0]);
-	TransformMatrix.r[1] = XMVector3Normalize(TransformMatrix.r[1]);
-	TransformMatrix.r[2] = XMVector3Normalize(TransformMatrix.r[2]);
+		TransformMatrix.r[0] = XMVector3Normalize(TransformMatrix.r[0]);
+		TransformMatrix.r[1] = XMVector3Normalize(TransformMatrix.r[1]);
+		TransformMatrix.r[2] = XMVector3Normalize(TransformMatrix.r[2]);
 
 
-	m_pColliderCom->Update_Transform(1, TransformMatrix * m_pTransformCom->Get_WorldMatrix());
-	//for (_uint i = 1; i < m_pColliderCom->Get_NumColliderBuffer(); i++)
-	//{
+		m_pColliderCom->Update_Transform(1, TransformMatrix * m_pTransformCom->Get_WorldMatrix());
 
-	//	_Matrix			TransformMatrix = XMLoadFloat4x4(m_tCollisionAttachPtr[i - 1].pUpdatedNodeMat) * XMLoadFloat4x4(m_tCollisionAttachPtr[i - 1].pDefaultPivotMat);
+		g_pGameInstance->Add_CollisionGroup(CollisionType_Monster, this, m_pColliderCom);
+	}
 
-	//	TransformMatrix.r[0] = XMVector3Normalize(TransformMatrix.r[0]);
-	//	TransformMatrix.r[1] = XMVector3Normalize(TransformMatrix.r[1]);
-	//	TransformMatrix.r[2] = XMVector3Normalize(TransformMatrix.r[2]);
 
-	//	m_pColliderCom->Update_Transform(i, TransformMatrix * m_pTransformCom->Get_WorldMatrix());
-	//}
+
 
 	return _int();
 }

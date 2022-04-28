@@ -146,104 +146,110 @@ void CColliderBuffer::Update_Transform(_fMatrix TransformMatrix)
 	default:
 		break;
 	}
-
+	m_bIsConflicted = false;
 }
 
-_bool CColliderBuffer::Collision_AABB(CColliderBuffer * pTargetColliderBuffer)
+_bool CColliderBuffer::Collision_AABB(CColliderBuffer * pTargetColliderBuffer, _bool IsFinialBuffer)
 {
 	if (m_pAABB[BOUNDING_TRANSFORM]  == nullptr)
 	{
 		__debugbreak();
 		return false;
 	}
-
+	_bool bBool = false;
 	switch (pTargetColliderBuffer->m_eColliderType)
 	{
 	case Engine::COLLIDER_AABB:
-		m_bIsConflicted = m_pAABB[BOUNDING_TRANSFORM]->Intersects(*pTargetColliderBuffer->m_pAABB[BOUNDING_TRANSFORM]);
+		bBool = m_pAABB[BOUNDING_TRANSFORM]->Intersects(*pTargetColliderBuffer->m_pAABB[BOUNDING_TRANSFORM]);
 		break;
 	case Engine::COLLIDER_OBB:
-		m_bIsConflicted = m_pAABB[BOUNDING_TRANSFORM]->Intersects(*pTargetColliderBuffer->m_pOBB[BOUNDING_TRANSFORM]);
+		bBool = m_pAABB[BOUNDING_TRANSFORM]->Intersects(*pTargetColliderBuffer->m_pOBB[BOUNDING_TRANSFORM]);
 		break;
 	case Engine::COLLIDER_SPHERE:
-		m_bIsConflicted = m_pAABB[BOUNDING_TRANSFORM]->Intersects(*pTargetColliderBuffer->m_pSphere[BOUNDING_TRANSFORM]);
+		bBool = m_pAABB[BOUNDING_TRANSFORM]->Intersects(*pTargetColliderBuffer->m_pSphere[BOUNDING_TRANSFORM]);
 		break;
 	default:
 		__debugbreak();
 		break;
 	}
 
-	return m_bIsConflicted;
+	if (IsFinialBuffer && bBool)m_bIsConflicted = true;
+
+	return bBool;
 }
 
-_bool CColliderBuffer::Collision_OBB(CColliderBuffer * pTargetColliderBuffer)
+_bool CColliderBuffer::Collision_OBB(CColliderBuffer * pTargetColliderBuffer, _bool IsFinialBuffer)
 {
 	if (m_pOBB[BOUNDING_TRANSFORM] == nullptr)
 	{
 		__debugbreak();
 		return false;
 	}
+	_bool bBool = false;
+
 
 	switch (pTargetColliderBuffer->m_eColliderType)
 	{
 	case Engine::COLLIDER_AABB:
-		m_bIsConflicted = m_pOBB[BOUNDING_TRANSFORM]->Intersects(*pTargetColliderBuffer->m_pAABB[BOUNDING_TRANSFORM]);
+		bBool = m_pOBB[BOUNDING_TRANSFORM]->Intersects(*pTargetColliderBuffer->m_pAABB[BOUNDING_TRANSFORM]);
 		break;
 	case Engine::COLLIDER_OBB:
-		m_bIsConflicted = m_pOBB[BOUNDING_TRANSFORM]->Intersects(*pTargetColliderBuffer->m_pOBB[BOUNDING_TRANSFORM]);
+		bBool = m_pOBB[BOUNDING_TRANSFORM]->Intersects(*pTargetColliderBuffer->m_pOBB[BOUNDING_TRANSFORM]);
 		break;
 	case Engine::COLLIDER_SPHERE:
-		m_bIsConflicted = m_pOBB[BOUNDING_TRANSFORM]->Intersects(*pTargetColliderBuffer->m_pSphere[BOUNDING_TRANSFORM]);
+		bBool = m_pOBB[BOUNDING_TRANSFORM]->Intersects(*pTargetColliderBuffer->m_pSphere[BOUNDING_TRANSFORM]);
 		break;
 	default:
 		__debugbreak();
 		break;
 	}
+	if (IsFinialBuffer && bBool)m_bIsConflicted = true;
 
-
-	return m_bIsConflicted;
+	return bBool;
 }
 
-_bool CColliderBuffer::Collision_Sphere(CColliderBuffer * pTargetColliderBuffer)
+_bool CColliderBuffer::Collision_Sphere(CColliderBuffer * pTargetColliderBuffer, _bool IsFinialBuffer)
 {
 	if (m_pSphere[BOUNDING_TRANSFORM] == nullptr)
 	{
 		__debugbreak();
 		return false;
 	}
+	_bool bBool = false;
 
 	switch (pTargetColliderBuffer->m_eColliderType)
 	{
 	case Engine::COLLIDER_AABB:
-		m_bIsConflicted = m_pSphere[BOUNDING_TRANSFORM]->Intersects(*pTargetColliderBuffer->m_pAABB[BOUNDING_TRANSFORM]);
+		bBool = m_pSphere[BOUNDING_TRANSFORM]->Intersects(*pTargetColliderBuffer->m_pAABB[BOUNDING_TRANSFORM]);
 		break;
 	case Engine::COLLIDER_OBB:
-		m_bIsConflicted = m_pSphere[BOUNDING_TRANSFORM]->Intersects(*pTargetColliderBuffer->m_pOBB[BOUNDING_TRANSFORM]);
+		bBool = m_pSphere[BOUNDING_TRANSFORM]->Intersects(*pTargetColliderBuffer->m_pOBB[BOUNDING_TRANSFORM]);
 		break;
 	case Engine::COLLIDER_SPHERE:
-		m_bIsConflicted = m_pSphere[BOUNDING_TRANSFORM]->Intersects(*pTargetColliderBuffer->m_pSphere[BOUNDING_TRANSFORM]);
+		bBool = m_pSphere[BOUNDING_TRANSFORM]->Intersects(*pTargetColliderBuffer->m_pSphere[BOUNDING_TRANSFORM]);
 		break;
 	default:
 		__debugbreak();
 		break;
 	}
+	if (IsFinialBuffer && bBool)m_bIsConflicted = true;
 
-	return m_bIsConflicted;
+	return bBool;
 }
 
-_bool CColliderBuffer::Collision_All(CColliderBuffer * pTargetColliderBuffer)
+_bool CColliderBuffer::Collision_All(CColliderBuffer * pTargetColliderBuffer, _bool IsFinialBuffer)
 {
 
 	switch (m_eColliderType)
 	{
 	case Engine::COLLIDER_AABB:
-		 return Collision_AABB(pTargetColliderBuffer);
+		 return Collision_AABB(pTargetColliderBuffer, IsFinialBuffer);
 
 	case Engine::COLLIDER_OBB:
-		return Collision_OBB(pTargetColliderBuffer);
+		return Collision_OBB(pTargetColliderBuffer, IsFinialBuffer);
 		
 	case Engine::COLLIDER_SPHERE:
-		return Collision_Sphere(pTargetColliderBuffer);
+		return Collision_Sphere(pTargetColliderBuffer, IsFinialBuffer);
 
 	default:
 		__debugbreak();

@@ -18,6 +18,7 @@ class CFrustumMgr;
 class CSoundMgr;
 class CPipeLineMgr;
 class CLightMgr;
+class CCollisionMgr;
 
 
 class ENGINE_DLL CGameInstance final :public CBase
@@ -131,7 +132,9 @@ public:// LightMgr
 	HRESULT Add_Light(const LIGHTDESC& LightDesc);
 	HRESULT EasingDiffuseLightDesc(LIGHTDESC::TYPE eLightType, _uint iIndex, _fVector vTargetDiffuse, _float MixRate = 1.f);
 
-
+public: //CollisionMgr
+	HRESULT Add_CollisionGroup(CollisionTypeID eType, class CGameObject* pCollisionObject, class CCollider* pCollider);
+	void	Clear_CollisionGroup();
 
 private:
 	CGraphic_Device*	m_pGraphicDevice = nullptr;
@@ -146,6 +149,7 @@ private:
 	CSoundMgr*			m_pSoundMgr = nullptr;
 	CPipeLineMgr*		m_pPipeLineMgr = nullptr;
 	CLightMgr*			m_pLightMgr = nullptr;
+	CCollisionMgr*		m_pCollisionMgr = nullptr;
 
 public:
 	static void Release_Engine();
