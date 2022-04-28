@@ -93,8 +93,8 @@ _int CPlayer::Update(_double fDeltaTime)
 	if (m_iWeaponModelIndex != 10)
 	{
 		m_vecWeapon[m_iWeaponModelIndex]->Update(fDeltaTime);
-		m_vBulletFirePos = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS) + (m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * 0.8f)
-			+ (m_pTransformCom->Get_MatrixState(CTransform::STATE_UP));
+		m_vBulletFirePos = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS) + (m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * 0.6f)
+			+ (m_pTransformCom->Get_MatrixState(CTransform::STATE_UP)) + (m_pTransformCom->Get_MatrixState(CTransform::STATE_RIGHT)*0.1f);
 	}
 
 
@@ -730,9 +730,14 @@ HRESULT CPlayer::SetUp_Weapon()
 
 HRESULT CPlayer::Ready_ParticleDesc()
 {
+
+
 	m_vecParticleDesc.clear();
 	m_vecParticleDesc.reserve(5);
 
+	//GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[0]);
+
+	/////////0//////////////////
 	PARTICLEDESC tDesc;
 
 	tDesc.eParticleTypeID = Particle_Ball;
@@ -780,7 +785,7 @@ HRESULT CPlayer::Ready_ParticleDesc()
 
 	m_vecParticleDesc.push_back(tDesc);
 
-	////////////////////////////////////////////////////////////////////////
+	///////////1/////////////////////////////////////////////////////////////
 
 	tDesc = PARTICLEDESC();
 
@@ -830,7 +835,7 @@ HRESULT CPlayer::Ready_ParticleDesc()
 	m_vecParticleDesc.push_back(tDesc);
 
 
-	////////////////////////////////////////////////////////////////////////	 
+	////////////2////////////////////////////////////////////////////////////	 
 	tDesc = PARTICLEDESC();
 
 	tDesc.eParticleTypeID = Particle_Ball;
@@ -879,12 +884,13 @@ HRESULT CPlayer::Ready_ParticleDesc()
 
 	m_vecParticleDesc.push_back(tDesc);
 
-	////////////////////////////////////////////////////////////////////////
+	//////////3//////////////////////////////////////////////////////////////
+
 	tDesc = PARTICLEDESC();
 
 	tDesc.eParticleTypeID = Particle_Ball;
 
-	tDesc.FollowingTarget = m_pTransformCom;
+	tDesc.FollowingTarget = nullptr;
 
 	tDesc.szTextureProtoTypeTag = TAG_CP(Prototype_Texture_PlayerEffect);
 	tDesc.szTextureLayerTag = L"Explosion";
@@ -893,21 +899,22 @@ HRESULT CPlayer::Ready_ParticleDesc()
 	tDesc.TextureChageFrequency = 1;
 	tDesc.vTextureXYNum = _float2(5, 4);
 
-	tDesc.TotalParticleTime = 2;
+	tDesc.TotalParticleTime = 0.1f;
 	tDesc.EachParticleLifeTime = 0.34f;
-	tDesc.MaxParticleCount = 10;
 
-	tDesc.SizeChageFrequency = 0;
-	tDesc.ParticleSize = _float3(1, 1, 1);
-	tDesc.ParticleSize2 = _float3(0.5, 0.5, 0.5);
+	tDesc.MaxParticleCount = 1;
+
+	tDesc.SizeChageFrequency = 1;
+	tDesc.ParticleSize = _float3(0.2f, 0.2f, 0.2f);
+	tDesc.ParticleSize2 = _float3(1.f, 1.f, 1.f);
 
 	tDesc.ColorChageFrequency = 0;
-	tDesc.TargetColor = _float4(1.f, 1.f, 1.f, 1.f);
+	tDesc.TargetColor = _float4(1.f, 1.f, 1.f, 0.7f);
 	tDesc.TargetColor2 = _float4(1.f, 1.f, 1.f, 1.f);
 
 
 	tDesc.Particle_Power = 1;
-	tDesc.PowerRandomRange = _float2(0.5f, 1.5f);
+	tDesc.PowerRandomRange = _float2(0.5f, 1.0f);
 
 	tDesc.vUp = _float3(0, 1, 0);
 
@@ -916,8 +923,8 @@ HRESULT CPlayer::Ready_ParticleDesc()
 	tDesc.m_bIsUI = false;
 	tDesc.m_bUIDepth = 0;
 
-	tDesc.ParticleStartRandomPosMin = _float3(-1.0f, 0.5f, -1.0f);
-	tDesc.ParticleStartRandomPosMax = _float3(1.f, 1.f, 1.f);
+	tDesc.ParticleStartRandomPosMin = _float3(-0.05f, 0.0f, -0.05f);
+	tDesc.ParticleStartRandomPosMax = _float3(0.05f, 0.1f, 0.05f);
 
 	tDesc.DepthTestON = true;
 	tDesc.AlphaBlendON = true;
@@ -929,7 +936,7 @@ HRESULT CPlayer::Ready_ParticleDesc()
 	m_vecParticleDesc.push_back(tDesc);
 
 
-	////////////////////////////////////////////////////////////////////////
+	/////////4///////////////////////////////////////////////////////////////
 	tDesc = PARTICLEDESC();
 
 	tDesc.eParticleTypeID = Particle_Ball;
@@ -1457,9 +1464,10 @@ HRESULT CPlayer::Lunch_Bullet(_double fDeltaTime, CGameInstance * pInstance)
 			CTransform* pCamTransform = m_pMainCamera->Get_Camera_Transform();
 			_float3 vBulletDir = XMVector3Normalize(XMVector3TransformNormal(XMVectorSet(0, 0, 300, 0), pCamTransform->Get_WorldMatrix()));
 
+			m_vecParticleDesc[3].FixedTarget = m_vBulletFirePos;
+			GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[3]);
 
-			pInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Bullet), TAG_OP(Prototype_Bullet_Normal),
-				&vBulletDir);
+			pInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Bullet), TAG_OP(Prototype_Bullet_Normal),	&vBulletDir);
 
 			m_BulletNormalInterver = GetSingle(CUtilityMgr)->RandomFloat(0.15f, 0.2f);
 		}

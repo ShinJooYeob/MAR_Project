@@ -11,7 +11,7 @@ enum ParticleID
 	Particle_Ball,
 	Particle_Suck,
 	Particle_Straight,
-	//Particle_Cone,
+	Particle_Cone,
 	//Particle_Fountain,
 	//Particle_Spread,
 
@@ -48,6 +48,7 @@ typedef struct tagParticleDesc
 
 	_float Particle_Power = 0;
 	_float2 PowerRandomRange = _float2(0.5f, 1.5f);
+	_float2 SubPowerRandomRange = _float2(1.f, 1.f);
 
 	_float3 vUp = _float3(0, 1, 0);
 

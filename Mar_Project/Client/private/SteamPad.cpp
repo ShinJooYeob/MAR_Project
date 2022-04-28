@@ -34,6 +34,11 @@ HRESULT CSteamPad::Initialize_Clone(void * pArg)
 	}
 	m_fRangeRadius = 0.514f;
 
+
+
+	FAILED_CHECK(Ready_ParticleDesc());
+
+
 	return S_OK;
 }
 
@@ -186,6 +191,60 @@ HRESULT CSteamPad::Set_ProPellaTransform()
 	_float4x4 ShaderWorldMatrix4x4 = XMMatrixTranspose(ShaderWorldMatrix);
 
 	return m_pShaderSubCom->Set_RawValue("g_WorldMatrix", &ShaderWorldMatrix4x4, sizeof(_float4x4));
+}
+
+HRESULT CSteamPad::Ready_ParticleDesc()
+{
+	//GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_tParticleDesc);
+
+	m_tParticleDesc.eParticleTypeID = Particle_Cone;
+
+	m_tParticleDesc.FollowingTarget = m_pTransformCom;
+
+	m_tParticleDesc.szTextureProtoTypeTag = TAG_CP(Prototype_Texture_PlayerEffect);
+	m_tParticleDesc.szTextureLayerTag = L"Dust2";
+	m_tParticleDesc.iSimilarLayerNum = 1;
+
+	m_tParticleDesc.TextureChageFrequency = 8;
+	m_tParticleDesc.vTextureXYNum = _float2(2, 2);
+
+	m_tParticleDesc.TotalParticleTime = 9999999999.f;
+	m_tParticleDesc.EachParticleLifeTime = 0.64f;
+	m_tParticleDesc.MaxParticleCount = 45;
+
+	m_tParticleDesc.SizeChageFrequency = 1;
+	m_tParticleDesc.ParticleSize = _float3(1.f);
+	m_tParticleDesc.ParticleSize2 = _float3(3.f);
+
+	m_tParticleDesc.ColorChageFrequency = 0;
+	m_tParticleDesc.TargetColor = _float4(1.f, 1.f, 1.f, 1.f);
+	m_tParticleDesc.TargetColor2 = _float4(1.f, 1.f, 1.f, 0.f);
+
+
+	m_tParticleDesc.Particle_Power = m_fMaxHight*1.5f;
+	m_tParticleDesc.PowerRandomRange = _float2(0.8f, 1.f);
+	m_tParticleDesc.SubPowerRandomRange = _float2(5.f, 6.f);
+
+	m_tParticleDesc.vUp = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_UP);
+
+	m_tParticleDesc.MaxBoundaryRadius = 999999.f;
+
+	m_tParticleDesc.m_bIsUI = false;
+	m_tParticleDesc.m_bUIDepth = 0;
+
+	m_tParticleDesc.ParticleStartRandomPosMin = _float3(-0.2f, 0, -0.2f);
+	m_tParticleDesc.ParticleStartRandomPosMax = _float3(0.2f, 0, 0.2f);
+
+	m_tParticleDesc.DepthTestON = true;
+	m_tParticleDesc.AlphaBlendON = true;
+
+	m_tParticleDesc.m_fAlphaTestValue = 0.18f;
+	m_tParticleDesc.m_iPassIndex = 4;
+
+	GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_tParticleDesc);
+
+
+	return S_OK;
 }
 
 CSteamPad * CSteamPad::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, void * pArg)

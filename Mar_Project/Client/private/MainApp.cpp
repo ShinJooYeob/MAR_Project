@@ -126,7 +126,23 @@ HRESULT CMainApp::Render()
 	//콜리전 내부 비워주는중
 	//m_pCollision->Collision_Obsever_Release(); 
 
+#ifdef _DEBUG
+	if (m_pGameInstance->Get_DIKeyState(DIK_F6)& DIS_Down) g_bIsShowFPS = !g_bIsShowFPS;
+	if (g_bIsShowFPS)
+	{
+		++m_dwNumRender;
+		m_dTimerAcc += g_fDeltaTime;
 
+		if (m_dTimerAcc >= 1.f)
+		{
+			wsprintf(m_szFPS, TEXT("FPS : %d"), m_dwNumRender);
+			SetWindowText(g_hWnd, m_szFPS);
+
+			m_dwNumRender = 0;
+			m_dTimerAcc = 0.f;
+		}
+	}
+#endif // _DEBUG
 
 
 	return S_OK;
@@ -328,6 +344,9 @@ HRESULT CMainApp::Ready_Static_GameObject_Prototype()
 	FAILED_CHECK(m_pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_UILoading), CLoadingUI::Create(m_pDevice, m_pDeviceContext)));
 	
 	FAILED_CHECK(m_pGameInstance->Add_GameObject_Prototype(TEXT("ProtoType_GameObject_Object_particle_Ball"), CParticleeObj_Ball::Create(m_pDevice, m_pDeviceContext)));
+	FAILED_CHECK(m_pGameInstance->Add_GameObject_Prototype(TEXT("ProtoType_GameObject_Object_particle_Straight"), CParticleeObj_Straight::Create(m_pDevice, m_pDeviceContext)));
+	FAILED_CHECK(m_pGameInstance->Add_GameObject_Prototype(TEXT("ProtoType_GameObject_Object_particle_Cone"), CParticleeObj_Cone::Create(m_pDevice, m_pDeviceContext)));
+	FAILED_CHECK(m_pGameInstance->Add_GameObject_Prototype(TEXT("ProtoType_GameObject_Object_particle_Fixed"), CParticleeObj_Fixed::Create(m_pDevice, m_pDeviceContext)));
 	//FAILED_CHECK(m_pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_UILoading), CLoadingUI::Create(m_pDevice, m_pDeviceContext)));
 	//FAILED_CHECK(m_pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_UILoading), CLoadingUI::Create(m_pDevice, m_pDeviceContext)));
 	//FAILED_CHECK(m_pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_UILoading), CLoadingUI::Create(m_pDevice, m_pDeviceContext)));

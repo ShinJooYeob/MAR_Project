@@ -57,6 +57,8 @@ _int CScene_StageSelect::Render()
 
 
 #ifdef _DEBUG
+	if (!g_bIsShowFPS)
+
 	SetWindowText(g_hWnd, TEXT("GameScene"));
 #endif // _DEBUG
 

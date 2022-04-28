@@ -144,6 +144,22 @@ PS_OUT PS_MAIN_PARTICLEREMOVEALPHA(PS_IN In)
 	return Out;
 }
 
+PS_OUT PS_MAIN_PARTICLEREMOVEALPHA2(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	Out.vColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);//vector(1.f, 0.f, 0.f, 1.f);rgba
+	float Alpha = Out.vColor.r;
+
+	if (Alpha < g_fAlphaTestValue)
+		discard;
+
+	Out.vColor += (Out.vColor*g_vColor*0.2 + g_vColor*0.8) ;
+	//Out.vColor *= g_vColor;
+	Out.vColor.a = Alpha * 0.5f;
+	return Out;
+}
+
 
 technique11		DefaultTechnique
 {
@@ -196,6 +212,16 @@ technique11		DefaultTechnique
 		VertexShader = compile vs_5_0 VS_MAIN_PARTICLE();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN_PARTICLEREMOVEALPHA();
+	}
+	pass ParticleRectRemoveAlpha2		//5
+	{
+		SetBlendState(ParticleBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(ZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_ccw);
+
+		VertexShader = compile vs_5_0 VS_MAIN_PARTICLE();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_PARTICLEREMOVEALPHA2();
 	}
 
 }

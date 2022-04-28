@@ -107,6 +107,7 @@ _int CScene_Loading::Render()
 
 
 #ifdef _DEBUG
+	if (!g_bIsShowFPS)
 
 	if (m_pLoader != nullptr) 
 	{

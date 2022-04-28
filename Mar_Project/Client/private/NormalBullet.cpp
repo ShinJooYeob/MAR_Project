@@ -44,6 +44,7 @@ HRESULT CNormalBullet::Initialize_Clone(void * pArg)
 	m_vTargetDir = m_vTargetDir.XMVector() + pUtilMgr->RandomFloat3(-0.1f, 0.1f).XMVector();
 
 
+	FAILED_CHECK(Ready_ParticleDesc());
 
 	return S_OK;
 }
@@ -127,6 +128,52 @@ _int CNormalBullet::LateRender()
 {
 
 	return _int();
+}
+
+HRESULT CNormalBullet::Ready_ParticleDesc()
+{
+
+
+	m_tParticleDesc.eParticleTypeID = Particle_Fixed;
+
+	m_tParticleDesc.FollowingTarget = m_pTransformCom;
+
+	m_tParticleDesc.szTextureProtoTypeTag = TAG_CP(Prototype_Texture_PlayerEffect);
+	m_tParticleDesc.szTextureLayerTag = L"Dust2";
+	m_tParticleDesc.iSimilarLayerNum = 1;
+
+	m_tParticleDesc.TextureChageFrequency = 8;
+	m_tParticleDesc.vTextureXYNum = _float2(2, 2);
+	
+	m_tParticleDesc.TotalParticleTime = m_fTotalLifeTime;
+	//m_tParticleDesc.TotalParticleTime = 9999999999.f;
+	m_tParticleDesc.EachParticleLifeTime = 0.64f;
+	m_tParticleDesc.MaxParticleCount = 3;
+
+	m_tParticleDesc.SizeChageFrequency = 1;
+	m_tParticleDesc.ParticleSize = _float3(1.f);
+	m_tParticleDesc.ParticleSize2 = _float3(3.f);
+
+	m_tParticleDesc.ColorChageFrequency = 0;
+	m_tParticleDesc.TargetColor = _float4(1.f, 1.f, 0, 1.f);
+	m_tParticleDesc.TargetColor2 = _float4(1.f, 1.f, 1.f, 0.f);
+
+	m_tParticleDesc.MaxBoundaryRadius = 1.;
+
+	m_tParticleDesc.m_bIsUI = false;
+	m_tParticleDesc.m_bUIDepth = 0;
+
+	m_tParticleDesc.ParticleStartRandomPosMin = _float3(-0, 0, -0);
+
+	m_tParticleDesc.DepthTestON = true;
+	m_tParticleDesc.AlphaBlendON = true;
+
+	m_tParticleDesc.m_fAlphaTestValue = 0.18f;
+	m_tParticleDesc.m_iPassIndex = 5;
+
+	GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_tParticleDesc);
+
+	return S_OK;
 }
 
 CNormalBullet * CNormalBullet::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)

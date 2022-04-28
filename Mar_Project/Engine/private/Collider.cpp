@@ -95,6 +95,7 @@ _int CCollider::Add_ColliderBuffer(COLLIDERTYPE eColliderType, COLLIDERDESC * pC
 	return _int(m_vecColliderBuffer.size() - 1);
 }
 
+#ifdef _DEBUG
 
 _int CCollider::Render()
 {
@@ -110,6 +111,7 @@ _int CCollider::Render()
 
 	return 0;
 }
+#endif // _DEBUG
 
 _bool CCollider::Inspect_ChildBuffer(_uint iBufferIndex, CCollider* pTargetCollider, _uint iTargetIndex, _uint2* pOutIndex)
 {

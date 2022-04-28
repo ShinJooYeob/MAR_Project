@@ -82,7 +82,8 @@ _int CScene_Loby::Render()
 		return -1;
 
 #ifdef _DEBUG
-	SetWindowText(g_hWnd, TEXT("LobyScene"));
+	if (!g_bIsShowFPS)
+		SetWindowText(g_hWnd, TEXT("LobyScene"));
 #endif // _DEBUG
 
 	return 0;

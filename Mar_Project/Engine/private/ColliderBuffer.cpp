@@ -17,9 +17,11 @@ CColliderBuffer::CColliderBuffer(ID3D11Device * pDevice, ID3D11DeviceContext * p
 
 CColliderBuffer::CColliderBuffer(const CColliderBuffer & rhs)
 	:m_pDevice(rhs.m_pDevice),
+#ifdef _DEBUG
 	m_pBasicEffect(rhs.m_pBasicEffect),
 	m_pBatch(rhs.m_pBatch),
 	m_pInputLayout(rhs.m_pInputLayout),
+#endif // _DEBUG
 	m_pDeviceContext(rhs.m_pDeviceContext),
 	m_eColliderType(rhs.m_eColliderType),
 	m_bIsClone(true),
@@ -27,7 +29,9 @@ CColliderBuffer::CColliderBuffer(const CColliderBuffer & rhs)
 {
 	Safe_AddRef(m_pDevice);
 	Safe_AddRef(m_pDeviceContext);
+#ifdef _DEBUG
 	Safe_AddRef(m_pInputLayout);
+#endif // _DEBUG
 
 	for (_uint i = 0; i < BOUNDING_END; ++i)
 	{
@@ -264,6 +268,7 @@ void CColliderBuffer::Add_ChildBufferIndex(_uint iIndex)
 	m_ChildNodeIndexList.push_back(iIndex);
 }
 
+#ifdef _DEBUG
 _int CColliderBuffer::Render()
 {
 	m_pDeviceContext->IASetInputLayout(m_pInputLayout);
@@ -302,6 +307,7 @@ _int CColliderBuffer::Render()
 
 	return 0;
 }
+#endif // _DEBUG
 
 _Matrix CColliderBuffer::Remove_Rotation(_fMatrix TransformMatrix)
 {
@@ -350,12 +356,14 @@ void CColliderBuffer::Free()
 		Safe_Delete(m_pSphere[i]);
 	}
 
+#ifdef _DEBUG
 	Safe_Release(m_pInputLayout);
 	if (!m_bIsClone)
 	{
 		Safe_Delete(m_pBasicEffect);
 		Safe_Delete(m_pBatch);
 	}
+#endif // _DEBUG
 	Safe_Release(m_pDevice);
 	Safe_Release(m_pDeviceContext);
 

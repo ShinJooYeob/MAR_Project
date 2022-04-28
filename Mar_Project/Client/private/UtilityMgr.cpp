@@ -104,10 +104,10 @@ HRESULT CUtilityMgr::Create_ParticleObject(_uint eSceneID, PARTICLEDESC tParticl
 		FAILED_CHECK(GetSingle(CGameInstance)->Add_GameObject_To_Layer(eSceneID, TAG_LAY(Layer_Particle), TEXT("ProtoType_GameObject_Object_particle_Suck"), &tParticleDesc));
 		break;
 
-		/*
 		case Client::Particle_Cone:
-		FAILED_CHECK(GetSingle(CGameInstance)->Add_GameObject_To_Layer(eSceneID, TEXT("Layer_Particle"), TEXT("ProtoType_GameObject_Object_particle_Cone"), &tParticleDesc));
+		FAILED_CHECK(GetSingle(CGameInstance)->Add_GameObject_To_Layer(eSceneID, TAG_LAY(Layer_Particle), TEXT("ProtoType_GameObject_Object_particle_Cone"), &tParticleDesc));
 		break;
+		/*
 
 		case Client::Particle_Fountain:
 		FAILED_CHECK(GetSingle(CGameInstance)->Add_GameObject_To_Layer(eSceneID, TEXT("Layer_Particle"), TEXT("ProtoType_GameObject_Object_particle_Fountain"), &tParticleDesc));

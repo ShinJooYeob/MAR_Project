@@ -5,6 +5,7 @@ static const int g_iWinCY = 720;
 extern HINSTANCE g_hInst;
 extern HWND g_hWnd;
 extern _double g_fDeltaTime;
+extern _bool	g_bIsShowFPS;
 extern CGameInstance* g_pGameInstance;
 
 #ifdef USE_IMGUI

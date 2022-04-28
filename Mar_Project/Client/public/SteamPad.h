@@ -39,10 +39,14 @@ private:
 	_float				m_fMaxHight = 0;
 
 	_float				m_fAngle = 0;
+
+	PARTICLEDESC		m_tParticleDesc;
+
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_SubConstTable();
 	HRESULT	Set_ProPellaTransform();
+	HRESULT Ready_ParticleDesc();
 
 
 public:

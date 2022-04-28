@@ -154,3 +154,114 @@ public:
 END
 
 #pragma endregion
+
+#pragma region StraightParticle
+
+BEGIN(Client)
+
+///////////직선 형태 파티클///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class CParticleeObj_Straight final : public CParticleObject
+{
+private:
+	explicit CParticleeObj_Straight(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
+	explicit CParticleeObj_Straight(const CParticleeObj_Straight& rhs);
+	virtual ~CParticleeObj_Straight() = default;
+
+private:
+
+	virtual void Reset_Velocity(_float3& fAttVlocity)override;
+	virtual void Update_Position_by_Velocity(PARTICLEATT* tParticleAtt, _double fTimeDelta)override;
+
+
+	virtual HRESULT Initialize_Child_Clone() override;
+	//	virtual void ResetParticle(PARTICLEATT* attribute);
+
+	virtual _int Update(_double fTimeDelta)override;
+	virtual _int LateUpdate(_double fTimeDelta)override;
+	// 랜더는 부모 것 사용
+
+
+public:
+
+	static CParticleeObj_Straight* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, void* pArg = nullptr);
+	virtual CGameObject * Clone(void * pArg) override;
+};
+END
+
+#pragma endregion
+
+
+
+#pragma region ConeParticle
+
+BEGIN(Client)
+
+///////////원뿔 형태 파티클///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class CParticleeObj_Cone final : public CParticleObject
+{
+private:
+	explicit CParticleeObj_Cone(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
+	explicit CParticleeObj_Cone(const CParticleeObj_Ball& rhs);
+	virtual ~CParticleeObj_Cone() = default;
+
+private:
+
+	virtual void Reset_Velocity(_float3& fAttVlocity)override;
+	virtual void Update_Position_by_Velocity(PARTICLEATT* tParticleAtt, _double fTimeDelta)override;
+
+
+	virtual HRESULT Initialize_Child_Clone() override;
+	//	virtual void ResetParticle(PARTICLEATT* attribute);
+
+	virtual _int Update(_double fTimeDelta)override;
+	virtual _int LateUpdate(_double fTimeDelta)override;
+	// 랜더는 부모 것 사용
+
+
+public:
+
+	static CParticleeObj_Cone* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, void* pArg = nullptr);
+	virtual CGameObject * Clone(void * pArg) override;
+};
+END
+
+#pragma endregion
+
+
+#pragma region ConeParticle
+
+BEGIN(Client)
+
+///////////고정 형태 파티클///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class CParticleeObj_Fixed final : public CParticleObject
+{
+private:
+	explicit CParticleeObj_Fixed(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
+	explicit CParticleeObj_Fixed(const CParticleeObj_Ball& rhs);
+	virtual ~CParticleeObj_Fixed() = default;
+
+private:
+
+	virtual void Reset_Velocity(_float3& fAttVlocity)override;
+	virtual void Update_Position_by_Velocity(PARTICLEATT* tParticleAtt, _double fTimeDelta)override;
+
+
+	virtual HRESULT Initialize_Child_Clone() override;
+	//	virtual void ResetParticle(PARTICLEATT* attribute);
+
+	virtual _int Update(_double fTimeDelta)override;
+	virtual _int LateUpdate(_double fTimeDelta)override;
+	// 랜더는 부모 것 사용
+
+
+public:
+
+	static CParticleeObj_Fixed* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, void* pArg = nullptr);
+	virtual CGameObject * Clone(void * pArg) override;
+};
+END
+
+#pragma endregion

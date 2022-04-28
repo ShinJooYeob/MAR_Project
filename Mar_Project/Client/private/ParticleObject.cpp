@@ -34,6 +34,9 @@ HRESULT CParticleObject::Initialize_Clone(void * pArg)
 
 	FAILED_CHECK(Initialize_Child_Clone());
 
+
+	Safe_AddRef(m_ParticleDesc.FollowingTarget);
+
 	return S_OK;
 }
 
@@ -404,6 +407,9 @@ void CParticleObject::Free()
 {
 	__super::Free();
 
+	Safe_Release(m_ParticleDesc.FollowingTarget);
+
+
 	Safe_Release(m_pParentTransformCom);
 	Safe_Release(m_pParticleTransformCom);
 	Safe_Release(m_pRendererCom);
@@ -445,13 +451,7 @@ HRESULT CParticleeObj_Ball::Initialize_Child_Clone()
 	m_ParticleList.clear();
 
 	PARTICLEATT part;
-	_float3 RandomVelocity = _float3(0, 0, 0);
 
-
-	_float3 RandomPos = _float3(0, 0, 0);
-
-
-	
 
 	for (_uint i = 0; i < m_ParticleDesc.MaxParticleCount; i++)
 	{
@@ -504,4 +504,257 @@ CGameObject * CParticleeObj_Ball::Clone(void * pArg)
 }
 #pragma endregion
 
+CParticleeObj_Straight::CParticleeObj_Straight(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
+	:CParticleObject(pDevice, pDeviceContext)
+{
+}
 
+CParticleeObj_Straight::CParticleeObj_Straight(const CParticleeObj_Straight & rhs)
+	: CParticleObject(rhs)
+{
+}
+
+void CParticleeObj_Straight::Reset_Velocity(_float3 & fAttVlocity)
+{
+
+	if (m_ParticleDesc.m_bIsUI) m_vUp.z = 0;
+
+	fAttVlocity = m_vUp.Get_Nomalize();
+}
+
+void CParticleeObj_Straight::Update_Position_by_Velocity(PARTICLEATT * tParticleAtt, _double fTimeDelta)
+{
+	tParticleAtt->_position = tParticleAtt->_position .XMVector() + tParticleAtt->_velocity.XMVector() * tParticleAtt->_force * _float(fTimeDelta);
+}
+
+HRESULT CParticleeObj_Straight::Initialize_Child_Clone()
+{
+
+	m_ParticleList.clear();
+
+	PARTICLEATT part;
+
+
+	for (_uint i = 0; i < m_ParticleDesc.MaxParticleCount; i++)
+	{
+		ResetParticle(&part);
+		m_ParticleList.push_front(part);
+	}
+
+	return S_OK;
+}
+
+_int CParticleeObj_Straight::Update(_double fTimeDelta)
+{
+	if (0 > __super::Update(fTimeDelta)) return -1;
+	return _int();
+}
+
+_int CParticleeObj_Straight::LateUpdate(_double fTimeDelta)
+{
+	if (0 > __super::LateUpdate(fTimeDelta)) return -1;
+	return _int();
+}
+
+CParticleeObj_Straight * CParticleeObj_Straight::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, void * pArg)
+{
+	CParticleeObj_Straight* pInstance = new CParticleeObj_Straight(pDevice, pDeviceContext);
+
+	if (FAILED(pInstance->Initialize_Prototype(pArg)))
+	{
+		MSGBOX("Fail to Create CParticleeObj_Straight");
+		Safe_Release(pInstance);
+
+	}
+
+	return pInstance;
+}
+
+CGameObject * CParticleeObj_Straight::Clone(void * pArg)
+{
+	CParticleeObj_Straight* pInstance = new CParticleeObj_Straight(*this);
+
+	if (FAILED(pInstance->Initialize_Clone(pArg)))
+	{
+		MSGBOX("Fail to Create CParticleeObj_Straight");
+		Safe_Release(pInstance);
+	}
+
+	return pInstance;
+}
+
+CParticleeObj_Cone::CParticleeObj_Cone(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
+	: CParticleObject(pDevice,pDeviceContext)
+{
+}
+
+CParticleeObj_Cone::CParticleeObj_Cone(const CParticleeObj_Ball & rhs)
+	: CParticleObject(rhs)
+{
+}
+
+void CParticleeObj_Cone::Reset_Velocity(_float3 & fAttVlocity)
+{
+
+	if (m_ParticleDesc.m_bIsUI) m_vUp.z = 0;
+
+	_float Rate = GetSingle(CUtilityMgr)->RandomFloat(0.f, 1.f);
+
+	_float IsMinus1 = rand()% 2 ? 1.f:-1.f;
+	_float IsMinus2 = rand() % 2 ? 1.f : -1.f;
+
+	_Vector vRand = XMVector3Normalize(m_vRight.XMVector() *IsMinus1 * Rate + m_vLook.XMVector() *IsMinus2 * (1 - Rate) 
+		+ m_vUp.Get_Nomalize() * GetSingle(CUtilityMgr)->RandomFloat(m_ParticleDesc.SubPowerRandomRange.x, m_ParticleDesc.SubPowerRandomRange.y));
+
+	fAttVlocity = vRand;
+}
+
+void CParticleeObj_Cone::Update_Position_by_Velocity(PARTICLEATT * tParticleAtt, _double fTimeDelta)
+{
+	tParticleAtt->_position = tParticleAtt->_position.XMVector() + tParticleAtt->_velocity.XMVector() * tParticleAtt->_force * _float(fTimeDelta);
+}
+
+HRESULT CParticleeObj_Cone::Initialize_Child_Clone()
+{
+
+	m_ParticleList.clear();
+
+	PARTICLEATT part;
+
+
+	for (_uint i = 0; i < m_ParticleDesc.MaxParticleCount; i++)
+	{
+		ResetParticle(&part);
+		m_ParticleList.push_front(part);
+	}
+
+	return S_OK;
+}
+
+_int CParticleeObj_Cone::Update(_double fTimeDelta)
+{
+	if (0 > __super::Update(fTimeDelta)) return -1;
+	return _int();
+}
+
+_int CParticleeObj_Cone::LateUpdate(_double fTimeDelta)
+{
+	if (0 > __super::LateUpdate(fTimeDelta)) return -1;
+	return _int();
+}
+
+CParticleeObj_Cone * CParticleeObj_Cone::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, void * pArg)
+{
+	CParticleeObj_Cone* pInstance = new CParticleeObj_Cone(pDevice, pDeviceContext);
+
+	if (FAILED(pInstance->Initialize_Prototype(pArg)))
+	{
+		MSGBOX("Fail to Create CParticleeObj_Cone");
+		Safe_Release(pInstance);
+
+	}
+
+	return pInstance;
+}
+
+CGameObject * CParticleeObj_Cone::Clone(void * pArg)
+{
+	CParticleeObj_Cone* pInstance = new CParticleeObj_Cone(*this);
+
+	if (FAILED(pInstance->Initialize_Clone(pArg)))
+	{
+		MSGBOX("Fail to Create CParticleeObj_Cone");
+		Safe_Release(pInstance);
+	}
+
+	return pInstance;
+}
+
+CParticleeObj_Fixed::CParticleeObj_Fixed(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
+	: CParticleObject(pDevice,pDeviceContext)
+{
+}
+
+CParticleeObj_Fixed::CParticleeObj_Fixed(const CParticleeObj_Ball & rhs)
+	: CParticleObject(rhs)
+{
+}
+
+void CParticleeObj_Fixed::Reset_Velocity(_float3 & fAttVlocity)
+{
+
+}
+
+void CParticleeObj_Fixed::Update_Position_by_Velocity(PARTICLEATT * tParticleAtt, _double fTimeDelta)
+{
+	if (m_ParticleDesc.FollowingTarget != nullptr)
+		tParticleAtt->_position = m_ParticleDesc.FollowingTarget->Get_MatrixState(CTransform::STATE_POS) + m_vPivot.XMVector();
+	else
+		tParticleAtt->_position = m_ParticleDesc.FixedTarget.XMVector()+ m_vPivot.XMVector();
+}
+
+HRESULT CParticleeObj_Fixed::Initialize_Child_Clone()
+{
+
+	m_ParticleList.clear();
+
+	PARTICLEATT part;
+
+
+	m_ParticleDesc.Particle_Power = 0.;
+	m_ParticleDesc.PowerRandomRange = _float2(0.0f, 0.1f);
+	m_ParticleDesc.SubPowerRandomRange = _float2(0, 0);
+	m_ParticleDesc.vUp = _float3(0, 1, 0);
+	m_ParticleDesc.MaxBoundaryRadius = 1.f;
+	m_vPivot = m_ParticleDesc.ParticleStartRandomPosMin;
+	m_ParticleDesc.ParticleStartRandomPosMin = _float3(-0, 0, -0);
+	m_ParticleDesc.ParticleStartRandomPosMax = _float3(0, 0, 0);
+	if (m_ParticleDesc.MaxParticleCount > 5)m_ParticleDesc.MaxParticleCount = 5;
+
+
+	for (_uint i = 0; i < m_ParticleDesc.MaxParticleCount; i++)
+	{
+		ResetParticle(&part);
+		m_ParticleList.push_front(part);
+	}
+	return S_OK;
+}
+
+_int CParticleeObj_Fixed::Update(_double fTimeDelta)
+{
+	if (0 > __super::Update(fTimeDelta)) return -1;
+	return _int();
+}
+
+_int CParticleeObj_Fixed::LateUpdate(_double fTimeDelta)
+{
+	if (0 > __super::LateUpdate(fTimeDelta)) return -1;
+	return _int();
+}
+
+CParticleeObj_Fixed * CParticleeObj_Fixed::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, void * pArg)
+{
+	CParticleeObj_Fixed* pInstance = new CParticleeObj_Fixed(pDevice, pDeviceContext);
+
+	if (FAILED(pInstance->Initialize_Prototype(pArg)))
+	{
+		MSGBOX("Fail to Create CParticleeObj_Fixed");
+		Safe_Release(pInstance);
+
+	}
+
+	return pInstance;
+}
+
+CGameObject * CParticleeObj_Fixed::Clone(void * pArg)
+{
+	CParticleeObj_Fixed* pInstance = new CParticleeObj_Fixed(*this);
+
+	if (FAILED(pInstance->Initialize_Clone(pArg)))
+	{
+		MSGBOX("Fail to Create CParticleeObj_Fixed");
+		Safe_Release(pInstance);
+	}
+
+	return pInstance;
+}

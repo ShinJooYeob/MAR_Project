@@ -20,7 +20,11 @@ public:
 	virtual _int Render()override;
 	virtual _int LateRender()override;
 
+private:
+	PARTICLEDESC		m_tParticleDesc;
 
+private:
+	HRESULT Ready_ParticleDesc();
 
 public:
 	static CNormalBullet* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);

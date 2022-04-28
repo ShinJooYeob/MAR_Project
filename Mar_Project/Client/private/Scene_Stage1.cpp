@@ -46,11 +46,11 @@ HRESULT CScene_Stage1::Initialize()
 
 
 
-	FAILED_CHECK(Ready_Layer_Grunt(TAG_LAY(Layer_Monster)));
-	FAILED_CHECK(Ready_Layer_Eyepot(TAG_LAY(Layer_Monster)));
-	FAILED_CHECK(Ready_Layer_WaspInk(TAG_LAY(Layer_Monster)));
-	FAILED_CHECK(Ready_Layer_WaspArrow(TAG_LAY(Layer_Monster)));
-	FAILED_CHECK(Ready_Layer_Executor(TAG_LAY(Layer_Monster)));
+	//FAILED_CHECK(Ready_Layer_Grunt(TAG_LAY(Layer_Monster)));
+	//FAILED_CHECK(Ready_Layer_Eyepot(TAG_LAY(Layer_Monster)));
+	//FAILED_CHECK(Ready_Layer_WaspInk(TAG_LAY(Layer_Monster)));
+	//FAILED_CHECK(Ready_Layer_WaspArrow(TAG_LAY(Layer_Monster)));
+	//FAILED_CHECK(Ready_Layer_Executor(TAG_LAY(Layer_Monster)));
 
 
 		
@@ -89,7 +89,8 @@ _int CScene_Stage1::Render()
 		return -1;
 
 #ifdef _DEBUG
-	SetWindowText(g_hWnd, TEXT("Scene_Stage1"));
+	if (!g_bIsShowFPS)
+		SetWindowText(g_hWnd, TEXT("Scene_Stage1"));
 #endif // _DEBUG
 
 	return 0;
@@ -214,7 +215,9 @@ HRESULT CScene_Stage1::Ready_Layer_JumpPad(const _tchar * pLayerTag)
 
 HRESULT CScene_Stage1::Ready_Layer_SteamPad(const _tchar * pLayerTag)
 {
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_SteamPad), &_float4(9, 22.5, 7, 10)));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_SteamPad), &_float4(9, 22.5, 7, 5)));
+
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_SteamPad), &_float4(9, 22.5, 5, 10)));
 
 	return S_OK;
 }
@@ -266,7 +269,7 @@ HRESULT CScene_Stage1::Ready_Layer_StaticMapObj(const _tchar * pLayerTag)
 HRESULT CScene_Stage1::Ready_Layer_Executor(const _tchar * pLayerTag)
 {
 
-	for (_uint i = 0 ; i < 20; i ++)
+	for (_uint i = 0 ; i < 1; i ++)
 	{
 		FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_Executor), &_float3(2 + _float(i), 21, 4)));
 	}
