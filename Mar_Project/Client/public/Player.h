@@ -16,7 +16,7 @@ public:
 	enum eWeaponState
 	{
 		//Weapon_None = 0, Weapon_Knife = 47, Weapon_Grinder = 73, Weapon_Horse = 89, Weapon_Teapot = 113, Weapon_Umbrella = 134, Weapon_End
-		Weapon_None = 0, Weapon_Knife =88888888, Weapon_Grinder = 45651, Weapon_Horse = 777777777, Weapon_Teapot = 47, Weapon_Umbrella = 213137, Weapon_End
+		Weapon_None = 0, Weapon_Knife =88888888, Weapon_Grinder = 45651, Weapon_Horse = 387137, Weapon_Teapot = 123123, Weapon_Umbrella = 47, Weapon_End
 	};
 
 
@@ -173,8 +173,6 @@ private:
 	HRESULT Set_Player_On_Slieder(_double fDeltatime);
 	HRESULT Set_Camera_On_Player(_double fDeltaTime);
 
-	/*For_Animation*/
-	//HRESULT Play_Animation();
 
 public:
 	static CPlayer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext,void* pArg = nullptr);

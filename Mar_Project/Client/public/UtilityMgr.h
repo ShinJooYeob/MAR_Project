@@ -23,7 +23,7 @@ public:
 
 
 	/*For SlowMotion*/
-	void SlowMotionStart(_float fTargetTime = 0.5f, _float TargetSpeed = 0.3f);
+	void SlowMotionStart(_float fTargetTime = 0.4f, _float TargetSpeed = 0.2f);
 
 	/*For Particle*/
 	HRESULT Create_ParticleObject(_uint eSceneID, PARTICLEDESC tParticleDesc);

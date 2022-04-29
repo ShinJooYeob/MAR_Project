@@ -56,7 +56,8 @@ _int CGrenadeBullet::Update(_double fDeltaTime)
 	if (__super::Update(fDeltaTime) < 0)
 		return -1;
 	if (m_bIsDead) return 0;
-	
+	m_pColliderCom->Update_ConflictPassedTime(fDeltaTime);
+
 	_float EasedValue = g_pGameInstance->Easing(TYPE_Linear, 20, -100, m_fLifeTime, m_fTotalLifeTime);
 
 	m_pTransformCom->MovetoDir_bySpeed(XMVectorSet(0, 1, 0, 0), EasedValue, fDeltaTime);
@@ -127,6 +128,29 @@ _int CGrenadeBullet::LateRender()
 {
 
 	return _int();
+}
+
+void CGrenadeBullet::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedObj, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType)
+{
+	switch (eConflictedObjCollisionType)
+	{
+
+	case Engine::CollisionType_Monster:
+	{
+
+		CCollider* MonsterCollider = (CCollider*)(pConflictedObj->Get_Component(TAG_COM(Com_Collider)));
+		MonsterCollider->Set_Conflicted();
+		//GetSingle(CUtilityMgr)->SlowMotionStart();
+
+
+	}
+	break;
+	case Engine::CollisionType_Terrain:
+		break;
+
+	default:
+		break;
+	}
 }
 
 CGrenadeBullet * CGrenadeBullet::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)

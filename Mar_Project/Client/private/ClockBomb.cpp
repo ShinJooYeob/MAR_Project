@@ -37,7 +37,8 @@ _int CClockBomb::Update(_double fDeltaTime)
 	if (__super::Update(fDeltaTime) < 0)
 		return -1;
 	if (m_bIsDead) return 0;
-	
+	m_pColliderCom->Update_ConflictPassedTime(fDeltaTime);
+
 	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime));
 
 
@@ -117,6 +118,10 @@ _int CClockBomb::LateRender()
 {
 
 	return _int();
+}
+
+void CClockBomb::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedObj, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType)
+{
 }
 
 HRESULT CClockBomb::SetUp_Components()

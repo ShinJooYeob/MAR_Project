@@ -90,10 +90,12 @@ _double CMainApp::Update_SlowMotion(_double fDeltaTime)
 {
 	m_fPassedTime += _float(fDeltaTime);
 
-	if (m_fPassedTime < m_fTargetTime * 0.5f)
-		 m_SlowTimes = m_pGameInstance->Easing(TYPE_QuarticOut, 1, m_fTargetSpeed, m_fPassedTime, m_fTargetTime *0.5f);
+#define SLOWMOTIONTURNINGPOINT 0.0f
+
+	if (m_fPassedTime < m_fTargetTime * SLOWMOTIONTURNINGPOINT)
+		m_SlowTimes = m_pGameInstance->Easing(TYPE_QuarticOut, 1, m_fTargetSpeed, m_fPassedTime, m_fTargetTime *SLOWMOTIONTURNINGPOINT);
 	else
-		m_SlowTimes = m_pGameInstance->Easing(TYPE_QuarticIn, m_fTargetSpeed, 1, m_fPassedTime - m_fTargetTime *0.5f, m_fTargetTime *0.5f);
+		m_SlowTimes = m_pGameInstance->Easing(TYPE_QuarticIn, m_fTargetSpeed, 1, m_fPassedTime - m_fTargetTime *SLOWMOTIONTURNINGPOINT, m_fTargetTime * (1 - SLOWMOTIONTURNINGPOINT));
 
 	if (m_fPassedTime > m_fTargetTime)
 	{

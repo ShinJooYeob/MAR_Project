@@ -39,6 +39,8 @@ HRESULT CGrunt::Initialize_Clone(void * pArg)
 _int CGrunt::Update(_double fDeltaTime)
 {
 
+	if (__super::Update(fDeltaTime) < 0)return -1;
+	m_pColliderCom->Update_ConflictPassedTime(fDeltaTime);
 
 	/*
 	static float testFloat = 1.;
@@ -88,27 +90,27 @@ _int CGrunt::Update(_double fDeltaTime)
 
 
 
-	_uint AnimIndex = m_pModel->Get_NowAnimIndex();
+	//_uint AnimIndex = m_pModel->Get_NowAnimIndex();
 
-	if (AnimIndex == 1)
-		m_pModel->Set_NextAnim_Must(2);
+	//if (AnimIndex == 1)
+	//	m_pModel->Set_NextAnim_Must(2);
 
-	if (!(AnimIndex >= 23 && AnimIndex <= 25 || AnimIndex == 1))
-	{
+	//if (!(AnimIndex >= 23 && AnimIndex <= 25 || AnimIndex == 1))
+	//{
 
-		if (!m_bIsPatternFinished || Distance_BetweenPlayer(m_pTransformCom) < 3)
-		{
-			Update_Pattern(fDeltaTime);
-		}
-		else
-		{
-			if (!m_pModel->Get_IsUntillPlay())
-			{
-				m_pModel->Change_AnimIndex(2);
-				FAILED_CHECK(__super::Update_WanderAround(m_pTransformCom, fDeltaTime, 0.05f));
-			}
-		}
-	}
+	//	if (!m_bIsPatternFinished || Distance_BetweenPlayer(m_pTransformCom) < 3)
+	//	{
+	//		Update_Pattern(fDeltaTime);
+	//	}
+	//	else
+	//	{
+	//		if (!m_pModel->Get_IsUntillPlay())
+	//		{
+	//			m_pModel->Change_AnimIndex(2);
+	//			FAILED_CHECK(__super::Update_WanderAround(m_pTransformCom, fDeltaTime, 0.05f));
+	//		}
+	//	}
+	//}
 
 
 	/*

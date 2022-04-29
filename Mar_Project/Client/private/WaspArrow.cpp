@@ -37,6 +37,8 @@ _int CWaspArrow::Update(_double fDeltaTime)
 {
 
 
+	if (__super::Update(fDeltaTime) < 0)return -1;
+	m_pColliderCom->Update_ConflictPassedTime(fDeltaTime);
 
 
 	m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));

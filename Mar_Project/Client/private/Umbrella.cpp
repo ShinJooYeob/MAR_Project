@@ -37,8 +37,231 @@ _int CUmbrella::Update(_double fDeltaTime)
 	if (__super::Update(fDeltaTime) < 0)
 		return -1;
 	if (m_bIsDead) return 0;
-	
+	m_pColliderCom->Update_ConflictPassedTime(fDeltaTime);
 
+	//{
+	//	//XMMatrixRotationX(XMConvertToRadians(-20.713932f))*
+	//	//	XMMatrixRotationY(XMConvertToRadians(205.632385f))*
+	//	//	XMMatrixRotationZ(XMConvertToRadians(68.354744f))*
+	//	//	XMMatrixTranslation(-0.584000f, -0.032000f, -1.333000f); */
+	//static _float3 testFloat3 = _float3(-0.584000f, -0.032000f, -1.333000f);
+	//static _float3 RotFloat3 = _float3(-20.713932f, 205.632385f, 68.354744f);
+	//static _float value = 0.015f;
+	//static _int kind = 0;
+
+	//_Matrix tt = XMMatrixRotationX(XMConvertToRadians(RotFloat3.x))*
+	//XMMatrixRotationY(XMConvertToRadians(RotFloat3.y))*
+	//XMMatrixRotationZ(XMConvertToRadians(RotFloat3.z));
+
+	//tt.r[3] = XMVectorSetW(testFloat3.XMVector(), 1);
+	//m_pTransformCom->Set_Matrix(tt);
+
+	//CGameInstance* m_pInstance = g_pGameInstance;
+	//if (m_pInstance->Get_DIKeyState(DIK_UP) & DIS_Down)
+	//{
+	//testFloat3.x -= value;
+
+
+	//_Matrix tt = XMMatrixRotationX(XMConvertToRadians(RotFloat3.x))*
+	//XMMatrixRotationY(XMConvertToRadians(RotFloat3.y))*
+	//XMMatrixRotationZ(XMConvertToRadians(RotFloat3.z));
+
+	//tt.r[3] = XMVectorSetW(testFloat3.XMVector(), 1);
+	//m_pTransformCom->Set_Matrix(tt);
+	//string ttszLog = "Pivot  : " + to_string(testFloat3.x) + " , " + to_string(testFloat3.y) + " , " + to_string(testFloat3.z) + " , " + "\n";
+
+	//wstring ttDebugLog;
+	//ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+
+	//OutputDebugStringW(ttDebugLog.c_str());
+	//}
+
+	//else if (m_pInstance->Get_DIKeyState(DIK_DOWN) & DIS_Down)
+	//{
+	//testFloat3.x += value;
+
+	//_Matrix tt = XMMatrixRotationX(XMConvertToRadians(RotFloat3.x))*
+	//XMMatrixRotationY(XMConvertToRadians(RotFloat3.y))*
+	//XMMatrixRotationZ(XMConvertToRadians(RotFloat3.z));
+
+	//tt.r[3] = XMVectorSetW(testFloat3.XMVector(), 1);
+	//m_pTransformCom->Set_Matrix(tt);
+	//string ttszLog = "Pivot  : " + to_string(testFloat3.x) + " , " + to_string(testFloat3.y) + " , " + to_string(testFloat3.z) + " , " + "\n";
+
+	//wstring ttDebugLog;
+	//ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+
+	//OutputDebugStringW(ttDebugLog.c_str());
+
+
+
+	//}
+	//else if (m_pInstance->Get_DIKeyState(DIK_LEFT) & DIS_Down)
+	//{
+	//testFloat3.z += value;
+
+	//_Matrix tt = XMMatrixRotationX(XMConvertToRadians(RotFloat3.x))*
+	//XMMatrixRotationY(XMConvertToRadians(RotFloat3.y))*
+	//XMMatrixRotationZ(XMConvertToRadians(RotFloat3.z));
+
+	//tt.r[3] = XMVectorSetW(testFloat3.XMVector(), 1);
+	//m_pTransformCom->Set_Matrix(tt);
+	//string ttszLog = "Pivot  : " + to_string(testFloat3.x) + " , " + to_string(testFloat3.y) + " , " + to_string(testFloat3.z) + " , " + "\n";
+
+	//wstring ttDebugLog;
+	//ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+
+	//OutputDebugStringW(ttDebugLog.c_str());
+
+
+
+	//}
+
+	//else if (m_pInstance->Get_DIKeyState(DIK_RIGHT) & DIS_Down)
+	//{
+	//testFloat3.z -= value;
+
+	//_Matrix tt = XMMatrixRotationX(XMConvertToRadians(RotFloat3.x))*
+	//XMMatrixRotationY(XMConvertToRadians(RotFloat3.y))*
+	//XMMatrixRotationZ(XMConvertToRadians(RotFloat3.z));
+
+	//tt.r[3] = XMVectorSetW(testFloat3.XMVector(), 1);
+	//m_pTransformCom->Set_Matrix(tt);
+	//string ttszLog = "Pivot  : " + to_string(testFloat3.x) + " , " + to_string(testFloat3.y) + " , " + to_string(testFloat3.z) + " , " + "\n";
+
+	//wstring ttDebugLog;
+	//ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+
+	//OutputDebugStringW(ttDebugLog.c_str());
+
+
+
+	//}
+
+	//else if (m_pInstance->Get_DIKeyState(DIK_DELETE) & DIS_Down)
+	//{
+	//testFloat3.y += value;
+	//_Matrix tt = XMMatrixRotationX(XMConvertToRadians(RotFloat3.x))*
+	//XMMatrixRotationY(XMConvertToRadians(RotFloat3.y))*
+	//XMMatrixRotationZ(XMConvertToRadians(RotFloat3.z));
+
+	//tt.r[3] = XMVectorSetW(testFloat3.XMVector(), 1);
+	//m_pTransformCom->Set_Matrix(tt);
+	//string ttszLog = "Pivot  : " + to_string(testFloat3.x) + " , " + to_string(testFloat3.y) + " , " + to_string(testFloat3.z) + " , " + "\n";
+
+	//wstring ttDebugLog;
+	//ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+
+	//OutputDebugStringW(ttDebugLog.c_str());
+
+
+
+	//}
+
+	//else if (m_pInstance->Get_DIKeyState(DIK_END) & DIS_Down)
+	//{
+	//testFloat3.y -= value;
+	//_Matrix tt = XMMatrixRotationX(XMConvertToRadians(RotFloat3.x))*
+	//XMMatrixRotationY(XMConvertToRadians(RotFloat3.y))*
+	//XMMatrixRotationZ(XMConvertToRadians(RotFloat3.z));
+
+	//tt.r[3] = XMVectorSetW(testFloat3.XMVector(), 1);
+	//m_pTransformCom->Set_Matrix(tt);
+	//string ttszLog = "Pivot  : " + to_string(testFloat3.x) + " , " + to_string(testFloat3.y) + " , " + to_string(testFloat3.z) + " , " + "\n";
+
+	//wstring ttDebugLog;
+	//ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+
+	//OutputDebugStringW(ttDebugLog.c_str());
+
+
+
+	//}
+	//else if (m_pInstance->Get_DIKeyState(DIK_PGUP) & DIS_Press)
+	//{
+	//switch (kind)
+	//{
+	//case 0:
+	//RotFloat3.x += value;
+	//break;
+	//case 1:
+	//RotFloat3.y += value;
+	//break;
+	//case 2:
+	//RotFloat3.z += value;
+	//break;
+
+	//default:
+	//break;
+	//}
+
+	//_Matrix tt = XMMatrixRotationX(XMConvertToRadians(RotFloat3.x))*
+	//XMMatrixRotationY(XMConvertToRadians(RotFloat3.y))*
+	//XMMatrixRotationZ(XMConvertToRadians(RotFloat3.z));
+
+	//tt.r[3] = XMVectorSetW(testFloat3.XMVector(), 1);
+	//m_pTransformCom->Set_Matrix(tt);
+
+	//string ttszLog = "rot  : " + to_string(RotFloat3.x) + " , " + to_string(RotFloat3.y) + " , " + to_string(RotFloat3.z) + " , " + "\n";
+
+	//wstring ttDebugLog;
+	//ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+
+	//OutputDebugStringW(ttDebugLog.c_str());
+
+
+
+	//}
+	//else if (m_pInstance->Get_DIKeyState(DIK_PGDN) & DIS_Press)
+	//{
+	//switch (kind)
+	//{
+	//case 0:
+	//RotFloat3.x -= value;
+	//break;
+	//case 1:
+	//RotFloat3.y -= value;
+	//break;
+	//case 2:
+	//RotFloat3.z -= value;
+	//break;
+
+	//default:
+	//break;
+	//}
+
+	//_Matrix tt = XMMatrixRotationX(XMConvertToRadians(RotFloat3.x))*
+	//XMMatrixRotationY(XMConvertToRadians(RotFloat3.y))*
+	//XMMatrixRotationZ(XMConvertToRadians(RotFloat3.z));
+
+	//tt.r[3] = XMVectorSetW(testFloat3.XMVector(), 1);
+	//m_pTransformCom->Set_Matrix(tt);
+
+	//string ttszLog = "Rot  : " + to_string(RotFloat3.x) + " , " + to_string(RotFloat3.y) + " , " + to_string(RotFloat3.z) + " , " + "\n";
+
+	//wstring ttDebugLog;
+	//ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+
+	//OutputDebugStringW(ttDebugLog.c_str());
+
+
+
+	//}
+	//else if (m_pInstance->Get_DIKeyState(DIK_TAB) & DIS_Down)
+	//{
+	//kind++;
+	//if (kind > 2)kind = 0;
+
+	//string ttszLog = "kind  : " + to_string(kind) + "\n";
+
+	//wstring ttDebugLog;
+	//ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+
+	//OutputDebugStringW(ttDebugLog.c_str());
+	//}
+
+	//}
+	
 
 	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime));
 
@@ -117,6 +340,10 @@ _int CUmbrella::LateRender()
 {
 
 	return _int();
+}
+
+void CUmbrella::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedObj, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType)
+{
 }
 
 HRESULT CUmbrella::SetUp_Components()

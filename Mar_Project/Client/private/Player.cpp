@@ -13,7 +13,6 @@ _uint CALLBACK Add_Force_Thread(void* _Prameter)
 	memcpy(&tThreadArg, _Prameter, sizeof(THREADARG));
 	delete _Prameter;
 
-
 	CPlayer* pPlayer = (CPlayer*)(tThreadArg.pArg);
 	FAILED_CHECK(pPlayer->Calculate_Force(tThreadArg.IsClientQuit, tThreadArg.CriSec));
 	return 0;
@@ -58,8 +57,9 @@ _int CPlayer::Update(_double fDeltaTime)
 	if (m_eNowSceneNum == SCENE_LOADING)
 		return 0;
 
-	if (__super::Update(fDeltaTime) < 0)
-		return -1;
+	if (__super::Update(fDeltaTime) < 0)return -1;
+	m_pColliderCom->Update_ConflictPassedTime(fDeltaTime);
+
 
 
 	FAILED_CHECK(Manage_CoolTime(fDeltaTime));
@@ -1021,10 +1021,6 @@ HRESULT CPlayer::Input_Keyboard(_double fDeltaTime)
 	CGameInstance* pInstance = GetSingle(CGameInstance);
 
 
-	if (pInstance->Get_DIKeyState(DIK_Z)&DIS_Down)
-		GetSingle(CUtilityMgr)->SlowMotionStart();
-
-
 
 	/*To All*/
 	if (m_eNowWeapon != CPlayer::Weapon_Umbrella)
@@ -1822,40 +1818,85 @@ HRESULT CPlayer::Attack_Update_Horse(_double fDeltaTime, CGameInstance * pInstan
 	switch (m_iAttackCount)
 	{
 	case 1:
-		if (!m_bAtkMoveMentChecker[0] && PlayRate > 0.45)
+		if (PlayRate > 0.45)
 		{
-			m_bAtkMoveMentChecker[0] = true;
-			Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 10);
+			if (!m_bAtkMoveMentChecker[0])
+			{
+				m_bAtkMoveMentChecker[0] = true;
+				Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 10);
+
+			}
+
+			m_vecWeapon[m_iWeaponModelIndex]->Set_AttackAble(true);
 		}
+		else
+		{
+			m_vecWeapon[m_iWeaponModelIndex]->Set_AttackAble(false);
+		}
+
+
 		break;
 	case 2:
-		if (!m_bAtkMoveMentChecker[0] && PlayRate > 0.43)
+		if (PlayRate > 0.43)
 		{
-			m_bAtkMoveMentChecker[0] = true;
-			Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 10);
+			if (!m_bAtkMoveMentChecker[0])
+			{
+				m_bAtkMoveMentChecker[0] = true;
+				Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 10);
+
+			}
+
+			m_vecWeapon[m_iWeaponModelIndex]->Set_AttackAble(true);
+		}
+		else
+		{
+			m_vecWeapon[m_iWeaponModelIndex]->Set_AttackAble(false);
 		}
 		break;
 	case 3:
-		if (!m_bAtkMoveMentChecker[0] && PlayRate > 0.33)
+		if (PlayRate > 0.33)
 		{
-			m_bAtkMoveMentChecker[0] = true;
-			Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 10);
+			if (!m_bAtkMoveMentChecker[0])
+			{
+				m_bAtkMoveMentChecker[0] = true;
+				Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 10);		
+
+			}
+
+			m_vecWeapon[m_iWeaponModelIndex]->Set_AttackAble(true);
+		}
+		else
+		{
+			m_vecWeapon[m_iWeaponModelIndex]->Set_AttackAble(false);
 		}
 		break;
 	case 4:
-		if (!m_bAtkMoveMentChecker[0] && PlayRate > 0.06)
+		if (PlayRate > 0.06)
 		{
-			m_bAtkMoveMentChecker[0] = true;
-			Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 20);
+			if (!m_bAtkMoveMentChecker[0])
+			{
+				m_bAtkMoveMentChecker[0] = true;
+				Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 30);
+			}
+
+			if (PlayRate > 0.5)
+				m_vecWeapon[m_iWeaponModelIndex]->Set_AttackAble(true);
 		}
+		else
+		{
+			m_vecWeapon[m_iWeaponModelIndex]->Set_AttackAble(false);
+		}
+
 		break;
 
 	default:
+		m_vecWeapon[m_iWeaponModelIndex]->Set_AttackAble(false);
 		break;
 	}
 
 
-
+	if (g_pGameInstance->Get_DIKeyState(DIK_Z) &DIS_Down)
+		m_vecWeapon[m_iWeaponModelIndex]->Get_WeaponModel()->Change_AnimIndex_ReturnTo_Must(1, 0, 0, true);
 
 	return S_OK;
 }
@@ -2528,6 +2569,8 @@ HRESULT CPlayer::Attack_Update_Knife(_double fDeltaTime, CGameInstance * pInstan
 	{
 		if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_LBUTTON) & DIS_Down)
 			m_bIsAttackClicked = true;
+
+
 	}
 
 	if (PlayRate < 0.1 && iNowAnimIndex >= Weapon_Knife + 8 && iNowAnimIndex <= Weapon_Knife + 16)
@@ -2635,34 +2678,93 @@ HRESULT CPlayer::Attack_Update_Knife(_double fDeltaTime, CGameInstance * pInstan
 	switch (m_iAttackCount)
 	{
 	case 1:
-		if (!m_bAtkMoveMentChecker[0] && PlayRate > 0.1)
+		if (PlayRate > 0.1)
 		{
-			m_bAtkMoveMentChecker[0] = true;
-			Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 10);
+			if (!m_bAtkMoveMentChecker[0])
+			{
+				m_bAtkMoveMentChecker[0] = true;
+				Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 10);
+			}
+
+			if (PlayRate > 0.4)
+				m_vecWeapon[m_iWeaponModelIndex]->Set_AttackAble(true);
 		}
+		else
+		{
+			m_vecWeapon[m_iWeaponModelIndex]->Set_AttackAble(false);
+		}
+
 		break;
-	case 3:
-		if (!m_bAtkMoveMentChecker[0] && PlayRate > 0.6)
+	case 2:
+		if (PlayRate > 0.4)
 		{
-			m_bAtkMoveMentChecker[0] = true;
-			Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 10);
+			m_vecWeapon[m_iWeaponModelIndex]->Set_AttackAble(true);
 		}
+		else
+		{
+			m_vecWeapon[m_iWeaponModelIndex]->Set_AttackAble(false);
+		}
+
+		break;
+
+
+	case 3:
+
+		if (PlayRate > 0.6)
+		{
+			if (!m_bAtkMoveMentChecker[0])
+			{
+				m_bAtkMoveMentChecker[0] = true;
+				Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 10);
+			}
+			m_vecWeapon[m_iWeaponModelIndex]->Set_AttackAble(true);
+		}
+		else
+		{
+			m_vecWeapon[m_iWeaponModelIndex]->Set_AttackAble(false);
+		}
+
 		break;
 	case 4:
-		if (!m_bAtkMoveMentChecker[0] && PlayRate > 0.15)
+
+		if (PlayRate > 0.15)
 		{
-			m_bAtkMoveMentChecker[0] = true;
-			Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 10);
+			if (!m_bAtkMoveMentChecker[0])
+			{
+				m_bAtkMoveMentChecker[0] = true;
+				Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 10);
+			}
+			m_vecWeapon[m_iWeaponModelIndex]->Set_AttackAble(true);
 		}
+		else
+		{
+			m_vecWeapon[m_iWeaponModelIndex]->Set_AttackAble(false);
+		}
+
+
 		break;
 	case 5:
-		if (!m_bAtkMoveMentChecker[0] && PlayRate > 0.28)
+
+		if (PlayRate > 0.28)
 		{
-			m_bAtkMoveMentChecker[0] = true;
-			Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 10);
+			if (!m_bAtkMoveMentChecker[0])
+			{
+				m_bAtkMoveMentChecker[0] = true;
+				Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 10);
+			}
+			m_vecWeapon[m_iWeaponModelIndex]->Set_AttackAble(true);
+		}
+		else
+		{
+			m_vecWeapon[m_iWeaponModelIndex]->Set_AttackAble(false);
 		}
 		break;
+
+
 	default:
+
+		m_vecWeapon[m_iWeaponModelIndex]->Set_AttackAble(false);
+
 		break;
 	}
 

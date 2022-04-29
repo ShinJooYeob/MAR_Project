@@ -39,6 +39,7 @@ _int CKnife::Update(_double fDeltaTime)
 		return -1;
 	if (m_bIsDead) return 0;
 	
+	m_pColliderCom->Update_ConflictPassedTime(fDeltaTime);
 
 	
 	_Matrix			TransformMatrix = XMLoadFloat4x4(m_tATBMat.pUpdatedNodeMat) * XMLoadFloat4x4(m_tATBMat.pDefaultPivotMat);
@@ -55,7 +56,8 @@ _int CKnife::Update(_double fDeltaTime)
 	for (_uint i = 0; i < m_pColliderCom->Get_NumColliderBuffer(); i++)
 		m_pColliderCom->Update_Transform(i, TransformMatrix);
 
-	g_pGameInstance->Add_CollisionGroup(CollisionType_PlayerWeapon, this, m_pColliderCom);
+	if (m_bIsAttackAble)
+		g_pGameInstance->Add_CollisionGroup(CollisionType_PlayerWeapon, this, m_pColliderCom);
 
 
 	return _int();
@@ -115,6 +117,30 @@ _int CKnife::LateRender()
 {
 
 	return _int();
+}
+
+void CKnife::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedObj, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType)
+{
+	switch (eConflictedObjCollisionType)
+	{
+
+	case Engine::CollisionType_Monster:
+	{
+		
+			CCollider* MonsterCollider = (CCollider*)(pConflictedObj->Get_Component(TAG_COM(Com_Collider)));
+			MonsterCollider->Set_Conflicted();
+			GetSingle(CUtilityMgr)->SlowMotionStart();
+
+		
+	}
+		break;
+	case Engine::CollisionType_Terrain:
+		break;
+
+	default:
+		break;
+	}
+
 }
 
 HRESULT CKnife::SetUp_Components()

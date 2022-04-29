@@ -41,6 +41,19 @@ HRESULT CCollider::Initialize_Clone(void * pArg)
 	return S_OK;
 }
 
+void CCollider::Update_ConflictPassedTime(_double fDeltaTime)
+{
+	if (m_bIsConflicted)
+	{
+		m_ConflictedPassedTime -= fDeltaTime;
+		if (m_ConflictedPassedTime < 0)
+		{
+			m_ConflictedPassedTime = 0;
+			m_bIsConflicted = false;
+		}
+	}
+}
+
 void CCollider::Update_Transform(_uint iIndex, _fMatrix Transform)
 {
 	if (iIndex >= m_vecColliderBuffer.size())
@@ -55,6 +68,7 @@ void CCollider::Update_Transform(_uint iIndex, _fMatrix Transform)
 
 _bool CCollider::Inspect_Collision(CCollider* pTargetCollider, _uint iBufferIndex, _uint iTargetIndex, _uint2* pOutIndex)
 {
+	if (m_bIsConflicted || pTargetCollider->m_bIsConflicted) return false;
 
 	if (iBufferIndex >= m_vecColliderBuffer.size() || iTargetIndex >= pTargetCollider->m_vecColliderBuffer.size())
 	{
@@ -93,6 +107,15 @@ _int CCollider::Add_ColliderBuffer(COLLIDERTYPE eColliderType, COLLIDERDESC * pC
 	m_vecColliderBuffer.push_back(pColliderBuffer);
 
 	return _int(m_vecColliderBuffer.size() - 1);
+}
+
+void CCollider::Set_Conflicted(_double TotalTime)
+{
+	if (!m_bIsConflicted)
+	{
+		m_bIsConflicted = true;
+		m_ConflictedPassedTime = TotalTime;
+	}
 }
 
 #ifdef _DEBUG

@@ -16,8 +16,8 @@ private:
 public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize_Clone(void* pArg)override;
-
 	void Update_Transform(_uint iIndex, _fMatrix Transform);
+	void Update_ConflictPassedTime(_double fDeltaTime);
 
 	_bool Inspect_Collision( CCollider* pTargetCollider, _uint iBufferIndex = 0, _uint iTargetIndex = 0, _uint2* pOutIndex = nullptr);
 
@@ -25,6 +25,8 @@ public:
 
 	_uint Get_NumColliderBuffer() { return _uint(m_vecColliderBuffer.size()); };
 	_int Add_ColliderBuffer(COLLIDERTYPE eColliderType, COLLIDERDESC* pColliderDesc = nullptr);
+	void Set_Conflicted(_double TotalTime = 0.5);
+
 #ifdef _DEBUG
 public:
 	virtual _int Render();
@@ -33,6 +35,10 @@ public:
 private:
 	vector<CColliderBuffer*>    m_vecColliderBuffer;
 	vector<CColliderBuffer*>	m_vecPrototypeCollideBuffer;
+
+private:
+	_bool						m_bIsConflicted = false;
+	_double						m_ConflictedPassedTime = 0;
 
 private:
 	_bool Inspect_ChildBuffer(_uint iBufferIndex, CCollider* pTargetCollider, _uint iTargetIndex,_uint2* pOutIndex);

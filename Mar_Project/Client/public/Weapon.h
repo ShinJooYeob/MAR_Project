@@ -30,6 +30,7 @@ public:
 	virtual _int LateRender()override;
 
 	virtual CModel*	Get_WeaponModel() { return nullptr; };
+	void Set_AttackAble(_bool bBool = true) { m_bIsAttackAble = bBool; };
 
 protected:
 	class CPlayer*			m_pPlayer = nullptr;
@@ -37,6 +38,7 @@ protected:
 	WEAPONDESC				m_tWeaponDesc;
 	ATTACHBONEMATRIX_PTR	m_tATBMat;
 	_float4x4				m_BoneMatrix;
+	_bool					m_bIsAttackAble = false;
 
 public:
 	virtual void Free() override;

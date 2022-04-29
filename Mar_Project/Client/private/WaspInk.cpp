@@ -45,6 +45,8 @@ _int CWaspInk::Update(_double fDeltaTime)
 {
 
 
+	if (__super::Update(fDeltaTime) < 0)return -1;
+	m_pColliderCom->Update_ConflictPassedTime(fDeltaTime);
 
 	m_pTransformCom->Set_MoveSpeed(4.8f);
 

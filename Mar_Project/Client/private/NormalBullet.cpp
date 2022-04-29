@@ -61,6 +61,7 @@ _int CNormalBullet::Update(_double fDeltaTime)
 		return -1;
 	if (m_bIsDead) return 0;
 	
+	m_pColliderCom->Update_ConflictPassedTime(fDeltaTime);
 
 	//_float EasedValue = g_pGameInstance->Easing(TYPE_Linear, 20, -100, m_fLifeTime, m_fTotalLifeTime);
 	_float EasedValue = g_pGameInstance->Easing(TYPE_QuinticIn, 0, -5, m_fLifeTime, m_fTotalLifeTime);
@@ -134,6 +135,29 @@ _int CNormalBullet::LateRender()
 {
 
 	return _int();
+}
+
+void CNormalBullet::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedObj, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType)
+{
+	switch (eConflictedObjCollisionType)
+	{
+
+	case Engine::CollisionType_Monster:
+	{
+
+		CCollider* MonsterCollider = (CCollider*)(pConflictedObj->Get_Component(TAG_COM(Com_Collider)));
+		MonsterCollider->Set_Conflicted();
+		//GetSingle(CUtilityMgr)->SlowMotionStart();
+
+
+	}
+	break;
+	case Engine::CollisionType_Terrain:
+		break;
+
+	default:
+		break;
+	}
 }
 
 HRESULT CNormalBullet::Ready_ParticleDesc()

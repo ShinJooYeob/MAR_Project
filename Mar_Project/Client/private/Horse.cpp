@@ -38,10 +38,11 @@ _int CHorse::Update(_double fDeltaTime)
 		return -1;
 	if (m_bIsDead) return 0;
 	
+	m_pColliderCom->Update_ConflictPassedTime(fDeltaTime);
 
 
 
-	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime));
+	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime * 2));
 
 
 	_Matrix			TransformMatrix = XMLoadFloat4x4(m_tATBMat.pUpdatedNodeMat) * XMLoadFloat4x4(m_tATBMat.pDefaultPivotMat);
@@ -57,7 +58,8 @@ _int CHorse::Update(_double fDeltaTime)
 		m_pColliderCom->Update_Transform(i, TransformMatrix);
 
 
-	g_pGameInstance->Add_CollisionGroup(CollisionType_PlayerWeapon, this, m_pColliderCom);
+	if (m_bIsAttackAble)
+		g_pGameInstance->Add_CollisionGroup(CollisionType_PlayerWeapon, this, m_pColliderCom);
 
 	return _int();
 }
@@ -105,7 +107,7 @@ _int CHorse::Render()
 		for (_uint j = 0; j < AI_TEXTURE_TYPE_MAX; j++)
 			FAILED_CHECK(m_pModel->Bind_OnShader(m_pShaderCom, i, j, MODLETEXTYPE(j)));
 
-		FAILED_CHECK(m_pModel->Render(m_pShaderCom, 6, i, "g_BoneMatrices"));
+		FAILED_CHECK(m_pModel->Render(m_pShaderCom, 8, i, "g_BoneMatrices"));
 	}
 
 
@@ -116,6 +118,32 @@ _int CHorse::LateRender()
 {
 
 	return _int();
+}
+
+void CHorse::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedObj, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType)
+{
+
+	switch (eConflictedObjCollisionType)
+	{
+
+	case Engine::CollisionType_Monster:
+	{
+
+		CCollider* MonsterCollider = (CCollider*)(pConflictedObj->Get_Component(TAG_COM(Com_Collider)));
+		MonsterCollider->Set_Conflicted();
+		GetSingle(CUtilityMgr)->SlowMotionStart();
+		//m_pModel->Change_AnimIndex_ReturnTo_Must(1, 0, 0, true);
+
+
+	}
+	break;
+	case Engine::CollisionType_Terrain:
+		break;
+
+	default:
+		break;
+	}
+
 }
 
 HRESULT CHorse::SetUp_Components()

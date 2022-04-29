@@ -37,6 +37,7 @@ HRESULT CExecutor::Initialize_Clone(void * pArg)
 _int CExecutor::Update(_double fDeltaTime)
 {
 	if (__super::Update(fDeltaTime) < 0)return -1;
+	m_pColliderCom->Update_ConflictPassedTime(fDeltaTime);
 
 	if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
 		m_pModel->Change_AnimIndex(0);
