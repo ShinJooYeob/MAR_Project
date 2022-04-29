@@ -46,6 +46,9 @@ protected:
 	HRESULT Ready_WeaponChageRing(CGameInstance* pInstance);
 	HRESULT Ready_WeaponChageCursor(CGameInstance* pInstance);
 
+	HRESULT Ready_CrossHead(CGameInstance* pInstance);
+
+
 public:
 	static CGamePlayUI* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, void* pArg = nullptr);
 	virtual CGameObject* Clone(void* pArg);

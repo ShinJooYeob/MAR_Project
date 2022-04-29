@@ -68,8 +68,16 @@ _int CUIImage::Render()
 
 		NULL_CHECK_RETURN(m_pVIBufferCom, E_FAIL);
 
+		if (m_bIsDrawByDesc)
+		{
+			FAILED_CHECK(Apply_UIDesc_To_Transform());
 
-		FAILED_CHECK(Apply_Rect_To_Transform());
+		}
+		else
+		{
+			FAILED_CHECK(Apply_Rect_To_Transform());
+		}
+
 		FAILED_CHECK(Bind_Transform_OnShader(m_pShaderCom, "g_WorldMatrix"));
 
 		FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ViewMatrix", &XMMatrixIdentity(), sizeof(_float4x4)));

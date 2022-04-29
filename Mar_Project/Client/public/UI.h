@@ -57,6 +57,7 @@ public:
 	HRESULT Apply_UIDesc_To_Transform();
 	HRESULT Apply_Rect_To_Transform();
 
+	void Set_DrawingValueIsUIDesc(_bool bBool) { m_bIsDrawByDesc = bBool; };
 protected:
 	_uint			m_iTextureLayerIndex = 0;
 	_uint			m_iTargetTextureLayerIndex = 0;
@@ -65,6 +66,8 @@ protected:
 	_bool			m_bIsUntilTo = false;
 
 	_bool			m_bIsDraw = true;
+	_bool			m_bIsDrawByDesc = false;
+
 
 	_float			m_fDepth = 0;
 	_float			m_fAngle = 0;

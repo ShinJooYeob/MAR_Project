@@ -241,6 +241,7 @@ HRESULT CGamePlayUI::SetUp_Components()
 	
 	FAILED_CHECK(Ready_WeaponChageRing(pInstance));
 	FAILED_CHECK(Ready_WeaponChageCursor(pInstance));
+	FAILED_CHECK(Ready_CrossHead(pInstance));
 
 	
 		
@@ -424,6 +425,37 @@ HRESULT CGamePlayUI::Ready_WeaponChageCursor(CGameInstance * pInstance)
 
 	m_vecUIContainer.push_back(pUI);
 
+	return S_OK;
+}
+
+HRESULT CGamePlayUI::Ready_CrossHead(CGameInstance * pInstance)
+{
+
+	CUI* pUI = nullptr;
+	FAILED_CHECK(pInstance->Add_GameObject_Out_of_Manager((CGameObject**)(&pUI), m_eNowSceneNum, TAG_OP(Prototype_UIImage)));
+
+	NULL_CHECK_RETURN(pUI, E_FAIL);
+
+	FAILED_CHECK(pUI->Change_Component_by_NewAssign(m_eNowSceneNum, TAG_CP(Prototype_Texture_GamePlayScene), TAG_COM(Com_Texture)));
+
+	FAILED_CHECK(pUI->Change_TextureLayer(L"CrossHead"));
+	pUI->Set_TextureLayerIndex(0);
+	pUI->Set_IsDraw(false);
+	UIDESC tUIDesc;
+
+	tUIDesc.fX = g_iWinCX*0.5f;
+	tUIDesc.fY = g_iWinCY*0.5f;
+	tUIDesc.fCX = 50;
+	tUIDesc.fCY = 50;
+
+	pUI->Apply_UI_To_MemberValue(tUIDesc);
+	pUI->Set_DrawingValueIsUIDesc(true);
+
+	FAILED_CHECK(pUI->Apply_UIDesc_To_Transform());
+
+	pUI->Set_UIDepth(-1);
+
+	m_vecUIContainer.push_back(pUI);
 	return S_OK;
 }
 

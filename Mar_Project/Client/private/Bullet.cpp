@@ -31,8 +31,6 @@ HRESULT CBullet::Initialize_Clone(void * pArg)
 	if (pArg != nullptr)
 		memcpy(&m_vTargetDir, pArg, sizeof(_float3));
 
-	_float3 t = m_pPlayer->Get_FirePos();
-	_float3 tt = ((CTransform*)(m_pPlayer->Get_Component(TAG_COM(Com_Transform))))->Get_MatrixState(CTransform::STATE_POS);
 
 	m_pTransformCom->Set_MatrixState(CTransform::STATE_POS,	m_pPlayer->Get_FirePos());
 

@@ -1528,7 +1528,11 @@ HRESULT CPlayer::Lunch_Bullet(_double fDeltaTime, CGameInstance * pInstance)
 			//_float3 vBulletDir = XMVector3Normalize(vPlayerLook + XMVectorSet(0, -m_CamDegreeAngle.z * 0.1f, 0 , 0));
 
 			CTransform* pCamTransform = m_pMainCamera->Get_Camera_Transform();
-			_float3 vBulletDir = XMVector3Normalize(XMVector3TransformNormal(XMVectorSet(0, 0, 300, 0), pCamTransform->Get_WorldMatrix()));
+
+			
+			_float3 vBulletDir = XMVector3Normalize(XMVector3TransformNormal(
+				XMVectorSet(0, 0, 10, 0) - m_vBulletFirePos.Multiply_Matrix_AsPosVector(pCamTransform->Get_InverseWorldMatrix()), 
+				pCamTransform->Get_WorldMatrix()));
 
 			m_vecParticleDesc[3].FixedTarget = m_vBulletFirePos;
 			GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[3]);
@@ -1539,10 +1543,6 @@ HRESULT CPlayer::Lunch_Bullet(_double fDeltaTime, CGameInstance * pInstance)
 			 m_BulletNormalInterver = GetSingle(CUtilityMgr)->RandomFloat(0.15f, 0.2f);
 			 m_fGrinderCoolTime += m_BulletNormalInterver*PlayerGrinderCoolTime*0.8;
 
-			 string ttszLog = "GrinderCoolTime  : " + to_string(m_fGrinderCoolTime) + "\n";
-			 wstring ttDebugLog;
-			 ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-			 OutputDebugStringW(ttDebugLog.c_str());
 
 			 if (m_fGrinderCoolTime > PlayerGrinderCoolTime)
 			 {
@@ -2159,9 +2159,11 @@ HRESULT CPlayer::Attack_Update_Teapot(_double fDeltaTime, CGameInstance * pInsta
 					m_bAtkMoveMentChecker[0] = true;
 					Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * -1, 10);
 
-					
 					CTransform* pCamTransform = m_pMainCamera->Get_Camera_Transform();
-					_float3 vBulletDir = XMVector3Normalize(XMVector3TransformNormal(XMVectorSet(0, 0, 300, 0), pCamTransform->Get_WorldMatrix()));
+					_float3 vBulletDir = XMVector3Normalize(XMVector3TransformNormal(
+						XMVectorSet(0, 0, 10, 0) - m_vBulletFirePos.Multiply_Matrix_AsPosVector(pCamTransform->Get_InverseWorldMatrix()),
+						pCamTransform->Get_WorldMatrix()));
+
 					FAILED_CHECK(pInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Bullet), TAG_OP(Prototype_Bullet_Grenade),&vBulletDir));
 
 				}
@@ -2172,10 +2174,11 @@ HRESULT CPlayer::Attack_Update_Teapot(_double fDeltaTime, CGameInstance * pInsta
 				if (!m_bAtkMoveMentChecker[0] && m_pModel->Get_PlayRate() > 0.1)
 				{
 					m_bAtkMoveMentChecker[0] = true;
+
 					CTransform* pCamTransform = m_pMainCamera->Get_Camera_Transform();
-					_float3 vBulletDir = XMVector3Normalize(XMVector3TransformNormal(XMVectorSet(0, 0, 300, 0), pCamTransform->Get_WorldMatrix()));
-
-
+					_float3 vBulletDir = XMVector3Normalize(XMVector3TransformNormal(
+						XMVectorSet(0, 0, 10, 0) - m_vBulletFirePos.Multiply_Matrix_AsPosVector(pCamTransform->Get_InverseWorldMatrix()),
+						pCamTransform->Get_WorldMatrix()));
 					FAILED_CHECK(pInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Bullet), TAG_OP(Prototype_Bullet_Grenade),&vBulletDir));
 
 
@@ -3039,7 +3042,7 @@ HRESULT CPlayer::Set_Player_On_Slieder(_double fDeltatime)
 HRESULT CPlayer::Set_Camera_On_Player(_double fDeltaTime)
 {
 	CGameInstance* pInstance = GetSingle(CGameInstance);
-
+#define CamLerpLate 0.2f
 
 	if (m_eNowWeapon == CPlayer::Weapon_Grinder)
 	{
@@ -3060,17 +3063,19 @@ HRESULT CPlayer::Set_Camera_On_Player(_double fDeltaTime)
 				else if (m_CamDegreeAngle.x > 60.f)m_CamDegreeAngle.x = 60.f;
 			}
 
-			_Matrix NewCamMatrix;
+			CTransform* pCamTransform = m_pMainCamera->Get_Camera_Transform();
+			_Matrix OldCamMat = pCamTransform->Get_WorldMatrix();
 			_float3 PlayerPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
-
-			NewCamMatrix = XMMatrixTranslation(0.7f , 1.7f , m_CamDegreeAngle.z *0.3f
+			_Matrix	NewCamMatrix = XMMatrixTranslation(0.7f, 1.7f, m_CamDegreeAngle.z *0.3f
 				* m_fSmallScale * (1 - m_fDashPower / PlayerMaxDashPower * 0.1f))
 				* XMMatrixRotationX(XMConvertToRadians(m_CamDegreeAngle.x))
 				* XMMatrixRotationY(XMConvertToRadians(m_CamDegreeAngle.y))
 				* XMMatrixTranslation(PlayerPos.x, PlayerPos.y, PlayerPos.z);
 
-
-			CTransform* pCamTransform = m_pMainCamera->Get_Camera_Transform();
+			NewCamMatrix.r[0] = XMVectorLerp(OldCamMat.r[0], NewCamMatrix.r[0], CamLerpLate);
+			NewCamMatrix.r[1] = XMVectorLerp(OldCamMat.r[1], NewCamMatrix.r[1], CamLerpLate);
+			NewCamMatrix.r[2] = XMVectorLerp(OldCamMat.r[2], NewCamMatrix.r[2], CamLerpLate);
+			NewCamMatrix.r[3] = XMVectorLerp(OldCamMat.r[3], NewCamMatrix.r[3], CamLerpLate);
 
 			pCamTransform->Set_Matrix(NewCamMatrix);
 		}
@@ -3091,17 +3096,22 @@ HRESULT CPlayer::Set_Camera_On_Player(_double fDeltaTime)
 				else if (m_CamDegreeAngle.x > 60.f)m_CamDegreeAngle.x = 60.f;
 			}
 
-			_Matrix NewCamMatrix;
+			CTransform* pCamTransform = m_pMainCamera->Get_Camera_Transform();
+			_Matrix OldCamMat = pCamTransform->Get_WorldMatrix();
 			_float3 PlayerPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
-
-			NewCamMatrix = XMMatrixTranslation(0 , 1.5f , m_CamDegreeAngle.z
+			_Matrix	NewCamMatrix = XMMatrixTranslation(0, 1.5f, m_CamDegreeAngle.z
 				* m_fSmallScale * (1 - m_fDashPower / PlayerMaxDashPower * 0.1f))
 				* XMMatrixRotationX(XMConvertToRadians(m_CamDegreeAngle.x))
 				* XMMatrixRotationY(XMConvertToRadians(m_CamDegreeAngle.y))
 				* XMMatrixTranslation(PlayerPos.x, PlayerPos.y, PlayerPos.z);
 
 
-			CTransform* pCamTransform = m_pMainCamera->Get_Camera_Transform();
+
+
+			NewCamMatrix.r[0] = XMVectorLerp(OldCamMat.r[0], NewCamMatrix.r[0], CamLerpLate);
+			NewCamMatrix.r[1] = XMVectorLerp(OldCamMat.r[1], NewCamMatrix.r[1], CamLerpLate);
+			NewCamMatrix.r[2] = XMVectorLerp(OldCamMat.r[2], NewCamMatrix.r[2], CamLerpLate);
+			NewCamMatrix.r[3] = XMVectorLerp(OldCamMat.r[3], NewCamMatrix.r[3], CamLerpLate);
 
 			pCamTransform->Set_Matrix(NewCamMatrix);
 		}
@@ -3129,17 +3139,23 @@ HRESULT CPlayer::Set_Camera_On_Player(_double fDeltaTime)
 				else if (m_CamDegreeAngle.x > 60.f)m_CamDegreeAngle.x = 60.f;
 			}
 
-			_Matrix NewCamMatrix;
-			_float3 PlayerPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
-
-			NewCamMatrix = XMMatrixTranslation(0.7f, 1.7f, m_CamDegreeAngle.z * _float(-0.7 * m_fCharedGauge + 1)
-				* m_fSmallScale * (1 - m_fDashPower / PlayerMaxDashPower * 0.1f))
-				* XMMatrixRotationX(XMConvertToRadians(m_CamDegreeAngle.x))
-				* XMMatrixRotationY(XMConvertToRadians(m_CamDegreeAngle.y))
-				* XMMatrixTranslation(PlayerPos.x, PlayerPos.y, PlayerPos.z);
 
 
 			CTransform* pCamTransform = m_pMainCamera->Get_Camera_Transform();
+			_Matrix OldCamMat = pCamTransform->Get_WorldMatrix();
+			_float3 PlayerPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+			_Matrix	NewCamMatrix = XMMatrixTranslation(0.7f, 1.7f, m_CamDegreeAngle.z * _float(-0.7 * m_fCharedGauge + 1)
+					* m_fSmallScale * (1 - m_fDashPower / PlayerMaxDashPower * 0.1f))
+					* XMMatrixRotationX(XMConvertToRadians(m_CamDegreeAngle.x))
+					* XMMatrixRotationY(XMConvertToRadians(m_CamDegreeAngle.y))
+					* XMMatrixTranslation(PlayerPos.x, PlayerPos.y, PlayerPos.z);
+
+
+
+			NewCamMatrix.r[0] = XMVectorLerp(OldCamMat.r[0], NewCamMatrix.r[0], CamLerpLate);
+			NewCamMatrix.r[1] = XMVectorLerp(OldCamMat.r[1], NewCamMatrix.r[1], CamLerpLate);
+			NewCamMatrix.r[2] = XMVectorLerp(OldCamMat.r[2], NewCamMatrix.r[2], CamLerpLate);
+			NewCamMatrix.r[3] = XMVectorLerp(OldCamMat.r[3], NewCamMatrix.r[3], CamLerpLate);
 
 			pCamTransform->Set_Matrix(NewCamMatrix);
 		}
@@ -3160,17 +3176,23 @@ HRESULT CPlayer::Set_Camera_On_Player(_double fDeltaTime)
 				else if (m_CamDegreeAngle.x > 60.f)m_CamDegreeAngle.x = 60.f;
 			}
 
-			_Matrix NewCamMatrix;
-			_float3 PlayerPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
 
-			NewCamMatrix = XMMatrixTranslation(0, 1.5f, m_CamDegreeAngle.z
+
+			CTransform* pCamTransform = m_pMainCamera->Get_Camera_Transform();
+			_Matrix OldCamMat = pCamTransform->Get_WorldMatrix();
+			_float3 PlayerPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+			_Matrix	NewCamMatrix = XMMatrixTranslation(0, 1.5f, m_CamDegreeAngle.z
 				* m_fSmallScale * (1 - m_fDashPower / PlayerMaxDashPower * 0.1f))
 				* XMMatrixRotationX(XMConvertToRadians(m_CamDegreeAngle.x))
 				* XMMatrixRotationY(XMConvertToRadians(m_CamDegreeAngle.y))
 				* XMMatrixTranslation(PlayerPos.x, PlayerPos.y, PlayerPos.z);
 
 
-			CTransform* pCamTransform = m_pMainCamera->Get_Camera_Transform();
+
+			NewCamMatrix.r[0] = XMVectorLerp(OldCamMat.r[0], NewCamMatrix.r[0], CamLerpLate);
+			NewCamMatrix.r[1] = XMVectorLerp(OldCamMat.r[1], NewCamMatrix.r[1], CamLerpLate);
+			NewCamMatrix.r[2] = XMVectorLerp(OldCamMat.r[2], NewCamMatrix.r[2], CamLerpLate);
+			NewCamMatrix.r[3] = XMVectorLerp(OldCamMat.r[3], NewCamMatrix.r[3], CamLerpLate);
 
 			pCamTransform->Set_Matrix(NewCamMatrix);
 		}
@@ -3196,17 +3218,21 @@ HRESULT CPlayer::Set_Camera_On_Player(_double fDeltaTime)
 			else if (m_CamDegreeAngle.x > 60.f)m_CamDegreeAngle.x = 60.f;
 		}
 
-		_Matrix NewCamMatrix;
-		_float3 PlayerPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
 
-		NewCamMatrix = XMMatrixTranslation(0.7f, 1.3f, m_CamDegreeAngle.z * _float(-0.7 * m_fUmbrellaIntro + 1)
-			* m_fSmallScale * (1 - m_fDashPower / PlayerMaxDashPower * 0.1f))
+		CTransform* pCamTransform = m_pMainCamera->Get_Camera_Transform();
+		_Matrix OldCamMat = pCamTransform->Get_WorldMatrix();
+		_float3 PlayerPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+		_Matrix	NewCamMatrix = XMMatrixTranslation(0.7f, 1.3f, m_CamDegreeAngle.z * _float(-0.7 * m_fUmbrellaIntro + 1)
+				* m_fSmallScale * (1 - m_fDashPower / PlayerMaxDashPower * 0.1f))
 			* XMMatrixRotationX(XMConvertToRadians(m_CamDegreeAngle.x))
 			* XMMatrixRotationY(XMConvertToRadians(m_CamDegreeAngle.y))
 			* XMMatrixTranslation(PlayerPos.x, PlayerPos.y, PlayerPos.z);
 
 
-		CTransform* pCamTransform = m_pMainCamera->Get_Camera_Transform();
+		NewCamMatrix.r[0] = XMVectorLerp(OldCamMat.r[0], NewCamMatrix.r[0], CamLerpLate);
+		NewCamMatrix.r[1] = XMVectorLerp(OldCamMat.r[1], NewCamMatrix.r[1], CamLerpLate);
+		NewCamMatrix.r[2] = XMVectorLerp(OldCamMat.r[2], NewCamMatrix.r[2], CamLerpLate);
+		NewCamMatrix.r[3] = XMVectorLerp(OldCamMat.r[3], NewCamMatrix.r[3], CamLerpLate);
 
 		pCamTransform->Set_Matrix(NewCamMatrix);
 
@@ -3252,19 +3278,24 @@ HRESULT CPlayer::Set_Camera_On_Player(_double fDeltaTime)
 				else if (m_CamDegreeAngle.x > 60.f)m_CamDegreeAngle.x = 60.f;
 			}
 
-			_Matrix NewCamMatrix;
-			_float3 PlayerPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
 
-			NewCamMatrix = XMMatrixTranslation(0, 1.5f * m_fSmallScale, m_CamDegreeAngle.z
+			CTransform* pCamTransform = m_pMainCamera->Get_Camera_Transform();
+			_Matrix OldCamMat = pCamTransform->Get_WorldMatrix();
+			_float3 PlayerPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+			_Matrix NewCamMatrix = XMMatrixTranslation(0, 1.5f * m_fSmallScale, m_CamDegreeAngle.z
 				* m_fSmallScale * (1 - m_fDashPower / PlayerMaxDashPower * 0.1f))
 				* XMMatrixRotationX(XMConvertToRadians(m_CamDegreeAngle.x))
 				* XMMatrixRotationY(XMConvertToRadians(m_CamDegreeAngle.y))
 				* XMMatrixTranslation(PlayerPos.x, PlayerPos.y, PlayerPos.z);
 
 
-			CTransform* pCamTransform = m_pMainCamera->Get_Camera_Transform();
+			NewCamMatrix.r[0] = XMVectorLerp(OldCamMat.r[0], NewCamMatrix.r[0], CamLerpLate);
+			NewCamMatrix.r[1] = XMVectorLerp(OldCamMat.r[1], NewCamMatrix.r[1], CamLerpLate);
+			NewCamMatrix.r[2] = XMVectorLerp(OldCamMat.r[2], NewCamMatrix.r[2], CamLerpLate);
+			NewCamMatrix.r[3] = XMVectorLerp(OldCamMat.r[3], NewCamMatrix.r[3], CamLerpLate);
 
 			pCamTransform->Set_Matrix(NewCamMatrix);
+
 		}
 		FAILED_CHECK(m_pMainCamera->Set_ViewMatrix());
 		FAILED_CHECK(m_pMainCamera->Set_ProjectMatrix());
