@@ -130,6 +130,8 @@ HRESULT CTornadoSwirl::SetUp_Components()
 	_float Angle = pUtil->RandomFloat(-10, 10);
 
 	m_pTransformCom->Rotation_CW(RotAxis, XMConvertToRadians(Angle));
+	Angle = pUtil->RandomFloat(0, 360);
+	m_pTransformCom->Turn_CW(XMVectorSet(0,1,0,0), XMConvertToRadians(Angle));
 	m_pTransformCom->Scaled_All(_float3(pUtil->RandomFloat(0.7f, 1)));
 
 	FAILED_CHECK(Add_Component(m_eNowSceneNum, TAG_CP(COMPONENTPROTOTYPEID(Prototype_Mesh_Tornado1 + m_iKindsOfSwirl * 2 + rand() % 2)), TAG_COM(Com_Model), (CComponent**)&m_pModel));

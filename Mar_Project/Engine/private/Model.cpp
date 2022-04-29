@@ -199,19 +199,22 @@ HRESULT CModel::Change_AnimIndex(_uint iAnimIndex, _double ExitTime, _bool bBloc
 
 	m_bIsChagingAnim = true;
 
+
 	if (m_AnimExitAcc)
 	{
 		_uint iNumOldAnimKeyFrameIdx = _uint(m_vecCurrentKeyFrameIndices[m_iOldAnimIndex].size());
 		m_vecCurrentKeyFrameIndices[m_iOldAnimIndex].clear();
 		m_vecCurrentKeyFrameIndices[m_iOldAnimIndex].resize(iNumOldAnimKeyFrameIdx);
 	}
+
 	m_AnimExitAcc = 0;
 	m_TotalAnimExitTime = ExitTime;
 
-
-	m_OldPlayTimeAcc = m_NowPlayTimeAcc;
-	m_iOldAnimIndex = m_iNowAnimIndex;
-
+	if (!m_bIsSwapFunctionCalled)
+	{
+		m_OldPlayTimeAcc = m_NowPlayTimeAcc;
+		m_iOldAnimIndex = m_iNowAnimIndex;
+	}
 
 	m_NowPlayTimeAcc = 0;
 	m_iNowAnimIndex = iAnimIndex;
@@ -222,6 +225,8 @@ HRESULT CModel::Change_AnimIndex(_uint iAnimIndex, _double ExitTime, _bool bBloc
 
 	m_KindsOfAnimChange = 0;
 	m_bIsUntill = false;
+
+	m_bIsSwapFunctionCalled = true;
 	return S_OK;
 }
 
@@ -233,7 +238,9 @@ HRESULT CModel::Change_AnimIndex_UntilNReturn(_uint iAnimIndex, _uint iUntilInde
 
 	if (iReturnIndex == m_iNextAnimIndex) return S_FALSE;
 
-	if (m_bIsChagingAnim || m_AnimExitAcc) // m_AnimExitAcc 변환 중이였다면
+
+
+	if (!m_bIsSwapFunctionCalled &&(m_bIsChagingAnim || m_AnimExitAcc)) // m_AnimExitAcc 변환 중이였다면
 	{
 		_uint iNumOldAnimKeyFrameIdx = _uint(m_vecCurrentKeyFrameIndices[m_iOldAnimIndex].size());
 		m_vecCurrentKeyFrameIndices[m_iOldAnimIndex].clear();
@@ -246,10 +253,13 @@ HRESULT CModel::Change_AnimIndex_UntilNReturn(_uint iAnimIndex, _uint iUntilInde
 	m_AnimExitAcc = 0;
 	m_TotalAnimExitTime = ExitTime;
 
+	if (!m_bIsSwapFunctionCalled)
+	{
 
-	m_OldPlayTimeAcc = m_NowPlayTimeAcc;
-	m_iOldAnimIndex = m_iNowAnimIndex;
+		m_OldPlayTimeAcc = m_NowPlayTimeAcc;
+		m_iOldAnimIndex = m_iNowAnimIndex;
 
+	}
 
 	m_NowPlayTimeAcc = 0;
 	m_iNowAnimIndex = iAnimIndex;
@@ -260,6 +270,7 @@ HRESULT CModel::Change_AnimIndex_UntilNReturn(_uint iAnimIndex, _uint iUntilInde
 	m_bIsBlockAnim = bBlockAnimUntilReturnChange;
 	m_KindsOfAnimChange = 2;
 	m_bIsUntill = true;
+	m_bIsSwapFunctionCalled = true;
 
 	return S_OK;
 }
@@ -270,7 +281,7 @@ HRESULT CModel::Change_AnimIndex_UntilNReturn_Must(_uint iAnimIndex, _uint iUnti
 		return E_FAIL;
 
 
-	if (m_bIsChagingAnim || m_AnimExitAcc) // m_AnimExitAcc 변환 중이였다면
+	if (!m_bIsSwapFunctionCalled&&(m_bIsChagingAnim || m_AnimExitAcc)) // m_AnimExitAcc 변환 중이였다면
 	{
 		_uint iNumOldAnimKeyFrameIdx = _uint(m_vecCurrentKeyFrameIndices[m_iOldAnimIndex].size());
 		m_vecCurrentKeyFrameIndices[m_iOldAnimIndex].clear();
@@ -283,10 +294,13 @@ HRESULT CModel::Change_AnimIndex_UntilNReturn_Must(_uint iAnimIndex, _uint iUnti
 	m_AnimExitAcc = 0;
 	m_TotalAnimExitTime = ExitTime;
 
+	if (!m_bIsSwapFunctionCalled)
+	{
 
-	m_OldPlayTimeAcc = m_NowPlayTimeAcc;
-	m_iOldAnimIndex = m_iNowAnimIndex;
+		m_OldPlayTimeAcc = m_NowPlayTimeAcc;
+		m_iOldAnimIndex = m_iNowAnimIndex;
 
+	}
 
 	m_NowPlayTimeAcc = 0;
 	m_iNowAnimIndex = iAnimIndex;
@@ -297,6 +311,7 @@ HRESULT CModel::Change_AnimIndex_UntilNReturn_Must(_uint iAnimIndex, _uint iUnti
 	m_bIsBlockAnim = bBlockAnimUntilReturnChange;
 	m_KindsOfAnimChange = 2;
 	m_bIsUntill = true;
+	m_bIsSwapFunctionCalled = true;
 
 	return S_OK;
 }
@@ -309,7 +324,7 @@ HRESULT CModel::Change_AnimIndex_UntilTo(_uint iAnimIndex, _uint iReturnIndex, _
 
 	if (iReturnIndex == m_iNextAnimIndex) return S_FALSE;
 
-	if (m_bIsChagingAnim || m_AnimExitAcc) // m_AnimExitAcc 변환 중이였다면
+	if (!m_bIsSwapFunctionCalled && (m_bIsChagingAnim || m_AnimExitAcc)) // m_AnimExitAcc 변환 중이였다면
 	{
 		_uint iNumOldAnimKeyFrameIdx = _uint(m_vecCurrentKeyFrameIndices[m_iOldAnimIndex].size());
 		m_vecCurrentKeyFrameIndices[m_iOldAnimIndex].clear();
@@ -322,10 +337,13 @@ HRESULT CModel::Change_AnimIndex_UntilTo(_uint iAnimIndex, _uint iReturnIndex, _
 	m_AnimExitAcc = 0;
 	m_TotalAnimExitTime = ExitTime;
 
+	if (!m_bIsSwapFunctionCalled)
+	{
 
-	m_OldPlayTimeAcc = m_NowPlayTimeAcc;
-	m_iOldAnimIndex = m_iNowAnimIndex;
+		m_OldPlayTimeAcc = m_NowPlayTimeAcc;
+		m_iOldAnimIndex = m_iNowAnimIndex;
 
+	}
 
 	m_NowPlayTimeAcc = 0;
 	m_iNowAnimIndex = iAnimIndex;
@@ -336,6 +354,7 @@ HRESULT CModel::Change_AnimIndex_UntilTo(_uint iAnimIndex, _uint iReturnIndex, _
 	m_KindsOfAnimChange = 0;
 	m_bIsUntill = true;
 
+	m_bIsSwapFunctionCalled = true;
 	return S_OK;
 }
 
@@ -351,7 +370,7 @@ HRESULT CModel::Change_AnimIndex_ReturnTo(_uint iAnimIndex, _uint iReturnIndex, 
 
 	m_bIsChagingAnim = true;
 
-	if (m_AnimExitAcc)
+	if (!m_bIsSwapFunctionCalled && m_AnimExitAcc)
 	{
 		_uint iNumOldAnimKeyFrameIdx = _uint(m_vecCurrentKeyFrameIndices[m_iOldAnimIndex].size());
 		m_vecCurrentKeyFrameIndices[m_iOldAnimIndex].clear();
@@ -360,9 +379,11 @@ HRESULT CModel::Change_AnimIndex_ReturnTo(_uint iAnimIndex, _uint iReturnIndex, 
 	m_AnimExitAcc = 0;
 	m_TotalAnimExitTime = ExitTime;
 
-
-	m_OldPlayTimeAcc = m_NowPlayTimeAcc;
-	m_iOldAnimIndex = m_iNowAnimIndex;
+	if (!m_bIsSwapFunctionCalled)
+	{
+		m_OldPlayTimeAcc = m_NowPlayTimeAcc;
+		m_iOldAnimIndex = m_iNowAnimIndex;
+	}
 
 
 	m_NowPlayTimeAcc = 0;
@@ -375,6 +396,7 @@ HRESULT CModel::Change_AnimIndex_ReturnTo(_uint iAnimIndex, _uint iReturnIndex, 
 	m_KindsOfAnimChange = 1;
 	m_bIsUntill = false;
 
+	m_bIsSwapFunctionCalled = true;
 	return S_OK;
 }
 
@@ -388,7 +410,7 @@ HRESULT CModel::Change_AnimIndex_ReturnTo_Must(_uint iAnimIndex, _uint iReturnIn
 
 	m_bIsChagingAnim = true;
 
-	if (m_AnimExitAcc)
+	if (!m_bIsSwapFunctionCalled && m_AnimExitAcc)
 	{
 		_uint iNumOldAnimKeyFrameIdx = _uint(m_vecCurrentKeyFrameIndices[m_iOldAnimIndex].size());
 		m_vecCurrentKeyFrameIndices[m_iOldAnimIndex].clear();
@@ -397,10 +419,13 @@ HRESULT CModel::Change_AnimIndex_ReturnTo_Must(_uint iAnimIndex, _uint iReturnIn
 	m_AnimExitAcc = 0;
 	m_TotalAnimExitTime = ExitTime;
 
+	if (!m_bIsSwapFunctionCalled)
+	{
 
-	m_OldPlayTimeAcc = m_NowPlayTimeAcc;
-	m_iOldAnimIndex = m_iNowAnimIndex;
+		m_OldPlayTimeAcc = m_NowPlayTimeAcc;
+		m_iOldAnimIndex = m_iNowAnimIndex;
 
+	}
 
 	m_NowPlayTimeAcc = 0;
 	m_iNowAnimIndex = iAnimIndex;
@@ -412,6 +437,7 @@ HRESULT CModel::Change_AnimIndex_ReturnTo_Must(_uint iAnimIndex, _uint iReturnIn
 	m_KindsOfAnimChange = 1;
 	m_bIsUntill = false;
 
+	m_bIsSwapFunctionCalled = true;
 	return S_OK;
 }
 
@@ -420,6 +446,18 @@ HRESULT CModel::Change_AnimIndex_ReturnTo_Must(_uint iAnimIndex, _uint iReturnIn
 _double CModel::Get_PlayRate()
 {
 	return m_vecAnimator[m_iNowAnimIndex]->Get_PlayRate(m_NowPlayTimeAcc);
+}
+
+HRESULT CModel::Remove_CertainKeyFrameIndex(_uint iAnimIndex)
+{
+	if (iAnimIndex >= m_vecAnimator.size())
+		return E_FAIL;
+
+	_uint iNumAnimKeyFrameIdx = _uint(m_vecCurrentKeyFrameIndices[iAnimIndex].size());
+	m_vecCurrentKeyFrameIndices[iAnimIndex].clear();
+	m_vecCurrentKeyFrameIndices[iAnimIndex].resize(iNumAnimKeyFrameIdx);
+
+	return S_OK;
 }
 
 HRESULT CModel::Bind_OnShader(CShader * pShader, _uint iMaterialIndex, _uint eTextureType, const char * pHlslConstValueName)
@@ -446,6 +484,7 @@ HRESULT CModel::Bind_OnShader(CShader * pShader, _uint iMaterialIndex, _uint eTe
 
 HRESULT CModel::Update_AnimationClip(_double fDeltaTime,_bool IsUpdateAll)
 {
+	m_bIsSwapFunctionCalled = false;
 	switch (m_KindsOfAnimChange)
 	{
 	case 0:

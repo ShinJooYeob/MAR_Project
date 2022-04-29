@@ -38,15 +38,17 @@ _int CGrinder::Update(_double fDeltaTime)
 		return -1;
 	if (m_bIsDead) return 0;
 	
-
+	//XMMatrixRotationX(XMConvertToRadians(-27.03f))*
+	//XMMatrixRotationY(XMConvertToRadians(-10.069997f))*
+	//XMMatrixRotationZ(XMConvertToRadians(-201.929626f))*
+	//XMMatrixTranslation(-0.61f, 0.0200f, -1.290f);
 	/*{
-	//rot: -27.030010, -10.069997, -201.929626,
-
-	//Pivot: -0.610000, 0.020000, -1.290000,
+		//Rot: -20.865261, -10.069997, -201.929626,
+		//Pivot: -0.610000, 0.005000, -1.365000,
 
 		static _float3 testFloat3 = _float3(-0.610000, 0.020000, -1.290000);
 		static _float3 RotFloat3 = _float3(-27.030010, -10.069997, -201.929626);
-		static _float value = 0.03f;
+		static _float value = 0.015f;
 		static _int kind = 0;
 
 		_Matrix tt = XMMatrixRotationX(XMConvertToRadians(RotFloat3.x))*
@@ -265,9 +267,13 @@ _int CGrinder::Update(_double fDeltaTime)
 
 
 
+	_Matrix			TransformMatrix = XMLoadFloat4x4(m_tATBMat.pUpdatedNodeMat) * XMLoadFloat4x4(m_tATBMat.pDefaultPivotMat);
 
+	TransformMatrix.r[0] = XMVector3Normalize(TransformMatrix.r[0]);
+	TransformMatrix.r[1] = XMVector3Normalize(TransformMatrix.r[1]);
+	TransformMatrix.r[2] = XMVector3Normalize(TransformMatrix.r[2]);
 
-
+	m_BoneMatrix = XMMatrixTranspose(m_pTransformCom->Get_WorldMatrix()* TransformMatrix * m_tWeaponDesc.pParantTransform->Get_WorldMatrix());
 
 
 
@@ -295,15 +301,9 @@ _int CGrinder::Render()
 
 	NULL_CHECK_RETURN(m_pModel, E_FAIL);
 
-	_Matrix			TransformMatrix = XMLoadFloat4x4(m_tATBMat.pUpdatedNodeMat) * XMLoadFloat4x4(m_tATBMat.pDefaultPivotMat);
 
-	TransformMatrix.r[0] = XMVector3Normalize(TransformMatrix.r[0]);
-	TransformMatrix.r[1] = XMVector3Normalize(TransformMatrix.r[1]);
-	TransformMatrix.r[2] = XMVector3Normalize(TransformMatrix.r[2]);
 
-	TransformMatrix = XMMatrixTranspose(m_pTransformCom->Get_WorldMatrix()* TransformMatrix * m_tWeaponDesc.pParantTransform->Get_WorldMatrix());
-
-	_float4x4 ShaderMat = TransformMatrix;
+	_float4x4 ShaderMat = m_BoneMatrix;
 	m_pShaderCom->Set_RawValue("g_AttechMatrix", &ShaderMat, sizeof(_float4x4));
 
 

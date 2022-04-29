@@ -62,6 +62,7 @@ _int CPlayer::Update(_double fDeltaTime)
 		return -1;
 
 
+	FAILED_CHECK(Manage_CoolTime(fDeltaTime));
 	FAILED_CHECK(Input_Keyboard(fDeltaTime));
 
 
@@ -99,9 +100,18 @@ _int CPlayer::Update(_double fDeltaTime)
 
 
 
+	_uint iNowAnimIndex  = m_pModel->Get_NowAnimIndex();
+	if (iNowAnimIndex ==  15|| iNowAnimIndex == 20||
+		(iNowAnimIndex >= Weapon_Knife + 8 && iNowAnimIndex <= Weapon_Knife + 16) ||
+		(iNowAnimIndex >= Weapon_Horse + 8 && iNowAnimIndex <= Weapon_Horse + 14))
+	{
+		FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime * 1.5));
+	}
+	else
+	{
+		FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime ));
 
-
-	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime));
+	}
 
 	m_pColliderCom->Update_Transform(0, m_pTransformCom->Get_WorldMatrix());
 	for (_uint i = 1; i < m_pColliderCom->Get_NumColliderBuffer(); i++)
@@ -146,7 +156,7 @@ _int CPlayer::LateUpdate(_double fDeltaTime)
 	if (!m_fDashPassedTime)
 	{
 		FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this));
-		if (m_iWeaponModelIndex != 10)
+		if (m_iWeaponModelIndex != 10 && !m_LevitationTime)
 		{
 			m_vecWeapon[m_iWeaponModelIndex]->LateUpdate(fDeltaTime);
 		}
@@ -176,6 +186,7 @@ _int CPlayer::Render()
 	FAILED_CHECK(SetUp_ConstTable());
 
 
+
 	FAILED_CHECK(m_pTransformCom->Bind_OnShader(m_pShaderCom, "g_WorldMatrix"));
 	
 	_uint NumMaterial = m_pModel->Get_NumMaterial();
@@ -195,6 +206,9 @@ _int CPlayer::Render()
 		}
 
 	}
+
+	
+
 	
 	return _int();
 }
@@ -988,6 +1002,19 @@ HRESULT CPlayer::Ready_ParticleDesc()
 	return S_OK;
 }
 
+HRESULT CPlayer::Manage_CoolTime(_double fDeltaTime)
+{
+
+	m_fGrinderCoolTime -= g_fDeltaTime;
+	if (m_fGrinderCoolTime < 0)
+	{
+		m_fGrinderCoolTime = 0;
+		m_bNeedToGrinderCooling = false;
+	}
+
+	return S_OK;
+}	
+
 HRESULT CPlayer::Input_Keyboard(_double fDeltaTime)
 {
 
@@ -1243,13 +1270,14 @@ HRESULT CPlayer::Jump_Update(_double fDeltaTime, CGameInstance* pInstance)
 {
 	if (!m_pModel->Get_IsHavetoBlockAnimChange())
 	{
-		if (m_iJumpCount < 2 && !m_fDashPassedTime && pInstance->Get_DIKeyState(DIK_SPACE) & DIS_Down)
+		if (m_iJumpCount < 3 && !m_fDashPassedTime && pInstance->Get_DIKeyState(DIK_SPACE) & DIS_Down)
 		{
 			Add_JumpForce(PlayerMaxJumpPower * m_fSmallScale);
 
-			m_pModel->Change_AnimIndex_UntilTo(15 + m_iJumpCount * 5, 17 + m_iJumpCount * 5, 0.08);
+			_uint iJumpIndex = (m_iJumpCount) ? 1: 0;
+			m_pModel->Change_AnimIndex_UntilTo(15 + iJumpIndex * 5, 17 + iJumpIndex * 5, 0.08);
 
-			if (m_iJumpCount == 1)
+			if (m_iJumpCount)
 			{
 				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[2]);
 				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[4]);
@@ -1279,7 +1307,37 @@ HRESULT CPlayer::Jump_Update(_double fDeltaTime, CGameInstance* pInstance)
 	}
 	else
 	{
-		fGravity = _float((m_LevitationTime) * (m_LevitationTime)* -29.4f);
+		if (m_iJumpCount && pInstance->Get_DIKeyState(DIK_SPACE) & DIS_Press)
+		{
+			static _double particleTimeInterver = 0;
+			particleTimeInterver += fDeltaTime;
+
+			if (particleTimeInterver > 0.2)
+			{
+
+				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[2]);
+				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[4]);
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerTornado),
+					&_float4(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS), 1));
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerTornado),
+					&_float4(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS), 1));
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerTornado),
+					&_float4(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS), 1));
+				particleTimeInterver = 0;
+			}
+			m_LevitationTime -= fDeltaTime*0.8;
+			//fGravity = _float((m_LevitationTime) * -2.4f);
+
+		}
+
+
+		if (m_LevitationTime == fDeltaTime)
+			fGravity = _float(-2.94f);
+		else
+			fGravity = _float((m_LevitationTime) * (m_LevitationTime)* -29.4f);
+
+
+
 	}
 
 	if (m_LevitationTime != fDeltaTime &&fGravity < 0)
@@ -1440,13 +1498,21 @@ HRESULT CPlayer::Plant_ClockBomb(_double fDeltaTime, CGameInstance * pInstance)
 HRESULT CPlayer::Lunch_Bullet(_double fDeltaTime, CGameInstance * pInstance)
 {
 	
-	if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_LBUTTON) & DIS_Press)
+	if (!m_bNeedToGrinderCooling  && pInstance->Get_DIMouseButtonState(CInput_Device::MBS_LBUTTON) & DIS_Press)
 	{
+
 		m_pModel->Change_AnimIndex(Weapon_Grinder + 8,0.15, true);
+		m_vecWeapon[m_iWeaponModelIndex]->Get_WeaponModel()->Change_AnimIndex(1,0.15);
+
+
 
 		m_BulletNormalInterver -=fDeltaTime;
 		if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_LBUTTON) & DIS_Up)
+		{
+			m_vecWeapon[m_iWeaponModelIndex]->Get_WeaponModel()->Change_AnimIndex_ReturnTo_Must(3, 0,0.15,true);
+
 			m_BulletNormalInterver = 0;
+		}
 
 		if (m_BulletNormalInterver < 0)
 		{
@@ -1469,7 +1535,21 @@ HRESULT CPlayer::Lunch_Bullet(_double fDeltaTime, CGameInstance * pInstance)
 
 			pInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Bullet), TAG_OP(Prototype_Bullet_Normal),	&vBulletDir);
 
-			m_BulletNormalInterver = GetSingle(CUtilityMgr)->RandomFloat(0.15f, 0.2f);
+			
+			 m_BulletNormalInterver = GetSingle(CUtilityMgr)->RandomFloat(0.15f, 0.2f);
+			 m_fGrinderCoolTime += m_BulletNormalInterver*PlayerGrinderCoolTime*0.8;
+
+			 string ttszLog = "GrinderCoolTime  : " + to_string(m_fGrinderCoolTime) + "\n";
+			 wstring ttDebugLog;
+			 ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+			 OutputDebugStringW(ttDebugLog.c_str());
+
+			 if (m_fGrinderCoolTime > PlayerGrinderCoolTime)
+			 {
+				 m_vecWeapon[m_iWeaponModelIndex]->Get_WeaponModel()->Change_AnimIndex_ReturnTo_Must(3, 0, 0.15, true);
+				 m_fGrinderCoolTime = PlayerGrinderCoolTime;
+				 m_bNeedToGrinderCooling = true;
+			 }
 		}
 	}
 	else
@@ -1558,14 +1638,15 @@ HRESULT CPlayer::Jump_Update_Horse(_double fDeltaTime, CGameInstance * pInstance
 {
 	if (!m_pModel->Get_IsHavetoBlockAnimChange())
 	{
-		if (m_iJumpCount < 2 && !m_fDashPassedTime&& pInstance->Get_DIKeyState(DIK_SPACE) & DIS_Down)
+		if (m_iJumpCount < 3 && !m_fDashPassedTime&& pInstance->Get_DIKeyState(DIK_SPACE) & DIS_Down)
 		{
 			Add_JumpForce(PlayerMaxJumpPower * m_fSmallScale);
 
-			m_pModel->Change_AnimIndex_UntilTo(15 + m_iJumpCount * 5, 17 + m_iJumpCount * 5, 0.08);
+			_uint iJumpIndex = (m_iJumpCount) ? 1 : 0;
+			m_pModel->Change_AnimIndex_UntilTo(15 + iJumpIndex * 5, 17 + iJumpIndex * 5, 0.08);
 
 
-			if (m_iJumpCount == 1)
+			if (m_iJumpCount)
 			{
 				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[2]);
 				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[4]);
@@ -1595,7 +1676,33 @@ HRESULT CPlayer::Jump_Update_Horse(_double fDeltaTime, CGameInstance * pInstance
 	}
 	else
 	{
-		fGravity = _float((m_LevitationTime) * (m_LevitationTime)* -29.4f);
+		if (m_iJumpCount && pInstance->Get_DIKeyState(DIK_SPACE) & DIS_Press)
+		{
+			static _double particleTimeInterver = 0;
+			particleTimeInterver += fDeltaTime;
+
+			if (particleTimeInterver > 0.2)
+			{
+
+				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[2]);
+				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[4]);
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerTornado),
+					&_float4(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS), 1));
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerTornado),
+					&_float4(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS), 1));
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerTornado),
+					&_float4(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS), 1));
+				particleTimeInterver = 0;
+			}
+			m_LevitationTime -= fDeltaTime*0.8;
+			//fGravity = _float((m_LevitationTime) * -2.4f);
+
+		}
+
+		if (m_LevitationTime == fDeltaTime)
+			fGravity = _float(-2.94f);
+		else
+			fGravity = _float((m_LevitationTime) * (m_LevitationTime)* -29.4f);
 	}
 
 	if (m_LevitationTime != fDeltaTime &&fGravity < 0)
@@ -1940,13 +2047,14 @@ HRESULT CPlayer::Jump_Update_Teapot(_double fDeltaTime, CGameInstance * pInstanc
 {
 	if (!m_pModel->Get_IsHavetoBlockAnimChange())
 	{
-		if (m_iJumpCount < 2 && !m_fDashPassedTime && pInstance->Get_DIKeyState(DIK_SPACE) & DIS_Down)
+		if (m_iJumpCount < 3 && !m_fDashPassedTime && pInstance->Get_DIKeyState(DIK_SPACE) & DIS_Down)
 		{
 			Add_JumpForce(PlayerMaxJumpPower * m_fSmallScale);
 
-			m_pModel->Change_AnimIndex_UntilTo(15 + m_iJumpCount * 5, 17 + m_iJumpCount * 5, 0.08);
+			_uint iJumpIndex = (m_iJumpCount) ? 1 : 0;
+			m_pModel->Change_AnimIndex_UntilTo(15 + iJumpIndex * 5, 17 + iJumpIndex * 5, 0.08);
 
-			if (m_iJumpCount == 1)
+			if (m_iJumpCount )
 			{
 				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[2]);
 				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[4]);
@@ -1977,7 +2085,39 @@ HRESULT CPlayer::Jump_Update_Teapot(_double fDeltaTime, CGameInstance * pInstanc
 	}
 	else
 	{
-		fGravity = _float((m_LevitationTime) * (m_LevitationTime)* -29.4f);
+		if (m_iJumpCount && pInstance->Get_DIKeyState(DIK_SPACE) & DIS_Press)
+		{
+			static _double particleTimeInterver = 0;
+			particleTimeInterver += fDeltaTime;
+
+			if (particleTimeInterver > 0.2)
+			{
+
+				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[2]);
+				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[4]);
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerTornado),
+					&_float4(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS), 1));
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerTornado),
+					&_float4(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS), 1));
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerTornado),
+					&_float4(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS), 1));
+				particleTimeInterver = 0;
+			}
+			m_LevitationTime -= fDeltaTime*0.8;
+			//fGravity = _float((m_LevitationTime) * -2.4f);
+
+		}
+		if (m_pModel->Get_NowAnimIndex() == Weapon_Teapot + 8 || m_pModel->Get_NowAnimIndex() == Weapon_Teapot + 16)
+		{
+			fGravity = _float(-8.82f);
+		}
+		else
+		{
+			if (m_LevitationTime == fDeltaTime)
+				fGravity = _float(-2.94f);
+			else
+				fGravity = _float((m_LevitationTime) * (m_LevitationTime)* -29.4f);
+		}
 	}
 
 	if (m_LevitationTime != fDeltaTime &&fGravity < 0)
@@ -2019,7 +2159,7 @@ HRESULT CPlayer::Attack_Update_Teapot(_double fDeltaTime, CGameInstance * pInsta
 					m_bAtkMoveMentChecker[0] = true;
 					Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * -1, 10);
 
-
+					
 					CTransform* pCamTransform = m_pMainCamera->Get_Camera_Transform();
 					_float3 vBulletDir = XMVector3Normalize(XMVector3TransformNormal(XMVectorSet(0, 0, 300, 0), pCamTransform->Get_WorldMatrix()));
 					FAILED_CHECK(pInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Bullet), TAG_OP(Prototype_Bullet_Grenade),&vBulletDir));
@@ -2070,10 +2210,18 @@ HRESULT CPlayer::Attack_Update_Teapot(_double fDeltaTime, CGameInstance * pInsta
 
 
 				if (m_fCharedGauge < 0.4f)
+				{
+					m_vecWeapon[m_iWeaponModelIndex]->Get_WeaponModel()->Change_AnimIndex_ReturnTo_Must(1, 0, 0.15, true);
+
 
 					m_pModel->Change_AnimIndex(Weapon_Teapot + 9, 0.15, true);
+				}
 				else
+				{
+
+					m_vecWeapon[m_iWeaponModelIndex]->Get_WeaponModel()->Change_AnimIndex_ReturnTo(1, 2, 0.15, true);
 					m_pModel->Change_AnimIndex(Weapon_Teapot + 11, 0.15, true);
+				}
 
 			}
 			else
@@ -2104,16 +2252,19 @@ HRESULT CPlayer::Lunch_Grenade(_double fDeltaTime, CGameInstance * pInstance)
 	if (!m_bIsCoolTime && pInstance->Get_DIMouseButtonState(CInput_Device::MBS_LBUTTON) & DIS_Down)
 	{
 
+
 		if (m_fCharedGauge < 0.4f)
 		{
 			m_pModel->Change_AnimIndex_ReturnTo_Must(Weapon_Teapot + 8, Weapon_Teapot + 3,0.15, true);
 
+			m_vecWeapon[m_iWeaponModelIndex]->Get_WeaponModel()->Change_AnimIndex_ReturnTo_Must(3, 0, 0.15, true);
 			//쿨링 타임 들어가는거로 해주자
 			
 		}
 		else
 		{
 			m_pModel->Change_AnimIndex_ReturnTo_Must(Weapon_Teapot + 16, Weapon_Teapot + 3, 0.15, true);
+			m_vecWeapon[m_iWeaponModelIndex]->Get_WeaponModel()->Change_AnimIndex_ReturnTo_Must(4, 0, 0.15, true);
 
 
 		
@@ -2162,7 +2313,33 @@ HRESULT CPlayer::Jump_Update_Umbrella(_double fDeltaTime, CGameInstance * pInsta
 	}
 	else
 	{
-		fGravity = _float((m_LevitationTime) * (m_LevitationTime)* -29.4f);
+		if (m_iJumpCount && pInstance->Get_DIKeyState(DIK_SPACE) & DIS_Press)
+		{
+			static _double particleTimeInterver = 0;
+			particleTimeInterver += fDeltaTime;
+
+			if (particleTimeInterver > 0.2)
+			{
+
+				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[2]);
+				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[4]);
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerTornado),
+					&_float4(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS), 1));
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerTornado),
+					&_float4(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS), 1));
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerTornado),
+					&_float4(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS), 1));
+				particleTimeInterver = 0;
+			}
+			m_LevitationTime -= fDeltaTime*0.8;
+			//fGravity = _float((m_LevitationTime) * -2.4f);
+
+		}
+
+		if (m_LevitationTime == fDeltaTime)
+			fGravity = _float(-2.94f);
+		else
+			fGravity = _float((m_LevitationTime) * (m_LevitationTime)* -29.4f);
 	}
 
 	if (m_LevitationTime != fDeltaTime &&fGravity < 0)
@@ -2258,14 +2435,15 @@ HRESULT CPlayer::Jump_Update_Knife(_double fDeltaTime, CGameInstance * pInstance
 {
 	if (!m_pModel->Get_IsHavetoBlockAnimChange())
 	{
-		if (m_iJumpCount < 2 && !m_fDashPassedTime && pInstance->Get_DIKeyState(DIK_SPACE) & DIS_Down)
+		if (m_iJumpCount < 3 && !m_fDashPassedTime && pInstance->Get_DIKeyState(DIK_SPACE) & DIS_Down)
 		{
 			Add_JumpForce(PlayerMaxJumpPower * m_fSmallScale);
 
-			m_pModel->Change_AnimIndex_UntilTo(15 + m_iJumpCount * 5, 17 + m_iJumpCount * 5, 0.08);
+			_uint iJumpIndex = (m_iJumpCount) ? 1 : 0;
+			m_pModel->Change_AnimIndex_UntilTo(15 + iJumpIndex * 5, 17 + iJumpIndex * 5, 0.08);
 
 
-			if (m_iJumpCount == 1)
+			if (m_iJumpCount )
 			{
 				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[2]);
 				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[4]);
@@ -2295,7 +2473,33 @@ HRESULT CPlayer::Jump_Update_Knife(_double fDeltaTime, CGameInstance * pInstance
 	}
 	else
 	{
-		fGravity = _float((m_LevitationTime) * (m_LevitationTime)* -29.4f);
+		if (m_iJumpCount && pInstance->Get_DIKeyState(DIK_SPACE) & DIS_Press)
+		{
+			static _double particleTimeInterver = 0;
+			particleTimeInterver += fDeltaTime;
+
+			if (particleTimeInterver > 0.2)
+			{
+
+				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[2]);
+				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[4]);
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerTornado),
+					&_float4(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS), 1));
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerTornado),
+					&_float4(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS), 1));
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerTornado),
+					&_float4(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS), 1));
+				particleTimeInterver = 0;
+			}
+			m_LevitationTime -= fDeltaTime*0.8;
+			//fGravity = _float((m_LevitationTime) * -2.4f);
+
+		}
+
+		if (m_LevitationTime == fDeltaTime)
+			fGravity = _float(-2.94f);
+		else
+			fGravity = _float((m_LevitationTime) * (m_LevitationTime)* -29.4f);
 	}
 
 	if (m_LevitationTime != fDeltaTime &&fGravity < 0)
@@ -2634,13 +2838,14 @@ HRESULT CPlayer::Jump_Update_Grinder(_double fDeltaTime, CGameInstance * pInstan
 {
 	if (!m_pModel->Get_IsHavetoBlockAnimChange())
 	{
-		if (m_iJumpCount < 2 && !m_fDashPassedTime && pInstance->Get_DIKeyState(DIK_SPACE) & DIS_Down)
+		if (m_iJumpCount < 3 && !m_fDashPassedTime && pInstance->Get_DIKeyState(DIK_SPACE) & DIS_Down)
 		{
 			Add_JumpForce(PlayerMaxJumpPower * m_fSmallScale);
+			_uint iJumpIndex = (m_iJumpCount) ? 1 : 0;
 
-			m_pModel->Change_AnimIndex_UntilTo(15 + m_iJumpCount * 5, 17 + m_iJumpCount * 5, 0.08);
+			m_pModel->Change_AnimIndex_UntilTo(15 + iJumpIndex * 5, 17 + iJumpIndex * 5, 0.08);
 
-			if (m_iJumpCount == 1)
+			if (m_iJumpCount)
 			{
 				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[2]);
 				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[4]);
@@ -2671,7 +2876,33 @@ HRESULT CPlayer::Jump_Update_Grinder(_double fDeltaTime, CGameInstance * pInstan
 	}
 	else
 	{
-		fGravity = _float((m_LevitationTime) * (m_LevitationTime)* -29.4f);
+		if (m_iJumpCount && pInstance->Get_DIKeyState(DIK_SPACE) & DIS_Press)
+		{
+			static _double particleTimeInterver = 0;
+			particleTimeInterver += fDeltaTime;
+
+			if (particleTimeInterver > 0.2)
+			{
+
+				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[2]);
+				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[4]);
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerTornado),
+					&_float4(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS), 1));
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerTornado),
+					&_float4(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS), 1));
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerTornado),
+					&_float4(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS), 1));
+				particleTimeInterver = 0;
+			}
+			m_LevitationTime -= fDeltaTime*0.8;
+			//fGravity = _float((m_LevitationTime) * -2.4f);
+
+		}
+
+		if (m_LevitationTime == fDeltaTime)
+			fGravity = _float(-2.94f);
+		else
+			fGravity = _float((m_LevitationTime) * (m_LevitationTime)* -29.4f);
 	}
 
 	if (m_LevitationTime != fDeltaTime &&fGravity < 0)
@@ -2687,6 +2918,7 @@ HRESULT CPlayer::Attack_Update_Grinder(_double fDeltaTime, CGameInstance * pInst
 	if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_RBUTTON) & DIS_Press)
 	{
 		m_bIsZoom = true;
+
 
 		FAILED_CHECK(Lunch_Bullet(fDeltaTime, pInstance));
 
@@ -2719,7 +2951,17 @@ HRESULT CPlayer::Set_Player_On_Terrain()
 		if (m_LevitationTime > g_fDeltaTime)
 		{
 			if (m_LevitationTime < 0.9f)
-				m_pModel->Change_AnimIndex_ReturnTo(18 + m_iJumpCount * 5, 0,0);
+			{
+
+				//_uint iJumpIndex = (m_iJumpCount) ? 1: 0;
+				//m_pModel->Change_AnimIndex(0, 0.15,true);
+				////m_pModel->Change_AnimIndex(18 + m_iJumpCount * 5, 0,0.15);
+				//if (pInstance->Get_DIKeyState(DIK_SPACE) & DIS_Press)
+				//	m_pModel->Change_AnimIndex_ReturnTo(18 + iJumpIndex * 5, 0, g_fDeltaTime, true);
+				//else
+				//	m_pModel->Change_AnimIndex_ReturnTo(18 + iJumpIndex * 5, 0, g_fDeltaTime,true);
+
+			}
 			else
 			{
 				m_pModel->Change_AnimIndex_ReturnTo(19, 0, 0, true);

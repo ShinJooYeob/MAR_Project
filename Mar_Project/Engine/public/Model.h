@@ -34,6 +34,7 @@ public:
 	_bool	Get_IsAnimChanging() { return m_bIsChagingAnim; }
 	void	Set_BlockAnim(_bool IsBlock) { m_bIsBlockAnim = IsBlock; };
 	void    Set_NextAnim_Must(_uint iAnim) { m_iNextAnimIndex = iAnim; };
+	HRESULT	Remove_CertainKeyFrameIndex(_uint iAnimIndex);
 
 	HRESULT Bind_OnShader(class CShader* pShader, _uint iMaterialIndex , _uint eTextureType, const char* pHlslConstValueName);
 	HRESULT Update_AnimationClip(_double fDeltaTime, _bool IsUpdateAll = true);	
@@ -81,6 +82,7 @@ private:
 	_bool		m_bIsBlockAnim = false;
 	_bool		m_bIsChagingAnim = false;
 	_uint		m_KindsOfAnimChange = 0;
+	_bool		m_bIsSwapFunctionCalled= false;
 
 private:
 	MODELTYPE								m_eModelType = TYPE_END;

@@ -15,8 +15,8 @@ class CPlayer final : public CGameObject
 public:
 	enum eWeaponState
 	{
-		Weapon_None = 0, Weapon_Knife = 47, Weapon_Grinder = 73, Weapon_Horse = 89, Weapon_Teapot = 113, Weapon_Umbrella = 134, Weapon_End
-		//Weapon_None = 0, Weapon_Knife =88888888, Weapon_Grinder = 47, Weapon_Horse = 777777777, Weapon_Teapot = 21654, Weapon_Umbrella = 213137, Weapon_End
+		//Weapon_None = 0, Weapon_Knife = 47, Weapon_Grinder = 73, Weapon_Horse = 89, Weapon_Teapot = 113, Weapon_Umbrella = 134, Weapon_End
+		Weapon_None = 0, Weapon_Knife =88888888, Weapon_Grinder = 45651, Weapon_Horse = 777777777, Weapon_Teapot = 47, Weapon_Umbrella = 213137, Weapon_End
 	};
 
 
@@ -99,6 +99,9 @@ private:
 	_float				m_fUmbrellaIntro = 0;
 
 
+	_double				m_fGrinderCoolTime = 0;
+	_bool				m_bNeedToGrinderCooling = false;
+
 
 	/*For AddForce*/
 	_bool				m_bIsActived = false;
@@ -120,7 +123,7 @@ private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ConstTable();
 	HRESULT Ready_ParticleDesc();
-
+	HRESULT Manage_CoolTime(_double fDeltaTime);
 	
 
 	HRESULT Input_Keyboard(_double fDeltaTime);

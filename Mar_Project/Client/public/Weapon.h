@@ -29,6 +29,8 @@ public:
 	virtual _int Render()override;
 	virtual _int LateRender()override;
 
+	virtual CModel*	Get_WeaponModel() { return nullptr; };
+
 protected:
 	class CPlayer*			m_pPlayer = nullptr;
 
