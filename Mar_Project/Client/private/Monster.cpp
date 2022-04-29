@@ -199,7 +199,7 @@ HRESULT CMonster::Update_WanderAround(CTransform * pTransform,_double fDeltaTime
 {
 	iWanderCount = 0;
 
-	while (!(Check_Movable_Terrain(pTransform, m_vLookDir.XMVector(), 0.1f)))
+	while (!(Check_Movable_Terrain(pTransform, m_vLookDir.XMVector(), 0.001f)))
 	{
 		_float RandFloat = GetSingle(CUtilityMgr)->RandomFloat(-0.5, 0.5);
 		_Vector NewLook = m_vLookDir.XMVector() * -1;

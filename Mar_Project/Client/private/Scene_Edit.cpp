@@ -3526,7 +3526,7 @@ HRESULT CScene_Edit::Ready_Layer_Player(const _tchar * pLayerTag)
 
 HRESULT CScene_Edit::Ready_ParticleDesc()
 {
-	m_tParticleDesc.eParticleTypeID = Particle_Fixed;
+	m_tParticleDesc.eParticleTypeID = Particle_Ball;
 
 	m_tParticleDesc.FollowingTarget = nullptr;
 

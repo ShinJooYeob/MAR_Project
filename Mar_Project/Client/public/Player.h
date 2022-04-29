@@ -15,8 +15,8 @@ class CPlayer final : public CGameObject
 public:
 	enum eWeaponState
 	{
-		//Weapon_None = 0, Weapon_Knife = 47, Weapon_Grinder = 73, Weapon_Horse = 89, Weapon_Teapot = 113, Weapon_Umbrella = 134, Weapon_End
-		Weapon_None = 0, Weapon_Knife =88888888, Weapon_Grinder = 47, Weapon_Horse = 777777777, Weapon_Teapot = 21654, Weapon_Umbrella = 213137, Weapon_End
+		Weapon_None = 0, Weapon_Knife = 47, Weapon_Grinder = 73, Weapon_Horse = 89, Weapon_Teapot = 113, Weapon_Umbrella = 134, Weapon_End
+		//Weapon_None = 0, Weapon_Knife =88888888, Weapon_Grinder = 47, Weapon_Horse = 777777777, Weapon_Teapot = 21654, Weapon_Umbrella = 213137, Weapon_End
 	};
 
 
