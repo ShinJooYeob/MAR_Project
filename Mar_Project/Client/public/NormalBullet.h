@@ -14,6 +14,8 @@ public:
 	virtual HRESULT Initialize_Prototype(void* pArg)override;
 	virtual HRESULT Initialize_Clone(void* pArg)override;
 
+
+	virtual void Set_IsDead()override;
 public:
 	virtual _int Update(_double fDeltaTime)override;
 	virtual _int LateUpdate(_double fDeltaTime)override;

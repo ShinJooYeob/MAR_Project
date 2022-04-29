@@ -49,6 +49,12 @@ HRESULT CNormalBullet::Initialize_Clone(void * pArg)
 	return S_OK;
 }
 
+void CNormalBullet::Set_IsDead()
+{
+	m_pTransformCom->Set_IsOwnerDead();
+	m_bIsDead = true;
+}
+
 _int CNormalBullet::Update(_double fDeltaTime)
 {
 	if (__super::Update(fDeltaTime) < 0)
@@ -145,8 +151,8 @@ HRESULT CNormalBullet::Ready_ParticleDesc()
 	m_tParticleDesc.TextureChageFrequency = 8;
 	m_tParticleDesc.vTextureXYNum = _float2(2, 2);
 	
-	m_tParticleDesc.TotalParticleTime = m_fTotalLifeTime;
-	//m_tParticleDesc.TotalParticleTime = 9999999999.f;
+	//m_tParticleDesc.TotalParticleTime = m_fTotalLifeTime;
+	m_tParticleDesc.TotalParticleTime = 9999999999.f;
 	m_tParticleDesc.EachParticleLifeTime = 0.64f;
 	m_tParticleDesc.MaxParticleCount = 3;
 

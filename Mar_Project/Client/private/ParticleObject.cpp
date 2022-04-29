@@ -49,12 +49,11 @@ _int CParticleObject::Update(_double fTimeDelta)
 
 
 
-	//_float3 vParentPos;
-	//if (m_ParticleDesc.FollowingTarget == nullptr)
-	//	vParentPos = m_ParticleDesc.FixedTarget;
-	//else
-	//	vParentPos = m_ParticleDesc.FollowingTarget->Get_MatrixState_Float3(CTransform::STATE_POS);
-
+	if (m_ParticleDesc.FollowingTarget && m_ParticleDesc.FollowingTarget->Get_IsOwnerDead())
+	{
+		this->Set_IsDead();
+		return 0;
+	}
 
 	std::list<PARTICLEATT>::iterator iter;
 

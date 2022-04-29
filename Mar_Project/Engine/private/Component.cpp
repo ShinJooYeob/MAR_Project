@@ -14,7 +14,8 @@ CComponent::CComponent(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContex
 CComponent::CComponent(const CComponent & rhs)
 	:m_pDevice(rhs.m_pDevice),
 	m_pDeviceContext(rhs.m_pDeviceContext),
-	m_bIsClone(true)
+	m_bIsClone(true),
+	m_bIsOwnerDead(false)
 {
 	Safe_AddRef(m_pDevice);
 	Safe_AddRef(m_pDeviceContext);

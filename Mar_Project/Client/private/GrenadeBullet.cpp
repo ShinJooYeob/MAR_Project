@@ -45,6 +45,12 @@ HRESULT CGrenadeBullet::Initialize_Clone(void * pArg)
 	return S_OK;
 }
 
+void CGrenadeBullet::Set_IsDead()
+{
+	m_pTransformCom->Set_IsOwnerDead();
+	m_bIsDead = true;
+}
+
 _int CGrenadeBullet::Update(_double fDeltaTime)
 {
 	if (__super::Update(fDeltaTime) < 0)

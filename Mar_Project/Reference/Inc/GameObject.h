@@ -29,7 +29,7 @@ public:
 	virtual _float	Get_RenderSortValue() { return m_fRenderSortValue; };
 	virtual _float	Compute_RenderSortValue();
 
-	void Set_IsDead() { m_bIsDead = true; }
+	virtual void Set_IsDead() { m_bIsDead = true; }
 	_bool Get_IsDead() { return m_bIsDead; }
 
 

@@ -15,11 +15,13 @@ public:
 	virtual HRESULT Initialize_Prototype(void * pArg);
 	virtual HRESULT Initialize_Clone(void * pArg);
 
-
+	_bool	Get_IsOwnerDead() { return m_bIsOwnerDead; };
+	void	Set_IsOwnerDead() { m_bIsOwnerDead = true; };
 protected:
 	ID3D11Device*			m_pDevice = nullptr;
 	ID3D11DeviceContext*	m_pDeviceContext = nullptr;
-	_bool				m_bIsClone = false;
+	_bool					m_bIsClone = false;
+	_bool					m_bIsOwnerDead = false;
 
 
 public:

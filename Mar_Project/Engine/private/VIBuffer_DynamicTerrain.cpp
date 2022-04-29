@@ -67,10 +67,19 @@ HRESULT CVIBuffer_DynamicTerrain::Initialize_Prototype(const _tchar* pHeightMap)
 			_uint		iIndex = i * m_iNumVerticesX + j;
 			//_float ValueY = (pPixel[iIndex] & 0x000000ff) / 10.f;			
 
-			if ((_ulong(pPixel[iIndex] & 0x00ff0000) >> 4) != 0)
+			if ((_ulong((pPixel[iIndex] & 0x00ff0000) >> 16) ) != 0)
 				m_pKeepVertices[iIndex].vPosition = m_pVertices[iIndex] = _float3(_float(j), -FLT_MAX, _float(i));
 			else
-				m_pKeepVertices[iIndex].vPosition = m_pVertices[iIndex] = _float3(_float(j), _float((pPixel[iIndex] & 0x000000ff)), _float(i));
+			{
+
+				_float fInt = _float(_ulong((pPixel[iIndex] & 0x0000ff00)>> 8) );
+				if (fInt > 255)fInt = 255;
+				_float fFlt = _float(_ulong(pPixel[iIndex] & 0x000000ff))*0.01f;
+				
+				m_pKeepVertices[iIndex].vPosition = m_pVertices[iIndex] = _float3(_float(j), fInt+ fFlt, _float(i));
+
+				//m_pKeepVertices[iIndex].vPosition = m_pVertices[iIndex] = _float3(_float(j), _float(_ulong(pPixel[iIndex] & 0x000000ff)*0.1f), _float(i));
+			}
 
 			//m_pKeepVertices[iIndex].vPosition = m_pVertices[iIndex] = _float3(_float(j), (pPixel[iIndex] & 0x000000ff) / 1.f, _float(i));
 
@@ -391,14 +400,20 @@ HRESULT CVIBuffer_DynamicTerrain::Save_HeightMap(const _tchar * FileFullPath)
 		{
 			_uint		iIndex = i * m_iNumVerticesX + j;
 
-			_ulong	Value = 0;
 
 			if (m_pKeepVertices[iIndex].vPosition.y >= 0)
 			{
-				Value = _ulong(m_pKeepVertices[iIndex].vPosition.y);
+				_ulong TempHieht = _ulong(m_pKeepVertices[iIndex].vPosition.y * 100);
+				_ulong	Value = _ulong(TempHieht / 100);
 				if (Value > 255)Value = 255;
+				_ulong	Value2 = TempHieht % 100;
+				if (Value2 > 255)Value2 = 255;
 
-				pPixel[iIndex] = D3D11COLOR_ARGB(255, 0, Value, Value);
+				pPixel[iIndex] = D3D11COLOR_ARGB(255, 0, Value, Value2);
+
+				//_ulong Value = _ulong(m_pKeepVertices[iIndex].vPosition.y * 10);
+				//if (Value > 255)Value = 255;
+				//pPixel[iIndex] = D3D11COLOR_ARGB(255, 0, Value, Value);
 			}
 			else
 			{
@@ -419,6 +434,8 @@ HRESULT CVIBuffer_DynamicTerrain::Save_HeightMap(const _tchar * FileFullPath)
 	FAILED_CHECK(m_pDevice->CreateTexture2D(&TextureDesc, &SubResourceData, &pTexture));
 
 	FAILED_CHECK(SaveWICTextureToFile(m_pDeviceContext, pTexture, GUID_ContainerFormatBmp, FileFullPath, &GUID_WICPixelFormat32bppBGRA));
+
+	Safe_Release(pTexture);
 
 	Safe_Delete_Array(pPixel);
 
