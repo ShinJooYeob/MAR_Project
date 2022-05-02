@@ -189,6 +189,8 @@ private:
 	_bool		m_bIsBlockPick = false;
 	_bool		m_bIsRandomHeight = false;
 
+
+	_float		m_MovableHeight = 0.5f;
 #pragma endregion HeightMap
 
 

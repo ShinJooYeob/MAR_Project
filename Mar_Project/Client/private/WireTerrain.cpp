@@ -81,6 +81,8 @@ _int CWireTerrain::Render()
 	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vBrushPos", &(_float4(m_vPickedPos, 1)), sizeof(_float4)));
 
 
+	FAILED_CHECK(m_pVIBufferCom->Bind_HeightMapOnShader(m_pShaderCom, "g_HeightMapTexture"));
+
 	if (m_iPassIndex == 3)
 	{
 
@@ -208,6 +210,42 @@ HRESULT CWireTerrain::Easing_Terrain_Curve(EasingTypeID eEasingType, _float3 vPo
 	return S_OK;
 }
 
+HRESULT CWireTerrain::Chage_Terrain_Tile(_float3 vPosition, _float fTargetKinds, _float fRadius)
+{
+	NULL_CHECK_RETURN(m_pVIBufferCom, E_FAIL);
+
+	_Matrix InverMat = m_InverseWorldMat.XMatrix();
+	_float3 vLocalPosition = XMVector3TransformCoord(vPosition.XMVector(), InverMat);
+
+
+	_uint minX, maxX, minZ, maxZ;
+
+	minX = _uint(vLocalPosition.x - fRadius);
+	maxX = _uint(vLocalPosition.x + fRadius);
+	minZ = _uint(vLocalPosition.z - fRadius);
+	maxZ = _uint(vLocalPosition.z + fRadius);
+
+	CGameInstance* pInstance = GetSingle(CGameInstance);
+
+	for (_uint i = minX; i <= maxX; i++)
+	{
+		for (_uint j = minZ; j < maxZ; j++)
+		{
+			_float2 Temp = { _float(i),_float(j) };
+			_float fDist = Temp.Get_Distance(_float2(vLocalPosition.x, vLocalPosition.z).XMVector());
+
+			if (fDist < fRadius)
+			{
+
+				m_pVIBufferCom->Chage_KindsOfTile(Temp, fTargetKinds);
+			}
+		}
+	}
+
+	return S_OK;
+}
+
+
 HRESULT CWireTerrain::Erasing_TerrainBuffer(_float3 vPosition, _float fRadius)
 {
 	NULL_CHECK_RETURN(m_pVIBufferCom, E_FAIL);
@@ -261,6 +299,19 @@ HRESULT CWireTerrain::Save_HeightMap(const _tchar * FileFullpath)
 	return S_OK;
 }
 
+
+HRESULT CWireTerrain::AutoBakeNavigateTerrain(_float vMovableHeight)
+{
+
+	
+	return m_pVIBufferCom->Bake_NavigationTerrain(vMovableHeight);;
+}
+
+HRESULT CWireTerrain::Reset_BakeNavigateTerrain(_int Target)
+{
+
+	return m_pVIBufferCom->Reset_NavigationTerrain(_uint(Target));
+}
 
 HRESULT CWireTerrain::Draw_FilterMap(_uint iFilterMapIndex, _float3 vPosition, _float fTargetHeight, _float fRadius, _bool bEasing)
 {
@@ -518,6 +569,13 @@ HRESULT CWireTerrain::Save_FilterMap(const _tchar* FileFullpath)
 
 
 	return S_OK;
+}
+
+_float CWireTerrain::Get_Kinds(_float2 Pos)
+{
+
+	if (!m_pVIBufferCom) return 0;
+	return m_pVIBufferCom->Get_Kinds(Pos);
 }
 
 HRESULT CWireTerrain::Renew_FilterMap()

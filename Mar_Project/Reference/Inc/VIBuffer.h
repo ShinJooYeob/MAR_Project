@@ -17,7 +17,7 @@ public:
 
 
 public:
-	HRESULT Render(class CShader* pShader, _uint iPassIndex);
+	virtual HRESULT Render(class CShader* pShader, _uint iPassIndex);
 
 protected:
 	ID3D11Buffer*				m_pVB = nullptr;

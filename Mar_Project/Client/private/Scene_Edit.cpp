@@ -992,6 +992,14 @@ HRESULT CScene_Edit::Input_KeyBoard(_double fDeltaTime)
 										//m_pCreatedTerrain->Erasing_TerrainBuffer(vResult, m_fPickingRadius);
 									}
 								}
+
+								else if (m_iEditingKinds == 3)
+								{
+				
+										m_pCreatedTerrain->Chage_Terrain_Tile(vResult, _float(m_iKindsOfFilter), m_fPickingRadius);
+
+								}
+
 							}
 						}
 
@@ -1038,13 +1046,24 @@ HRESULT CScene_Edit::Input_KeyBoard(_double fDeltaTime)
 				}
 				else
 				{
-
 					m_iEditingKinds = 2;
 				}
 
 
 			}
+			if (pInstance->Get_DIKeyState(DIK_4) & DIS_Down)
+			{
+				if (m_iEditingKinds == 3)
+				{
+					m_iKindsOfFilter += 1;
+					if (m_iKindsOfFilter > 3) m_iKindsOfFilter = 0;
+				}
+				else
+				{
+					m_iEditingKinds = 3;
+				}
 
+			}
 
 			
 		}
@@ -1234,8 +1253,16 @@ HRESULT CScene_Edit::Widget_SRT(_double fDeltatime)
 {
 	Make_VerticalSpacing(3);
 
-	char PickingPos[64] = "";
-	sprintf_s(PickingPos, "Picked Position : ( %f   , %f   , %f   )", m_fPickingedPosition[0], m_fPickingedPosition[1], m_fPickingedPosition[2]);
+	char PickingPos[128] = "";
+	if (m_pCreatedTerrain)
+	{
+		sprintf_s(PickingPos, "Picked Position : ( %f   , %f   , %f   )\nKinds : %f",
+			m_fPickingedPosition[0], m_fPickingedPosition[1], m_fPickingedPosition[2], m_pCreatedTerrain->Get_Kinds({ m_fPickingedPosition[0] ,m_fPickingedPosition[2] }));
+	}
+	else
+	{
+	sprintf_s(PickingPos, "Picked Position : ( %f   , %f   , %f   )\nKinds : 0", m_fPickingedPosition[0], m_fPickingedPosition[1], m_fPickingedPosition[2]);
+	}
 	ImGui::Text(PickingPos);
 
 	Make_VerticalSpacing(3);
@@ -2861,8 +2888,16 @@ HRESULT CScene_Edit::Widget_CreateDeleteHeightMap(_double fDeltatime)
 
 		Make_VerticalSpacing(3);
 
-		char PickingPos[64] = "";
-		sprintf_s(PickingPos, "Picked Position : ( %f   , %f   , %f   )", m_fPickingedPosition[0], m_fPickingedPosition[1], m_fPickingedPosition[2]);
+		char PickingPos[128] = "";
+		if (m_pCreatedTerrain)
+		{
+			sprintf_s(PickingPos, "Picked Position : ( %f   , %f   , %f   )\nKinds : %f",
+				m_fPickingedPosition[0], m_fPickingedPosition[1], m_fPickingedPosition[2], m_pCreatedTerrain->Get_Kinds({ m_fPickingedPosition[0] ,m_fPickingedPosition[2] }));
+		}
+		else
+		{
+			sprintf_s(PickingPos, "Picked Position : ( %f   , %f   , %f   )\nKinds : 0", m_fPickingedPosition[0], m_fPickingedPosition[1], m_fPickingedPosition[2]);
+		}
 		ImGui::Text(PickingPos);
 
 		Make_VerticalSpacing(3);
@@ -3069,7 +3104,8 @@ HRESULT CScene_Edit::Widget_ChangeValue(_double fDeltatime)
 
 	ImGui::RadioButton("Height", &m_iEditingKinds, 0); ImGui::SameLine();
 	ImGui::RadioButton("Erase", &m_iEditingKinds, 1); ImGui::SameLine();
-	ImGui::RadioButton("Filter", &m_iEditingKinds, 2);
+	ImGui::RadioButton("Filter", &m_iEditingKinds, 2); ImGui::SameLine();
+	ImGui::RadioButton("TileKinds", &m_iEditingKinds, 3); ImGui::SameLine();
 
 	Make_VerticalSpacing(2);
 	if (m_iEditingKinds == 2)
@@ -3078,6 +3114,34 @@ HRESULT CScene_Edit::Widget_ChangeValue(_double fDeltatime)
 
 		if (m_iKindsOfFilter > 3) m_iKindsOfFilter = 3;
 		else if (m_iKindsOfFilter < 0)m_iKindsOfFilter = 0;
+
+	}
+	if (m_iEditingKinds == 3)
+	{
+		ImGui::Text("0 : Can't Move,  1 : JumpMovalbe,  \n2 : ShrinkMovable,  3 : Movable");
+		ImGui::InputInt("Tile Kinds", &m_iKindsOfFilter);
+
+		if (m_iKindsOfFilter > 3) m_iKindsOfFilter = 3;
+		else if (m_iKindsOfFilter < 0)m_iKindsOfFilter = 0;
+
+
+		Make_VerticalSpacing(2);
+
+		ImGui::DragFloat("MovableHeight", &m_MovableHeight,0.01f,0,3);
+		Make_VerticalSpacing(2);
+		if (ImGui::Button("Auto Bake Navigation", ImVec2(-FLT_MIN, 30)))
+		{
+			m_pCreatedTerrain->AutoBakeNavigateTerrain(m_MovableHeight);
+		}
+		Make_VerticalSpacing(2);
+
+		static int Target = 0;
+		ImGui::InputInt("Reset Target Kinds", &Target);
+
+		if (ImGui::Button("Reset Target Navigation", ImVec2(-FLT_MIN, 30)))
+		{
+			m_pCreatedTerrain->Reset_BakeNavigateTerrain(Target);
+		}
 
 	}
 

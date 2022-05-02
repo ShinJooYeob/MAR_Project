@@ -31,15 +31,21 @@ public:
 	void Set_PickedPos(_float3* vPickPos) { memcpy(&m_vPickedPos, vPickPos, sizeof(_float3)); };
 
 	HRESULT Easing_Terrain_Curve(EasingTypeID eEasingType, _float3 vPosition, _float fTargetHeight, _float fRadius);
+	HRESULT Chage_Terrain_Tile(_float3 vPosition, _float fTargetKinds, _float fRadius);
 	HRESULT Erasing_TerrainBuffer(_float3 vPosition, _float fRadius);
 	HRESULT Save_HeightMap(const _tchar* FileFullpath);;
+
+
+	HRESULT AutoBakeNavigateTerrain(_float vMovableHeight);
+	HRESULT Reset_BakeNavigateTerrain(_int Target);
 
 
 	HRESULT Draw_FilterMap(_uint iFilterMapIndex, _float3 vPosition, _float fTargetHeight, _float fRadius, _bool bEasing = false);
 	HRESULT Create_FilterMap();
 	HRESULT Create_FilterMap_byLoad(const char* pFileFullPath);
 	HRESULT Delete_FilterMap();
-	HRESULT Save_FilterMap(const _tchar* FileFullpath);;
+	HRESULT Save_FilterMap(const _tchar* FileFullpath);
+	_float Get_Kinds(_float2 Pos);
 private:
 	CShader*						m_pShaderCom = nullptr;
 	CRenderer*						m_pRendererCom = nullptr;

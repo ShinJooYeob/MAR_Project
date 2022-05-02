@@ -21,6 +21,8 @@ texture2D		g_DestDiffuseTexture4;
 texture2D		g_FilterTexture;
 texture2D		g_BrushTexture;
 
+texture2D		g_HeightMapTexture;
+
 cbuffer BrushDesc
 {
 	float4		g_vBrushPos = float4(10.0f, 0.0f, 10.f, 1.f);
@@ -59,6 +61,8 @@ struct VS_OUT
 	float		bIsNotDraw : TEXCOORD2;
 };
 
+
+
 VS_OUT VS_MAIN_TERRAIN(VS_IN In)
 {
 	VS_OUT			Out = (VS_OUT)0;
@@ -82,6 +86,7 @@ VS_OUT VS_MAIN_TERRAIN(VS_IN In)
 	return Out;
 }
 
+
 struct PS_IN
 {
 	float4		vPosition : SV_POSITION;
@@ -91,6 +96,7 @@ struct PS_IN
 	float4		vWorldPos : TEXCOORD1;
 	float		bIsNotDraw : TEXCOORD2;
 };
+
 
 struct PS_OUT
 {
@@ -199,8 +205,26 @@ PS_OUT PS_MAIN_TERRAIN_WIRE(PS_IN In)
 			vBrushColor = g_BrushTexture.Sample(DefaultSampler, vBrushUV);
 		}
 
+		vector	vTileKinds = g_HeightMapTexture.Sample(PointSampler, In.vTexUV);
 
-		Out.vColor = vector(0, 0.5, 0, 1) +vBrushColor;
+		//Out.vColor = vector(0, 0.5f, 0, 1) + vBrushColor;
+
+		//vector	vTileKinds = g_HeightMapTexture.Sample(DefaultSampler, HeightUV);
+
+		Out.vColor = vTileKinds;
+
+		if (vTileKinds.r <= 0.f)// 1 못가는곳
+		{
+			Out.vColor = vector(1, 0, 0, 1) + vBrushColor;
+		}
+		else if (vTileKinds.r <= 0.00785f) // 2 이하 특수타일
+		{
+			Out.vColor = vector(0, 0, 1, 1) + vBrushColor;
+		}
+		else if(vTileKinds.r <= 0.01177f) // 움직일수 있는곳
+		{
+			Out.vColor = vector(0, 0.5f, 0, 1) + vBrushColor;
+		}
 
 	}
 

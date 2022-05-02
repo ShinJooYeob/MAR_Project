@@ -3,6 +3,8 @@
 
 namespace Engine {
 
+	enum TerrainTileID{	Tile_None,  Tile_JumpMovable, Tile_ShrinkMovable, Tile_Movable, Tile_End };
+
 	enum CollisionTypeID{  CollisionType_Player, CollisionType_PlayerWeapon, CollisionType_Monster, CollisionType_MonsterWeapon,  CollisionType_NPC, CollisionType_Terrain, CollisionType_END	};
 
 	enum CHANNELID {  CHANNEL_PLAYER, CHANNEL_OBJECT, CHANNEL_EFFECT, CHANNEL_UI, CHANNEL_BGM, CHANNEL_MAXCHANNEL };

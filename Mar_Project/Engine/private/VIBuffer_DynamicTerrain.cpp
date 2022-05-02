@@ -1,7 +1,9 @@
 #include "..\Public\VIBuffer_DynamicTerrain.h"
+#include "Shader.h"
 
 CVIBuffer_DynamicTerrain::CVIBuffer_DynamicTerrain(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
-	: CVIBuffer(pDevice, pDeviceContext)
+	: CVIBuffer(pDevice, pDeviceContext),
+	m_pHeightMapSRV(nullptr)
 {
 
 }
@@ -11,17 +13,27 @@ CVIBuffer_DynamicTerrain::CVIBuffer_DynamicTerrain(const CVIBuffer_DynamicTerrai
 	, m_iNumVerticesX(rhs.m_iNumVerticesX)
 	, m_iNumVerticesZ(rhs.m_iNumVerticesZ)
 	, m_fMinMapSize(rhs.m_fMinMapSize)
+	,m_pHeightMapSRV(rhs.m_pHeightMapSRV)
+	,m_pNaviTerrain(rhs.m_pNaviTerrain)
 {
-
+	Safe_AddRef(m_pHeightMapSRV);
 }
 
 HRESULT CVIBuffer_DynamicTerrain::Initialize_Prototype(const _tchar* pHeightMap)
 {
 	FAILED_CHECK(__super::Initialize_Prototype(nullptr));
 
+	CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+
 	_tchar szHeightMapPath[MAX_PATH] = L"../Bin/Resources/Textures/HeightMap/";
 
 	lstrcat(szHeightMapPath, pHeightMap);
+
+	//if (m_pHeightMapSRV)Safe_Release(m_pHeightMapSRV);
+	//FAILED_CHECK(CreateWICTextureFromFile(m_pDevice, szHeightMapPath, nullptr, &m_pHeightMapSRV));
+	//NULL_CHECK_RETURN(m_pHeightMapSRV, E_FAIL);
+
+
 
 	HANDLE		hFile = CreateFile(szHeightMapPath, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 	if (0 == hFile)
@@ -58,6 +70,9 @@ HRESULT CVIBuffer_DynamicTerrain::Initialize_Prototype(const _tchar* pHeightMap)
 	m_pKeepVertices = new VTXNORTEX[m_iNumVertices];
 	ZeroMemory(m_pKeepVertices, sizeof(VTXNORTEX) * m_iNumVertices);
 	m_pVertices = new _float3[m_iNumVertices];
+	ZeroMemory(m_pVertices, sizeof(_float3) * m_iNumVertices);
+	m_pNaviTerrain = new _float[m_iNumVertices];
+	ZeroMemory(m_pNaviTerrain, sizeof(_float) * m_iNumVertices);
 
 
 	for (_uint i = 0; i < m_iNumVerticesZ; ++i)
@@ -67,8 +82,11 @@ HRESULT CVIBuffer_DynamicTerrain::Initialize_Prototype(const _tchar* pHeightMap)
 			_uint		iIndex = i * m_iNumVerticesX + j;
 			//_float ValueY = (pPixel[iIndex] & 0x000000ff) / 10.f;			
 
-			if ((_ulong((pPixel[iIndex] & 0x00ff0000) >> 16) ) != 0)
+			if ((_ulong((pPixel[iIndex] & 0xff000000) >> 24)) == 0)
+			{
 				m_pKeepVertices[iIndex].vPosition = m_pVertices[iIndex] = _float3(_float(j), -FLT_MAX, _float(i));
+
+			}
 			else
 			{
 
@@ -85,6 +103,9 @@ HRESULT CVIBuffer_DynamicTerrain::Initialize_Prototype(const _tchar* pHeightMap)
 
 			m_pKeepVertices[iIndex].vNormal = _float3(0.f, 0.f, 0.f);
 			m_pKeepVertices[iIndex].vTexUV = _float2(j / (m_iNumVerticesX - 1.f), i / (m_iNumVerticesZ - 1.f));
+			m_pNaviTerrain[iIndex] = _float(_ulong((pPixel[iIndex] & 0x00ff0000 )>> 16));
+			//m_pNaviTerrain[iIndex] = Tile_Movable;
+			int t = 0;
 		}
 	}
 
@@ -203,6 +224,7 @@ HRESULT CVIBuffer_DynamicTerrain::Initialize_Prototype(const _tchar* pHeightMap)
 	_float2 vTerrainSize = Get_NumVerticesXY();
 	_float fCrossSize = vTerrainSize.Get_Lenth();
 	m_fMinMapSize = fCrossSize / 5;
+	m_bIsHeightMapChange = true;
 	return S_OK;
 }
 
@@ -236,6 +258,9 @@ HRESULT CVIBuffer_DynamicTerrain::Initialize_Prototype(_uint iNumWidthPixelX, _u
 	m_pKeepVertices = new VTXNORTEX[m_iNumVertices];
 	ZeroMemory(m_pKeepVertices, sizeof(VTXNORTEX) * m_iNumVertices);
 	m_pVertices = new _float3[m_iNumVertices];
+	ZeroMemory(m_pVertices, sizeof(_float3) * m_iNumVertices);
+	m_pNaviTerrain = new _float[m_iNumVertices];
+	ZeroMemory(m_pNaviTerrain, sizeof(_float) * m_iNumVertices);
 
 
 	for (_uint i = 0; i < m_iNumVerticesZ; ++i)
@@ -356,6 +381,9 @@ HRESULT CVIBuffer_DynamicTerrain::Initialize_Prototype(_uint iNumWidthPixelX, _u
 	_float2 vTerrainSize = Get_NumVerticesXY();
 	_float fCrossSize = vTerrainSize.Get_Lenth();
 	m_fMinMapSize = fCrossSize / 5;
+	
+	m_bIsHeightMapChange = true;
+
 	return S_OK;
 }
 
@@ -365,6 +393,113 @@ HRESULT CVIBuffer_DynamicTerrain::Initialize_Clone(void * pArg)
 
 	return S_OK;
 }
+
+
+
+HRESULT CVIBuffer_DynamicTerrain::Bind_HeightMapOnShader(CShader * pShader, const char* szValueName)
+{
+
+	if (!m_pHeightMapSRV)return S_FALSE;
+	//NULL_CHECK_RETURN(m_pHeightMapSRV, E_FAIL);
+	
+	return pShader->Set_Texture(szValueName, m_pHeightMapSRV);;
+}
+
+HRESULT CVIBuffer_DynamicTerrain::Bake_NavigationTerrain(_float MovableHeight)
+{
+
+	for (_uint i = 0; i < m_iNumVerticesZ - 1; ++i)
+	{
+		for (_uint j = 0; j < m_iNumVerticesX - 1; ++j)
+		{
+			_int		iIndex = _int(i * m_iNumVerticesX + j);
+
+			if (m_pKeepVertices[iIndex].vPosition.y < -9999)
+			{
+				m_pNaviTerrain[iIndex] = Tile_None;
+				continue;
+			}
+
+			if (m_pNaviTerrain[iIndex] == Tile_None)
+			{
+				continue;
+			}
+
+
+			_int		iIndices[6] = {
+				iIndex - 1, iIndex + 1 ,
+				_int(iIndex + m_iNumVerticesX - 1), _int(iIndex + m_iNumVerticesX),
+				_int(iIndex - m_iNumVerticesX), _int(iIndex - m_iNumVerticesX + 1),
+			};
+
+			_int PivotZ = _int(iIndex / m_iNumVerticesX);
+			if (_int(iIndices[0] / m_iNumVerticesX) != PivotZ)
+				iIndices[0] = -1;
+
+			if (_int(iIndices[1] / m_iNumVerticesX) != PivotZ)
+				iIndices[1] = -1;
+
+			if (_int(iIndices[2] / m_iNumVerticesX) != PivotZ + 1)
+				iIndices[2] = -1;
+
+			if (_int(iIndices[3] / m_iNumVerticesX) != PivotZ + 1)
+				iIndices[3] = -1;
+
+			if (_int(iIndices[4] / m_iNumVerticesX) != PivotZ - 1)
+				iIndices[4] = -1;
+
+			if (_int(iIndices[5] / m_iNumVerticesX) != PivotZ - 1)
+				iIndices[5] = -1;
+
+
+			for (_uint k = 0 ; k < 6 ; k ++)
+			{
+				if (iIndices[k] < 0 || iIndices[k] > _int(m_iNumVertices))
+				{
+					iIndices[k] = - 1;
+				}
+			}
+
+
+			for (_uint k = 0 ; k < 6; k++)
+			{
+				if(iIndices[k] == -1) continue;
+
+				if (m_pNaviTerrain[iIndex] == Tile_Movable && 
+					m_pKeepVertices[iIndices[k]].vPosition.y > m_pKeepVertices[iIndex].vPosition.y &&
+					m_pKeepVertices[iIndices[k]].vPosition.y - m_pKeepVertices[iIndex].vPosition.y > MovableHeight)
+				{
+					m_pNaviTerrain[iIndex] = Tile_JumpMovable;
+				}
+
+			}
+
+		}
+	}
+
+
+	m_bIsHeightMapChange = true;
+	return S_OK;
+}
+
+HRESULT CVIBuffer_DynamicTerrain::Reset_NavigationTerrain(_uint ClearTarget)
+{
+
+	for (_uint i = 0; i < m_iNumVerticesZ - 1; ++i)
+	{
+		for (_uint j = 0; j < m_iNumVerticesX - 1; ++j)
+		{
+			_int		iIndex = _int(i * m_iNumVerticesX + j);
+	
+			if (m_pNaviTerrain[iIndex] == ClearTarget)
+				m_pNaviTerrain[iIndex] = Tile_Movable;
+		}
+	}
+
+
+	m_bIsHeightMapChange = true;
+	return S_OK;
+}	
 
 HRESULT CVIBuffer_DynamicTerrain::Save_HeightMap(const _tchar * FileFullPath)
 {
@@ -399,25 +534,28 @@ HRESULT CVIBuffer_DynamicTerrain::Save_HeightMap(const _tchar * FileFullPath)
 		for (_uint j = 0; j < m_iNumVerticesX; j++)
 		{
 			_uint		iIndex = i * m_iNumVerticesX + j;
+			_uint		pPixelIndex = (m_iNumVerticesZ - 1 - i) * m_iNumVerticesX + j;
 
 
 			if (m_pKeepVertices[iIndex].vPosition.y >= 0)
 			{
+				_ulong TerrainKinds = _ulong(m_pNaviTerrain[iIndex]);
 				_ulong TempHieht = _ulong(m_pKeepVertices[iIndex].vPosition.y * 100);
 				_ulong	Value = _ulong(TempHieht / 100);
 				if (Value > 255)Value = 255;
 				_ulong	Value2 = TempHieht % 100;
 				if (Value2 > 255)Value2 = 255;
 
-				pPixel[iIndex] = D3D11COLOR_ARGB(255, 0, Value, Value2);
+				pPixel[pPixelIndex] = D3D11COLOR_ARGB(255, TerrainKinds, Value, Value2);
+				//pPixel[iIndex] = D3D11COLOR_ARGB(255, TerrainKinds, Value, Value2);
 
-				//_ulong Value = _ulong(m_pKeepVertices[iIndex].vPosition.y * 10);
-				//if (Value > 255)Value = 255;
-				//pPixel[iIndex] = D3D11COLOR_ARGB(255, 0, Value, Value);
 			}
 			else
 			{
-				pPixel[iIndex] = D3D11COLOR_ARGB(255, 255, 0, 0);
+				_ulong TerrainKinds = Tile_None;
+
+				pPixel[pPixelIndex] = D3D11COLOR_ARGB(0, TerrainKinds, 0, 0);
+				//pPixel[iIndex] = D3D11COLOR_ARGB(0, TerrainKinds, 0, 0);
 
 			}
 		}
@@ -433,7 +571,7 @@ HRESULT CVIBuffer_DynamicTerrain::Save_HeightMap(const _tchar * FileFullPath)
 
 	FAILED_CHECK(m_pDevice->CreateTexture2D(&TextureDesc, &SubResourceData, &pTexture));
 
-	FAILED_CHECK(SaveWICTextureToFile(m_pDeviceContext, pTexture, GUID_ContainerFormatBmp, FileFullPath, &GUID_WICPixelFormat32bppBGRA));
+	FAILED_CHECK(SaveWICTextureToFile(m_pDeviceContext, pTexture, GUID_ContainerFormatBmp, FileFullPath, &GUID_WICPixelFormat32bppPBGRA));
 
 	Safe_Release(pTexture);
 
@@ -643,6 +781,20 @@ _float CVIBuffer_DynamicTerrain::EquationPlane(_bool * pbIsOnTerrain, _float3 Po
 	return (Plane.x * PosOnTerrainLocal.x + Plane.y * PosOnTerrainLocal.y + Plane.z * PosOnTerrainLocal.z + Plane.w);
 }
 
+_float CVIBuffer_DynamicTerrain::Get_Kinds(_float2 Pos)
+{
+	if (Pos.x < 0 || Pos.x >= m_iNumVerticesX ||
+		Pos.y < 0 || Pos.y >= m_iNumVerticesZ)
+	{
+		return -FLT_MAX;
+	}
+
+	_uint iIndex = _uint(_uint(Pos.y) * m_iNumVerticesX + Pos.x);
+
+
+	return m_pNaviTerrain[iIndex];
+}
+
 _Vector CVIBuffer_DynamicTerrain::Pick_ByRay(_fVector vRayPos, _fVector vRayDir, _float2 vIndex, _bool * bIsPieck)
 {
 	if (vIndex.x < 0 || vIndex.x >= m_iNumVerticesX ||
@@ -734,21 +886,119 @@ HRESULT CVIBuffer_DynamicTerrain::Erase_VertexBuffer(_float2 vChangeVertexIndex)
 	return S_OK;
 }
 
+HRESULT CVIBuffer_DynamicTerrain::Chage_KindsOfTile(_float2 vChangeVertexIndex, _float fValueY)
+{
+
+	m_bIsHeightMapChange = true;
+
+	_uint		iIndex = _uint(vChangeVertexIndex.y) * m_iNumVerticesX + _uint(vChangeVertexIndex.x);
+	m_pNaviTerrain[iIndex] = fValueY;
+
+
+
+	return S_OK;
+}
+
 HRESULT CVIBuffer_DynamicTerrain::Renew_VertexBuffer()
 {
-	if (!m_bIsVertexChange) return S_OK;
+	if (m_bIsVertexChange)
+	{
+
+		D3D11_MAPPED_SUBRESOURCE mappedResource;
+		ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
+
+		FAILED_CHECK(m_pDeviceContext->Map(m_pVB, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
+		//  Update the vertex buffer here.
+		memcpy(mappedResource.pData, m_pKeepVertices, sizeof(VTXNORTEX) * m_iNumVertices);
+		//  Reenable GPU access to the vertex buffer data.
+		m_pDeviceContext->Unmap(m_pVB, 0);
+
+		m_bIsVertexChange = false;
+	}
+
+	if (m_bIsHeightMapChange)
+	{
+		NULL_CHECK_RETURN(m_pDeviceContext, E_FAIL);
 
 
-	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
+		D3D11_TEXTURE2D_DESC TextureDesc;
+		ZeroMemory(&TextureDesc, sizeof(D3D11_TEXTURE2D_DESC));
 
-	FAILED_CHECK(m_pDeviceContext->Map(m_pVB, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
-	//  Update the vertex buffer here.
-	memcpy(mappedResource.pData, m_pKeepVertices, sizeof(VTXNORTEX) * m_iNumVertices);
-	//  Reenable GPU access to the vertex buffer data.
-	m_pDeviceContext->Unmap(m_pVB, 0);
+		TextureDesc.Width = _uint(m_iNumVerticesX);
+		TextureDesc.Height = _uint(m_iNumVerticesZ);
+		TextureDesc.MipLevels = 1;
+		TextureDesc.ArraySize = 1;
+		TextureDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+		TextureDesc.SampleDesc.Count = 1;
+		TextureDesc.SampleDesc.Quality = 0;
+		TextureDesc.Usage = D3D11_USAGE_DYNAMIC;
+		TextureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+		TextureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
-	m_bIsVertexChange = false;	
+		D3D11_SUBRESOURCE_DATA			SubResourceData;
+		ZeroMemory(&SubResourceData, sizeof(D3D11_SUBRESOURCE_DATA));
+
+		_ulong*		pPixel = nullptr;
+
+		pPixel = new _ulong[TextureDesc.Width * TextureDesc.Height];
+		ZeroMemory(pPixel, sizeof(_ulong) * TextureDesc.Width * TextureDesc.Height);
+
+
+		for (_uint i = 0; i < m_iNumVerticesZ; i++)
+		{
+			for (_uint j = 0; j < m_iNumVerticesX; j++)
+			{
+				_uint		iIndex = i * m_iNumVerticesX + j;
+				//_uint		pPixelIndex = (m_iNumVerticesZ - 1 - i) * m_iNumVerticesX + j;
+
+
+				if (m_pKeepVertices[iIndex].vPosition.y >= 0)
+				{
+					_ulong TerrainKinds = _ulong(m_pNaviTerrain[iIndex]);
+					_ulong TempHieht = _ulong(m_pKeepVertices[iIndex].vPosition.y * 100);
+					_ulong	Value = _ulong(TempHieht / 100);
+					if (Value > 255)Value = 255;
+					_ulong	Value2 = TempHieht % 100;
+					if (Value2 > 255)Value2 = 255;
+
+					pPixel[iIndex] = D3D11COLOR_ARGB(255, TerrainKinds, Value, Value2);
+					//pPixel[iIndex] = D3D11COLOR_ARGB(255, TerrainKinds, Value, Value2);
+
+				}
+				else
+				{
+					_ulong TerrainKinds = Tile_None;
+
+					pPixel[iIndex] = D3D11COLOR_ARGB(0, TerrainKinds, 0, 0);
+					//pPixel[iIndex] = D3D11COLOR_ARGB(0, TerrainKinds, 0, 0);
+
+				}
+			}
+		}
+
+
+
+		SubResourceData.pSysMem = pPixel;
+		SubResourceData.SysMemPitch = sizeof(_ulong) * TextureDesc.Width;
+
+
+		ID3D11Texture2D*				pTexture = nullptr;
+
+		FAILED_CHECK(m_pDevice->CreateTexture2D(&TextureDesc, &SubResourceData, &pTexture));
+
+		if (m_pHeightMapSRV)Safe_Release(m_pHeightMapSRV);
+		FAILED_CHECK(m_pDevice->CreateShaderResourceView(pTexture, nullptr, &m_pHeightMapSRV));
+
+
+		//FAILED_CHECK(SaveWICTextureToFile(m_pDeviceContext, pTexture, GUID_ContainerFormatBmp, FileFullPath, &GUID_WICPixelFormat32bppPBGRA));
+
+
+		Safe_Release(pTexture);
+		Safe_Delete_Array(pPixel);
+
+
+		m_bIsHeightMapChange = false;
+	}
 
 	return S_OK;
 }
@@ -794,6 +1044,10 @@ void CVIBuffer_DynamicTerrain::Free()
 {
 	__super::Free();
 
-	if(!m_bIsClone)
+	if (!m_bIsClone)
+	{
 		Safe_Delete_Array(m_pKeepVertices);
+		Safe_Delete_Array(m_pNaviTerrain);
+	}
+		Safe_Release(m_pHeightMapSRV);
 }
