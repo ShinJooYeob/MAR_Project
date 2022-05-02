@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "..\public\GrenadeBullet.h"
+#include "Monster.h"
 
 
 
@@ -141,6 +142,7 @@ void CGrenadeBullet::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConf
 		CCollider* MonsterCollider = (CCollider*)(pConflictedObj->Get_Component(TAG_COM(Com_Collider)));
 		MonsterCollider->Set_Conflicted();
 		//GetSingle(CUtilityMgr)->SlowMotionStart();
+		((CMonster*)(pConflictedObj))->Add_Dmg_to_Monster(15);
 
 
 	}

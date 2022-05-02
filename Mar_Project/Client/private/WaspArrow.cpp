@@ -30,6 +30,9 @@ HRESULT CWaspArrow::Initialize_Clone(void * pArg)
 	if (pArg != nullptr)
 		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, *((_float3*)pArg));
 
+	m_fHP = m_fMaxHP = 192;
+
+
 	return S_OK;
 }
 

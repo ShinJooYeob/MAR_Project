@@ -40,6 +40,11 @@ _int CGamePlayUI::Update(_double fDeltaTime)
 
 
 	FAILED_CHECK(Change_WeaponUI());
+	FAILED_CHECK(Update_CrossHead());
+	FAILED_CHECK(Update_GrinderHUD());
+	FAILED_CHECK(Update_TeapotHUD(fDeltaTime));
+	FAILED_CHECK(Update_ClockBombHUD());
+
 
 	for (auto& pUI : m_vecUIContainer)
 	{
@@ -226,6 +231,118 @@ HRESULT CGamePlayUI::Change_WeaponUI()
 	return S_OK;
 }
 
+HRESULT CGamePlayUI::Update_CrossHead()
+{
+
+	m_vecUIContainer[12]->Set_Color({1,1,1,m_pPlayer->Get_CharedGauge()});
+
+	return S_OK;
+}
+HRESULT CGamePlayUI::Update_GrinderHUD()
+{
+
+	if (m_pPlayer->Get_NowWeaponIndex() == 1)
+	{
+		for (_uint i = 0; i < 2; i++)
+			m_vecUIContainer[13 + i]->Set_IsDraw(true);
+		
+		_float CutY = _float(121 - (m_pPlayer->Get_GrinderCoolGauge() / PlayerGrinderCoolTime) * 70);
+		m_vecUIContainer[13]->Set_UICutY(CutY);
+
+
+		if (m_pPlayer->Get_IsNeedToGrinderCooling())
+		{
+			m_vecUIContainer[15]->Set_IsDraw(true);
+
+			m_vecUIContainer[15]->Set_Color({ 1,1,1,_float(m_pPlayer->Get_GrinderCoolGauge() / PlayerGrinderCoolTime) });
+
+		}
+		else
+		{
+			m_vecUIContainer[15]->Set_IsDraw(false);
+
+		}
+
+	}
+	else
+	{
+		for (_uint i =0 ; i < 3; i++)
+		{
+			m_vecUIContainer[13 + i]->Set_IsDraw(false);
+		}
+	}
+
+
+
+
+
+
+	return S_OK;
+}
+
+HRESULT CGamePlayUI::Update_TeapotHUD(_double fDeltaTime)
+{
+
+
+	if (m_pPlayer->Get_NowWeaponIndex() == 3)
+	{
+		for (_uint i = 0; i < 3; i++)
+			m_vecUIContainer[16 + i]->Set_IsDraw(true);
+
+		_float Gauge = m_pPlayer->Get_CharedGauge();
+		_float CutY = _float(116.f - Gauge * 53.f);
+		m_vecUIContainer[17]->Set_UICutY(CutY);
+
+
+		if (m_pPlayer->Get_IsNeedToTeapotCooling())
+		{
+			m_vecUIContainer[16]->Set_IsDraw(false);
+			m_vecUIContainer[19]->Set_IsDraw(true);
+
+			m_vecUIContainer[19]->Set_Color({ 1,1,1,Gauge });
+
+		}
+		else
+		{
+			m_vecUIContainer[19]->Set_IsDraw(false);
+
+			static _float PassedTime = 0;
+			PassedTime += _float(fDeltaTime);
+			_float AlphaValue = GetSingle(CGameInstance)->Easing_Return(TYPE_Linear, TYPE_Linear, 0, Gauge, PassedTime, 1);
+
+			if (PassedTime > 1)
+			{
+				AlphaValue = 0;
+				PassedTime = 0;
+			}
+
+			m_vecUIContainer[16]->Set_Color({ 1,1,1,AlphaValue });
+
+		}
+
+	}
+	else
+	{
+		for (_uint i = 0; i < 4; i++)
+		{
+			m_vecUIContainer[16 + i]->Set_IsDraw(false);
+		}
+	}
+
+
+
+
+
+
+	return S_OK;
+}
+
+HRESULT CGamePlayUI::Update_ClockBombHUD()
+{
+	return S_OK;
+}
+
+
 HRESULT CGamePlayUI::SetUp_Components()
 {
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Renderer), TAG_COM(Com_Renderer), (CComponent**)&m_pRendererCom));
@@ -235,14 +352,16 @@ HRESULT CGamePlayUI::SetUp_Components()
 
 
 	FAILED_CHECK(Ready_Player(pInstance));
-	FAILED_CHECK(Ready_HpBarBackGround(pInstance));
-	FAILED_CHECK(Ready_TeethUI(pInstance));
-	FAILED_CHECK(Ready_HpFlowerPetal(pInstance));
+	FAILED_CHECK(Ready_HpBarBackGround(pInstance));//0
+	FAILED_CHECK(Ready_TeethUI(pInstance));//1
+	FAILED_CHECK(Ready_HpFlowerPetal(pInstance));//2~9
 	
-	FAILED_CHECK(Ready_WeaponChageRing(pInstance));
-	FAILED_CHECK(Ready_WeaponChageCursor(pInstance));
-	FAILED_CHECK(Ready_CrossHead(pInstance));
-
+	FAILED_CHECK(Ready_WeaponChageRing(pInstance));//10
+	FAILED_CHECK(Ready_WeaponChageCursor(pInstance));//11
+	FAILED_CHECK(Ready_CrossHead(pInstance));//12
+	FAILED_CHECK(Ready_WeaponGrinderHUD(pInstance));//13 - 15
+	FAILED_CHECK(Ready_WeaponTeapotHUD(pInstance));//16 - 19
+	
 	
 		
 	sort(m_vecUIContainer.begin(), m_vecUIContainer.end(), [](CUI* pSour, CUI* pDest)->_bool
@@ -428,6 +547,138 @@ HRESULT CGamePlayUI::Ready_WeaponChageCursor(CGameInstance * pInstance)
 	return S_OK;
 }
 
+HRESULT CGamePlayUI::Ready_WeaponGrinderHUD(CGameInstance * pInstance)
+{
+
+	for (_uint i = 0; i < 3; i++)
+	{
+		CUI* pUI = nullptr;
+		FAILED_CHECK(pInstance->Add_GameObject_Out_of_Manager((CGameObject**)(&pUI), m_eNowSceneNum, TAG_OP(Prototype_UIImage)));
+
+		NULL_CHECK_RETURN(pUI, E_FAIL);
+
+		FAILED_CHECK(pUI->Change_Component_by_NewAssign(m_eNowSceneNum, TAG_CP(Prototype_Texture_GamePlayScene), TAG_COM(Com_Texture)));
+
+		FAILED_CHECK(pUI->Change_TextureLayer(L"Skill_Grinder"));
+		pUI->Set_TextureLayerIndex(i+1);
+		if (i == 0)
+			pUI->Set_PassIndex(6);
+		pUI->Set_IsDraw(false);
+		UIDESC tUIDesc;
+
+		tUIDesc.fX = 1213;
+		tUIDesc.fY = 86;
+		tUIDesc.fCX = 70;
+		tUIDesc.fCY = 100;
+
+		pUI->Apply_UI_To_MemberValue(tUIDesc);
+		pUI->Set_DrawingValueIsUIDesc(false);
+		FAILED_CHECK(pUI->Apply_UIDesc_To_Transform());
+
+		pUI->Set_UIDepth(_float(-2 -_int(i)));
+
+		m_vecUIContainer.push_back(pUI);
+
+	}
+
+	return S_OK;
+}
+
+HRESULT CGamePlayUI::Ready_WeaponTeapotHUD(CGameInstance * pInstance)
+{
+
+	{
+
+		CUI* pUI = nullptr;
+		FAILED_CHECK(pInstance->Add_GameObject_Out_of_Manager((CGameObject**)(&pUI), m_eNowSceneNum, TAG_OP(Prototype_UIImage)));
+
+		NULL_CHECK_RETURN(pUI, E_FAIL);
+
+		FAILED_CHECK(pUI->Change_Component_by_NewAssign(m_eNowSceneNum, TAG_CP(Prototype_Texture_GamePlayScene), TAG_COM(Com_Texture)));
+
+		FAILED_CHECK(pUI->Change_TextureLayer(L"Skill_Teapot"));
+		pUI->Set_TextureLayerIndex(0);
+
+		pUI->Set_IsDraw(false);
+		UIDESC tUIDesc;
+
+		tUIDesc.fX = 1218;
+		tUIDesc.fY = 86;
+		tUIDesc.fCX = 120;
+		tUIDesc.fCY = 130;
+
+		pUI->Apply_UI_To_MemberValue(tUIDesc);
+		pUI->Set_DrawingValueIsUIDesc(false);
+		FAILED_CHECK(pUI->Apply_UIDesc_To_Transform());
+
+		pUI->Set_UIDepth(_float(-10));
+
+		m_vecUIContainer.push_back(pUI);
+	}
+	{
+
+		CUI* pUI = nullptr;
+		FAILED_CHECK(pInstance->Add_GameObject_Out_of_Manager((CGameObject**)(&pUI), m_eNowSceneNum, TAG_OP(Prototype_UIImage)));
+
+		NULL_CHECK_RETURN(pUI, E_FAIL);
+
+		FAILED_CHECK(pUI->Change_Component_by_NewAssign(m_eNowSceneNum, TAG_CP(Prototype_Texture_GamePlayScene), TAG_COM(Com_Texture)));
+
+		FAILED_CHECK(pUI->Change_TextureLayer(L"Skill_Teapot"));
+		pUI->Set_TextureLayerIndex(1);
+
+		pUI->Set_IsDraw(false);
+		pUI->Set_PassIndex(6);
+		UIDESC tUIDesc;
+
+		tUIDesc.fX = 1217;
+		tUIDesc.fY = 90;
+		tUIDesc.fCX = 25;
+		tUIDesc.fCY = 53;
+
+		pUI->Apply_UI_To_MemberValue(tUIDesc);
+		pUI->Set_DrawingValueIsUIDesc(false);
+		FAILED_CHECK(pUI->Apply_UIDesc_To_Transform());
+
+		pUI->Set_UIDepth(_float(-10));
+
+		m_vecUIContainer.push_back(pUI);
+	}
+
+	for (_uint i = 0; i < 2; i++)
+	{
+		CUI* pUI = nullptr;
+		FAILED_CHECK(pInstance->Add_GameObject_Out_of_Manager((CGameObject**)(&pUI), m_eNowSceneNum, TAG_OP(Prototype_UIImage)));
+
+		NULL_CHECK_RETURN(pUI, E_FAIL);
+
+		FAILED_CHECK(pUI->Change_Component_by_NewAssign(m_eNowSceneNum, TAG_CP(Prototype_Texture_GamePlayScene), TAG_COM(Com_Texture)));
+
+		FAILED_CHECK(pUI->Change_TextureLayer(L"Skill_Teapot"));
+		pUI->Set_TextureLayerIndex(i + 2);
+		if (i == 0)
+			pUI->Set_PassIndex(6);
+		pUI->Set_IsDraw(false);
+		UIDESC tUIDesc;
+
+		tUIDesc.fX = 1213;
+		tUIDesc.fY = 86;
+		tUIDesc.fCX = 70;
+		tUIDesc.fCY = 100;
+
+		pUI->Apply_UI_To_MemberValue(tUIDesc);
+		pUI->Set_DrawingValueIsUIDesc(false);
+		FAILED_CHECK(pUI->Apply_UIDesc_To_Transform());
+
+		pUI->Set_UIDepth(_float(-11 - _int(i)));
+
+		m_vecUIContainer.push_back(pUI);
+
+	}
+
+	return S_OK;
+}
+
 HRESULT CGamePlayUI::Ready_CrossHead(CGameInstance * pInstance)
 {
 
@@ -440,7 +691,7 @@ HRESULT CGamePlayUI::Ready_CrossHead(CGameInstance * pInstance)
 
 	FAILED_CHECK(pUI->Change_TextureLayer(L"CrossHead"));
 	pUI->Set_TextureLayerIndex(0);
-	pUI->Set_IsDraw(false);
+	pUI->Set_IsDraw(true);
 	UIDESC tUIDesc;
 
 	tUIDesc.fX = g_iWinCX*0.5f;

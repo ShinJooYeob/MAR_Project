@@ -34,6 +34,10 @@ protected:
 	
 protected:
 	HRESULT Change_WeaponUI();
+	HRESULT Update_CrossHead();
+	HRESULT Update_GrinderHUD();
+	HRESULT Update_TeapotHUD(_double fDeltaTime);
+	HRESULT Update_ClockBombHUD();
 
 protected:
 	HRESULT SetUp_Components();
@@ -45,6 +49,8 @@ protected:
 	HRESULT Ready_HpFlowerPetal(CGameInstance* pInstance);
 	HRESULT Ready_WeaponChageRing(CGameInstance* pInstance);
 	HRESULT Ready_WeaponChageCursor(CGameInstance* pInstance);
+	HRESULT Ready_WeaponGrinderHUD(CGameInstance* pInstance);
+	HRESULT Ready_WeaponTeapotHUD(CGameInstance* pInstance);
 
 	HRESULT Ready_CrossHead(CGameInstance* pInstance);
 

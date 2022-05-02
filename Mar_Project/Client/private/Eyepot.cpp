@@ -34,7 +34,7 @@ HRESULT CEyepot::Initialize_Clone(void * pArg)
 	m_pModel->Change_AnimIndex(25);
 	m_bStartPos = false;
 	ZeroMemory(m_bIsDmgAnimUpdated, sizeof(_bool) * 3);
-	m_fHP = m_fMaxHP = 32;
+	m_fHP = m_fMaxHP = 128;
 
 	m_iPatternCount = 0;
 	m_bIsJumping = false;

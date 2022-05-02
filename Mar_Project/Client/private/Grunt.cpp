@@ -31,7 +31,7 @@ HRESULT CGrunt::Initialize_Clone(void * pArg)
 		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, *((_float3*)pArg));
 
 	ZeroMemory(m_bIsDmgAnimUpdated, sizeof(_bool) * 3);
-	m_fHP = m_fMaxHP = 32;
+	m_fHP = m_fMaxHP = 128;
 
 	return S_OK;
 }
@@ -376,7 +376,7 @@ _int CGrunt::Update_DmgCalculate(_double fDeltaTime)
 	}
 	m_DmgPassedTime -= fDeltaTime;
 
-	if (!m_bIsDmgAnimUpdated[0] && m_fMaxHP * 0.1 < m_fDmgAmount)
+	if (!m_bIsDmgAnimUpdated[0] && m_fMaxHP * 0.07 < m_fDmgAmount)
 	{
 		m_pModel->Change_AnimIndex_ReturnTo_Must(23, 1, 0.15, true);
 		m_bIsPatternFinished = true;
@@ -385,7 +385,7 @@ _int CGrunt::Update_DmgCalculate(_double fDeltaTime)
 		m_pTransformCom->Set_MoveSpeed(0.5);
 		m_bIsDmgAnimUpdated[0] = true;
 	}
-	else if (!m_bIsDmgAnimUpdated[1] && m_fMaxHP * 0.2 < m_fDmgAmount)
+	else if (!m_bIsDmgAnimUpdated[1] && m_fMaxHP * 0.15 < m_fDmgAmount)
 	{
 		m_pModel->Change_AnimIndex_ReturnTo_Must(24, 1, 0.15, true);
 		m_bIsPatternFinished = true;

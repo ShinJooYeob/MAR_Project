@@ -82,6 +82,12 @@ _int CUIImage::Render()
 
 		FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ViewMatrix", &XMMatrixIdentity(), sizeof(_float4x4)));
 		FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ProjMatrix", &m_ProjMatrix, sizeof(_float4x4)));
+		FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vColor", &m_vColor, sizeof(_float4)));
+		
+		if(m_PassIndex == 6)
+			FAILED_CHECK(m_pShaderCom->Set_RawValue("g_CutY", &m_fUICutY, sizeof(_float)));
+
+			
 
 		//FAILED_CHECK(m_pTextureCom->Bind_OnShader_AutoFrame(m_pShaderCom, "g_DiffuseTexture", g_fDeltaTime));
 		if (m_bIsUntilTo)
@@ -111,7 +117,7 @@ _int CUIImage::Render()
 			FAILED_CHECK(m_pTextureCom->Bind_OnShader(m_pShaderCom, "g_DiffuseTexture", m_iTextureLayerIndex));
 		}
 
-		FAILED_CHECK(m_pVIBufferCom->Render(m_pShaderCom, 1));
+		FAILED_CHECK(m_pVIBufferCom->Render(m_pShaderCom, m_PassIndex));
 
 	}
 	return _int();

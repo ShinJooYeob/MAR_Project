@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "..\public\Knife.h"
+#include "Monster.h"
 
 
 
@@ -130,7 +131,7 @@ void CKnife::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedOb
 			CCollider* MonsterCollider = (CCollider*)(pConflictedObj->Get_Component(TAG_COM(Com_Collider)));
 			MonsterCollider->Set_Conflicted();
 			GetSingle(CUtilityMgr)->SlowMotionStart();
-
+			((CMonster*)(pConflictedObj))->Add_Dmg_to_Monster(3);
 		
 	}
 		break;

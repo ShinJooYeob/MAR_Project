@@ -58,6 +58,11 @@ public:
 	HRESULT Apply_Rect_To_Transform();
 
 	void Set_DrawingValueIsUIDesc(_bool bBool) { m_bIsDrawByDesc = bBool; };
+
+	void Set_PassIndex(_uint iPassIndex) { m_PassIndex = iPassIndex; };
+	void Set_Color(_float4 vColor) { m_vColor = vColor; };
+	void Set_UICutY(_float vCutY) { m_fUICutY = vCutY; };
+
 protected:
 	_uint			m_iTextureLayerIndex = 0;
 	_uint			m_iTargetTextureLayerIndex = 0;
@@ -71,6 +76,9 @@ protected:
 
 	_float			m_fDepth = 0;
 	_float			m_fAngle = 0;
+	_uint			m_PassIndex = 1;
+	_float4			m_vColor = { 1,1,1,1 };
+	_float			m_fUICutY = 0;
 	UIDESC			m_UIDesc;
 	FLOATRECT		m_UIRect;
 	_float4x4		m_ProjMatrix;

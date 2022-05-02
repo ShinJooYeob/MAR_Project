@@ -15,8 +15,8 @@ class CPlayer final : public CGameObject
 public:
 	enum eWeaponState
 	{
-		//Weapon_None = 0, Weapon_Knife = 47, Weapon_Grinder = 73, Weapon_Horse = 89, Weapon_Teapot = 113, Weapon_Umbrella = 134, Weapon_End
-		Weapon_None = 0, Weapon_Knife =88888888, Weapon_Grinder = 45651, Weapon_Horse = 387137, Weapon_Teapot = 123123, Weapon_Umbrella = 47, Weapon_End
+		Weapon_None = 0, Weapon_Knife = 47, Weapon_Grinder = 73, Weapon_Horse = 89, Weapon_Teapot = 113, Weapon_Umbrella = 134, Weapon_End
+		//Weapon_None = 0, Weapon_Knife =88888888, Weapon_Grinder = 45651, Weapon_Horse = 387137, Weapon_Teapot = 123123, Weapon_Umbrella = 47, Weapon_End
 	};
 
 
@@ -47,6 +47,13 @@ public:
 	HRESULT Calculate_Force(_bool* _IsClientQuit, CRITICAL_SECTION* _CriSec);
 
 	_float	Get_SmallVisualTime() { return m_fSmallVisualTime; }
+	_float Get_CharedGauge() { return m_fCharedGauge; };
+	_double Get_GrinderCoolGauge() { return m_fGrinderCoolTime; };
+	_bool Get_IsNeedToGrinderCooling() { return m_bNeedToGrinderCooling; };
+	_bool Get_IsNeedToTeapotCooling() { return m_bIsCoolTime; };
+	
+	_uint Get_NowWeaponIndex() {return m_iWeaponModelIndex;	}
+
 private:
 	CShader*			m_pShaderCom = nullptr;
 	CRenderer*			m_pRendererCom = nullptr;

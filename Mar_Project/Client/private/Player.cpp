@@ -3023,6 +3023,7 @@ HRESULT CPlayer::Attack_Update_Grinder(_double fDeltaTime, CGameInstance * pInst
 	if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_RBUTTON) & DIS_Press)
 	{
 		m_bIsZoom = true;
+		m_fCharedGauge = 1;
 
 
 		FAILED_CHECK(Lunch_Bullet(fDeltaTime, pInstance));
@@ -3034,6 +3035,7 @@ HRESULT CPlayer::Attack_Update_Grinder(_double fDeltaTime, CGameInstance * pInst
 	else
 	{
 		m_bIsZoom = false;
+		m_fCharedGauge = 0;
 		
 	}
 
@@ -3168,7 +3170,7 @@ HRESULT CPlayer::Set_Camera_On_Player(_double fDeltaTime)
 			CTransform* pCamTransform = m_pMainCamera->Get_Camera_Transform();
 			_Matrix OldCamMat = pCamTransform->Get_WorldMatrix();
 			_float3 PlayerPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
-			_Matrix	NewCamMatrix = XMMatrixTranslation(0.7f, 1.7f, m_CamDegreeAngle.z *0.3f
+			_Matrix	NewCamMatrix = XMMatrixTranslation(0.7f, 1.7f, m_CamDegreeAngle.z * _float(-0.7 * m_fCharedGauge + 1)
 				* m_fSmallScale * (1 - m_fDashPower / PlayerMaxDashPower * 0.1f))
 				* XMMatrixRotationX(XMConvertToRadians(m_CamDegreeAngle.x))
 				* XMMatrixRotationY(XMConvertToRadians(m_CamDegreeAngle.y))

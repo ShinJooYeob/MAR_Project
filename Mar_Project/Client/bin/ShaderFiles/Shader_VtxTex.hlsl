@@ -13,6 +13,8 @@ cbuffer Particle {
 
 };
 
+float g_CutY = 0;
+
 
 struct VS_IN
 {
@@ -86,6 +88,8 @@ PS_OUT PS_MAIN_RECT(PS_IN In)
 	if (Out.vColor.a < 0.1f)
 		discard; 
 
+	Out.vColor *= g_vColor;
+
 	//if (Out.vColor.a < 0.1f)
 	//{
 	//	Out.vColor = vector(1,0,1,0);
@@ -100,6 +104,23 @@ PS_OUT PS_MAIN_RECT(PS_IN In)
 
 	return Out;
 }
+PS_OUT PS_MAIN_UI_CUTY(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	if (In.vPosition.y < g_CutY)
+		discard;
+
+	Out.vColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);//vector(1.f, 0.f, 0.f, 1.f);rgba
+
+	if (Out.vColor.a < 0.1f)
+		discard;
+
+	Out.vColor *= g_vColor;
+
+	return Out;
+}
+
 
 PS_OUT PS_MAIN_WORLD(PS_IN In)
 {
@@ -159,6 +180,8 @@ PS_OUT PS_MAIN_PARTICLEREMOVEALPHA2(PS_IN In)
 	Out.vColor.a = Alpha * 0.5f;
 	return Out;
 }
+
+
 
 
 technique11		DefaultTechnique
@@ -223,5 +246,15 @@ technique11		DefaultTechnique
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN_PARTICLEREMOVEALPHA2();
 	}
+	pass UICUTY			//6
+	{
+		SetBlendState(AlphaBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(NonZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_ccw);
 
+		VertexShader = compile vs_5_0 VS_MAIN_RECT();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_UI_CUTY();
+	}
+	
 }

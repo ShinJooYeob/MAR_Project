@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "..\public\NormalBullet.h"
-
+#include "Monster.h"
 
 
 
@@ -148,6 +148,7 @@ void CNormalBullet::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConfl
 		CCollider* MonsterCollider = (CCollider*)(pConflictedObj->Get_Component(TAG_COM(Com_Collider)));
 		MonsterCollider->Set_Conflicted();
 		//GetSingle(CUtilityMgr)->SlowMotionStart();
+		((CMonster*)(pConflictedObj))->Add_Dmg_to_Monster(1);
 
 
 	}

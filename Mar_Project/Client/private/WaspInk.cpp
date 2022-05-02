@@ -21,7 +21,7 @@ HRESULT CWaspInk::Initialize_Prototype(void * pArg)
 		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, *((_float3*)pArg));
 
 	ZeroMemory(m_bIsDmgAnimUpdated, sizeof(_bool) * 3);
-	m_fHP = m_fMaxHP = 32;
+	m_fHP = m_fMaxHP = 64;
 
 
 	return S_OK;
