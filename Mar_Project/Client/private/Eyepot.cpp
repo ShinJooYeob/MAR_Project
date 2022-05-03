@@ -280,8 +280,9 @@ HRESULT CEyepot::Set_Monster_On_Terrain(CTransform * pTransform, _double fDeltaT
 	CTerrain* pTerrain = (CTerrain*)(pInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Terrain)));
 
 	_bool bIsOn = false;
+	_uint eTileKinds = Tile_End;
 
-	_float3 CaculatedPos = pTerrain->PutOnTerrain(&bIsOn, pTransform->Get_MatrixState(CTransform::STATE_POS), m_vOldPos.XMVector());
+	_float3 CaculatedPos = pTerrain->PutOnTerrain(&bIsOn, pTransform->Get_MatrixState(CTransform::STATE_POS), m_vOldPos.XMVector(),nullptr,&eTileKinds);
 
 	if (bIsOn)
 	{

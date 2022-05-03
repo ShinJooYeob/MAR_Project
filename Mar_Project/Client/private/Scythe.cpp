@@ -60,7 +60,7 @@ _int CScythe::Update(_double fDeltaTime)
 	for (_uint i = 0; i < m_pColliderCom->Get_NumColliderBuffer(); i++)
 		m_pColliderCom->Update_Transform(i, TransformMatrix);
 
-	if (m_bIsAttackAble)
+	//if (m_bIsAttackAble)
 		g_pGameInstance->Add_CollisionGroup(CollisionType_MonsterWeapon, this, m_pColliderCom);
 
 
@@ -131,10 +131,9 @@ void CScythe::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedO
 	case Engine::CollisionType_Player:
 	{
 		
-			//CCollider* PlayerCollider = (CCollider*)(pConflictedObj->Get_Component(TAG_COM(Com_Collider)));
-			//PlayerCollider->Set_Conflicted();
-			//GetSingle(CUtilityMgr)->SlowMotionStart();
-			//((CPlayer*)(pConflictedObj))->Add_Dmg_to_Player(3);
+		CCollider* PlayerCollider = (CCollider*)(pConflictedObj->Get_Component(TAG_COM(Com_Collider)));
+		PlayerCollider->Set_Conflicted();
+		((CPlayer*)(pConflictedObj))->Add_Dmg_to_Player(rand()%2 + 3);
 		
 	}
 		break;

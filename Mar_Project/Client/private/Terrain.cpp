@@ -157,15 +157,24 @@ _bool CTerrain::Check_Movable_Terrain(_bool * pbIsMovable, _fVector ObjectNowPos
 {
 	_Matrix InverMat = m_InverseWorldMat.XMatrix();
 
+	_uint eKinds = m_pVIBufferCom->Get_TerrainKinds(pbIsMovable, XMVector3TransformCoord(CheckPos, InverMat));
+
+	if (eKinds != Tile_Movable)
+	{
+		*pbIsMovable = false;
+		return false;
+	}
+
+
 	_float NowTerrainHeight = m_pVIBufferCom->Get_TerrainHeight(pbIsMovable, XMVector3TransformCoord(ObjectNowPos, InverMat));
 	_float TargetHeight = m_pVIBufferCom->Get_TerrainHeight(pbIsMovable, XMVector3TransformCoord(CheckPos, InverMat));
 
 	if (*pbIsMovable && abs(NowTerrainHeight - TargetHeight) < fMovableHeight)
 	{
 		*pbIsMovable = true;
-		return true;	
+		return true;
 	}
-	
+
 	*pbIsMovable = false;
 	return false;
 

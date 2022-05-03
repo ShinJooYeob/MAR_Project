@@ -90,205 +90,28 @@ _int CGrunt::Update(_double fDeltaTime)
 
 
 
-	//_uint AnimIndex = m_pModel->Get_NowAnimIndex();
+	_uint AnimIndex = m_pModel->Get_NowAnimIndex();
 
-	//if (AnimIndex == 1)
-	//	m_pModel->Set_NextAnim_Must(2);
+	if (AnimIndex == 1)
+		m_pModel->Set_NextAnim_Must(2);
 
-	//if (!(AnimIndex >= 23 && AnimIndex <= 25 || AnimIndex == 1))
-	//{
+	if (!(AnimIndex >= 23 && AnimIndex <= 25 || AnimIndex == 1))
+	{
 
-	//	if (!m_bIsPatternFinished || Distance_BetweenPlayer(m_pTransformCom) < 3)
-	//	{
-	//		Update_Pattern(fDeltaTime);
-	//	}
-	//	else
-	//	{
-	//		if (!m_pModel->Get_IsUntillPlay())
-	//		{
-	//			m_pModel->Change_AnimIndex(2);
-	//			FAILED_CHECK(__super::Update_WanderAround(m_pTransformCom, fDeltaTime, 0.05f));
-	//		}
-	//	}
-	//}
-
-
-	/*
-
+		if (!m_bIsPatternFinished || Distance_BetweenPlayer(m_pTransformCom) < 3)
 		{
-			//size: -27.030010, -10.069997, -201.929626,
-
-			//Pivot: -0.610000, 0.020000, -1.290000,
-
-			static _float3 testFloat3 = _float3(0, 0, 0);
-			static _float3 RotFloat3 = _float3(1, 1, 1);
-			static _float value = 0.01f;
-			static _int kind = 0;
-
-
-
-			CGameInstance* m_pInstance = g_pGameInstance;
-			if (m_pInstance->Get_DIKeyState(DIK_UP) & DIS_Press)
+			Update_Pattern(fDeltaTime);
+		}
+		else
+		{
+			if (!m_pModel->Get_IsUntillPlay())
 			{
-				testFloat3.z += value;
-
-				string ttszLog = "//Pivot  : " + to_string(testFloat3.x) + "f , " + to_string(testFloat3.y) + "f , " + to_string(testFloat3.z) + "f , 1" + "\n";
-
-				wstring ttDebugLog;
-				ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-
-				OutputDebugStringW(ttDebugLog.c_str());
+				m_pModel->Change_AnimIndex(2);
+				FAILED_CHECK(__super::Update_WanderAround(m_pTransformCom, fDeltaTime, 0.05f));
 			}
+		}
+	}
 
-			else if (m_pInstance->Get_DIKeyState(DIK_DOWN) & DIS_Press)
-			{
-				testFloat3.z -= value;
-
-				string ttszLog = "//Pivot  : " + to_string(testFloat3.x) + "f , " + to_string(testFloat3.y) + "f , " + to_string(testFloat3.z) + "f , 1" + "\n";
-
-				wstring ttDebugLog;
-				ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-
-				OutputDebugStringW(ttDebugLog.c_str());
-
-
-
-			}
-			else if (m_pInstance->Get_DIKeyState(DIK_LEFT) & DIS_Press)
-			{
-				testFloat3.x -= value;
-
-				string ttszLog = "//Pivot  : " + to_string(testFloat3.x) + "f , " + to_string(testFloat3.y) + "f , " + to_string(testFloat3.z) + "f , 1" + "\n";
-
-				wstring ttDebugLog;
-				ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-
-				OutputDebugStringW(ttDebugLog.c_str());
-
-
-
-			}
-
-			else if (m_pInstance->Get_DIKeyState(DIK_RIGHT) & DIS_Press)
-			{
-				testFloat3.x += value;
-
-				string ttszLog = "//Pivot  : " + to_string(testFloat3.x) + "f , " + to_string(testFloat3.y) + "f , " + to_string(testFloat3.z) + "f , 1" + "\n";
-
-				wstring ttDebugLog;
-				ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-
-				OutputDebugStringW(ttDebugLog.c_str());
-
-
-
-			}
-
-			else if (m_pInstance->Get_DIKeyState(DIK_DELETE) & DIS_Press)
-			{
-				testFloat3.y += value;
-				string ttszLog = "//Pivot  : " + to_string(testFloat3.x) + "f , " + to_string(testFloat3.y) + "f , " + to_string(testFloat3.z) + "f , 1" + "\n";
-
-				wstring ttDebugLog;
-				ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-
-				OutputDebugStringW(ttDebugLog.c_str());
-
-
-
-			}
-
-			else if (m_pInstance->Get_DIKeyState(DIK_END) & DIS_Press)
-			{
-				testFloat3.y -= value;
-				string ttszLog = "//Pivot  : " + to_string(testFloat3.x) + "f , " + to_string(testFloat3.y) + "f , " + to_string(testFloat3.z) + "f , 1" + "\n";
-
-				wstring ttDebugLog;
-				ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-
-				OutputDebugStringW(ttDebugLog.c_str());
-
-
-
-			}
-			else if (m_pInstance->Get_DIKeyState(DIK_PGUP) & DIS_Press)
-			{
-				switch (kind)
-				{
-				case 0:
-					RotFloat3.x += value;
-					break;
-				case 1:
-					RotFloat3.y += value;
-					break;
-				case 2:
-					RotFloat3.z += value;
-					break;
-
-				default:
-					break;
-				}
-
-
-				string ttszLog = "//size  : " + to_string(RotFloat3.x) + "f , " + to_string(RotFloat3.y) + "f , " + to_string(RotFloat3.z) + "f , " + "\n";
-
-				wstring ttDebugLog;
-				ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-
-				OutputDebugStringW(ttDebugLog.c_str());
-
-
-
-			}
-			else if (m_pInstance->Get_DIKeyState(DIK_PGDN) & DIS_Press)
-			{
-				switch (kind)
-				{
-				case 0:
-					RotFloat3.x -= value;
-					break;
-				case 1:
-					RotFloat3.y -= value;
-					break;
-				case 2:
-					RotFloat3.z -= value;
-					break;
-
-				default:
-					break;
-				}
-
-
-				string ttszLog = "//size  : " + to_string(RotFloat3.x) + "f , " + to_string(RotFloat3.y) + "f , " + to_string(RotFloat3.z) + "f , " + "\n";
-
-				wstring ttDebugLog;
-				ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-
-				OutputDebugStringW(ttDebugLog.c_str());
-
-
-
-			}
-			else if (m_pInstance->Get_DIKeyState(DIK_TAB) & DIS_Down)
-			{
-				kind++;
-				if (kind > 2)kind = 0;
-
-				string ttszLog = "kind  : " + to_string(kind) + "\n";
-
-				wstring ttDebugLog;
-				ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-
-				OutputDebugStringW(ttDebugLog.c_str());
-			}
-
-
-			_Matrix tt = XMMatrixScaling(RotFloat3.x, RotFloat3.y, RotFloat3.z) *XMMatrixTranslation(testFloat3.x, testFloat3.y, testFloat3.z);
-
-			//tt.r[3] = XMVectorSetW(testFloat3.XMVector(), 1);
-			//m_pTransformCom->Set_Matrix(tt);
-
-		}*/
 
 
 

@@ -1,6 +1,9 @@
 #include "..\Public\VIBuffer_Terrain.h"
 #include "Shader.h"
 
+#define MovableHeight 0.5f
+
+
 CVIBuffer_Terrain::CVIBuffer_Terrain(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
 	: CVIBuffer(pDevice, pDeviceContext)
 {
@@ -388,6 +391,176 @@ _float CVIBuffer_Terrain::Get_TerrainHeight(_bool* bIsMovable , _float3 PosOnTer
 	return fHeight;
 }
 
+_uint CVIBuffer_Terrain::Get_TerrainKinds(_bool * bIsMovable, _float3 PosOnTerrainLocal)
+{
+	_uint eTileKinds = Tile_None;
+
+
+	if (PosOnTerrainLocal.x < 0 || PosOnTerrainLocal.x >= m_iNumVerticesX ||
+		PosOnTerrainLocal.z < 0 || PosOnTerrainLocal.z >= m_iNumVerticesZ)
+	{
+		return Tile_None;
+	}
+
+	_uint iIndex = _uint(_uint(PosOnTerrainLocal.z) * m_iNumVerticesX + PosOnTerrainLocal.x);
+
+	_uint		iIndices[4] = {
+		iIndex + m_iNumVerticesX,
+		iIndex + m_iNumVerticesX + 1,
+		iIndex + 1,
+		iIndex };
+
+	if (m_pVertices[iIndices[0]].y < -9999.f || m_pVertices[iIndices[2]].y < -9999.f)
+	{
+		return Tile_None;
+
+	}
+
+	_float4 Plane;
+
+	if (PosOnTerrainLocal.x - m_pVertices[iIndices[0]].x < m_pVertices[iIndices[0]].z - PosOnTerrainLocal.z)
+	{//¾Æ·¡ 023
+		if (m_pVertices[iIndices[3]].y < -9999.f)
+		{
+			return Tile_None;
+		}
+
+
+		if (m_pNaviTerrain[iIndices[0]] == Tile_None || m_pNaviTerrain[iIndices[2]] == Tile_None || m_pNaviTerrain[iIndices[3]] == Tile_None)
+		{
+			return Tile_None;
+
+		}
+
+		eTileKinds = Tile_Movable;
+
+		if (m_pNaviTerrain[iIndices[0]] != Tile_Movable)
+		{
+			switch (_uint(m_pNaviTerrain[iIndices[0]]))
+			{
+			case Tile_JumpMovable:
+
+				if (MovableHeight < m_pVertices[iIndices[2]].y - m_pVertices[iIndices[0]].y || MovableHeight < m_pVertices[iIndices[3]].y - m_pVertices[iIndices[0]].y)
+				{
+					eTileKinds = Tile_JumpMovable;
+				}
+
+				break;
+			case Tile_ShrinkMovable:
+				eTileKinds = Tile_ShrinkMovable;
+				break;
+			}
+
+		}
+		else if (m_pNaviTerrain[iIndices[2]] != Tile_Movable)
+		{
+			switch (_uint(m_pNaviTerrain[iIndices[2]]))
+			{
+			case Tile_JumpMovable:
+				if (MovableHeight < m_pVertices[iIndices[0]].y - m_pVertices[iIndices[2]].y || MovableHeight < m_pVertices[iIndices[3]].y - m_pVertices[iIndices[2]].y)
+				{
+					eTileKinds = Tile_JumpMovable;
+				}
+
+				break;
+			case Tile_ShrinkMovable:
+				eTileKinds = Tile_ShrinkMovable;
+				break;
+			}
+
+		}
+		else if (m_pNaviTerrain[iIndices[3]] != Tile_Movable)
+		{
+			switch (_uint(m_pNaviTerrain[iIndices[3]]))
+			{
+			case Tile_JumpMovable:
+				if (MovableHeight < m_pVertices[iIndices[0]].y - m_pVertices[iIndices[3]].y || MovableHeight < m_pVertices[iIndices[2]].y - m_pVertices[iIndices[3]].y)
+				{
+					eTileKinds = Tile_JumpMovable;
+				}
+
+				break;
+			case Tile_ShrinkMovable:
+				eTileKinds = Tile_ShrinkMovable;
+				break;
+			}
+
+		}
+
+	}
+	else
+	{//À§ 012
+		if (m_pVertices[iIndices[1]].y < -9999.f)
+		{
+			return Tile_None;
+		}
+
+		if (m_pNaviTerrain[iIndices[0]] == Tile_None || m_pNaviTerrain[iIndices[2]] == Tile_None || m_pNaviTerrain[iIndices[1]] == Tile_None)
+		{
+			return Tile_None;
+		}
+
+		eTileKinds = Tile_Movable;
+
+
+		if (m_pNaviTerrain[iIndices[0]] != Tile_Movable)
+		{
+			switch (_uint(m_pNaviTerrain[iIndices[0]]))
+			{
+			case Tile_JumpMovable:
+				if (MovableHeight < m_pVertices[iIndices[2]].y - m_pVertices[iIndices[0]].y || MovableHeight < m_pVertices[iIndices[1]].y - m_pVertices[iIndices[0]].y)
+				{
+					eTileKinds = Tile_JumpMovable;
+				}
+
+				break;
+			case Tile_ShrinkMovable:
+				eTileKinds = Tile_ShrinkMovable;
+				break;
+			}
+
+		}
+		else if (m_pNaviTerrain[iIndices[2]] != Tile_Movable)
+		{
+			switch (_uint(m_pNaviTerrain[iIndices[2]]))
+			{
+			case Tile_JumpMovable:
+				if (MovableHeight < m_pVertices[iIndices[0]].y - m_pVertices[iIndices[2]].y || MovableHeight < m_pVertices[iIndices[1]].y - m_pVertices[iIndices[2]].y)
+				{
+					eTileKinds = Tile_JumpMovable;
+				}
+
+				break;
+			case Tile_ShrinkMovable:
+				eTileKinds = Tile_ShrinkMovable;
+				break;
+			}
+
+		}
+		else if (m_pNaviTerrain[iIndices[1]] != Tile_Movable)
+		{
+			switch (_uint(m_pNaviTerrain[iIndices[1]]))
+			{
+			case Tile_JumpMovable:
+				if (MovableHeight < m_pVertices[iIndices[0]].y - m_pVertices[iIndices[1]].y || MovableHeight < m_pVertices[iIndices[2]].y - m_pVertices[iIndices[1]].y)
+				{
+					eTileKinds = Tile_JumpMovable;
+				}
+
+				break;
+			case Tile_ShrinkMovable:
+				eTileKinds = Tile_ShrinkMovable;
+				break;
+			}
+
+		}
+
+	}
+
+
+	return eTileKinds;
+}
+
 _Vector CVIBuffer_Terrain::Caculate_TerrainY(_bool* pbIsOnTerrain ,_float3 PosOnTerrainLocal, _float3 OldPosOnTerrainLocal, _float3* vLocalPlaneNormVector, _uint* eNowTile )
 {
 	_uint NowNaviTile = Tile_None;
@@ -637,7 +810,6 @@ _float CVIBuffer_Terrain::EquationPlane(_bool * pbIsOnTerrain, _float3 PosOnTerr
 	return (Plane.x * PosOnTerrainLocal.x + Plane.y * PosOnTerrainLocal.y + Plane.z * PosOnTerrainLocal.z + Plane.w);
 }
 
-#define MovableHeight 0.5f
 
 _float CVIBuffer_Terrain::EquationPlane_Kinds_Of_NavigationTile(_uint * pOutKidsOfTile, _bool * pbIsOnTerrain, _float3 PosOnTerrainLocal,
 	_float * pCaculateY, _float3 * vNormVector)
