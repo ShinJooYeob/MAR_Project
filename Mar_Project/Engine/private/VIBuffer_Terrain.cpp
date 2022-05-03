@@ -388,30 +388,12 @@ _float CVIBuffer_Terrain::Get_TerrainHeight(_bool* bIsMovable , _float3 PosOnTer
 	return fHeight;
 }
 
-_Vector CVIBuffer_Terrain::Caculate_TerrainY(_bool* pbIsOnTerrain ,_float3 PosOnTerrainLocal, _float3 OldPosOnTerrainLocal, _float3* vLocalPlaneNormVector)
+_Vector CVIBuffer_Terrain::Caculate_TerrainY(_bool* pbIsOnTerrain ,_float3 PosOnTerrainLocal, _float3 OldPosOnTerrainLocal, _float3* vLocalPlaneNormVector, _uint* eNowTile )
 {
-	
+	_uint NowNaviTile = Tile_None;
+	_float CaculatedY = 0;
+	_float CacluatedNow = EquationPlane_Kinds_Of_NavigationTile(&NowNaviTile, pbIsOnTerrain, PosOnTerrainLocal, &CaculatedY, vLocalPlaneNormVector);
 
-	//_float CacluatedOld = EquationPlane(pbIsOnTerrain, OldPosOnTerrainLocal);
-
-	//_float CaculatedY = 0;
-	//_float CacluatedNow = EquationPlane(pbIsOnTerrain, PosOnTerrainLocal, &CaculatedY, vLocalPlaneNormVector);
-
-	//if (*pbIsOnTerrain == false ) {
-	//	*pbIsOnTerrain = false;
-	//	return PosOnTerrainLocal.XMVector();
-	//}
-
-	//if (PosOnTerrainLocal.y <= CaculatedY && CacluatedOld >= -0.2f)
-	//{
-	//	*pbIsOnTerrain = true;
-	//	return _float3(PosOnTerrainLocal.x, CaculatedY, PosOnTerrainLocal.z).XMVector();
-
-	//}
-	//else {
-	//	*pbIsOnTerrain = false;
-	//	return PosOnTerrainLocal.XMVector();
-	//}
 
 	_uint OldNaviTile = Tile_None;
 	_float CaculatedOldY = 0; 
@@ -419,19 +401,38 @@ _Vector CVIBuffer_Terrain::Caculate_TerrainY(_bool* pbIsOnTerrain ,_float3 PosOn
 	_float3 vSlidingVec = XMVector3Normalize(PosOnTerrainLocal.XMVector() - OldPosOnTerrainLocal.XMVector());
 	_float CacluatedOld = EquationPlane_Kinds_Of_NavigationTile(&OldNaviTile, &IsOldOnTerrain, OldPosOnTerrainLocal,&CaculatedOldY,&vSlidingVec);
 	
-
-	_uint NowNaviTile = Tile_None;
-	_float CaculatedY = 0;
-	_float CacluatedNow = EquationPlane_Kinds_Of_NavigationTile(&NowNaviTile, pbIsOnTerrain, PosOnTerrainLocal, &CaculatedY, vLocalPlaneNormVector);
-
-
 	if (NowNaviTile == Tile_None)
 	{
-		*pbIsOnTerrain = IsOldOnTerrain;
-		return OldPosOnTerrainLocal.XMVector();
+		if (eNowTile)*eNowTile = Tile_None;
+		*pbIsOnTerrain = false;
+
+		
+
+		_float3 Temp = OldPosOnTerrainLocal.XMVector() + Calculate_SlidingVector_ForNoneTile(OldPosOnTerrainLocal, PosOnTerrainLocal);
+
+
+
+		CacluatedNow = EquationPlane_Kinds_Of_NavigationTile(&OldNaviTile, &IsOldOnTerrain, Temp, &CaculatedOldY, &vSlidingVec);
+
+		if (PosOnTerrainLocal.y <= CaculatedOldY)
+			*pbIsOnTerrain = true;
+
+
+			if (CaculatedOldY > OldPosOnTerrainLocal.y)
+				return XMVectorSet(Temp.x, CaculatedOldY, Temp.z, 0);
+			else
+				return XMVectorSet(Temp.x, OldPosOnTerrainLocal.y, Temp.z, 0);
+
+		
+
+		//return OldPosOnTerrainLocal.XMVector();
 	}
 
+
+
+
 	if (*pbIsOnTerrain == false) {
+		if (eNowTile)*eNowTile = NowNaviTile;
 		*pbIsOnTerrain = false;
 		return PosOnTerrainLocal.XMVector();
 	}
@@ -441,6 +442,7 @@ _Vector CVIBuffer_Terrain::Caculate_TerrainY(_bool* pbIsOnTerrain ,_float3 PosOn
 		if (NowNaviTile == Tile_JumpMovable || NowNaviTile == Tile_ShrinkMovable)
 		{
 			*pbIsOnTerrain = IsOldOnTerrain;
+			if (eNowTile)*eNowTile = NowNaviTile;
 
 			_float3 Temp = OldPosOnTerrainLocal.XMVector() + Calculate_SlidingVector(OldPosOnTerrainLocal, PosOnTerrainLocal);
 
@@ -451,11 +453,14 @@ _Vector CVIBuffer_Terrain::Caculate_TerrainY(_bool* pbIsOnTerrain ,_float3 PosOn
 		}
 		else
 		{
+			if (eNowTile)*eNowTile = NowNaviTile;
 			*pbIsOnTerrain = true;
 			return _float3(PosOnTerrainLocal.x, CaculatedY, PosOnTerrainLocal.z).XMVector();
 		}
 	}
-	else {
+	else 
+	{
+		if (eNowTile)*eNowTile = NowNaviTile;
 		*pbIsOnTerrain = false;
 		return PosOnTerrainLocal.XMVector();
 	}
@@ -671,6 +676,15 @@ _float CVIBuffer_Terrain::EquationPlane_Kinds_Of_NavigationTile(_uint * pOutKids
 			return -FLT_MAX;
 		}
 
+
+		if (m_pNaviTerrain[iIndices[0]] == Tile_None || m_pNaviTerrain[iIndices[2]] == Tile_None || m_pNaviTerrain[iIndices[3]] == Tile_None)
+		{
+			*pOutKidsOfTile = Tile_None;
+			*pbIsOnTerrain = false;
+			return -FLT_MAX;
+		}
+
+
 		_uint TargetTile = Tile_Movable;
 		if (m_pNaviTerrain[iIndices[0]] != Tile_Movable)
 		{
@@ -740,6 +754,13 @@ _float CVIBuffer_Terrain::EquationPlane_Kinds_Of_NavigationTile(_uint * pOutKids
 	else
 	{//위 012
 		if (m_pVertices[iIndices[1]].y < -9999.f)
+		{
+			*pOutKidsOfTile = Tile_None;
+			*pbIsOnTerrain = false;
+			return -FLT_MAX;
+		}
+
+		if (m_pNaviTerrain[iIndices[0]] == Tile_None || m_pNaviTerrain[iIndices[2]] == Tile_None || m_pNaviTerrain[iIndices[1]] == Tile_None)
 		{
 			*pOutKidsOfTile = Tile_None;
 			*pbIsOnTerrain = false;
@@ -890,6 +911,81 @@ _Vector CVIBuffer_Terrain::Calculate_SlidingVector(_float3 OldPosOnTerrainLocal,
 	return XMVectorSet(0, 0, 0, 0);
 }
 
+_Vector CVIBuffer_Terrain::Calculate_SlidingVector_ForNoneTile(_float3 OldPosOnTerrainLocal, _float3 PosOnTerrainLocal)
+{
+	if (PosOnTerrainLocal.x < 0 || PosOnTerrainLocal.x >= m_iNumVerticesX ||
+		PosOnTerrainLocal.z < 0 || PosOnTerrainLocal.z >= m_iNumVerticesZ)
+	{
+		return (PosOnTerrainLocal.XMVector()- PosOnTerrainLocal.XMVector());
+	}
+
+	_uint iIndex = _uint(_uint(PosOnTerrainLocal.z) * m_iNumVerticesX + PosOnTerrainLocal.x);
+
+	_uint		iIndices[4] = {
+		iIndex + m_iNumVerticesX,
+		iIndex + m_iNumVerticesX + 1,
+		iIndex + 1,
+		iIndex };
+
+
+	_float4 Plane;
+	_Vector TempNow = PosOnTerrainLocal.XMVector();
+	//_Vector TempNow = PosOnTerrainLocal.XMVector()*2.f - OldPosOnTerrainLocal.XMVector();
+
+	if (PosOnTerrainLocal.x - m_pVertices[iIndices[0]].x < m_pVertices[iIndices[0]].z - PosOnTerrainLocal.z)
+	{//아래 023
+	 //if (m_pVertices[iIndices[3]].y < -9999.f)
+	 //{
+	 //	return XMVectorSet(0, 0, 0, 0);;
+	 //}
+
+
+		_float3 SlidVec;
+
+
+
+		if (OutOfLine_ForNoneTile(iIndices[2], iIndices[3], OldPosOnTerrainLocal.XMVector(), TempNow, &SlidVec))
+			return SlidVec.XMVector();
+
+
+		if(OutOfLine_ForNoneTile(iIndices[3], iIndices[0], OldPosOnTerrainLocal.XMVector(), TempNow, &SlidVec))
+			return SlidVec.XMVector();
+
+		if (OutOfLine_ForNoneTile(iIndices[0], iIndices[2], OldPosOnTerrainLocal.XMVector(), TempNow, &SlidVec))
+			return SlidVec.XMVector();
+
+		return (OldPosOnTerrainLocal.XMVector() - PosOnTerrainLocal.XMVector());
+
+	}
+	else
+	{//위 012
+	 //if (m_pVertices[iIndices[1]].y < -9999.f)
+	 //{
+	 //	return XMVectorSet(0, 0, 0, 0);;
+	 //}
+
+		_float3 SlidVec;
+
+
+		if (OutOfLine_ForNoneTile(iIndices[0], iIndices[1], OldPosOnTerrainLocal.XMVector(), TempNow, &SlidVec))
+			return SlidVec.XMVector();
+
+
+
+		if (OutOfLine_ForNoneTile(iIndices[1], iIndices[2], OldPosOnTerrainLocal.XMVector(), TempNow, &SlidVec))
+			return SlidVec.XMVector();
+		
+
+		if (OutOfLine_ForNoneTile(iIndices[2], iIndices[0], OldPosOnTerrainLocal.XMVector(), TempNow, &SlidVec))
+			return SlidVec.XMVector();
+
+		return (OldPosOnTerrainLocal.XMVector() - PosOnTerrainLocal.XMVector());
+
+	}
+
+	return (OldPosOnTerrainLocal.XMVector() - PosOnTerrainLocal.XMVector());
+}
+
 _bool CVIBuffer_Terrain::OutOfLine(_fVector StartPoint, _fVector EndPoint, _fVector OldPos, _gVector NowPos, _float3* pOutDirVec)
 {
 	_int IsUp = 1;
@@ -914,13 +1010,47 @@ _bool CVIBuffer_Terrain::OutOfLine(_fVector StartPoint, _fVector EndPoint, _fVec
 
 		_Vector vVerticVec = vSourDir;
 		vVerticVec = vVerticVec  * XMVector3Dot(-vNew + vOld, vVerticVec);
-		*pOutDirVec = (vNew - vOld + vVerticVec * 1.00001f) * IsUp;
+		*pOutDirVec = (vNew - vOld + vVerticVec * 1.00001f) * _float(IsUp);
 
 		return true;
 
 	//}	
 	return false;
 }
+
+_bool CVIBuffer_Terrain::OutOfLine_ForNoneTile(_uint iStartIndex, _uint iEndIndex, _fVector OldPos, _gVector NowPos, _float3 * pOutDirVec)
+{
+	_int IsUp = 1;
+
+	if (!((m_pNaviTerrain[iStartIndex] != Tile_None && m_pNaviTerrain[iEndIndex] != Tile_None) || (m_pNaviTerrain[iStartIndex] == Tile_None && m_pNaviTerrain[iEndIndex] == Tile_None)))
+	{
+		return false;
+	}
+
+
+
+	_Vector vStart = XMVectorSetY(m_pVertices[iStartIndex].XMVector(), 0);
+	_Vector vEnd = XMVectorSetY(m_pVertices[iEndIndex].XMVector(), 0);
+	_Vector vOld = XMVectorSetY(OldPos, 0);
+	_Vector vNew = XMVectorSetY(NowPos, 0);
+
+
+	_Vector		vDestDir = XMVector3Normalize(vNew - vStart);
+	_Vector		TempVec = vEnd - vStart;
+	_Vector		vSourDir = XMVector3Normalize(XMVectorSet(XMVectorGetZ(TempVec)* -1.f, 0, XMVectorGetX(TempVec), 0));
+
+	_Vector vVerticVec = vSourDir;
+	vVerticVec = vVerticVec  * XMVector3Dot(-vNew + vOld, vVerticVec);
+	*pOutDirVec = (vNew - vOld + vVerticVec * 1.00101f) * _float(IsUp);
+
+	//if (XMVectorGetX(XMVector3Dot(vSourDir, vDestDir)) >= 0)
+	//{
+		return true;
+	//}
+	//return false;
+}
+
+
 
 _Vector CVIBuffer_Terrain::Pick_ByRay(_fVector vRayPos, _fVector vRayDir, _float2 vIndex, _bool * bIsPieck)
 {

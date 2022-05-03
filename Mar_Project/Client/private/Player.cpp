@@ -3051,9 +3051,22 @@ HRESULT CPlayer::Set_Player_On_Terrain()
 
 	_bool bIsOn = false;
 
-	_float3 CaculatedPos = pTerrain->PutOnTerrain(&bIsOn, m_pTransformCom->Get_MatrixState(CTransform::STATE_POS),m_vOldPos.XMVector());
+	_uint eNowTile = Tile_End;
+	_float3 CaculatedPos = pTerrain->PutOnTerrain(&bIsOn, m_pTransformCom->Get_MatrixState(CTransform::STATE_POS),m_vOldPos.XMVector(),nullptr,&eNowTile);
 
-	if (bIsOn)
+
+	if (eNowTile == Tile_None)
+	{
+		//if (bIsOn)
+		//{
+			m_iJumpCount = 0;
+			m_LevitationTime = 0;
+			m_fJumpPower = -1.f;
+		//}
+
+		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, CaculatedPos);
+	}
+	else if (bIsOn)
 	{
 		if (m_LevitationTime > g_fDeltaTime)
 		{

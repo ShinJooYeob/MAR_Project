@@ -123,18 +123,24 @@ _int CTerrain::LateRender()
 	return _int();
 }
 
-_float3 CTerrain::PutOnTerrain(_bool* pbIsObTerrain,_fVector ObjectWorldPos, _fVector ObjectOldWorldPos, _float3* vOutPlaneNormalVec)
+_float3 CTerrain::PutOnTerrain(_bool* pbIsObTerrain,_fVector ObjectWorldPos, _fVector ObjectOldWorldPos, _float3* vOutPlaneNormalVec, _uint* eNowTile )
 {
-	if (XMVectorGetY(ObjectOldWorldPos) < XMVectorGetY(ObjectWorldPos))
-		return ObjectWorldPos;
 
 	_Matrix InverMat = m_InverseWorldMat.XMatrix();
 
 	_Vector CaculatedFloat3 = m_pVIBufferCom->Caculate_TerrainY(pbIsObTerrain,
-		(XMVector3TransformCoord(ObjectWorldPos, InverMat)), (XMVector3TransformCoord(ObjectOldWorldPos, InverMat)), vOutPlaneNormalVec);
+		(XMVector3TransformCoord(ObjectWorldPos, InverMat)), (XMVector3TransformCoord(ObjectOldWorldPos, InverMat)), vOutPlaneNormalVec, eNowTile);
 
-	//_Vector CaculatedFloat3 = m_pVIBufferCom->Caculate_Terrain_Pick_byRay(pbIsObTerrain,
-	//	(XMVector3TransformCoord(ObjectWorldPos, InverMat)), (XMVector3TransformCoord(ObjectOldWorldPos, InverMat)), vOutPlaneNormalVec);
+	if (*eNowTile == Tile_None)
+	{
+		if (vOutPlaneNormalVec != nullptr)
+			*vOutPlaneNormalVec = XMVector3TransformNormal(vOutPlaneNormalVec->XMVector(), m_pTransformCom->Get_WorldMatrix());
+
+		return XMVector3TransformCoord(CaculatedFloat3, m_pTransformCom->Get_WorldMatrix());
+	}
+
+	if (XMVectorGetY(ObjectOldWorldPos) < XMVectorGetY(ObjectWorldPos))
+		return ObjectWorldPos;
 
 	if (*pbIsObTerrain)
 	{

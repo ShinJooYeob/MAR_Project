@@ -183,10 +183,15 @@ HRESULT CMonster::Set_Monster_On_Terrain(CTransform* pTransform, _double fDeltaT
 	CTerrain* pTerrain = (CTerrain*)(pInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Terrain)));
 
 	_bool bIsOn = false;
+	_uint eNowTile = Tile_End;
+	_float3 CaculatedPos = pTerrain->PutOnTerrain(&bIsOn, pTransform->Get_MatrixState(CTransform::STATE_POS), m_vOldPos.XMVector(),nullptr,&eNowTile);
 
-	_float3 CaculatedPos = pTerrain->PutOnTerrain(&bIsOn, pTransform->Get_MatrixState(CTransform::STATE_POS), m_vOldPos.XMVector());
-
-	if (bIsOn)
+	if (eNowTile == Tile_None)
+	{
+		m_LevitationTime = 0;
+		pTransform->Set_MatrixState(CTransform::STATE_POS, CaculatedPos);
+	}
+	else if (bIsOn)
 	{
 		m_LevitationTime = 0;
 		pTransform->Set_MatrixState(CTransform::STATE_POS, CaculatedPos);
