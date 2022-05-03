@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "..\public\Executor.h"
+#include "Scythe.h"
 
 
 
@@ -27,11 +28,14 @@ HRESULT CExecutor::Initialize_Clone(void * pArg)
 
 	FAILED_CHECK(SetUp_Components());
 
+
 	if (pArg != nullptr)
 		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, *((_float3*)pArg));
 
 	m_fHP = m_fMaxHP = 192;
 
+
+	FAILED_CHECK(SetUp_Weapon());
 
 	return S_OK;
 }
@@ -44,220 +48,24 @@ _int CExecutor::Update(_double fDeltaTime)
 	if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
 		m_pModel->Change_AnimIndex(0);
 	if (g_pGameInstance->Get_DIKeyState(DIK_2)&DIS_Down)
-		m_pModel->Change_AnimIndex(1);
-	if (g_pGameInstance->Get_DIKeyState(DIK_3)&DIS_Down)
-		m_pModel->Change_AnimIndex(2);
-	if (g_pGameInstance->Get_DIKeyState(DIK_4)&DIS_Down)
-		m_pModel->Change_AnimIndex(3);
-	if (g_pGameInstance->Get_DIKeyState(DIK_5)&DIS_Down)
-		m_pModel->Change_AnimIndex(4);
-	if (g_pGameInstance->Get_DIKeyState(DIK_6)&DIS_Down)
-		m_pModel->Change_AnimIndex(5);
-	if (g_pGameInstance->Get_DIKeyState(DIK_7)&DIS_Down)
-		m_pModel->Change_AnimIndex(6);
-	if (g_pGameInstance->Get_DIKeyState(DIK_8)&DIS_Down)
-		m_pModel->Change_AnimIndex(7);
-	if (g_pGameInstance->Get_DIKeyState(DIK_9)&DIS_Down)
 		m_pModel->Change_AnimIndex(8);
+	if (g_pGameInstance->Get_DIKeyState(DIK_3)&DIS_Down)
+		m_pModel->Change_AnimIndex(9);
+	if (g_pGameInstance->Get_DIKeyState(DIK_4)&DIS_Down)
+		m_pModel->Change_AnimIndex(10);
+	if (g_pGameInstance->Get_DIKeyState(DIK_5)&DIS_Down)
+		m_pModel->Change_AnimIndex(11);
+	if (g_pGameInstance->Get_DIKeyState(DIK_6)&DIS_Down)
+		m_pModel->Change_AnimIndex(12);
+	if (g_pGameInstance->Get_DIKeyState(DIK_7)&DIS_Down)
+		m_pModel->Change_AnimIndex(13);
 
 	m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
 
 	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime, m_bIsOnScreen));
 
 
-/*
-	{
-		//size: -27.030010, -10.069997, -201.929626,
 
-		//Pivot: -0.610000, 0.020000, -1.290000,
-
-		static _float3 testFloat3 = _float3(0, 0, 0);
-		static _float3 RotFloat3 = _float3(1, 1, 1);
-		static _float value = 0.01f;
-		static _int kind = 0;
-
-
-
-		CGameInstance* m_pInstance = g_pGameInstance;
-		if (m_pInstance->Get_DIKeyState(DIK_UP) & DIS_Press)
-		{
-			testFloat3.z += value;
-
-			string ttszLog = "//Pivot  : " + to_string(testFloat3.x) + "f , " + to_string(testFloat3.y) + "f , " + to_string(testFloat3.z) + "f , 1" + "\n" +
-				"//size  : " + to_string(RotFloat3.x) + "f , " + to_string(RotFloat3.y) + "f , " + to_string(RotFloat3.z) + "f  " + "\n";
-
-			wstring ttDebugLog;
-			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-
-			OutputDebugStringW(ttDebugLog.c_str());
-		}
-
-		else if (m_pInstance->Get_DIKeyState(DIK_DOWN) & DIS_Press)
-		{
-			testFloat3.z -= value;
-			string ttszLog = "//Pivot  : " + to_string(testFloat3.x) + "f , " + to_string(testFloat3.y) + "f , " + to_string(testFloat3.z) + "f , 1" + "\n" +
-				"//size  : " + to_string(RotFloat3.x) + "f , " + to_string(RotFloat3.y) + "f , " + to_string(RotFloat3.z) + "f  " + "\n";
-
-			wstring ttDebugLog;
-			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-
-			OutputDebugStringW(ttDebugLog.c_str());
-
-
-
-		}
-		else if (m_pInstance->Get_DIKeyState(DIK_LEFT) & DIS_Press)
-		{
-			testFloat3.x -= value;
-			string ttszLog = "//Pivot  : " + to_string(testFloat3.x) + "f , " + to_string(testFloat3.y) + "f , " + to_string(testFloat3.z) + "f , 1" + "\n" +
-				"//size  : " + to_string(RotFloat3.x) + "f , " + to_string(RotFloat3.y) + "f , " + to_string(RotFloat3.z) + "f  " + "\n";
-
-			wstring ttDebugLog;
-			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-
-			OutputDebugStringW(ttDebugLog.c_str());
-
-
-
-		}
-
-		else if (m_pInstance->Get_DIKeyState(DIK_RIGHT) & DIS_Press)
-		{
-			testFloat3.x += value;
-			string ttszLog = "//Pivot  : " + to_string(testFloat3.x) + "f , " + to_string(testFloat3.y) + "f , " + to_string(testFloat3.z) + "f , 1" + "\n" +
-				"//size  : " + to_string(RotFloat3.x) + "f , " + to_string(RotFloat3.y) + "f , " + to_string(RotFloat3.z) + "f  " + "\n";
-
-			wstring ttDebugLog;
-			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-
-			OutputDebugStringW(ttDebugLog.c_str());
-
-
-
-		}
-
-		else if (m_pInstance->Get_DIKeyState(DIK_DELETE) & DIS_Press)
-		{
-			testFloat3.y += value;
-
-			string ttszLog = "//Pivot  : " + to_string(testFloat3.x) + "f , " + to_string(testFloat3.y) + "f , " + to_string(testFloat3.z) + "f , 1" + "\n" +
-				"//size  : " + to_string(RotFloat3.x) + "f , " + to_string(RotFloat3.y) + "f , " + to_string(RotFloat3.z) + "f  " + "\n";
-
-			wstring ttDebugLog;
-			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-
-			OutputDebugStringW(ttDebugLog.c_str());
-
-
-
-		}
-
-		else if (m_pInstance->Get_DIKeyState(DIK_END) & DIS_Press)
-		{
-			testFloat3.y -= value;
-			string ttszLog = "//Pivot  : " + to_string(testFloat3.x) + "f , " + to_string(testFloat3.y) + "f , " + to_string(testFloat3.z) + "f , 1" + "\n" +
-				"//size  : " + to_string(RotFloat3.x) + "f , " + to_string(RotFloat3.y) + "f , " + to_string(RotFloat3.z) + "f  " + "\n";
-
-			wstring ttDebugLog;
-			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-
-			OutputDebugStringW(ttDebugLog.c_str());
-
-
-
-		}
-		else if (m_pInstance->Get_DIKeyState(DIK_PGUP) & DIS_Press)
-		{
-			switch (kind)
-			{
-			case 0:
-				RotFloat3.x += value;
-				break;
-			case 1:
-				RotFloat3.y += value;
-				break;
-			case 2:
-				RotFloat3.z += value;
-				break;
-
-			default:
-				break;
-			}
-
-
-			string ttszLog = "//Pivot  : " + to_string(testFloat3.x) + "f , " + to_string(testFloat3.y) + "f , " + to_string(testFloat3.z) + "f , 1" + "\n" +
-				"//size  : " + to_string(RotFloat3.x) + "f , " + to_string(RotFloat3.y) + "f , " + to_string(RotFloat3.z) + "f  " + "\n";
-
-			wstring ttDebugLog;
-			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-
-			OutputDebugStringW(ttDebugLog.c_str());
-
-
-
-		}
-		else if (m_pInstance->Get_DIKeyState(DIK_PGDN) & DIS_Press)
-		{
-			switch (kind)
-			{
-			case 0:
-				RotFloat3.x -= value;
-				break;
-			case 1:
-				RotFloat3.y -= value;
-				break;
-			case 2:
-				RotFloat3.z -= value;
-				break;
-
-			default:
-				break;
-			}
-
-			string ttszLog = "//Pivot  : " + to_string(testFloat3.x) + "f , " + to_string(testFloat3.y) + "f , " + to_string(testFloat3.z) + "f , 1" + "\n" +
-				"//size  : " + to_string(RotFloat3.x) + "f , " + to_string(RotFloat3.y) + "f , " + to_string(RotFloat3.z) + "f  " + "\n";
-
-			wstring ttDebugLog;
-			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-
-			OutputDebugStringW(ttDebugLog.c_str());
-
-
-
-		}
-		else if (m_pInstance->Get_DIKeyState(DIK_TAB) & DIS_Down)
-		{
-			kind++;
-			if (kind > 2)kind = 0;
-
-			string ttszLog = "kind  : " + to_string(kind) + "\n";
-
-			wstring ttDebugLog;
-			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-
-			OutputDebugStringW(ttDebugLog.c_str());
-		}
-
-
-		_Matrix tt = XMMatrixScaling(RotFloat3.x, RotFloat3.y, RotFloat3.z) *XMMatrixTranslation(testFloat3.x, testFloat3.y, testFloat3.z);
-
-		//tt.r[3] = XMVectorSetW(testFloat3.XMVector(), 1);
-		//m_pTransformCom->Set_Matrix(tt);
-
-
-		m_pColliderCom->Update_Transform(0, tt* m_pTransformCom->Get_WorldMatrix());
-
-		_Matrix			TransformMatrix = XMLoadFloat4x4(m_tCollisionAttachPtr.pUpdatedNodeMat) * XMLoadFloat4x4(m_tCollisionAttachPtr.pDefaultPivotMat);
-
-		TransformMatrix.r[0] = XMVector3Normalize(TransformMatrix.r[0]);
-		TransformMatrix.r[1] = XMVector3Normalize(TransformMatrix.r[1]);
-		TransformMatrix.r[2] = XMVector3Normalize(TransformMatrix.r[2]);
-
-
-		m_pColliderCom->Update_Transform(1, tt * TransformMatrix * m_pTransformCom->Get_WorldMatrix());
-	
-
-	}*/
 
 	if (m_bIsOnScreen)
 	{
@@ -273,6 +81,8 @@ _int CExecutor::Update(_double fDeltaTime)
 		m_pColliderCom->Update_Transform(1, TransformMatrix * m_pTransformCom->Get_WorldMatrix());
 
 		g_pGameInstance->Add_CollisionGroup(CollisionType_Monster, this, m_pColliderCom);
+
+		m_vecWeapon[0]->Update(fDeltaTime);
 	}
 
 
@@ -290,6 +100,7 @@ _int CExecutor::LateUpdate(_double fDeltaTime)
 	if (m_bIsOnScreen)
 	{
 		FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this));
+		m_vecWeapon[0]->LateUpdate(fDeltaTime);
 	}
 
 	m_vOldPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
@@ -343,7 +154,7 @@ HRESULT CExecutor::SetUp_Components()
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Shader_VAM), TAG_COM(Com_Shader), (CComponent**)&m_pShaderCom));
 
 	FAILED_CHECK(Add_Component(m_eNowSceneNum, TAG_CP(Prototype_Mesh_Executor), TAG_COM(Com_Model), (CComponent**)&m_pModel));
-	FAILED_CHECK(m_pModel->Change_AnimIndex(rand()%12));
+	FAILED_CHECK(m_pModel->Change_AnimIndex(0));
 
 	m_tCollisionAttachPtr = m_pModel->Find_AttachMatrix_InHirarchyNode("Bip01-Spine1");
 	NULL_CHECK_RETURN(m_tCollisionAttachPtr.pDefaultPivotMat, E_FAIL);
@@ -391,6 +202,29 @@ HRESULT CExecutor::SetUp_Components()
 	return S_OK;
 }
 
+HRESULT CExecutor::SetUp_Weapon()
+{
+
+	CGameInstance* pInstance = GetSingle(CGameInstance);
+
+	NULL_CHECK_RETURN(m_pModel, E_FAIL);
+	NULL_CHECK_RETURN(m_pTransformCom, E_FAIL);
+
+	CMonsterWeapon::MONWEAPONDESC tWeaponDesc;
+	tWeaponDesc.pModel = m_pModel;
+	tWeaponDesc.pParantTransform = m_pTransformCom;
+	tWeaponDesc.szHirarchyNodeName = "Bip01-Prop1";
+
+	CMonsterWeapon* pWeapon = nullptr;
+	pInstance->Add_GameObject_Out_of_Manager((CGameObject**)&pWeapon, m_eNowSceneNum, TAG_OP(Prototype_Scythe), &tWeaponDesc);
+	NULL_CHECK_RETURN(pWeapon, E_FAIL);
+
+	m_vecWeapon.push_back(pWeapon);
+
+
+	return S_OK;
+}
+
 CExecutor * CExecutor::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, void * pArg)
 {
 	CExecutor*	pInstance = new CExecutor(pDevice, pDeviceContext);
@@ -418,6 +252,11 @@ CGameObject * CExecutor::Clone(void * pArg)
 void CExecutor::Free()
 {
 	__super::Free();
+
+
+	for (auto& pWeapon : m_vecWeapon)
+		Safe_Release(pWeapon);
+	
 
 	Safe_Release(m_pTransformCom);
 	Safe_Release(m_pRendererCom);

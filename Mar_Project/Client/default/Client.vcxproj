@@ -186,6 +186,8 @@
     <ClInclude Include="..\public\Client_Struct.h" />
     <ClInclude Include="..\public\GamePlayUI.h" />
     <ClInclude Include="..\public\ClockBomb.h" />
+    <ClInclude Include="..\public\Scythe.h" />
+    <ClInclude Include="..\public\MonsterWeapon.h" />
     <ClInclude Include="..\public\Umbrella.h" />
     <ClInclude Include="..\public\Teapot.h" />
     <ClInclude Include="..\public\Grunt.h" />
@@ -243,6 +245,8 @@
     <ClCompile Include="..\private\Camera_Main.cpp" />
     <ClCompile Include="..\private\GamePlayUI.cpp" />
     <ClCompile Include="..\private\ClockBomb.cpp" />
+    <ClCompile Include="..\private\Scythe.cpp" />
+    <ClCompile Include="..\private\MonsterWeapon.cpp" />
     <ClCompile Include="..\private\Umbrella.cpp" />
     <ClCompile Include="..\private\Teapot.cpp" />
     <ClCompile Include="..\private\Grunt.cpp" />

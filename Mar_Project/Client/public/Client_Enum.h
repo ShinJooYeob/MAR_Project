@@ -48,6 +48,13 @@ enum OBJECTPROTOTYPEID
 	Prototype_WaspArrow,
 	Prototype_WaspInk,
 
+	Prototype_Scythe,
+	Prototype_Bow,
+	Prototype_Arrow,
+	Prototype_FireBall,
+	Prototype_Cannonball,
+
+
 
 	Prototype_Camera_Main,
 	Prototype_Camera_Editor,
@@ -120,6 +127,23 @@ static const _tchar* Tag_Object_Prototype(OBJECTPROTOTYPEID eTag)
 		break;
 	case Prototype_WeaponClockBomb:
 		return TEXT("Prototype_WeaponClockBomb");
+		break;
+
+
+	case Prototype_Scythe:
+		return TEXT("Prototype_Scythe");
+		break;
+	case Prototype_Bow:
+		return TEXT("Prototype_Bow");
+		break;
+	case Prototype_Arrow:
+		return TEXT("Prototype_Arrow");
+		break;
+	case Prototype_FireBall:
+		return TEXT("Prototype_FireBall");
+		break;
+	case Prototype_Cannonball:
+		return TEXT("Prototype_Cannonball");
 		break;
 
 
@@ -578,6 +602,13 @@ enum COMPONENTPROTOTYPEID
 		Prototype_Mesh_ClockBomb,
 
 
+		Prototype_Mesh_Scythe,
+		Prototype_Mesh_Bow,
+		Prototype_Mesh_Arrow,
+		Prototype_Mesh_FireBall,
+		Prototype_Mesh_CannonBall,
+
+
 	Prototype_Mesh_SkyBox,
 
 	//////////////////////////////////////////////////////////////////////////
@@ -974,7 +1005,29 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 	case Prototype_Mesh_SkyBox:
 		return TEXT("Prototype_Mesh_SkyBox");
 		break;
-		
+
+
+	case Prototype_Mesh_Scythe:
+		return TEXT("Prototype_Mesh_Scythe");
+		break;
+
+	case Prototype_Mesh_Bow:
+		return TEXT("Prototype_Mesh_Bow");
+		break;
+
+	case Prototype_Mesh_Arrow:
+		return TEXT("Prototype_Mesh_Arrow");
+		break;
+
+	case Prototype_Mesh_FireBall:
+		return TEXT("Prototype_Mesh_FireBall");
+		break;
+
+	case Prototype_Mesh_CannonBall:
+		return TEXT("Prototype_Mesh_CannonBall");
+		break;
+
+
 		/////////////////≈ÿΩ∫√≥////////////////////////////////////////////////////////
 
 

@@ -1,16 +1,14 @@
 #pragma once
-
-#include "Monster.h"
+#include "MonsterWeapon.h"
 
 BEGIN(Client)
 
-class CExecutor final : public CMonster
+class CScythe final : public CMonsterWeapon
 {
 private:
-	CExecutor(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
-	CExecutor(const CExecutor& rhs);
-	virtual ~CExecutor() = default;
-
+	CScythe(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
+	CScythe(const CScythe& rhs);
+	virtual ~CScythe() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype(void* pArg)override;
@@ -22,26 +20,23 @@ public:
 	virtual _int Render()override;
 	virtual _int LateRender()override;
 
+	virtual void CollisionTriger(_uint iMyColliderIndex, CGameObject* pConflictedObj, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType) override;
+
 private:
 	CShader*			m_pShaderCom = nullptr;
 	CRenderer*			m_pRendererCom = nullptr;
-	CModel*				m_pModel = nullptr;
 	CTransform*			m_pTransformCom = nullptr;
+	CModel*				m_pModel = nullptr;
 	CCollider*			m_pColliderCom = nullptr;
 
-	ATTACHBONEMATRIX_PTR m_tCollisionAttachPtr;
-
-	vector<class CMonsterWeapon*>			m_vecWeapon;
 private:
 	HRESULT SetUp_Components();
-	HRESULT SetUp_Weapon();
+
 
 public:
-	static CExecutor* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, void* pArg = nullptr);
+	static CScythe* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	virtual CGameObject* Clone(void* pArg);
 	virtual void Free() override;
-
 };
 
-
-END
+END	

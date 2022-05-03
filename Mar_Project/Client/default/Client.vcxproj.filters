@@ -202,6 +202,12 @@
     <Filter Include="01.GameObject\08.Weapon\05.Horse">
       <UniqueIdentifier>{694ccd0e-563a-44b5-9639-89a8b09e0e58}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.GameObject\03.Monster\99.MonsterWeapon">
+      <UniqueIdentifier>{f2beecbe-3a49-4c4c-a05a-a83fd3f5a37a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\03.Monster\99.MonsterWeapon\05.Executor_Scythe">
+      <UniqueIdentifier>{8e729811-8869-4f28-8b41-599572726eb3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -408,6 +414,12 @@
     <ClInclude Include="..\public\ClockBomb.h">
       <Filter>01.GameObject\08.Weapon\02.ClockBomb</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\MonsterWeapon.h">
+      <Filter>01.GameObject\03.Monster\99.MonsterWeapon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Scythe.h">
+      <Filter>01.GameObject\03.Monster\99.MonsterWeapon\05.Executor_Scythe</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -589,6 +601,12 @@
     </ClCompile>
     <ClCompile Include="..\private\ClockBomb.cpp">
       <Filter>01.GameObject\08.Weapon\02.ClockBomb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\MonsterWeapon.cpp">
+      <Filter>01.GameObject\03.Monster\99.MonsterWeapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Scythe.cpp">
+      <Filter>01.GameObject\03.Monster\99.MonsterWeapon\05.Executor_Scythe</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
