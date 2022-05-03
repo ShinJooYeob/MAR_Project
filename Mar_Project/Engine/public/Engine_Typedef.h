@@ -37,6 +37,7 @@ namespace Engine
 
 	typedef XMVECTOR					_Vector;
 	typedef FXMVECTOR					_fVector;
+	typedef GXMVECTOR					_gVector;
 
 	typedef XMMATRIX					_Matrix;
 	typedef FXMMATRIX					_fMatrix;

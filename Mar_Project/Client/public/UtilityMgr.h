@@ -28,6 +28,10 @@ public:
 	/*For Particle*/
 	HRESULT Create_ParticleObject(_uint eSceneID, PARTICLEDESC tParticleDesc);
 
+	/*For ReflectVector*/
+
+	_Vector ReflectVector(_Vector vDir, _Vector vVerticleVector);
+	_Vector SlideVector(_Vector vDir, _Vector vVerticleVector);
 
 public:
 	HRESULT Clear_RenderGroup_forSceneChange();

@@ -24,6 +24,7 @@ public:
 		_float* CaculateY = nullptr, _float3* vNormVector = nullptr);
 
 	_Vector Calculate_SlidingVector(_float3 OldPosOnTerrainLocal, _float3 PosOnTerrainLocal);
+	_bool   OutOfLine(_fVector StartPoint, _fVector EndPoint, _fVector OldPos, _gVector NowPos,_float3* pOutDirVec);
 
 	_Vector Pick_ByRay(_fVector vRayPos, _fVector vRayDir, _float2 vIndex, _bool* bIsPieck);
 	_float2 Get_NumVerticesXY() { return _float2(_float(m_iNumVerticesX), _float(m_iNumVerticesZ)); };
@@ -40,6 +41,9 @@ private:
 	ID3D11ShaderResourceView* m_pHeightMapSRV = nullptr;
 private:
 	HRESULT LoadHeightMap();
+public:
+	HRESULT Bind_HeightMapOnShader(class CShader* pShader, const char* szValueName);
+
 #endif // _DEBUG
 
 

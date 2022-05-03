@@ -94,8 +94,19 @@ _int CTerrain::Render()
 	if (m_pFilterMap != nullptr)
 		FAILED_CHECK(m_pShaderCom->Set_Texture("g_FilterTexture", m_pFilterMap));
 
+#ifdef _DEBUG
+	static _bool	IsDebug = false;
+	
+	if (g_pGameInstance->Get_DIKeyState(DIK_F6)&DIS_Down)IsDebug = !IsDebug;
 
+	if (IsDebug)
+	{
+		FAILED_CHECK(m_pVIBufferCom->Bind_HeightMapOnShader(m_pShaderCom, "g_HeightMapTexture"));
 
+		FAILED_CHECK(m_pVIBufferCom->Render(m_pShaderCom, 2));
+	}
+	else
+#endif // _DEBUG
 	FAILED_CHECK(m_pVIBufferCom->Render(m_pShaderCom, 0));
 
 	return _int();

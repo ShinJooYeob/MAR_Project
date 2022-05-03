@@ -124,6 +124,22 @@ HRESULT CUtilityMgr::Create_ParticleObject(_uint eSceneID, PARTICLEDESC tParticl
 	return S_OK;
 }
 
+_Vector CUtilityMgr::ReflectVector(_Vector vDir, _Vector vVerticleVector)
+{
+	_Vector vVerticVec = XMVector3Normalize(vVerticleVector);
+	vVerticVec = vVerticVec  * XMVector3Dot(-vDir, vVerticVec);
+
+	return vDir + (vVerticVec * 2.f);
+}
+
+_Vector CUtilityMgr::SlideVector(_Vector vDir, _Vector vVerticleVector)
+{
+	_Vector vVerticVec = XMVector3Normalize(vVerticleVector);
+	vVerticVec = vVerticVec  * XMVector3Dot(-vDir, vVerticVec);
+
+	return vDir+ vVerticVec;
+}
+
 HRESULT CUtilityMgr::Clear_RenderGroup_forSceneChange()
 {
 	NULL_CHECK_RETURN(m_pRenderer, E_FAIL);

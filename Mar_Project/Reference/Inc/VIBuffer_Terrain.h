@@ -20,8 +20,11 @@ public:
 	_Vector Caculate_TerrainY(_bool* pbIsOnTerrain, _float3 PosOnTerrainLocal,_float3 OldPosOnTerrainLocal ,_float3* vLocalPlaneNormVector = nullptr);
 	_Vector Caculate_Terrain_Pick_byRay(_bool* pbIsOnTerrain, _float3 PosOnTerrainLocal, _float3 OldPosOnTerrainLocal, _float3* vLocalPlaneNormVector = nullptr);
 	_float EquationPlane(_bool* pbIsOnTerrain, _float3 PosOnTerrainLocal, _float* CaculateY = nullptr, _float3* vNormVector = nullptr);
-	_float EquationPlane_Kinds_Of_NavigationTile(_uint* pOutKidsOfTile,_bool* pbIsOnTerrain, _float3 PosOnTerrainLocal,
-		_float* CaculateY = nullptr, _float3* vNormVector = nullptr, _float3* vSlidingVector = nullptr);
+	_float EquationPlane_Kinds_Of_NavigationTile(_uint* pOutKidsOfTile, _bool* pbIsOnTerrain, _float3 PosOnTerrainLocal,
+		_float* CaculateY = nullptr, _float3* vNormVector = nullptr);
+
+	_Vector Calculate_SlidingVector(_float3 OldPosOnTerrainLocal, _float3 PosOnTerrainLocal);
+	_bool   OutOfLine(_fVector StartPoint, _fVector EndPoint, _fVector OldPos, _gVector NowPos,_float3* pOutDirVec);
 
 	_Vector Pick_ByRay(_fVector vRayPos, _fVector vRayDir, _float2 vIndex, _bool* bIsPieck);
 	_float2 Get_NumVerticesXY() { return _float2(_float(m_iNumVerticesX), _float(m_iNumVerticesZ)); };
@@ -38,6 +41,9 @@ private:
 	ID3D11ShaderResourceView* m_pHeightMapSRV = nullptr;
 private:
 	HRESULT LoadHeightMap();
+public:
+	HRESULT Bind_HeightMapOnShader(class CShader* pShader, const char* szValueName);
+
 #endif // _DEBUG
 
 

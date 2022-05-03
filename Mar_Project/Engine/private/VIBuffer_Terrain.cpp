@@ -1,4 +1,5 @@
 #include "..\Public\VIBuffer_Terrain.h"
+#include "Shader.h"
 
 CVIBuffer_Terrain::CVIBuffer_Terrain(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
 	: CVIBuffer(pDevice, pDeviceContext)
@@ -16,7 +17,9 @@ CVIBuffer_Terrain::CVIBuffer_Terrain(const CVIBuffer_Terrain & rhs)
 	, m_fMinMapSize(rhs.m_fMinMapSize)
 	, m_pNaviTerrain(rhs.m_pNaviTerrain)
 {
-
+#ifdef _DEBUG
+	Safe_AddRef(m_pHeightMapSRV);
+#endif // _DEBUG
 }
 
 HRESULT CVIBuffer_Terrain::Initialize_Prototype(const _tchar* pHeightMap)
@@ -438,7 +441,13 @@ _Vector CVIBuffer_Terrain::Caculate_TerrainY(_bool* pbIsOnTerrain ,_float3 PosOn
 		if (NowNaviTile == Tile_JumpMovable || NowNaviTile == Tile_ShrinkMovable)
 		{
 			*pbIsOnTerrain = IsOldOnTerrain;
-			return OldPosOnTerrainLocal.XMVector();
+
+			_float3 Temp = OldPosOnTerrainLocal.XMVector() + Calculate_SlidingVector(OldPosOnTerrainLocal, PosOnTerrainLocal);
+
+			EquationPlane(&IsOldOnTerrain, Temp, &CaculatedOldY, nullptr);
+
+			return XMVectorSet(Temp.x, CaculatedOldY, Temp.z,0);
+			//return OldPosOnTerrainLocal.XMVector();
 		}
 		else
 		{
@@ -668,9 +677,10 @@ _float CVIBuffer_Terrain::EquationPlane_Kinds_Of_NavigationTile(_uint * pOutKids
 			switch (_uint(m_pNaviTerrain[iIndices[0]]))
 			{
 			case Tile_JumpMovable:
-				if (m_pVertices[iIndices[0]].y < m_pVertices[iIndices[2]].y || m_pVertices[iIndices[0]].y < m_pVertices[iIndices[3]].y)
+				
+				if (MovableHeight < m_pVertices[iIndices[2]].y - m_pVertices[iIndices[0]].y || MovableHeight < m_pVertices[iIndices[3]].y - m_pVertices[iIndices[0]].y)
 				{
-					TargetTile = Tile_JumpMovable;
+				TargetTile = Tile_JumpMovable;
 				}
 
 				break;
@@ -685,9 +695,9 @@ _float CVIBuffer_Terrain::EquationPlane_Kinds_Of_NavigationTile(_uint * pOutKids
 			switch (_uint(m_pNaviTerrain[iIndices[2]]))
 			{
 			case Tile_JumpMovable:
-				if (m_pVertices[iIndices[2]].y < m_pVertices[iIndices[0]].y || m_pVertices[iIndices[2]].y < m_pVertices[iIndices[3]].y)
+				if (MovableHeight < m_pVertices[iIndices[0]].y - m_pVertices[iIndices[2]].y || MovableHeight < m_pVertices[iIndices[3]].y - m_pVertices[iIndices[2]].y)
 				{
-					TargetTile = Tile_JumpMovable;
+				TargetTile = Tile_JumpMovable;
 				}
 
 				break;
@@ -702,9 +712,9 @@ _float CVIBuffer_Terrain::EquationPlane_Kinds_Of_NavigationTile(_uint * pOutKids
 			switch (_uint(m_pNaviTerrain[iIndices[3]]))
 			{
 			case Tile_JumpMovable:
-				if (m_pVertices[iIndices[3]].y < m_pVertices[iIndices[0]].y || m_pVertices[iIndices[3]].y < m_pVertices[iIndices[2]].y)
+				if (MovableHeight< m_pVertices[iIndices[0]].y - m_pVertices[iIndices[3]].y || MovableHeight < m_pVertices[iIndices[2]].y - m_pVertices[iIndices[3]].y)
 				{
-					TargetTile = Tile_JumpMovable;
+				TargetTile = Tile_JumpMovable;
 				}
 
 				break;
@@ -742,9 +752,9 @@ _float CVIBuffer_Terrain::EquationPlane_Kinds_Of_NavigationTile(_uint * pOutKids
 			switch (_uint(m_pNaviTerrain[iIndices[0]]))
 			{
 			case Tile_JumpMovable:
-				if (m_pVertices[iIndices[0]].y < m_pVertices[iIndices[2]].y || m_pVertices[iIndices[0]].y < m_pVertices[iIndices[1]].y)
+				if (MovableHeight< m_pVertices[iIndices[2]].y  - m_pVertices[iIndices[0]].y || MovableHeight< m_pVertices[iIndices[1]].y - m_pVertices[iIndices[0]].y)
 				{
-					TargetTile = Tile_JumpMovable;
+				TargetTile = Tile_JumpMovable;
 				}
 
 				break;
@@ -759,9 +769,9 @@ _float CVIBuffer_Terrain::EquationPlane_Kinds_Of_NavigationTile(_uint * pOutKids
 			switch (_uint(m_pNaviTerrain[iIndices[2]]))
 			{
 			case Tile_JumpMovable:
-				if (m_pVertices[iIndices[2]].y < m_pVertices[iIndices[0]].y || m_pVertices[iIndices[2]].y < m_pVertices[iIndices[1]].y)
+				if (MovableHeight< m_pVertices[iIndices[0]].y  - m_pVertices[iIndices[2]].y || MovableHeight< m_pVertices[iIndices[1]].y - m_pVertices[iIndices[2]].y)
 				{
-					TargetTile = Tile_JumpMovable;
+				TargetTile = Tile_JumpMovable;
 				}
 
 				break;
@@ -773,12 +783,12 @@ _float CVIBuffer_Terrain::EquationPlane_Kinds_Of_NavigationTile(_uint * pOutKids
 		}
 		else if (m_pNaviTerrain[iIndices[1]] != Tile_Movable)
 		{
-			switch (_uint(m_pNaviTerrain[iIndices[3]]))
+			switch (_uint(m_pNaviTerrain[iIndices[1]]))
 			{
 			case Tile_JumpMovable:
-				if (m_pVertices[iIndices[1]].y < m_pVertices[iIndices[0]].y || m_pVertices[iIndices[1]].y < m_pVertices[iIndices[2]].y)
+				if (MovableHeight < m_pVertices[iIndices[0]].y - m_pVertices[iIndices[1]].y || MovableHeight< m_pVertices[iIndices[2]].y- m_pVertices[iIndices[1]].y)
 				{
-					TargetTile = Tile_JumpMovable;
+				TargetTile = Tile_JumpMovable;
 				}
 
 				break;
@@ -828,39 +838,88 @@ _Vector CVIBuffer_Terrain::Calculate_SlidingVector(_float3 OldPosOnTerrainLocal,
 
 
 	_float4 Plane;
+	_Vector TempNow = PosOnTerrainLocal.XMVector();
+	//_Vector TempNow = PosOnTerrainLocal.XMVector()*2.f - OldPosOnTerrainLocal.XMVector();
 
 	if (OldPosOnTerrainLocal.x - m_pVertices[iIndices[0]].x < m_pVertices[iIndices[0]].z - OldPosOnTerrainLocal.z)
 	{//¾Æ·¡ 023
-		if (m_pVertices[iIndices[3]].y < -9999.f)
-		{
-			return XMVectorSet(0, 0, 0, 0);;
-		}
+		//if (m_pVertices[iIndices[3]].y < -9999.f)
+		//{
+		//	return XMVectorSet(0, 0, 0, 0);;
+		//}
 
 	
-
-		Plane = XMPlaneFromPoints(XMLoadFloat3(&m_pVertices[iIndices[0]]),
-			XMLoadFloat3(&m_pVertices[iIndices[2]]), XMLoadFloat3(&m_pVertices[iIndices[3]]));
+		_float3 SlidVec;
 
 
+		if (OutOfLine(m_pVertices[iIndices[0]].XMVector(), m_pVertices[iIndices[2]].XMVector(), OldPosOnTerrainLocal.XMVector(), TempNow, &SlidVec))
+			return SlidVec.XMVector();
+		
+		if (OutOfLine(m_pVertices[iIndices[2]].XMVector(), m_pVertices[iIndices[3]].XMVector(), OldPosOnTerrainLocal.XMVector(), TempNow, &SlidVec))
+			return SlidVec.XMVector();
+
+		if (OutOfLine(m_pVertices[iIndices[3]].XMVector(), m_pVertices[iIndices[0]].XMVector(), OldPosOnTerrainLocal.XMVector(), TempNow, &SlidVec))
+			return SlidVec.XMVector();
+
+		return XMVectorSet(0, 0, 0, 0);;
 	
 	}
 	else
 	{//À§ 012
-		if (m_pVertices[iIndices[1]].y < -9999.f)
-		{
-			return XMVectorSet(0, 0, 0, 0);;
-		}
+		//if (m_pVertices[iIndices[1]].y < -9999.f)
+		//{
+		//	return XMVectorSet(0, 0, 0, 0);;
+		//}
 
-	
-
-		Plane = XMPlaneFromPoints(XMLoadFloat3(&m_pVertices[iIndices[0]]),
-			XMLoadFloat3(&m_pVertices[iIndices[1]]), XMLoadFloat3(&m_pVertices[iIndices[2]]));
+		_float3 SlidVec;
 
 
+		if (OutOfLine(m_pVertices[iIndices[0]].XMVector(), m_pVertices[iIndices[1]].XMVector(), OldPosOnTerrainLocal.XMVector(), TempNow, &SlidVec))
+			return SlidVec.XMVector();
+
+		if (OutOfLine(m_pVertices[iIndices[1]].XMVector(), m_pVertices[iIndices[2]].XMVector(), OldPosOnTerrainLocal.XMVector(), TempNow, &SlidVec))
+			return SlidVec.XMVector();
+
+		if (OutOfLine(m_pVertices[iIndices[2]].XMVector(), m_pVertices[iIndices[0]].XMVector(), OldPosOnTerrainLocal.XMVector(), TempNow, &SlidVec))
+			return SlidVec.XMVector();
+
+		return XMVectorSet(0, 0, 0, 0);
 
 	}
 
-	return;
+	return XMVectorSet(0, 0, 0, 0);
+}
+
+_bool CVIBuffer_Terrain::OutOfLine(_fVector StartPoint, _fVector EndPoint, _fVector OldPos, _gVector NowPos, _float3* pOutDirVec)
+{
+	_int IsUp = 1;
+
+	if (fabs(XMVectorGetY(StartPoint) - XMVectorGetY(EndPoint)) > MovableHeight)
+	{
+		//IsUp = -1;
+		return false;
+	}
+	_Vector vStart = XMVectorSetY(StartPoint,0);
+	_Vector vEnd = XMVectorSetY(EndPoint,0);
+	_Vector vOld = XMVectorSetY(OldPos, 0);
+	_Vector vNew = XMVectorSetY(NowPos, 0);
+
+
+	_Vector		vDestDir = XMVector3Normalize(vNew - vStart);
+	_Vector		TempVec = vEnd - vStart;
+	_Vector		vSourDir = XMVector3Normalize(XMVectorSet(XMVectorGetZ(TempVec)* -1.f, 0, XMVectorGetX(TempVec),0));
+
+	//if (XMVectorGetX(XMVector3Dot(vSourDir, vDestDir)) > 0)
+	//{
+
+		_Vector vVerticVec = vSourDir;
+		vVerticVec = vVerticVec  * XMVector3Dot(-vNew + vOld, vVerticVec);
+		*pOutDirVec = (vNew - vOld + vVerticVec * 1.00001f) * IsUp;
+
+		return true;
+
+	//}	
+	return false;
 }
 
 _Vector CVIBuffer_Terrain::Pick_ByRay(_fVector vRayPos, _fVector vRayDir, _float2 vIndex, _bool * bIsPieck)
@@ -997,6 +1056,16 @@ HRESULT CVIBuffer_Terrain::LoadHeightMap()
 	return S_OK;
 }
 
+HRESULT CVIBuffer_Terrain::Bind_HeightMapOnShader(CShader * pShader, const char * szValueName)
+{
+
+	if (!m_pHeightMapSRV)return S_FALSE;
+	//NULL_CHECK_RETURN(m_pHeightMapSRV, E_FAIL);
+
+	return pShader->Set_Texture(szValueName, m_pHeightMapSRV);;
+	return S_OK;
+}
+
 CVIBuffer_Terrain * CVIBuffer_Terrain::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, const _tchar* pHeightMap)
 {
 	CVIBuffer_Terrain*	pInstance = new CVIBuffer_Terrain(pDevice, pDeviceContext);
@@ -1038,7 +1107,7 @@ void CVIBuffer_Terrain::Free()
 	__super::Free();
 
 #ifdef _DEBUG
-	Safe_Release(m_pHeightMapSRV);
+		Safe_Release(m_pHeightMapSRV);
 #endif // _DEBUG
 
 	if (!m_bIsClone)
