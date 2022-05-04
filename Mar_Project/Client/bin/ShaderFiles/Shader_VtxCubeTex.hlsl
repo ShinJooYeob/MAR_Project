@@ -7,6 +7,12 @@ cbuffer Hidden
 	float	g_fVisualValue;
 };
 
+cbuffer EditScene
+{
+	float4	g_vColor = float4(1,0,0,1);
+};
+
+
 struct VS_IN
 {
 	float3		vPosition : POSITION;
@@ -66,7 +72,14 @@ PS_OUT PS_Hidden_Cube(PS_IN In)
 
 	return Out;
 }
+PS_OUT PS_EDITCUBE(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
 
+	Out.vColor = g_vColor;
+
+	return Out;
+}
 
 
 
@@ -103,6 +116,16 @@ technique11		DefaultTechnique
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_Hidden_Cube();
+	}
+	pass EditScene // 3
+	{
+		SetBlendState(AlphaBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(ZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_ccw);
+
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_EDITCUBE();
 	}
 
 

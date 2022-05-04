@@ -27,6 +27,7 @@ HRESULT CESCursor::Initialize_Clone(void * pArg)
 
 	FAILED_CHECK(SetUp_Components());
 
+
 	return S_OK;
 }
 
@@ -58,6 +59,9 @@ _int CESCursor::Render()
 	FAILED_CHECK(m_pTransformCom->Bind_OnShader(m_pShaderCom, "g_WorldMatrix"));
 
 
+	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vColor", &m_vColor, sizeof(_float4)));
+	
+
 	CGameInstance* pInstance = GetSingle(CGameInstance);
 
 	_float4x4		ViewFloat4x4 = pInstance->Get_Transform_Float4x4_TP(PLM_VIEW);
@@ -70,7 +74,7 @@ _int CESCursor::Render()
 
 
 
-	FAILED_CHECK(m_pVIBufferCom->Render(m_pShaderCom, 0));
+	FAILED_CHECK(m_pVIBufferCom->Render(m_pShaderCom, 3));
 
 	return _int();
 }
@@ -84,6 +88,11 @@ _int CESCursor::LateRender()
 
 
 	return _int();
+}
+
+void CESCursor::Set_Position(_float3 vPosition)
+{
+	m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, vPosition);
 }
 
 HRESULT CESCursor::SetUp_Components()

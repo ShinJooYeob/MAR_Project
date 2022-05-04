@@ -65,8 +65,11 @@ _int CExecutor::Update(_double fDeltaTime)
 		m_PatternPassedTime = 0;
 		m_ePattern = 0;
 
+		m_pModel->Change_AnimIndex_ReturnTo(15, 0, 0.15, true);
+
 		if (m_bIsBerseked)
 		{
+
 			m_bIsBerseked = false;
 			m_pTransformCom->Set_MoveSpeed(2.8f);
 		}
@@ -78,7 +81,7 @@ _int CExecutor::Update(_double fDeltaTime)
 	}
 
 
-	if (m_pModel->Get_NowAnimIndex() != 19)
+	if (m_pModel->Get_NowAnimIndex() != 19 && m_pModel->Get_NowAnimIndex() != 15)
 	{
 
 		if (!m_bIsPatternFinished || Distance_BetweenPlayer(m_pTransformCom) < 10)

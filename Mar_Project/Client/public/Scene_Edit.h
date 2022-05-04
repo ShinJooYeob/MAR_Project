@@ -14,6 +14,7 @@
 
 
 BEGIN(Client)
+class CESCursor;
 class CScene_Edit final : public CScene
 {
 
@@ -31,6 +32,7 @@ class CScene_Edit final : public CScene
 
 	}OBJELEMENT;
 
+
 	enum eDATATYPE
 	{
 		Data_Map,
@@ -41,6 +43,8 @@ class CScene_Edit final : public CScene
 		Data_FilterMap,
 		Datatype_End
 	};
+
+
 #endif
 
 
@@ -155,8 +159,25 @@ private:
 #pragma endregion ParticleTab
 
 #pragma region CamTab
-
 	HRESULT Update_CameraActionTab(_double fDeltatime);
+
+	HRESULT Widget_CursorBatch(_double fDeltatime);
+	HRESULT Widget_CreatedCamPosListBox(_double fDeltatime);
+	HRESULT Widget_Play(_double fDeltatime);
+	
+	CAMACTDESC CamDesc = { 0 };
+
+	_int iPickKinds = 0;
+	_uint iCamPosIndex = 0;
+	_uint iCamLookIndex = 0;
+	
+	CESCursor*		m_pCamCursor = nullptr;
+	vector<CESCursor*> m_vecCamPosBatchedObj;
+	vector<CESCursor*> m_vecLookBatchedObj;
+
+
+	vector<CAMACTDESC>		 m_vecCamPositions;
+	vector<CAMACTDESC>		 m_vecLookPostions;
 
 
 #pragma endregion CamTab
@@ -207,6 +228,7 @@ private:
 	HRESULT Ready_Layer_MainCamera(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_Player(const _tchar* pLayerTag);
 	HRESULT Ready_ParticleDesc();
+	HRESULT Ready_CamActionCursor(const _tchar* pLayerTag);
 
 
 public:

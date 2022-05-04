@@ -5,6 +5,22 @@
 
 BEGIN(Client)
 
+typedef struct tagCamActionDesc
+{
+	_float  fDuration;
+	_float3 vPosition;
+}CAMACTDESC;
+
+typedef struct tagCameraAction
+{
+	_double					 TotalTime = 0;
+	vector<CAMACTDESC>		 vecCamPos;
+	vector<CAMACTDESC>		 vecLookAt;
+
+}CAMERAACTION;
+
+
+
 enum ParticleID
 {
 	Particle_Fixed,

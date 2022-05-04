@@ -6,6 +6,7 @@
 #include "UIImage.h"
 #include "RendererEditSceneUI.h"
 #include "ParticleObject.h"
+#include "ESCursor.h"
 
 CScene_Edit::CScene_Edit(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
 	:CScene(pDevice, pDeviceContext)
@@ -25,6 +26,8 @@ HRESULT CScene_Edit::Initialize()
 	FAILED_CHECK(Ready_Layer_MainCamera(TAG_LAY(Layer_Camera_Main)));
 	FAILED_CHECK(Ready_Layer_RendererEditUI(TAG_LAY(Layer_UI_IMG)));
 	FAILED_CHECK(Ready_ParticleDesc());
+	FAILED_CHECK(Ready_CamActionCursor(L"CamCursor"));
+
 	
 
 
@@ -109,12 +112,22 @@ _int CScene_Edit::Update(_double fDeltaTime)
 				return -1;
 			}
 
-		
 
 		break;
 	case 2:
 		break;
 	case 3:
+
+	{
+		m_pCamCursor->Update(fDeltaTime);
+
+		for (auto& iter : m_vecCamPosBatchedObj)
+			iter->Update(fDeltaTime);
+		for (auto& iter : m_vecLookBatchedObj)
+			iter->Update(fDeltaTime);
+	}
+
+
 		break;
 	case 4:
 		if (m_pCreatedTerrain != nullptr)
@@ -178,6 +191,34 @@ _int CScene_Edit::LateUpdate(_double fDeltaTime)
 	case 2:
 		break;
 	case 3:
+	{
+		if (iPickKinds == 0)
+			m_pCamCursor->LateUpdate(fDeltaTime);
+
+		_uint i = 0;
+		for (auto& iter : m_vecCamPosBatchedObj)
+		{
+			if (i == iCamPosIndex)
+				iter->Set_Color({0, 0.7f, 0, 1});
+			else
+				iter->Set_Color({ 0.1f, 0.25f, 0.1f, 1 });
+
+			iter->LateUpdate(fDeltaTime);
+			i++;
+		}
+		i = 0;
+		for (auto& iter : m_vecLookBatchedObj)
+		{
+			if (i == iCamLookIndex)
+				iter->Set_Color({ 0, 0, 1.f, 1 });
+			else
+				iter->Set_Color({ 0.1f, 0.1f, 0.25f, 1 });
+
+			iter->LateUpdate(fDeltaTime);
+
+			i++;
+		}
+	}
 		break;
 	case 4:
 		if (m_pCreatedTerrain != nullptr)
@@ -249,8 +290,8 @@ _int CScene_Edit::Change_to_NextScene()
 #pragma region Total
 HRESULT CScene_Edit::Update_First_Frame(_double fDeltatime, const char * szFrameBarName)
 {
-	_bool demotrue = true;
-	ImGui::ShowDemoWindow(&demotrue);
+	//_bool demotrue = true;
+	//ImGui::ShowDemoWindow(&demotrue);
 
 	ImGuiWindowFlags window_flags = 0;
 	if (bArrWindowFlag[0])				window_flags |= ImGuiWindowFlags_NoBackground;
@@ -1200,8 +1241,89 @@ HRESULT CScene_Edit::Input_KeyBoard(_double fDeltaTime)
 	
 #pragma endregion UITOOL
 	}
-#pragma region HeightMap
-#pragma endregion HeightMap
+	else if (m_iNowTab == 3)
+	{
+#pragma region CamAction
+		if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_LBUTTON) & DIS_DoubleDown)
+		{
+			POINT ptMouse;
+			GetCursorPos(&ptMouse);
+			ScreenToClient(g_hWnd, &ptMouse);
+
+
+			_Vector vCursorPos = XMVectorSet(
+				(_float(ptMouse.x) / (g_iWinCX * 0.5f)) - 1.f,
+				(_float(ptMouse.y) / -(g_iWinCY * 0.5f)) + 1.f,
+				0, 1.f);
+			//_Vector vCursorPos = XMVectorSet(	(_float(ptMouse.x) / g_iWinCX * 0.5f) - 1.f, 	(_float(ptMouse.y) / g_iWinCY * 0.5f) + 1.f ,		0, 1.f);
+
+			_Matrix InvProjMat = XMMatrixInverse(nullptr, pInstance->Get_Transform_Matrix(PLM_PROJ));
+
+			_Vector vRayDir = XMVector4Transform(vCursorPos, InvProjMat) - XMVectorSet(0, 0, 0, 1);
+
+			_Matrix InvViewMat = XMMatrixInverse(nullptr, pInstance->Get_Transform_Matrix(PLM_VIEW));
+			vRayDir = XMVector3TransformNormal(vRayDir, InvViewMat);
+
+
+			if (m_pCreatedTerrain)
+			{
+				_Vector vCamPos = m_pEditorCam->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_POS);
+
+				_Vector vOldPos = vCamPos;
+				_Vector vNewPos;
+				_float3 vResult;
+				_bool IsPicked = false;
+
+
+				for (_uint i = 0; i < 200; i++)
+				{
+					vNewPos = vOldPos + vRayDir;
+
+					vResult = m_pCreatedTerrain->Pick_OnTerrain(&IsPicked, vNewPos, vOldPos);
+
+					if (IsPicked)
+					{
+
+						//wstring ResultString = L"X : " + to_wstring(vResult.x) + L"	Y : " + to_wstring(vResult.y) + L"	Z : " + to_wstring(vResult.z) + L"\n";
+						//OutputDebugStringW(ResultString.c_str());
+						m_fPickingedPosition[0] = vResult.x;
+						m_fPickingedPosition[1] = vResult.y;
+						m_fPickingedPosition[2] = vResult.z;
+						break;
+					}
+
+					vOldPos = vNewPos;
+				}
+
+				if (IsPicked)
+				{
+
+					CamDesc.vPosition = vResult;
+				}
+			}
+			else
+			{
+				_Vector vCamPos = m_pEditorCam->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_POS);
+
+				if (XMVectorGetY(vCamPos) * XMVectorGetY(vRayDir) < 0)
+				{
+					_float Scale = XMVectorGetY(vCamPos) / -XMVectorGetY(vRayDir);
+
+					_float3 vTargetPos = vCamPos + Scale * vRayDir;
+
+					m_fPickingedPosition[0] = vTargetPos.x;
+					m_fPickingedPosition[1] = vTargetPos.y;
+					m_fPickingedPosition[2] = vTargetPos.z;
+
+					CamDesc.vPosition = vTargetPos;
+
+
+				}
+			}
+
+		}
+#pragma endregion CamAction
+	}
 
 #pragma region HeightMap
 #pragma endregion HeightMap
@@ -2714,8 +2836,384 @@ HRESULT CScene_Edit::Widget_SettingParticleDesc(_double fDeltatime)
 
 HRESULT CScene_Edit::Update_CameraActionTab(_double fDeltatime)
 {
+
+
+	FAILED_CHECK(Widget_CursorBatch(fDeltatime));
+
+	FAILED_CHECK(Widget_CreatedCamPosListBox(fDeltatime));
+
+	FAILED_CHECK(Widget_Play(fDeltatime));
 	return S_OK;
 }
+
+HRESULT CScene_Edit::Widget_CursorBatch(_double fDeltatime)
+{
+	Make_VerticalSpacing(3);
+
+
+
+	ImGui::RadioButton("CursorEdit", &iPickKinds, 0); ImGui::SameLine();
+	if (ImGui::RadioButton("CamPosEdit", &iPickKinds, 1))
+	{
+		if (m_vecCamPosBatchedObj.size() <= 0)
+			iPickKinds = 0;
+
+		else
+		{
+			if (iCamPosIndex >= m_vecCamPosBatchedObj.size())
+				iCamPosIndex = _uint(m_vecCamPosBatchedObj.size() - 1);
+
+
+			CamDesc = m_vecCamPositions[iCamPosIndex];
+
+		}
+	}; ImGui::SameLine();
+
+	if(ImGui::RadioButton("LookEdit", &iPickKinds, 2))
+	{
+
+		if (m_vecLookPostions.size() <= 0)
+			iPickKinds = 0;
+
+		else
+		{
+			if (iCamLookIndex >= m_vecLookPostions.size())
+				iCamLookIndex = _uint(m_vecLookPostions.size() - 1);
+
+			CamDesc = m_vecLookPostions[iCamLookIndex];
+
+		}
+
+
+	}
+
+
+
+
+	Make_VerticalSpacing(3);
+
+	static float TempFloat3Arr[3];
+	switch (iPickKinds)
+	{
+	case 0:
+
+		ImGui::DragFloat("Duration", &CamDesc.fDuration, 0.01f, 0);
+
+
+		TempFloat3Arr[0] = CamDesc.vPosition.x;
+		TempFloat3Arr[1] = CamDesc.vPosition.y;
+		TempFloat3Arr[2] = CamDesc.vPosition.z;
+		
+		ImGui::DragFloat3("Position", TempFloat3Arr, 0.1f);
+		
+
+		CamDesc.vPosition.x = TempFloat3Arr[0];
+		CamDesc.vPosition.y = TempFloat3Arr[1];
+		CamDesc.vPosition.z = TempFloat3Arr[2];
+
+		m_pCamCursor->Set_Position(CamDesc.vPosition);
+
+
+		if (ImGui::Button("Create CamPosition", ImVec2(200, 30)))
+		{
+			CESCursor* pCursor = nullptr;
+			FAILED_CHECK(m_pGameInstance->Add_GameObject_Out_of_Manager((CGameObject**)(&pCursor), SCENE_EDIT, TAG_OP(Prototype_EditorCursor)));
+			NULL_CHECK_RETURN(pCursor, E_FAIL);
+			pCursor->Set_Position(CamDesc.vPosition);
+			pCursor->Set_Color({ 0, 0.5f, 0, 1 });
+
+			m_vecCamPosBatchedObj.push_back(pCursor);
+
+			CAMACTDESC tDesc = { 0 };
+
+			tDesc = CamDesc;
+			m_vecCamPositions.push_back(tDesc);
+
+
+		} ImGui::SameLine();
+
+		if (ImGui::Button("Create LookPosition", ImVec2(200, 30)))
+		{
+			CESCursor* pCursor = nullptr;
+			FAILED_CHECK(m_pGameInstance->Add_GameObject_Out_of_Manager((CGameObject**)(&pCursor), SCENE_EDIT, TAG_OP(Prototype_EditorCursor)));
+			NULL_CHECK_RETURN(pCursor, E_FAIL);
+			pCursor->Set_Position(CamDesc.vPosition);
+			pCursor->Set_Color({ 0, 0, 0.25f, 1 });
+			m_vecLookBatchedObj.push_back(pCursor);
+
+			CAMACTDESC tDesc = { 0 };
+
+			tDesc = CamDesc;
+			m_vecLookPostions.push_back(tDesc);
+
+
+
+		}
+
+
+
+		break;
+	case 1: // CamPositions
+
+	{
+		{
+			char buf[MAX_PATH];
+			sprintf_s(buf, "CamPos Index : %d", iCamPosIndex);
+			ImGui::Text(buf);
+		}
+
+		ImGui::DragFloat("Duration", &CamDesc.fDuration, 0.01f, 0);
+
+
+		TempFloat3Arr[0] = CamDesc.vPosition.x;
+		TempFloat3Arr[1] = CamDesc.vPosition.y;
+		TempFloat3Arr[2] = CamDesc.vPosition.z;
+
+		ImGui::DragFloat3("Position", TempFloat3Arr, 0.1f);
+
+
+		CamDesc.vPosition.x = TempFloat3Arr[0];
+		CamDesc.vPosition.y = TempFloat3Arr[1];
+		CamDesc.vPosition.z = TempFloat3Arr[2];
+
+		m_vecCamPosBatchedObj[iCamPosIndex]->Set_Position(CamDesc.vPosition);
+		m_vecCamPositions[iCamPosIndex].vPosition = CamDesc.vPosition;
+		m_vecCamPositions[iCamPosIndex].fDuration = CamDesc.fDuration;
+
+		if (ImGui::Button("Delete CamPostion", ImVec2(-FLT_MIN, 30)))
+		{
+
+			auto ObjIter = m_vecCamPosBatchedObj.begin();
+			ObjIter += iCamPosIndex;
+
+			Safe_Release(*ObjIter);
+			m_vecCamPosBatchedObj.erase(ObjIter);
+
+
+			auto DescIter = m_vecCamPositions.begin();
+			DescIter += iCamPosIndex;
+			m_vecCamPositions.erase(DescIter);
+
+			iCamPosIndex = 0;
+
+			if (m_vecCamPositions.size() <= 0 || m_vecCamPosBatchedObj.size() <= 0)
+			{
+				iPickKinds = 0;
+			}
+
+		}
+
+
+	}
+		break;
+	case 2: // CamLook
+	{
+		{
+			char buf[MAX_PATH];
+			sprintf_s(buf, "Look Index : %d", iCamLookIndex);
+			ImGui::Text(buf);
+		}
+
+		ImGui::DragFloat("Duration", &CamDesc.fDuration, 0.01f, 0);
+
+
+		TempFloat3Arr[0] = CamDesc.vPosition.x;
+		TempFloat3Arr[1] = CamDesc.vPosition.y;
+		TempFloat3Arr[2] = CamDesc.vPosition.z;
+
+		ImGui::DragFloat3("Position", TempFloat3Arr, 0.1f);
+
+
+		CamDesc.vPosition.x = TempFloat3Arr[0];
+		CamDesc.vPosition.y = TempFloat3Arr[1];
+		CamDesc.vPosition.z = TempFloat3Arr[2];
+
+
+		m_vecLookBatchedObj[iCamLookIndex]->Set_Position(CamDesc.vPosition);
+		m_vecLookPostions[iCamLookIndex].vPosition = CamDesc.vPosition;
+		m_vecLookPostions[iCamLookIndex].fDuration = CamDesc.fDuration;
+
+		if (ImGui::Button("Delete LookPosition", ImVec2(-FLT_MIN, 30)))
+		{
+			auto ObjIter = m_vecLookBatchedObj.begin();
+			ObjIter += iCamLookIndex;
+
+			Safe_Release(*ObjIter);
+			m_vecLookBatchedObj.erase(ObjIter);
+
+
+			auto DescIter = m_vecLookPostions.begin();
+			DescIter += iCamLookIndex;
+			m_vecLookPostions.erase(DescIter);
+
+			iCamLookIndex = 0;
+
+			if (m_vecLookPostions.size() <= 0 || m_vecLookBatchedObj.size() <= 0)
+			{
+				iPickKinds = 0;
+			}
+		}
+
+	}
+		break;
+
+
+	default:
+		break;
+	}
+
+	return S_OK;
+}
+
+HRESULT CScene_Edit::Widget_CreatedCamPosListBox(_double fDeltatime)
+{
+
+	Make_VerticalSpacing(5);
+
+	_float AllTotalTime = 0;
+	{
+		ImGuiWindowFlags window_flags = ImGuiWindowFlags_None | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_HorizontalScrollbar;
+		{
+
+			ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
+			ImGui::BeginChild("ChildL", ImVec2(ImGui::GetContentRegionAvail().x * 0.5f, 130), true, window_flags);
+
+
+			if (ImGui::BeginMenuBar())
+			{
+				if (ImGui::BeginMenu("CamPosList"))
+				{
+					ImGui::EndMenu();
+				}
+				ImGui::EndMenuBar();
+			}
+
+			if (ImGui::BeginTable("split", 1, ImGuiTableFlags_Resizable | ImGuiTableFlags_NoSavedSettings))
+			{
+				_float TotalTime = 0;
+
+				for (int i = 0; i < m_vecCamPositions.size(); i++)
+				{
+
+					char buf[MAX_PATH];
+					TotalTime += m_vecCamPositions[i].fDuration;
+					sprintf_s(buf, "%d : %3f(%3f)", i, m_vecCamPositions[i].fDuration, TotalTime);
+					ImGui::TableNextColumn();
+
+					if (ImGui::Button(buf, ImVec2(-FLT_MIN, 0.0f)))
+					{
+						iCamPosIndex = i;
+						if(iPickKinds == 1)
+							CamDesc = m_vecCamPositions[iCamPosIndex];
+					}
+
+					if (ImGui::IsItemHovered())
+					{
+						//m_iBatchedVecIndex = 0;
+						//m_bIsModelMove = 0;
+						//m_SelectedObjectSRT = &(m_vecBatchedObject[m_iBatchedVecIndex].matSRT);
+						//ZeroMemory(m_iSelectedObjectNMesh, sizeof(_uint) * 2);
+						//m_iSelectedObjectNMesh[0] = Prototype_StaticMapObject;
+						//m_iSelectedObjectNMesh[1] = Prototype_Mesh_None;
+
+					}
+				}
+
+				if (AllTotalTime < TotalTime)AllTotalTime = TotalTime;
+				ImGui::EndTable();
+			}
+			ImGui::EndChild();
+			ImGui::PopStyleVar();
+		}
+
+		ImGui::SameLine();
+
+		{
+
+			ImGui::BeginChild("ChildR", ImVec2(0, 130), true, window_flags);
+
+			if (ImGui::BeginMenuBar())
+			{
+				if (ImGui::BeginMenu("CamLook List"))
+				{
+					ImGui::EndMenu();
+				}
+				ImGui::EndMenuBar();
+
+				//char buf[128];
+				//sprintf_s(buf, "%ws\n", TAG_MESH(MESHTYPEID(m_iSelectedObjectNMesh[1])));
+				//ImGui::Text(buf);
+			}
+
+			if (ImGui::BeginTable("split", 1, ImGuiTableFlags_Resizable | ImGuiTableFlags_NoSavedSettings))
+			{
+				_float TotalTime = 0;
+
+				for (int i = 0; i < m_vecLookPostions.size(); i++)
+				{
+
+					char buf[MAX_PATH];
+					TotalTime += m_vecLookPostions[i].fDuration;
+					sprintf_s(buf, "%d : %.3f(%.3f)", i, m_vecLookPostions[i].fDuration, TotalTime);
+					ImGui::TableNextColumn();
+
+					if (ImGui::Button(buf, ImVec2(-FLT_MIN, 0.0f)))
+					{
+						iCamLookIndex = i;
+						if (iPickKinds == 2)
+							CamDesc = m_vecLookPostions[iCamLookIndex];
+					}
+
+					if (ImGui::IsItemHovered())
+					{
+						//m_iBatchedVecIndex = 0; m_bIsModelMove = 0;
+						//m_SelectedObjectSRT = &(m_vecBatchedObject[m_iBatchedVecIndex].matSRT);
+						//ZeroMemory(m_iSelectedObjectNMesh, sizeof(_uint) * 2);
+						//m_iSelectedObjectNMesh[0] = Prototype_StaticMapObject;
+						//m_iSelectedObjectNMesh[1] = Prototype_Mesh_None;
+
+					}
+				}
+				if (AllTotalTime < TotalTime)AllTotalTime = TotalTime;
+				ImGui::EndTable();
+			}
+
+			Make_VerticalSpacing(1);
+
+			ImGui::EndChild();
+		}
+	}
+
+	{
+		char buf[MAX_PATH];
+		sprintf_s(buf, "Total CamAction Time : %f", AllTotalTime);
+		ImGui::Text(buf);
+		Make_VerticalSpacing(2);
+	}
+
+
+
+	return S_OK;
+}
+
+HRESULT CScene_Edit::Widget_Play(_double fDeltatime)
+{
+	Make_VerticalSpacing(5);
+
+	if (ImGui::Button("Play", ImVec2(200, 60.f)))
+	{
+		CAMERAACTION tDesc;
+
+		tDesc.vecCamPos = m_vecCamPositions;
+		tDesc.vecLookAt = m_vecLookPostions;
+
+		m_pEditorCam->CamActionStart(tDesc);
+	}
+
+
+	return S_OK;
+}
+
 
 HRESULT CScene_Edit::Update_HeightMap(_double fDeltatime)
 {
@@ -3678,6 +4176,18 @@ HRESULT CScene_Edit::Ready_ParticleDesc()
 	return S_OK;
 }
 
+HRESULT CScene_Edit::Ready_CamActionCursor(const _tchar * pLayerTag)
+{
+
+	FAILED_CHECK(m_pGameInstance->Add_GameObject_Out_of_Manager((CGameObject**)(&m_pCamCursor), SCENE_EDIT, TAG_OP(Prototype_EditorCursor)));
+	NULL_CHECK_RETURN(m_pCamCursor, E_FAIL);
+	m_pCamCursor->Set_Color({1, 0, 0, 1});
+
+	CamDesc.fDuration = 0.5f;
+
+	return S_OK;
+}
+
 
 #endif // USE_IMGUI
 
@@ -3707,13 +4217,23 @@ void CScene_Edit::Free()
 		//객채 없애기 죽이기 비워주기
 		Safe_Release(iter.pObject);
 	}
-	
+	m_vecBatchedObject.clear();
+
 	for (auto& EditedUI : m_vecBatchedUI)
 	{
 		Safe_Release(EditedUI.SRV);
 	}
 	
 	m_vecBatchedObject.clear();
+
+
+	Safe_Release(m_pCamCursor);
+	for (auto& iter : m_vecCamPosBatchedObj)
+		Safe_Release(iter);
+	m_vecCamPosBatchedObj.clear();
+	for (auto& iter : m_vecLookBatchedObj)
+		Safe_Release(iter);
+	m_vecLookBatchedObj.clear();
 
 
 
