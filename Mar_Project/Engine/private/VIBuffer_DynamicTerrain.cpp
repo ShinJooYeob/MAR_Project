@@ -105,7 +105,6 @@ HRESULT CVIBuffer_DynamicTerrain::Initialize_Prototype(const _tchar* pHeightMap)
 			m_pKeepVertices[iIndex].vTexUV = _float2(j / (m_iNumVerticesX - 1.f), i / (m_iNumVerticesZ - 1.f));
 			m_pNaviTerrain[iIndex] = _float(_ulong((pPixel[iIndex] & 0x00ff0000 )>> 16));
 			//m_pNaviTerrain[iIndex] = Tile_Movable;
-			int t = 0;
 		}
 	}
 
