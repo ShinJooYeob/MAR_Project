@@ -13,6 +13,17 @@ _uint CALLBACK Monster_Add_Force_Thread(void* _Prameter)
 	FAILED_CHECK(pMonster->Calculate_Force(tThreadArg.IsClientQuit, tThreadArg.CriSec));
 	return 0;
 }
+_uint CALLBACK Monster_Smooth_AddForce_Thread(void* _Prameter)
+{
+	THREADARG tThreadArg{};
+	memcpy(&tThreadArg, _Prameter, sizeof(THREADARG));
+	delete _Prameter;
+
+
+	CMonster* pMonster = (CMonster*)(tThreadArg.pArg);
+	FAILED_CHECK(pMonster->Calculate_SmoothForce(tThreadArg.IsClientQuit, tThreadArg.CriSec));
+	return 0;
+}
 
 
 CMonster::CMonster(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
@@ -92,8 +103,22 @@ void CMonster::Add_Force(CTransform* pTransfrom, _float3 vDir, _float Power)
 		m_bIsAddForceActived = true;
 		g_pGameInstance->PlayThread(Monster_Add_Force_Thread, this);
 	}
-
 	
+	
+}
+
+void CMonster::Add_Force_Smooth(CTransform * pTransfrom, _float3 vDir, _float Power, _float TargetTime)
+{
+	m_vSmoothAddedForce = (vDir.Get_Nomalize() * Power) + m_vSmoothAddedForce.XMVector();
+	m_fSmoothDecrease = _float(m_vSmoothAddedForce.Get_Lenth()* g_fDeltaTime / TargetTime);
+	
+	if (!m_bIsSmoothAddForceActived)
+	{
+		pSAFTransfrom = pTransfrom;
+		m_bIsSmoothAddForceActived = true;
+		g_pGameInstance->PlayThread(Monster_Smooth_AddForce_Thread, this);
+	}
+
 }
 
 HRESULT CMonster::Calculate_Force(_bool * _IsClientQuit, CRITICAL_SECTION * _CriSec)
@@ -109,7 +134,7 @@ HRESULT CMonster::Calculate_Force(_bool * _IsClientQuit, CRITICAL_SECTION * _Cri
 
 		NowTick = GetTickCount();
 
-		if ((NowTick - OldTick) < g_fDeltaTime * 1000)
+		if ((NowTick - OldTick) <= g_fDeltaTime * 1000)
 			continue;
 		OldTick = NowTick;
 
@@ -117,7 +142,7 @@ HRESULT CMonster::Calculate_Force(_bool * _IsClientQuit, CRITICAL_SECTION * _Cri
 		_Vector vDir = m_vAddedForce.Get_Nomalize();
 
 
-		if (Power * 0.78f < 0.2)
+		if (Power * 0.78f < 0.2f)
 		{
 			EnterCriticalSection(_CriSec);
 			m_vAddedForce = _float3(0, 0, 0);
@@ -137,6 +162,49 @@ HRESULT CMonster::Calculate_Force(_bool * _IsClientQuit, CRITICAL_SECTION * _Cri
 	m_bIsAddForceActived = false;
 	LeaveCriticalSection(_CriSec);
 
+
+	return S_OK;
+}
+
+HRESULT CMonster::Calculate_SmoothForce(_bool * _IsClientQuit, CRITICAL_SECTION * _CriSec)
+{
+	DWORD  NowTick = GetTickCount();
+	DWORD  OldTick = NowTick;
+
+	while (true)
+	{
+		if (*_IsClientQuit == true)
+			return S_OK;
+
+		NowTick = GetTickCount();
+
+		if ((NowTick - OldTick) <= g_fDeltaTime * 1000)
+			continue;
+		OldTick = NowTick;
+
+		_float Power = m_vSmoothAddedForce.Get_Lenth();
+		_Vector vDir = m_vSmoothAddedForce.Get_Nomalize();
+
+
+		if (Power - m_fSmoothDecrease < 0.05f)
+		{
+			EnterCriticalSection(_CriSec);
+			m_vSmoothAddedForce = _float3(0, 0, 0);
+			LeaveCriticalSection(_CriSec);
+			break;
+		}
+
+		EnterCriticalSection(_CriSec);
+		pSAFTransfrom->MovetoDir_bySpeed(vDir, Power, g_fDeltaTime);
+		m_vSmoothAddedForce = vDir * (Power - m_fSmoothDecrease);
+		LeaveCriticalSection(_CriSec);
+
+
+	}
+
+	EnterCriticalSection(_CriSec);
+	m_bIsSmoothAddForceActived = false;
+	LeaveCriticalSection(_CriSec);
 
 	return S_OK;
 }

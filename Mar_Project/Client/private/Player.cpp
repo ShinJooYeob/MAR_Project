@@ -145,7 +145,9 @@ _int CPlayer::LateUpdate(_double fDeltaTime)
 		FAILED_CHECK(Set_Player_On_Terrain());
 	}
 	else {
-		FAILED_CHECK(Set_Player_On_Slieder(fDeltaTime));
+		FAILED_CHECK(Set_Player_On_Terrain());
+
+		//FAILED_CHECK(Set_Player_On_Slieder(fDeltaTime));
 	}
 	
 	FAILED_CHECK(Set_Camera_On_Player(fDeltaTime));

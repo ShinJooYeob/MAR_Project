@@ -45,56 +45,62 @@ _int CExecutor::Update(_double fDeltaTime)
 {
 	if (__super::Update(fDeltaTime) < 0)return -1;
 	m_pColliderCom->Update_ConflictPassedTime(fDeltaTime);
+	Update_DmgCalculate(fDeltaTime);
 
 	if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
 		m_pModel->Change_AnimIndex(0);
 	if (g_pGameInstance->Get_DIKeyState(DIK_2)&DIS_Down)
-		m_pModel->Change_AnimIndex(1);
-	if (g_pGameInstance->Get_DIKeyState(DIK_3)&DIS_Down)
-		m_pModel->Change_AnimIndex(2);
-	if (g_pGameInstance->Get_DIKeyState(DIK_4)&DIS_Down)
-		m_pModel->Change_AnimIndex(8);
-	if (g_pGameInstance->Get_DIKeyState(DIK_5)&DIS_Down)
-		m_pModel->Change_AnimIndex(10);
-	if (g_pGameInstance->Get_DIKeyState(DIK_6)&DIS_Down)
-		m_pModel->Change_AnimIndex(11);
-	if (g_pGameInstance->Get_DIKeyState(DIK_7)&DIS_Down)
-		m_pModel->Change_AnimIndex(12);
-	if (g_pGameInstance->Get_DIKeyState(DIK_8)&DIS_Down)
-		m_pModel->Change_AnimIndex(13);
-	if (g_pGameInstance->Get_DIKeyState(DIK_9)&DIS_Down)
-		m_pModel->Change_AnimIndex(14);
-	if (g_pGameInstance->Get_DIKeyState(DIK_0)&DIS_Down)
-		m_pModel->Change_AnimIndex(16);
+		Add_Dmg_to_Monster(10);
+
+	//m_pModel->Change_AnimIndex(16) // 슬램더
 	//walk 2.8 / 0.05f
 
 	//run 5.5 / 0.1
 	
 
+	if (g_pGameInstance->Get_DIKeyState(DIK_F1)&DIS_Down)
+	{
+		m_bIsPatternFinished = true;
+		m_PatternDelayTime = 0;
+		m_PatternPassedTime = 0;
+		m_ePattern = 0;
 
-	if (!m_bIsPatternFinished || Distance_BetweenPlayer(m_pTransformCom) < 10)
-	{
-		Update_Pattern(fDeltaTime);
-	}
-	else
-	{
-		if (!m_pModel->Get_IsUntillPlay())
+		if (m_bIsBerseked)
 		{
-			m_pModel->Change_AnimIndex((m_fHP < m_fMaxHP * 0.5f) ? 2 : 1);
-			FAILED_CHECK(__super::Update_WanderAround(m_pTransformCom, fDeltaTime, (m_fHP < m_fMaxHP * 0.5f) ? 0.1f : 0.05f));
+			m_bIsBerseked = false;
+			m_pTransformCom->Set_MoveSpeed(2.8f);
+		}
+		else
+		{
+			m_bIsBerseked = true;
+			m_pTransformCom->Set_MoveSpeed(5.5f);
 		}
 	}
-	
 
 
+	if (m_pModel->Get_NowAnimIndex() != 19)
+	{
 
+		if (!m_bIsPatternFinished || Distance_BetweenPlayer(m_pTransformCom) < 10)
+		{
+			Update_Pattern(fDeltaTime);
+		}
+		else
+		{
+			if (!m_pModel->Get_IsUntillPlay())
+			{
+				m_pModel->Change_AnimIndex((m_bIsBerseked) ? 1 : 2);
+				FAILED_CHECK(__super::Update_WanderAround(m_pTransformCom, fDeltaTime, (m_bIsBerseked) ? 0.1f : 0.05f));
+			}
+		}
 
+	}
 
 
 
 	m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
-	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime , m_bIsOnScreen));
-
+	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime * ((m_bIsBerseked) ? 1.5f : 1.f), m_bIsOnScreen));
+	FAILED_CHECK(Adjust_AnimMovedTransform(fDeltaTime));
 	if (m_bIsOnScreen)
 	{
 
@@ -178,7 +184,31 @@ _int CExecutor::LateRender()
 
 _int CExecutor::Update_DmgCalculate(_double fDeltaTime)
 {
-	return _int();
+	if (m_DmgPassedTime <= 0)
+	{
+		if (m_fDmgAmount > 0)
+		{
+			m_fDmgAmount = 0;
+			m_DmgPassedTime = 0;
+		}
+		return 0;
+	}
+
+	m_DmgPassedTime -= fDeltaTime;
+
+	if (m_fDmgAmount != 0 )
+	{
+		m_pModel->Change_AnimIndex_ReturnTo_Must(19, 0, 0.15, true);
+
+		m_bIsPatternFinished = true;
+		m_PatternPassedTime = 0;
+		m_PatternDelayTime = 3;
+		m_fDmgAmount = 0;
+		Add_Force(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK)* -1, 10);
+	}
+	
+
+	return 0;
 }
 
 _int CExecutor::Update_Pattern(_double fDeltaTime)
@@ -189,31 +219,16 @@ _int CExecutor::Update_Pattern(_double fDeltaTime)
 
 
 
-	if (m_fHP < m_fMaxHP * 0.5f)
+	if (m_bIsBerseked)
 		//버닝 모드
 	{
 		if (m_bIsPatternFinished)
 		{
 			m_ePattern += 1;
-			if (m_ePattern > 3) m_ePattern = 0;
+			if (m_ePattern > 4) m_ePattern = 0;
 			m_bIsPatternFinished = false;
 			m_PatternPassedTime = 0;
 			//m_pModel->Change_AnimIndex(2);
-		}
-
-
-
-
-	}
-	else
-		//일반 모드
-	{
-		if (m_bIsPatternFinished)
-		{
-			//m_ePattern += 1;
-			//if (m_ePattern > 3) m_ePattern = 0;
-			m_bIsPatternFinished = false;
-			m_PatternPassedTime = 0;
 		}
 
 
@@ -223,30 +238,456 @@ _int CExecutor::Update_Pattern(_double fDeltaTime)
 
 		{
 
-			if (!m_bIsJumping)
+			if (m_PatternDelayTime)
 			{
-				m_pModel->Change_AnimIndex_UntilTo(4, 6, 0.08, true);
-				m_bIsJumping = true;
+				m_PatternDelayTime -= fDeltaTime;
+
+
+				_uint iAnimIndex = m_pModel->Get_NowAnimIndex();
+				if (!iAnimIndex && m_pModel->Get_PlayRate() >= 0.01)
+					m_pModel->Change_AnimIndex((m_bIsBerseked) ? 1 : 2);
+
+				if (iAnimIndex == 1 || iAnimIndex == 2)
+				{
+					m_vLookDir = XMVector3Normalize(XMVectorSetY(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS) - m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0));
+					if (iAnimIndex == 1)
+						m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.1f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.9f));
+					else
+						m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.05f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.95f));
+
+					m_pTransformCom->MovetoDir(m_vLookDir.XMVector(), fDeltaTime);
+				}
+
+
+				if (m_PatternDelayTime < 0)
+				{
+					m_bIsPatternFinished = true;
+					m_PatternDelayTime = 0;
+					m_PatternPassedTime = 0;
+				}
+
 			}
-			else if(m_pModel->Get_NowAnimIndex() == 5 && !m_bIsAddForceActived)
+			else
 			{
-				m_vLookDir = XMVector3Normalize(XMVectorSetY(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS) - m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0));
-				m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.15f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.85f));
-				Add_Force(m_pTransformCom, m_vLookDir.XMVector() + XMVectorSet(0, 1, 0, 0), 50);
+
+				if (!m_bIsJumping)
+				{
+					m_pModel->Change_AnimIndex_UntilTo(4, 6, 0.15, true);
+					m_bIsJumping = true;
+				}
+				else if (m_pModel->Get_NowAnimIndex() == 5 && !m_bIsAddForceActived)
+				{
+					m_vLookDir = XMVector3Normalize(XMVectorSetY(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS) - m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0));
+					m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.15f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.85f));
+					Add_Force(m_pTransformCom, m_vLookDir.XMVector() * 0.25f + XMVectorSet(0, 1, 0, 0) * 0.25f, 100);
+					//Add_Force(m_pTransformCom, m_vLookDir.XMVector() * 0.75f + XMVectorSet(0, 1, 0, 0) * 0.25f, 100);
+				}
 			}
+
+		}
+
+		break;
+		case 1:
+		{
+			if (!m_PatternPassedTime)
+			{
+
+				m_pModel->Change_AnimIndex_UntilNReturn_Must(8, 9, 0, 0.15, true);
+			}
+			else
+			{
+				if (m_PatternDelayTime)
+				{
+					m_PatternDelayTime -= fDeltaTime;
+
+
+
+					_uint iAnimIndex = m_pModel->Get_NowAnimIndex();
+					if (!iAnimIndex && m_pModel->Get_PlayRate() >= 0.01)
+						m_pModel->Change_AnimIndex((m_bIsBerseked) ? 1 : 2);
+
+					if (iAnimIndex == 1 || iAnimIndex == 2)
+					{
+						m_vLookDir = XMVector3Normalize(XMVectorSetY(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS) - m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0));
+						if (iAnimIndex == 1)
+							m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.1f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.9f));
+						else
+							m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.05f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.95f));
+						m_pTransformCom->MovetoDir(m_vLookDir.XMVector(), fDeltaTime);
+					}
+
+
+					if (m_PatternDelayTime < 0)
+					{
+						m_bIsPatternFinished = true;
+						m_PatternDelayTime = 0;
+						m_PatternPassedTime = 0;
+					}
+				}
+				else
+				{
+					if (m_pModel->Get_NowAnimIndex() == 0)
+					{
+						m_PatternDelayTime = 2;
+					}
+				}
+			}
+
+
+		}
+		break;
+		case 2:
+
+		{
+			if (!m_PatternPassedTime)
+			{
+
+				m_pModel->Change_AnimIndex_UntilNReturn_Must(10, 11, 0, 0.15, true);
+			}
+			else
+			{
+				if (m_PatternDelayTime)
+				{
+					m_PatternDelayTime -= fDeltaTime;
+
+					_uint iAnimIndex = m_pModel->Get_NowAnimIndex();
+					if (!iAnimIndex && m_pModel->Get_PlayRate() >= 0.01)
+						m_pModel->Change_AnimIndex((m_bIsBerseked) ? 1 : 2);
+
+					if (iAnimIndex == 1 || iAnimIndex == 2)
+					{
+						m_vLookDir = XMVector3Normalize(XMVectorSetY(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS) - m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0));
+						if (iAnimIndex == 1)
+							m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.1f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.9f));
+						else
+							m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.05f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.95f));
+						m_pTransformCom->MovetoDir(m_vLookDir.XMVector(), fDeltaTime);
+					}
+
+					if (m_PatternDelayTime < 0)
+					{
+						m_bIsPatternFinished = true;
+						m_PatternDelayTime = 0;
+						m_PatternPassedTime = 0;
+					}
+				}
+				else
+				{
+					if (m_pModel->Get_NowAnimIndex() == 0)
+					{
+						m_PatternDelayTime = 2;
+					}
+				}
+			}
+
+
+		}
+
+		break;
+		case 3:
+		{
+			if (!m_PatternPassedTime)
+			{
+				m_pModel->Change_AnimIndex_ReturnTo_Must(13, 0, 0.15, true);
+			}
+			else
+			{
+				if (m_PatternDelayTime)
+				{
+					m_PatternDelayTime -= fDeltaTime;
+
+					_uint iAnimIndex = m_pModel->Get_NowAnimIndex();
+					if (!iAnimIndex && m_pModel->Get_PlayRate() >= 0.01)
+						m_pModel->Change_AnimIndex((m_bIsBerseked) ? 1 : 2);
+
+					if (iAnimIndex == 1 || iAnimIndex == 2)
+					{
+						m_vLookDir = XMVector3Normalize(XMVectorSetY(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS) - m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0));
+						if (iAnimIndex == 1)
+							m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.1f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.9f));
+						else
+							m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.05f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.95f));
+						m_pTransformCom->MovetoDir(m_vLookDir.XMVector(), fDeltaTime);
+					}
+
+					if (m_PatternDelayTime < 0)
+					{
+						m_bIsPatternFinished = true;
+						m_PatternDelayTime = 0;
+						m_PatternPassedTime = 0;
+					}
+				}
+				else
+				{
+					if (m_pModel->Get_NowAnimIndex() == 0)
+					{
+						m_PatternDelayTime = 2;
+					}
+				}
+			}
+		}
+		break;
+		case 4:
+		{
+			if (!m_PatternPassedTime)
+			{
+				m_pModel->Change_AnimIndex_ReturnTo_Must(14, 0, 0.15, true);
+			}
+			else
+			{
+				if (m_PatternDelayTime)
+				{
+					m_PatternDelayTime -= fDeltaTime;
+
+					_uint iAnimIndex = m_pModel->Get_NowAnimIndex();
+					if (!iAnimIndex && m_pModel->Get_PlayRate() >= 0.01)
+						m_pModel->Change_AnimIndex((m_bIsBerseked) ? 1 : 2);
+
+					if (iAnimIndex == 1 || iAnimIndex == 2)
+					{
+						m_vLookDir = XMVector3Normalize(XMVectorSetY(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS) - m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0));
+						if (iAnimIndex == 1)
+							m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.1f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.9f));
+						else
+							m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.05f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.95f));
+						m_pTransformCom->MovetoDir(m_vLookDir.XMVector(), fDeltaTime);
+					}
+
+					if (m_PatternDelayTime < 0)
+					{
+						m_bIsPatternFinished = true;
+						m_PatternDelayTime = 0;
+						m_PatternPassedTime = 0;
+					}
+				}
+				else
+				{
+					if (m_pModel->Get_NowAnimIndex() == 0)
+					{
+						m_PatternDelayTime = 2;
+					}
+				}
+			}
+		}
+		break;
+
+
+		default:
+			break;
+		}
+
+
+
+	}
+	else
+		//일반 모드
+	{
+		if (m_bIsPatternFinished)
+		{
+			m_ePattern += 1;
+			if (m_ePattern > 3) m_ePattern = 0;
+			m_bIsPatternFinished = false;
+			m_PatternPassedTime = 0;
+			m_PatternDelayTime = 0;
+		}
+
+
+		switch (m_ePattern)
+		{
+		case 0:
+
+		{
+
+			if (m_PatternDelayTime)
+			{
+				m_PatternDelayTime -= fDeltaTime;
+
+
+				_uint iAnimIndex = m_pModel->Get_NowAnimIndex();
+				if (!iAnimIndex && m_pModel->Get_PlayRate() >= 0.01)
+					m_pModel->Change_AnimIndex((m_bIsBerseked) ? 1 : 2);
+
+				if (iAnimIndex == 1 || iAnimIndex == 2)
+				{
+					m_vLookDir = XMVector3Normalize(XMVectorSetY(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS) - m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0));
+					if (iAnimIndex == 1)
+						m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.1f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.9f));
+					else
+						m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.05f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.95f));
+
+					m_pTransformCom->MovetoDir(m_vLookDir.XMVector(), fDeltaTime);
+				}
+
+
+				if (m_PatternDelayTime < 0)
+				{
+					m_bIsPatternFinished = true;
+					m_PatternDelayTime = 0;
+					m_PatternPassedTime = 0;
+				}
+
+			}
+			else
+			{
+
+				if (!m_bIsJumping)
+				{
+					m_pModel->Change_AnimIndex_UntilTo(4, 6, 0.15, true);
+					m_bIsJumping = true;
+				}
+				else if (m_pModel->Get_NowAnimIndex() == 5 && !m_bIsAddForceActived)
+				{
+					m_vLookDir = XMVector3Normalize(XMVectorSetY(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS) - m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0));
+					m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.15f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.85f));
+					Add_Force(m_pTransformCom, m_vLookDir.XMVector() * 0.25f + XMVectorSet(0, 1, 0, 0) * 0.25f, 100);
+					//Add_Force(m_pTransformCom, m_vLookDir.XMVector() * 0.75f + XMVectorSet(0, 1, 0, 0) * 0.25f, 100);
+				}
+			}
+
 		}
 
 			break;
 		case 1:
-	
+		{
+			if (!m_PatternPassedTime)
+			{
+
+				m_pModel->Change_AnimIndex_UntilNReturn_Must(8, 8, 0, 0.15, true);
+			}
+			else
+			{
+				if (m_PatternDelayTime)
+				{
+					m_PatternDelayTime -= fDeltaTime;
 
 
+
+					_uint iAnimIndex = m_pModel->Get_NowAnimIndex();
+					if (!iAnimIndex && m_pModel->Get_PlayRate() >= 0.01)
+						m_pModel->Change_AnimIndex((m_bIsBerseked) ? 1 : 2);
+
+					if (iAnimIndex == 1 || iAnimIndex == 2)
+					{
+						m_vLookDir = XMVector3Normalize(XMVectorSetY(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS) - m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0));
+						if (iAnimIndex == 1)
+							m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.1f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.9f));
+						else
+							m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.05f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.95f));
+						m_pTransformCom->MovetoDir(m_vLookDir.XMVector(), fDeltaTime);
+					}
+
+
+					if (m_PatternDelayTime < 0)
+					{
+						m_bIsPatternFinished = true;
+						m_PatternDelayTime = 0;					
+						m_PatternPassedTime = 0;
+					}
+				}
+				else
+				{
+					if (m_pModel->Get_NowAnimIndex() == 0)
+					{
+						m_PatternDelayTime = 2;
+					}
+				}
+			}
+
+
+		}
 			break;
 		case 2:
 
+		{
+			if (!m_PatternPassedTime)
+			{
+
+				m_pModel->Change_AnimIndex_UntilNReturn_Must(10, 10, 0, 0.15, true);
+			}
+			else
+			{
+				if (m_PatternDelayTime)
+				{
+					m_PatternDelayTime -= fDeltaTime;
+
+					_uint iAnimIndex = m_pModel->Get_NowAnimIndex();
+					if (!iAnimIndex && m_pModel->Get_PlayRate() >= 0.01)
+						m_pModel->Change_AnimIndex((m_bIsBerseked) ? 1 : 2);
+
+					if (iAnimIndex == 1 || iAnimIndex == 2)
+					{
+						m_vLookDir = XMVector3Normalize(XMVectorSetY(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS) - m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0));
+						if (iAnimIndex == 1)
+							m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.1f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.9f));
+						else
+							m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.05f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.95f));
+						m_pTransformCom->MovetoDir(m_vLookDir.XMVector(), fDeltaTime);
+					}
+
+					if (m_PatternDelayTime < 0)
+					{
+						m_bIsPatternFinished = true;
+						m_PatternDelayTime = 0;
+						m_PatternPassedTime = 0;
+					}
+				}
+				else
+				{
+					if (m_pModel->Get_NowAnimIndex() == 0)
+					{
+						m_PatternDelayTime = 2;
+					}
+				}
+			}
+
+
+		}
+
 			break;
 		case 3:
-	
+		{
+			if (!m_PatternPassedTime)
+			{
+				m_pModel->Change_AnimIndex_ReturnTo_Must(12, 0, 0.15, true);
+			}
+			else
+			{
+				if (m_PatternDelayTime)
+				{
+					m_PatternDelayTime -= fDeltaTime;
+
+					_uint iAnimIndex = m_pModel->Get_NowAnimIndex();
+					if (!iAnimIndex && m_pModel->Get_PlayRate() >= 0.01)
+						m_pModel->Change_AnimIndex((m_bIsBerseked) ? 1 : 2);
+
+					if (iAnimIndex == 1 || iAnimIndex == 2)
+					{
+						m_vLookDir = XMVector3Normalize(XMVectorSetY(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS) - m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0));
+						if (iAnimIndex == 1)
+							m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.1f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.9f));
+						else
+							m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.05f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.95f));
+						m_pTransformCom->MovetoDir(m_vLookDir.XMVector(), fDeltaTime);
+					}
+
+					if (m_PatternDelayTime < 0)
+					{
+						m_bIsPatternFinished = true;
+						m_PatternDelayTime = 0;
+						m_PatternPassedTime = 0;
+					}
+				}
+				else
+				{
+					if (m_pModel->Get_NowAnimIndex() == 0)
+					{
+						m_PatternDelayTime = 2;
+					}
+				}
+			}
+
+
+		}
 			break;
 
 
@@ -375,13 +816,176 @@ HRESULT CExecutor::Set_Monster_On_Terrain(CTransform * pTransform, _double fDelt
 		m_LevitationTime = 0;
 		pTransform->Set_MatrixState(CTransform::STATE_POS, CaculatedPos);
 
-		if (m_bIsJumping && m_pModel->Get_NowAnimIndex() != 4)
+		if (m_bIsJumping && m_pModel->Get_NowAnimIndex() != 4 && m_pModel->Get_NowAnimIndex() != 5)
 		{
 			m_bIsJumping = false;
-			m_pModel->Change_AnimIndex_ReturnTo(7, 0, 0.15, true);
+			m_PatternDelayTime = 3;
+			m_pModel->Change_AnimIndex_ReturnTo_Must(7, 0, 0, true);
 		}
 	}
 
+	return S_OK;
+}
+
+HRESULT CExecutor::Adjust_AnimMovedTransform(_double fDeltatime)
+{
+	_uint iNowAnimIndex = m_pModel->Get_NowAnimIndex();
+	_double PlayRate = m_pModel->Get_PlayRate();
+
+	if (iNowAnimIndex != m_iOldAnimIndex || PlayRate > 0.95)
+		m_iAdjMovedIndex = 0;
+
+	static float Power = 7.2f;
+	if (g_pGameInstance->Get_DIKeyState(DIK_UP)& DIS_Down)
+	{
+		Power += 0.2f;
+		string ttszLog = "//Power  : " + to_string(Power) + "\n";
+
+		wstring ttDebugLog;
+		ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+
+		OutputDebugStringW(ttDebugLog.c_str());
+
+	}
+	else if (g_pGameInstance->Get_DIKeyState(DIK_DOWN)& DIS_Down)
+	{
+		Power -= 0.2f;
+		string ttszLog = "//Power  : " + to_string(Power) + "\n";
+
+		wstring ttDebugLog;
+		ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+
+		OutputDebugStringW(ttDebugLog.c_str());
+	}
+
+
+	if (PlayRate <= 0.95)
+	{
+		switch (iNowAnimIndex)
+		{
+		case 8:
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.35714)
+			{
+				Add_Force(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 30);
+
+
+				m_iAdjMovedIndex++;
+			}
+			if (m_iAdjMovedIndex == 1 && PlayRate > 0.785714)
+			{
+				Add_Force_Smooth(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 5,0.4f / ((m_bIsBerseked) ? 1.5f : 1.f));
+				m_iAdjMovedIndex++;
+			}
+
+
+
+			break;
+
+		case 9:
+			if (m_iAdjMovedIndex == 0 && PlayRate >= 0.296875)
+			{
+				Add_Force_Smooth(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 8.8f, 0.5f / ((m_bIsBerseked) ? 1.5f : 1.f));
+
+
+				m_iAdjMovedIndex++;
+			}
+			break;
+
+		case 10:
+			if (m_iAdjMovedIndex == 0 && PlayRate >= 0.001)
+			{
+				Add_Force_Smooth(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 7.2f, 1.f / ((m_bIsBerseked) ? 1.5f : 1.f));
+				m_iAdjMovedIndex++;
+			}
+			if (m_iAdjMovedIndex == 1 && PlayRate >= 0.58666)
+			{
+				Add_Force_Smooth(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 3, 0.4f / ((m_bIsBerseked) ? 1.5f : 1.f));
+				m_iAdjMovedIndex++;
+			}
+			
+			break;
+		case 11:
+			if (m_iAdjMovedIndex == 0 && PlayRate >= 0.44444)
+			{
+				Add_Force_Smooth(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 4.0, 0.4f / ((m_bIsBerseked) ? 1.5f : 1.f));
+				m_iAdjMovedIndex++;
+			}
+
+
+			break;
+
+		case 12://shout
+			if (m_iAdjMovedIndex == 0 && PlayRate >= 0.2777)
+			{
+
+				//공격 파장 소환
+				//Add_Force_Smooth(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 4.0, 0.4f / ((m_bIsBerseked) ? 1.5f : 1.f));
+				m_iAdjMovedIndex++;
+			}
+
+
+			break;
+
+		case 13://shoutNEQ
+			if (m_iAdjMovedIndex == 0 && PlayRate >= 0.1578947)
+			{
+
+				//공격 파장 소환
+				//Add_Force_Smooth(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 4.0, 0.4f / ((m_bIsBerseked) ? 1.5f : 1.f));
+				m_iAdjMovedIndex++;
+			}
+			if (m_iAdjMovedIndex == 1 && PlayRate >= 0.5864661)
+			{
+
+				//Eq 소환
+				//Add_Force_Smooth(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 4.0, 0.4f / ((m_bIsBerseked) ? 1.5f : 1.f));
+				m_iAdjMovedIndex++;
+			}
+
+
+			break;
+
+		case 14://shoutNSummon
+			if (m_iAdjMovedIndex == 0 && PlayRate >= 0.123076)
+			{
+
+				//공격 파장 소환
+				//Add_Force_Smooth(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 4.0, 0.4f / ((m_bIsBerseked) ? 1.5f : 1.f));
+				m_iAdjMovedIndex++;
+			}
+			if (m_iAdjMovedIndex == 1 && PlayRate >= 0.72180)
+			{
+
+				//몬스터 소환
+				//Add_Force_Smooth(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 4.0, 0.4f / ((m_bIsBerseked) ? 1.5f : 1.f));
+				m_iAdjMovedIndex++;
+			}
+
+
+			break;
+
+
+			
+			
+		case 19://Knockback
+			if (m_iAdjMovedIndex == 0 && PlayRate >= 0.01)
+			{
+
+				Add_Force_Smooth(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * -1 , 4.0, 0.4f / ((m_bIsBerseked) ? 1.5f : 1.f));
+				m_iAdjMovedIndex++;
+			}
+
+			break;
+		default:
+			break;
+		}
+	}
+
+
+
+
+
+	m_iOldAnimIndex = iNowAnimIndex;
 	return S_OK;
 }
 

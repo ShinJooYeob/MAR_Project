@@ -33,9 +33,11 @@ private:
 	CTransform*			m_pTransformCom = nullptr;
 	CCollider*			m_pColliderCom = nullptr;
 
-
+	_bool				m_bIsBerseked = false;
 	_bool				m_bIsJumping = false;
 
+	_uint				m_iOldAnimIndex = INT_MAX;
+	_uint				m_iAdjMovedIndex = 0;
 
 	ATTACHBONEMATRIX_PTR m_tCollisionAttachPtr;
 
@@ -45,6 +47,7 @@ private:
 	HRESULT SetUp_Weapon();
 
 	virtual HRESULT Set_Monster_On_Terrain(CTransform* pTransform, _double fDeltaTime)override;
+	HRESULT Adjust_AnimMovedTransform(_double fDeltatime);
 
 
 public:

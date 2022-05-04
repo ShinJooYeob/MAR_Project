@@ -87,7 +87,8 @@ _int CBreakablePiece::Update(_double fDeltaTime)
 			CTerrain* pTerrain = (CTerrain*)(pInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Terrain)));
 
 			_bool bIsOn = false;
-			pTerrain->PutOnTerrain(&bIsOn, m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), m_vOldPos.XMVector());
+			_uint eTileKinds = Tile_End;
+			pTerrain->PutOnTerrain(&bIsOn, m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), m_vOldPos.XMVector(),nullptr, &eTileKinds);
 
 				m_pTransformCom->Turn_CW(m_vSpoutDir.XMVector(), fDeltaTime * 7);
 
