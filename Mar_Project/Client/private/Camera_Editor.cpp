@@ -128,6 +128,8 @@ HRESULT CCamera_Editor::SetUp_Components()
 	return S_OK;
 }
 
+#define EASINGTYPE TYPE_QuadInOut
+
 HRESULT CCamera_Editor::Update_CamAction(_double fDeltaTime)
 {
 
@@ -149,12 +151,12 @@ HRESULT CCamera_Editor::Update_CamAction(_double fDeltaTime)
 		_float3 Old = m_tCamAction.vecCamPos[m_tCamAction.vecCamPos.size()-1].vPosition;
 		_float3 Now = m_ReturnPos;
 
-		EasedPos = pInstance->Easing_Vector(TYPE_Linear, Old, Now, m_ActionPassedTime - m_tCamAction.TotalTime , 0.5f);
+		EasedPos = pInstance->Easing_Vector(EASINGTYPE, Old, Now, _float(m_ActionPassedTime - m_tCamAction.TotalTime) , 0.5f);
 
-		Old = m_tCamAction.vecCamPos[m_tCamAction.vecCamPos.size() - 1].vPosition;
+		Old = m_tCamAction.vecLookAt[m_tCamAction.vecLookAt.size() - 1].vPosition;
 		Now = m_ReturnLook;
 
-		EasedLookAt = pInstance->Easing_Vector(TYPE_Linear, Old, Now, m_ActionPassedTime - m_tCamAction.TotalTime, 0.5f);
+		EasedLookAt = pInstance->Easing_Vector(EASINGTYPE, Old, Now, _float(m_ActionPassedTime - m_tCamAction.TotalTime), 0.5f);
 
 		if (m_ActionPassedTime > m_tCamAction.TotalTime + 0.5f)
 		{
@@ -193,9 +195,9 @@ HRESULT CCamera_Editor::Update_CamAction(_double fDeltaTime)
 		}
 
 		Now = m_tCamAction.vecCamPos[iTargetIndex].vPosition;
-		_float TempPassedTime = min(m_ActionPassedTime - TargetTime, m_tCamAction.vecCamPos[iTargetIndex].fDuration);
+		_float TempPassedTime = min(_float(m_ActionPassedTime - TargetTime), m_tCamAction.vecCamPos[iTargetIndex].fDuration);
 
-		EasedPos = pInstance->Easing_Vector(TYPE_Linear, Old, Now, TempPassedTime, m_tCamAction.vecCamPos[iTargetIndex].fDuration);
+		EasedPos = pInstance->Easing_Vector(EASINGTYPE, Old, Now, TempPassedTime, m_tCamAction.vecCamPos[iTargetIndex].fDuration);
 
 
 		//////////////////////////////////////////////////////////////////////////
@@ -219,9 +221,9 @@ HRESULT CCamera_Editor::Update_CamAction(_double fDeltaTime)
 		}
 
 		Now = m_tCamAction.vecLookAt[iTargetIndex].vPosition;
-		TempPassedTime = min(m_ActionPassedTime - TargetTime, m_tCamAction.vecLookAt[iTargetIndex].fDuration);
+		TempPassedTime = min(_float(m_ActionPassedTime - TargetTime), m_tCamAction.vecLookAt[iTargetIndex].fDuration);
 
-		EasedLookAt = pInstance->Easing_Vector(TYPE_Linear, Old, Now, TempPassedTime, m_tCamAction.vecLookAt[iTargetIndex].fDuration);
+		EasedLookAt = pInstance->Easing_Vector(EASINGTYPE, Old, Now, TempPassedTime, m_tCamAction.vecLookAt[iTargetIndex].fDuration);
 
 
 

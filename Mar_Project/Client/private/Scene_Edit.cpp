@@ -192,6 +192,28 @@ _int CScene_Edit::LateUpdate(_double fDeltaTime)
 		break;
 	case 3:
 	{
+		static _bool	 Show = true;
+
+		if (g_pGameInstance->Get_DIKeyState(DIK_SPACE) & DIS_Down)Show = !Show;
+
+		if (Show)
+		{
+
+			for (auto& Element : m_vecBatchedObject)
+			{
+				if (Element.pObject->LateUpdate(fDeltaTime) < 0)
+				{
+					__debugbreak();
+					return -1;
+				}
+			}
+			if (m_pCreatedTerrain != nullptr)
+				m_pCreatedTerrain->LateUpdate(fDeltaTime);
+
+		}
+
+
+
 		if (iPickKinds == 0)
 			m_pCamCursor->LateUpdate(fDeltaTime);
 
@@ -474,6 +496,52 @@ HRESULT CScene_Edit::Sava_Data(const char* szFileName, eDATATYPE iKinds)
 		break;
 	case Client::CScene_Edit::Data_CameraAction:
 	{
+		//../bin/Resources/Data/Map/
+		_tchar szFullPath[MAX_PATH] = L"../bin/Resources/Data/CameraAction/";
+		_tchar wFileName[MAX_PATH] = L"";
+
+		MultiByteToWideChar(CP_UTF8, 0, szFileName, -1, wFileName, sizeof(wFileName));
+		//WideCharToMultiByte(CP_UTF8, 0, fd.name, -1, szFilename, sizeof(szFilename), NULL, NULL);
+		lstrcat(szFullPath, wFileName);
+
+
+		//HANDLE hFile = CreateFileW(szFullPath, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
+
+		HANDLE hFile = ::CreateFileW(szFullPath, GENERIC_WRITE, FILE_SHARE_READ, 0, CREATE_ALWAYS, 0, NULL);
+
+
+
+
+		if (INVALID_HANDLE_VALUE == hFile)
+			return E_FAIL;
+
+		DWORD	dwByte = 0;
+
+		_uint iCount = _uint(m_vecCamPositions.size());
+		WriteFile(hFile, &(iCount), sizeof(_uint), &dwByte, nullptr);
+		for (auto& tCamActDesc : m_vecCamPositions)
+		{
+			// key 값 저장
+			WriteFile(hFile, &(tCamActDesc.fDuration), sizeof(_float), &dwByte, nullptr);
+			WriteFile(hFile, &(tCamActDesc.vPosition), sizeof(_float3), &dwByte, nullptr);
+		}
+
+		iCount = _uint(m_vecLookPostions.size());
+		WriteFile(hFile, &(iCount), sizeof(_uint), &dwByte, nullptr);
+
+		for (auto& tCamActDesc : m_vecLookPostions)
+		{
+			// key 값 저장
+			WriteFile(hFile, &(tCamActDesc.fDuration), sizeof(_float), &dwByte, nullptr);
+			WriteFile(hFile, &(tCamActDesc.vPosition), sizeof(_float3), &dwByte, nullptr);
+		}
+
+
+
+
+
+
+		CloseHandle(hFile);
 
 	}
 		break;
@@ -660,6 +728,91 @@ HRESULT CScene_Edit::Load_Data(const char * szFileName, eDATATYPE iKinds)
 	break;
 	case Client::CScene_Edit::Data_CameraAction:
 	{
+		{
+			for (auto& iter : m_vecCamPosBatchedObj)
+				Safe_Release(iter);
+			m_vecCamPosBatchedObj.clear();
+
+			for (auto& iter : m_vecLookBatchedObj)
+				Safe_Release(iter);
+			m_vecLookBatchedObj.clear();
+
+			m_vecCamPositions.clear();
+			m_vecLookPostions.clear();
+		}
+
+
+
+		//../bin/Resources/Data/Map/
+		_tchar szFullPath[MAX_PATH] = L"../bin/Resources/Data/CameraAction/";
+		_tchar wFileName[MAX_PATH] = L"";
+
+		MultiByteToWideChar(CP_UTF8, 0, szFileName, -1, wFileName, sizeof(wFileName));
+		//WideCharToMultiByte(CP_UTF8, 0, fd.name, -1, szFilename, sizeof(szFilename), NULL, NULL);
+		lstrcat(szFullPath, wFileName);
+
+		//HANDLE hFile = CreateFileW(szFullPath, GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+
+
+		HANDLE hFile = ::CreateFileW(szFullPath, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, 0, NULL);
+
+
+		if (INVALID_HANDLE_VALUE == hFile)
+			return E_FAIL;
+
+		DWORD	dwByte = 0;
+
+		CGameInstance* pInstance = g_pGameInstance;
+
+		_uint iCount = 0;
+		ReadFile(hFile, &(iCount), sizeof(_uint), &dwByte, nullptr);
+
+		CAMACTDESC tDesc;
+
+		for (_uint i = 0 ; i < iCount; i++)
+		{
+			ReadFile(hFile, &(tDesc.fDuration), sizeof(_float), &dwByte, nullptr);
+			ReadFile(hFile, &(tDesc.vPosition), sizeof(_float3), &dwByte, nullptr);
+
+			m_vecCamPositions.push_back(tDesc);
+
+			CESCursor* pCursor = nullptr;
+			FAILED_CHECK(m_pGameInstance->Add_GameObject_Out_of_Manager((CGameObject**)(&pCursor), SCENE_EDIT, TAG_OP(Prototype_EditorCursor)));
+			NULL_CHECK_RETURN(pCursor, E_FAIL);
+			pCursor->Set_Position(tDesc.vPosition);
+			pCursor->Set_Color({ 0.1f, 0.25f, 0.1f, 1 });
+			m_vecCamPosBatchedObj.push_back(pCursor);
+		}
+
+
+		iCount = 0;
+		ReadFile(hFile, &(iCount), sizeof(_uint), &dwByte, nullptr);
+
+		for (_uint i = 0; i < iCount; i++)
+		{
+			ReadFile(hFile, &(tDesc.fDuration), sizeof(_float), &dwByte, nullptr);
+			ReadFile(hFile, &(tDesc.vPosition), sizeof(_float3), &dwByte, nullptr);
+
+			m_vecLookPostions.push_back(tDesc);
+
+			CESCursor* pCursor = nullptr;
+			FAILED_CHECK(m_pGameInstance->Add_GameObject_Out_of_Manager((CGameObject**)(&pCursor), SCENE_EDIT, TAG_OP(Prototype_EditorCursor)));
+			NULL_CHECK_RETURN(pCursor, E_FAIL);
+			pCursor->Set_Position(tDesc.vPosition);
+			pCursor->Set_Color({ 0.1f, 0.1f, 0.25f, 1 });
+			m_vecLookBatchedObj.push_back(pCursor);
+		}
+
+
+		CloseHandle(hFile);
+
+
+		iPickKinds = 0;
+		iCamPosIndex = 0;
+		iCamLookIndex = 0;
+
+		CamDesc.vPosition = _float3(0);
+		CamDesc.fDuration = 1;
 
 	}
 	break;
@@ -2843,6 +2996,9 @@ HRESULT CScene_Edit::Update_CameraActionTab(_double fDeltatime)
 	FAILED_CHECK(Widget_CreatedCamPosListBox(fDeltatime));
 
 	FAILED_CHECK(Widget_Play(fDeltatime));
+	FAILED_CHECK(Widget_SaveLoadCamAction(fDeltatime));
+
+	
 	return S_OK;
 }
 
@@ -3209,6 +3365,317 @@ HRESULT CScene_Edit::Widget_Play(_double fDeltatime)
 
 		m_pEditorCam->CamActionStart(tDesc);
 	}
+
+
+	return S_OK;
+}
+
+HRESULT CScene_Edit::Widget_SaveLoadCamAction(_double fDeltatime)
+{
+	Make_VerticalSpacing(10);
+
+
+	if (ImGui::Button("Clear Action"))
+		ImGui::OpenPopup("Clear Action");
+	ImGui::SameLine();
+	if (ImGui::Button("Save Action"))
+		ImGui::OpenPopup("Save Action");
+	ImGui::SameLine();
+	if (ImGui::Button("Laod Action"))
+		ImGui::OpenPopup("Laod Action");
+	ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+
+	// Always center this window when appearing
+	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+	if (ImGui::BeginPopupModal("Clear Action", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		ImGui::Text("!!!!!!!!!!!!!!!!Waring!!!!!!!!!!!!!!!!\n\n Delete Batched Object Without Save!!!\n\n	Please Check Save One more\n\n\n");
+		ImGui::Separator();
+
+		//static int unused_i = 0;
+		//ImGui::Combo("Combo", &unused_i, "Delete\0Delete harder\0");
+
+		//static bool dont_ask_me_next_time = false;
+		//ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+		//ImGui::Checkbox("Don't ask me next time", &dont_ask_me_next_time);
+		//ImGui::PopStyleVar();
+
+		if (ImGui::Button("OK", ImVec2(130, 0))) {
+
+
+			for (auto& iter : m_vecCamPosBatchedObj)
+				Safe_Release(iter);
+			m_vecCamPosBatchedObj.clear();
+
+			for (auto& iter : m_vecLookBatchedObj)
+				Safe_Release(iter);
+			m_vecLookBatchedObj.clear();
+
+			m_vecCamPositions.clear();
+			m_vecLookPostions.clear();
+
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::SetItemDefaultFocus();
+		ImGui::SameLine();
+		if (ImGui::Button("Cancel", ImVec2(130, 0))) { ImGui::CloseCurrentPopup(); }
+		ImGui::EndPopup();
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
+
+
+	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+	if (ImGui::BeginPopupModal("Save Action", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+
+		if (m_FilePathList.size() == 0)
+		{
+			m_FilePathList.clear();
+			_tfinddata64_t fd;
+			__int64 handle = _tfindfirst64(TEXT("../bin/Resources/Data/CameraAction/*.*"), &fd);
+			if (handle == -1 || handle == 0)
+				return E_FAIL;
+
+			_int iResult = 0;
+
+			//char szCurPath[128] = "../bin/Resources/Data/Map/";
+			//char szFullPath[128] = "";
+			char szFilename[MAX_PATH];
+
+			while (iResult != -1)
+			{
+				if (!lstrcmp(fd.name, L".") || !lstrcmp(fd.name, L".."))
+				{
+					iResult = _tfindnext64(handle, &fd);
+					continue;
+				}
+
+
+				WideCharToMultiByte(CP_UTF8, 0, fd.name, -1, szFilename, sizeof(szFilename), NULL, NULL);
+				//strcpy_s(szFullPath, szCurPath);
+				//strcat_s(szFullPath, szFilename);
+				m_FilePathList.push_back({ szFilename });
+
+
+				iResult = _tfindnext64(handle, &fd);
+			}
+
+
+			_findclose(handle);
+
+		}
+
+		ImGui::Text("Save Action!\n\nExist ActionDataList");
+
+		static ImGuiTextFilter filter;
+
+		char	szCheckforSameFileName[256] = "";
+
+		if (ImGui::BeginListBox(" "))
+		{
+			auto iter = m_FilePathList.begin();
+
+
+			for (; iter != m_FilePathList.end(); iter++)
+			{
+				const bool is_selected = false;
+
+				if (filter.PassFilter(iter->c_str()))
+				{
+					if (ImGui::Selectable(iter->c_str(), is_selected))
+					{
+						strcpy_s(filter.InputBuf, iter->c_str());
+					}
+
+					if (!strcmp(iter->c_str(), filter.InputBuf))
+						strcpy_s(szCheckforSameFileName, filter.InputBuf);
+				}
+			}
+			ImGui::EndListBox();
+
+		}
+
+		filter.Draw("Input FileName");
+
+
+		ImGui::Separator();
+		if (ImGui::Button("Save", ImVec2(120, 0)))
+		{
+
+			if (strcmp(filter.InputBuf, ""))
+			{
+
+				if (!strcmp(szCheckforSameFileName, filter.InputBuf))
+				{
+					ImGui::OpenPopup("One More Check");
+				}
+				else
+				{
+					//실제 저장
+
+					Sava_Data(filter.InputBuf, Data_CameraAction);
+
+					ImGui::CloseCurrentPopup();
+					m_FilePathList.clear();
+
+
+				}
+			}
+
+
+
+		}
+		ImGui::SetItemDefaultFocus();
+		ImGui::SameLine();
+		if (ImGui::Button("Cancel", ImVec2(120, 0)))
+		{
+			ImGui::CloseCurrentPopup();
+			m_FilePathList.clear();
+		}
+
+
+		//서브 팝업
+		ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+		if (ImGui::BeginPopupModal("One More Check", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+		{
+
+			ImGui::Text("Mapdata Already Exist\nDo you want to Override on it?");
+
+			if (ImGui::Button("Ok", ImVec2(130, 0)))
+			{
+
+				//실제 저장
+				Sava_Data(filter.InputBuf, Data_CameraAction);
+
+				ImGui::CloseCurrentPopup();
+				m_FilePathList.clear();
+			}
+
+			ImGui::SameLine();
+			if (ImGui::Button("Cancel", ImVec2(130, 0)))
+			{
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::EndPopup();
+		}
+
+
+		ImGui::EndPopup();
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
+
+	// Always center this window when appearing
+	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+	if (ImGui::BeginPopupModal("Laod Action", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		ImGui::Text("Laod Action!\n\n");
+		ImGui::Separator();
+
+
+		if (m_FilePathList.size() == 0)
+		{
+			m_FilePathList.clear();
+			_tfinddata64_t fd;
+			__int64 handle = _tfindfirst64(TEXT("../bin/Resources/Data/CameraAction/*.*"), &fd);
+			if (handle == -1 || handle == 0)
+				return E_FAIL;
+
+			_int iResult = 0;
+
+			//char szCurPath[128] = "../bin/Resources/Data/Map/";
+			//char szFullPath[128] = "";
+			char szFilename[MAX_PATH];
+
+			while (iResult != -1)
+			{
+				if (!lstrcmp(fd.name, L".") || !lstrcmp(fd.name, L".."))
+				{
+					iResult = _tfindnext64(handle, &fd);
+					continue;
+				}
+
+
+				WideCharToMultiByte(CP_UTF8, 0, fd.name, -1, szFilename, sizeof(szFilename), NULL, NULL);
+				//strcpy_s(szFullPath, szCurPath);
+				//strcat_s(szFullPath, szFilename);
+				m_FilePathList.push_back({ szFilename });
+
+
+				iResult = _tfindnext64(handle, &fd);
+			}
+
+
+			_findclose(handle);
+
+		}
+
+
+
+		static ImGuiTextFilter filter;
+
+		char	szCheckforSameFileName[256] = "";
+
+		if (ImGui::BeginListBox(" "))
+		{
+			auto iter = m_FilePathList.begin();
+
+
+			for (; iter != m_FilePathList.end(); iter++)
+			{
+				const bool is_selected = false;
+
+				if (filter.PassFilter(iter->c_str()))
+				{
+					if (ImGui::Selectable(iter->c_str(), is_selected))
+					{
+						strcpy_s(filter.InputBuf, iter->c_str());
+					}
+
+					if (!strcmp(iter->c_str(), filter.InputBuf))
+						strcpy_s(szCheckforSameFileName, filter.InputBuf);
+				}
+			}
+			ImGui::EndListBox();
+
+		}
+
+		filter.Draw("Input FileName");
+
+
+
+
+		if (ImGui::Button("OK", ImVec2(120, 0)))
+		{
+
+			if (strcmp(filter.InputBuf, ""))
+			{
+				if (!strcmp(szCheckforSameFileName, filter.InputBuf))
+				{
+					Load_Data(filter.InputBuf, Data_CameraAction);
+					m_FilePathList.clear();
+					ImGui::CloseCurrentPopup();
+				}
+			}
+		}
+		ImGui::SetItemDefaultFocus();
+		ImGui::SameLine();
+		if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+			m_FilePathList.clear();
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::EndPopup();
+	}
+
+
+
+
 
 
 	return S_OK;
@@ -4183,7 +4650,7 @@ HRESULT CScene_Edit::Ready_CamActionCursor(const _tchar * pLayerTag)
 	NULL_CHECK_RETURN(m_pCamCursor, E_FAIL);
 	m_pCamCursor->Set_Color({1, 0, 0, 1});
 
-	CamDesc.fDuration = 0.5f;
+	CamDesc.fDuration = 1.f;
 
 	return S_OK;
 }

@@ -73,7 +73,11 @@ namespace Engine
 			if (XMVectorGetX(pDeterminate) != 0)
 				return InversMatrix;
 			else
-				MessageBox(0, TEXT("Failed to Make Inverse Matrix"), TEXT("System Message"), MB_OK);
+			{
+				__debugbreak();
+				//MessageBox(0, TEXT("Failed to Make Inverse Matrix"), TEXT("System Message"), MB_OK);
+				OutputDebugStringW(L"Failed to Make Inverse Matrix\n");
+			}
 
 			return InversMatrix;
 

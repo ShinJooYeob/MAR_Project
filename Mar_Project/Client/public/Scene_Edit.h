@@ -164,6 +164,9 @@ private:
 	HRESULT Widget_CursorBatch(_double fDeltatime);
 	HRESULT Widget_CreatedCamPosListBox(_double fDeltatime);
 	HRESULT Widget_Play(_double fDeltatime);
+
+	HRESULT Widget_SaveLoadCamAction(_double fDeltatime);
+
 	
 	CAMACTDESC CamDesc = { 0 };
 
