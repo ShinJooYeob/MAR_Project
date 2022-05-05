@@ -50,7 +50,22 @@ _int CHiddenPad::Update(_double fDeltaTime)
 		return -1;
 
 
+	if (g_pGameInstance->Get_DIKeyState(DIK_LEFT) & DIS_Down)
+	{
+	 	FAILED_CHECK( Reset_TerrainTileKindsMovableNHeightZero());
 
+		m_pTransformCom->MovetoDir_bySpeed(XMVectorSet(-1, 0, 0, 0), 1, 1);
+		FAILED_CHECK(Set_TerrainTileKinds());
+
+	}
+	if (g_pGameInstance->Get_DIKeyState(DIK_RIGHT) & DIS_Down)
+	{
+		FAILED_CHECK(Reset_TerrainTileKindsMovableNHeightZero());
+
+		m_pTransformCom->MovetoDir_bySpeed(XMVectorSet(1, 0, 0, 0), 1, 1);
+		FAILED_CHECK(Set_TerrainTileKinds());
+
+	}
 
 
 	if (m_pPlayer->Get_SmallVisualTime())
@@ -142,6 +157,30 @@ HRESULT CHiddenPad::Set_TerrainTileKinds()
 
 	FAILED_CHECK(pTerrain->Chage_TileKindsNHeight(WorldRectPoints));
 
+
+
+	return S_OK;
+}
+
+HRESULT CHiddenPad::Reset_TerrainTileKindsMovableNHeightZero()
+{
+	CTerrain* pTerrain = (CTerrain*)(g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Terrain)));
+	NULL_CHECK_RETURN(pTerrain, E_FAIL);
+
+
+	_Matrix WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+
+	_Matrix RectMatrix = XMMatrixIdentity();
+
+	RectMatrix.r[0] = m_NevRectPoint[0].XMVector();
+	RectMatrix.r[1] = m_NevRectPoint[1].XMVector();
+	RectMatrix.r[2] = m_NevRectPoint[2].XMVector();
+	RectMatrix.r[3] = m_NevRectPoint[3].XMVector();
+
+
+	_Matrix WorldRectPoints = RectMatrix * WorldMatrix;
+
+	FAILED_CHECK(pTerrain->Chage_TileKindsMovableNZero(WorldRectPoints));
 
 
 	return S_OK;

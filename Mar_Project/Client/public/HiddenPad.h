@@ -22,6 +22,7 @@ public:
 
 public:
 	HRESULT Set_TerrainTileKinds();
+	HRESULT Reset_TerrainTileKindsMovableNHeightZero();
 
 private:
 	CShader*			m_pShaderCom = nullptr;

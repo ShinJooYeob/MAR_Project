@@ -27,7 +27,7 @@ public:
 	_bool	Check_Movable_Terrain(_bool* pbIsMovable, _fVector ObjectNowPos, _fVector CheckPos,_float fMovableHeight = 1.f);
 
 	HRESULT Chage_TileKindsNHeight(_fMatrix WorldPointsMat);
-	//HRESULT Chage_TileKindsBack();
+	HRESULT Chage_TileKindsMovableNZero(_fMatrix WorldPointsMat);
 
 private:
 	CShader*			m_pShaderCom = nullptr;

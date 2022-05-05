@@ -1022,7 +1022,7 @@ HRESULT CVIBuffer_Terrain::Chage_TileKindsNHeight(_uint iTileKinds, _float3 PosN
 
 	_uint iIndex = _uint(_uint(PosNHeight.z) * m_iNumVerticesX + PosNHeight.x);
 
-	if (PosNHeight.y > 0)
+	if (PosNHeight.y >= 0)
 		m_pVertices[iIndex].y = PosNHeight.y;
 	m_pNaviTerrain[iIndex] = _float(iTileKinds);
 
