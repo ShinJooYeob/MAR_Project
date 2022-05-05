@@ -180,6 +180,48 @@ _bool CTerrain::Check_Movable_Terrain(_bool * pbIsMovable, _fVector ObjectNowPos
 
 }
 
+HRESULT CTerrain::Chage_TileKindsNHeight(_fMatrix WorldPointsMat)
+{
+
+	_float4x4 PointsOnLocal = WorldPointsMat * m_pTransformCom->Get_InverseWorldMatrix();
+
+
+	RECT Points;
+
+	_float Height = PointsOnLocal._12;
+
+	_float LowHight = (min(min(min(PointsOnLocal._12, PointsOnLocal._22), PointsOnLocal._32), PointsOnLocal._42));
+	_float MaxHight = (max(max(max(PointsOnLocal._12, PointsOnLocal._22), PointsOnLocal._32), PointsOnLocal._42));
+
+
+
+	Points.left = _uint(min(min(min(PointsOnLocal._11, PointsOnLocal._21), PointsOnLocal._31), PointsOnLocal._41) -1);
+	Points.bottom = _uint(min(min(min(PointsOnLocal._13, PointsOnLocal._23), PointsOnLocal._33), PointsOnLocal._43) -1);
+	Points.right = _uint(max(max(max(PointsOnLocal._11, PointsOnLocal._21), PointsOnLocal._31), PointsOnLocal._41) +1);
+	Points.top = _uint(max(max(max(PointsOnLocal._13, PointsOnLocal._23), PointsOnLocal._33), PointsOnLocal._43) +1);
+
+	_float HeightIndterver = (MaxHight - LowHight) / (Points.top - Points.bottom -2 ); 
+	
+		
+	for (_uint i = (_uint)Points.left; i <= (_uint)Points.right; i++)
+	{
+		for (_uint j = (_uint)Points.bottom; j <= (_uint)Points.top; j++)
+		{
+
+			if (i == Points.left || i == Points.right || j == Points.bottom || j == Points.top)
+				m_pVIBufferCom->Chage_TileKindsNHeight(Tile_JumpMovable, _float3((_float)i, -1, (_float)j));
+
+			else
+				m_pVIBufferCom->Chage_TileKindsNHeight(Tile_Movable, _float3((_float)i, LowHight + ((j - Points.bottom -1) * HeightIndterver), (_float)j));
+
+		}
+
+	}
+
+
+	return S_OK;
+}
+
 HRESULT CTerrain::SetUp_Components()
 {
 

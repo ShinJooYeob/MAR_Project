@@ -24,6 +24,8 @@ public:
 	_float EquationPlane_Kinds_Of_NavigationTile(_uint* pOutKidsOfTile, _bool* pbIsOnTerrain, _float3 PosOnTerrainLocal,
 		_float* CaculateY = nullptr, _float3* vNormVector = nullptr);
 
+	HRESULT Chage_TileKindsNHeight(_uint iTileKinds, _float3 PosNHeight);
+
 	_Vector Calculate_SlidingVector(_float3 OldPosOnTerrainLocal, _float3 PosOnTerrainLocal);
 	_Vector Calculate_SlidingVector_ForNoneTile(_float3 OldPosOnTerrainLocal, _float3 PosOnTerrainLocal);
 	_bool   OutOfLine(_fVector StartPoint, _fVector EndPoint, _fVector OldPos, _gVector NowPos, _float3* pOutDirVec);

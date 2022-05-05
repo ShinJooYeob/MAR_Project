@@ -34,12 +34,12 @@ HRESULT CScene_Stage1::Initialize()
 	FAILED_CHECK(Ready_Layer_UI(TAG_LAY(Layer_UI_GamePlay)));
 	
 
-	FAILED_CHECK(Ready_Layer_JumpPad(TAG_LAY(Layer_JumpPad)));
-	FAILED_CHECK(Ready_Layer_SteamPad(TAG_LAY(Layer_SteamPad)));
+	//FAILED_CHECK(Ready_Layer_JumpPad(TAG_LAY(Layer_JumpPad)));
+	//FAILED_CHECK(Ready_Layer_SteamPad(TAG_LAY(Layer_SteamPad)));
 	FAILED_CHECK(Ready_Layer_HiddenPad(TAG_LAY(Layer_HiddenPad)));
-	FAILED_CHECK(Ready_Layer_TeethObj(TAG_LAY(Layer_TeethObj)));
-	FAILED_CHECK(Ready_Layer_RoseObj(TAG_LAY(Layer_RoseObj)));
-	FAILED_CHECK(Ready_Layer_BreakableObj(TAG_LAY(Layer_Breakable)))
+	//FAILED_CHECK(Ready_Layer_TeethObj(TAG_LAY(Layer_TeethObj)));
+	//FAILED_CHECK(Ready_Layer_RoseObj(TAG_LAY(Layer_RoseObj)));
+	//FAILED_CHECK(Ready_Layer_BreakableObj(TAG_LAY(Layer_Breakable)))
 	
 	
 	FAILED_CHECK(Ready_Layer_StaticMapObj(TAG_LAY(Layer_StaticMapObj)));
@@ -224,10 +224,15 @@ HRESULT CScene_Stage1::Ready_Layer_SteamPad(const _tchar * pLayerTag)
 
 HRESULT CScene_Stage1::Ready_Layer_HiddenPad(const _tchar * pLayerTag)
 {
-	for (_uint i = 0 ;i < 4 ; i ++)
-	{
-		FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_HiddenPad), &_float4(_float(11 + i), 20, _float(7 +i), _float(0 +i))));
-	}
+	///for (_uint i = 0; i < 4; i++)
+	///{
+	///	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_HiddenPad), &_float4(_float(11 + i *3), 22, _float(7 +i*2), _float(0 +i))));
+	///}
+
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_HiddenPad), &_float4(_float(11), 20, _float(7), _float(0))));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_HiddenPad), &_float4(_float(95), 20, _float(85), _float(1))));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_HiddenPad), &_float4(_float(100), 20, _float(90), _float(2))));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_HiddenPad), &_float4(_float(105), 20, _float(95), _float(3))));
 
 	return S_OK;
 }

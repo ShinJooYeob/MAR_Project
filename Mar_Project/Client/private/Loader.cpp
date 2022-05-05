@@ -352,12 +352,14 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_GiantToys_Die),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "GiantToys", "GiantToys_Die.FBX", TransformMatrix)));
 
+	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationX(XMConvertToRadians(90.f));
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_GiantToys_DominoC),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "GiantToys", "GiantToys_DominoC.FBX", TransformMatrix)));
 
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_GiantToys_DominoE),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "GiantToys", "GiantToys_DominoE.FBX", TransformMatrix)));
 
+	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_GiantToys_DominoStair),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "GiantToys", "GiantToys_DominoStair.FBX", TransformMatrix)));
 

@@ -20,7 +20,8 @@ public:
 	virtual _int Render()override;
 	virtual _int LateRender()override;
 
-
+public:
+	HRESULT Set_TerrainTileKinds();
 
 private:
 	CShader*			m_pShaderCom = nullptr;
@@ -29,12 +30,15 @@ private:
 	CModel*				m_pModel = nullptr;
 
 
+	
 private:
 	class CPlayer*		m_pPlayer= nullptr;
 	CTransform*			m_pPlayerTransform = nullptr;
 	_bool				m_bIsPlayerCloser = false;
 
 	_uint				m_iKindsOfHiddenPad = 0;
+
+	_float4				m_NevRectPoint[4];
 private:
 	HRESULT SetUp_Components();
 

@@ -1014,6 +1014,22 @@ _float CVIBuffer_Terrain::EquationPlane_Kinds_Of_NavigationTile(_uint * pOutKids
 	return (Plane.x * PosOnTerrainLocal.x + Plane.y * PosOnTerrainLocal.y + Plane.z * PosOnTerrainLocal.z + Plane.w);
 }
 
+HRESULT CVIBuffer_Terrain::Chage_TileKindsNHeight(_uint iTileKinds, _float3 PosNHeight)
+{
+	if (PosNHeight.x < 0 || PosNHeight.x >= m_iNumVerticesX ||	PosNHeight.z < 0 || PosNHeight.z >= m_iNumVerticesZ)
+		return E_FAIL;
+	
+
+	_uint iIndex = _uint(_uint(PosNHeight.z) * m_iNumVerticesX + PosNHeight.x);
+
+	if (PosNHeight.y > 0)
+		m_pVertices[iIndex].y = PosNHeight.y;
+	m_pNaviTerrain[iIndex] = _float(iTileKinds);
+
+
+	return S_OK;
+}
+
 _Vector CVIBuffer_Terrain::Calculate_SlidingVector(_float3 OldPosOnTerrainLocal, _float3 PosOnTerrainLocal)
 {
 	if (OldPosOnTerrainLocal.x < 0 || OldPosOnTerrainLocal.x >= m_iNumVerticesX ||
