@@ -3,7 +3,7 @@
 
 struct BoneMatrixArray
 {
-	matrix				BoneMatrices[128];
+	matrix				BoneMatrices[150];
 };
 
 cbuffer Matrices

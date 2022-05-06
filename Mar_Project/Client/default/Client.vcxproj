@@ -184,6 +184,7 @@
     <ClInclude Include="..\public\Client_Enum.h" />
     <ClInclude Include="..\public\Client_Macro.h" />
     <ClInclude Include="..\public\Client_Struct.h" />
+    <ClInclude Include="..\public\DollMaker.h" />
     <ClInclude Include="..\public\GamePlayUI.h" />
     <ClInclude Include="..\public\ClockBomb.h" />
     <ClInclude Include="..\public\Scythe.h" />
@@ -243,6 +244,7 @@
     <ClCompile Include="..\private\Bullet.cpp" />
     <ClCompile Include="..\private\Camera_Editor.cpp" />
     <ClCompile Include="..\private\Camera_Main.cpp" />
+    <ClCompile Include="..\private\DollMaker.cpp" />
     <ClCompile Include="..\private\GamePlayUI.cpp" />
     <ClCompile Include="..\private\ClockBomb.cpp" />
     <ClCompile Include="..\private\Scythe.cpp" />

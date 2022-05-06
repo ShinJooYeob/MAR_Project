@@ -722,7 +722,7 @@ HRESULT CModel::Render(CShader * pShader, _uint iPassIndex,_uint iMaterialIndex,
 	if (TYPE_ANIM == m_eModelType)
 	{
 		NULL_CHECK_RETURN(szBoneValueName, E_FAIL);
-		_float4x4		BoneMatrices[128];
+		_float4x4		BoneMatrices[150];
 		_Matrix matDefualtPivot = m_DefaultPivotMatrix.XMatrix();
 
 		for (auto& pMeshContainer : m_vecMeshContainerArr[iMaterialIndex])
@@ -820,8 +820,8 @@ HRESULT CModel::Ready_OffsetMatrices()
 
 					//계층뼈에 오프셋 매트릭스를 저장하자
 					pHierarchyNode->Set_OffsetMatrix(&OffsetMatrix);
+					//pMeshContainer->Set_OffSetMatrix(&OffsetMatrix);
 					pMeshContainer->Add_AffectingBoneIndex(iNodeIndex);
-
 				}
 
 			//}

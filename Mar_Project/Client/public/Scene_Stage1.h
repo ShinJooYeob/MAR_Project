@@ -39,6 +39,7 @@ private:
 	HRESULT Ready_Layer_Grunt(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_WaspArrow(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_WaspInk(const _tchar* pLayerTag);
+	HRESULT Ready_Layer_DollMaker(const _tchar* pLayerTag);
 
 
 

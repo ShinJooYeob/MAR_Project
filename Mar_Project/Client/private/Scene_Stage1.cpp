@@ -45,12 +45,13 @@ HRESULT CScene_Stage1::Initialize()
 	FAILED_CHECK(Ready_Layer_StaticMapObj(TAG_LAY(Layer_StaticMapObj)));
 
 
-
-	FAILED_CHECK(Ready_Layer_Grunt(TAG_LAY(Layer_Monster)));
+	FAILED_CHECK(Ready_Layer_DollMaker(TAG_LAY(Layer_Monster)));
+	
+	//FAILED_CHECK(Ready_Layer_Grunt(TAG_LAY(Layer_Monster)));
 	//FAILED_CHECK(Ready_Layer_Eyepot(TAG_LAY(Layer_Monster)));
 	//FAILED_CHECK(Ready_Layer_WaspInk(TAG_LAY(Layer_Monster)));
 	//FAILED_CHECK(Ready_Layer_WaspArrow(TAG_LAY(Layer_Monster)));
-	FAILED_CHECK(Ready_Layer_Executor(TAG_LAY(Layer_Monster)));
+	//FAILED_CHECK(Ready_Layer_Executor(TAG_LAY(Layer_Monster)));
 
 
 		
@@ -407,6 +408,15 @@ HRESULT CScene_Stage1::Ready_Layer_WaspArrow(const _tchar * pLayerTag)
 HRESULT CScene_Stage1::Ready_Layer_WaspInk(const _tchar * pLayerTag)
 {
 	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_WaspInk), &_float3(6, 22, 8)));
+
+	return S_OK;
+}
+
+HRESULT CScene_Stage1::Ready_Layer_DollMaker(const _tchar * pLayerTag)
+{
+
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_DollMaker), &_float3(210, 22, 45)));
+
 
 	return S_OK;
 }

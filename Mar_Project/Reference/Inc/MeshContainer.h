@@ -22,6 +22,7 @@ public:
 	_uint		Get_NumAffectingBones() { return m_iNumAffectingBones; };
 	aiMesh*		Get_AiMesh() { return m_pAIMesh; };
 	HRESULT		Add_AffectingBoneIndex(_uint iHierarchyIndex);
+	//void		Set_OffSetMatrix(_float4x4* OffSetMatrix);
 
 	void		Set_TargetPararntNodeIndex(_uint iNodeIndex) { m_iParantHierarchyNodeIndex = iNodeIndex; }
 	//_uint		Get_TargetPararntNodeIndex() {return m_iParantHierarchyNodeIndex ; }
@@ -33,11 +34,13 @@ private:
 	_uint		m_iNumAffectingBones = 0;
 	//이 매쉬의		AiMesh
 	aiMesh*			m_pAIMesh = nullptr;
-
 	_uint			m_iParantHierarchyNodeIndex = 0;
 
 	/* 현재 메시에 영향을 주는 노드들. */
 	vector<_uint>		m_vecAffectingBoneIndex;
+
+
+	//_float4x4		m_matOffSet = XMMatrixIdentity();
 private:
 	HRESULT Ready_NonAnimMeshContainer(aiMesh* pAIMesh, _fMatrix TransformMatrix);
 	HRESULT Ready_AnimMeshContainer(aiMesh* pAIMesh);

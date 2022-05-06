@@ -43,6 +43,7 @@ enum OBJECTPROTOTYPEID
 	Prototype_WeaponClockBomb,
 
 	Prototype_Executor,
+	Prototype_DollMaker,
 	Prototype_Grunt,
 	Prototype_Eyepot,
 	Prototype_WaspArrow,
@@ -128,8 +129,10 @@ static const _tchar* Tag_Object_Prototype(OBJECTPROTOTYPEID eTag)
 	case Prototype_WeaponClockBomb:
 		return TEXT("Prototype_WeaponClockBomb");
 		break;
-
-
+	case Prototype_DollMaker:
+		return TEXT("Prototype_DollMaker");
+		break;
+		
 	case Prototype_Scythe:
 		return TEXT("Prototype_Scythe");
 		break;
@@ -557,6 +560,7 @@ enum COMPONENTPROTOTYPEID
 	Prototype_Mesh_WaspArrow,
 	Prototype_Mesh_WaspInk,
 	Prototype_Mesh_Eyepot,
+		Prototype_Mesh_DollMaker,
 
 	Prototype_Mesh_JumpPad,
 	Prototype_Mesh_HealthRose,
@@ -915,8 +919,11 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 	case Prototype_Mesh_Eyepot:
 		return TEXT("Mesh_Eyepot");
 		break;
+	case Prototype_Mesh_DollMaker:
+		return TEXT("Prototype_Mesh_DollMaker");
+		break;
 
-
+		
 	case Prototype_Mesh_JumpPad:
 		return TEXT("Prototype_Mesh_JumpPad");
 		break;

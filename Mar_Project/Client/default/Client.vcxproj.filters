@@ -208,6 +208,9 @@
     <Filter Include="01.GameObject\03.Monster\99.MonsterWeapon\05.Executor_Scythe">
       <UniqueIdentifier>{8e729811-8869-4f28-8b41-599572726eb3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.GameObject\03.Monster\06.DollMaker">
+      <UniqueIdentifier>{e1a2fc06-ee7e-4f49-8ab3-dc8e3fd75ff6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -420,6 +423,9 @@
     <ClInclude Include="..\public\Scythe.h">
       <Filter>01.GameObject\03.Monster\99.MonsterWeapon\05.Executor_Scythe</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\DollMaker.h">
+      <Filter>01.GameObject\03.Monster\06.DollMaker</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -607,6 +613,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Scythe.cpp">
       <Filter>01.GameObject\03.Monster\99.MonsterWeapon\05.Executor_Scythe</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\DollMaker.cpp">
+      <Filter>01.GameObject\03.Monster\06.DollMaker</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
