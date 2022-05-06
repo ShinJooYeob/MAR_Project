@@ -3415,6 +3415,9 @@ HRESULT CScene_Edit::Widget_SaveLoadCamAction(_double fDeltatime)
 			m_vecCamPositions.clear();
 			m_vecLookPostions.clear();
 
+			iPickKinds = 0;
+
+
 			ImGui::CloseCurrentPopup();
 		}
 		ImGui::SetItemDefaultFocus();
