@@ -10,6 +10,7 @@ enum SCENEID
 	SCENE_STAGE1,
 	SCENE_STAGE2,
 	SCENE_STAGE3,
+	SCENE_BOSS,
 
 	SCENE_EDIT,
 	SCENE_END
@@ -549,6 +550,7 @@ enum COMPONENTPROTOTYPEID
 	Prototype_WaterLogB,
 	Prototype_WaterLogC,
 
+	Prototype_QueenTower_BrokenC,
 
 
 
@@ -870,6 +872,16 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 	case Prototype_WaterLogC:
 		return TEXT("WaterLogC");
 		break;
+
+	case Prototype_QueenTower_BrokenC:
+		return TEXT("QueenTower_BrokenC");
+		break;
+
+		
+
+
+
+
 
 
 

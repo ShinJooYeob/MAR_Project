@@ -211,6 +211,9 @@
     <Filter Include="01.GameObject\03.Monster\06.DollMaker">
       <UniqueIdentifier>{e1a2fc06-ee7e-4f49-8ab3-dc8e3fd75ff6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.Scene\03.Scene_Gameplay\Scene_Boss">
+      <UniqueIdentifier>{9c3f6788-5264-4916-bfa9-e72a81ed94dc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -426,6 +429,9 @@
     <ClInclude Include="..\public\DollMaker.h">
       <Filter>01.GameObject\03.Monster\06.DollMaker</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Scene_Boss.h">
+      <Filter>02.Scene\03.Scene_Gameplay\Scene_Boss</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -616,6 +622,9 @@
     </ClCompile>
     <ClCompile Include="..\private\DollMaker.cpp">
       <Filter>01.GameObject\03.Monster\06.DollMaker</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Scene_Boss.cpp">
+      <Filter>02.Scene\03.Scene_Gameplay\Scene_Boss</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -25,6 +25,7 @@ public:
 
 public:
 	void Set_PassIndex(_uint iIndex) { m_iPassIndex = iIndex; };
+	void Set_FrustumSize(_float fSize) { FrustumSize = fSize; };
 private:
 	CShader*			m_pShaderCom = nullptr;
 	CRenderer*			m_pRendererCom = nullptr;
@@ -35,6 +36,7 @@ private:
 private:
 	HRESULT SetUp_Components();
 	_uint m_iPassIndex = 1;
+	_float FrustumSize = 5.f;
 
 public:
 	static CStaticMapObject* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, void* pArg = nullptr);

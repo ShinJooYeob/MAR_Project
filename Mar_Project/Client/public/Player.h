@@ -29,7 +29,7 @@ public:
 	virtual HRESULT Initialize_Prototype(void* pArg)override;
 	virtual HRESULT Initialize_Clone(void* pArg)override;
 	HRESULT SetUp_Weapon();
-
+	HRESULT Renew_Player(_float3 Position);
 public:
 	virtual _int Update(_double fDeltaTime)override;
 	virtual _int LateUpdate(_double fDeltaTime)override;
@@ -53,7 +53,7 @@ public:
 	_bool Get_IsNeedToTeapotCooling() { return m_bIsCoolTime; };
 	
 	_uint Get_NowWeaponIndex() {return m_iWeaponModelIndex;	}
-
+	
 private:
 	CShader*			m_pShaderCom = nullptr;
 	CRenderer*			m_pRendererCom = nullptr;

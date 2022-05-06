@@ -187,6 +187,7 @@
     <ClInclude Include="..\public\DollMaker.h" />
     <ClInclude Include="..\public\GamePlayUI.h" />
     <ClInclude Include="..\public\ClockBomb.h" />
+    <ClInclude Include="..\public\Scene_Boss.h" />
     <ClInclude Include="..\public\Scythe.h" />
     <ClInclude Include="..\public\MonsterWeapon.h" />
     <ClInclude Include="..\public\Umbrella.h" />
@@ -247,6 +248,7 @@
     <ClCompile Include="..\private\DollMaker.cpp" />
     <ClCompile Include="..\private\GamePlayUI.cpp" />
     <ClCompile Include="..\private\ClockBomb.cpp" />
+    <ClCompile Include="..\private\Scene_Boss.cpp" />
     <ClCompile Include="..\private\Scythe.cpp" />
     <ClCompile Include="..\private\MonsterWeapon.cpp" />
     <ClCompile Include="..\private\Umbrella.cpp" />

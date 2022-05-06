@@ -45,7 +45,7 @@ HRESULT CScene_Stage1::Initialize()
 	FAILED_CHECK(Ready_Layer_StaticMapObj(TAG_LAY(Layer_StaticMapObj)));
 
 
-	FAILED_CHECK(Ready_Layer_DollMaker(TAG_LAY(Layer_Monster)));
+	//FAILED_CHECK(Ready_Layer_DollMaker(TAG_LAY(Layer_Monster)));
 	
 	//FAILED_CHECK(Ready_Layer_Grunt(TAG_LAY(Layer_Monster)));
 	//FAILED_CHECK(Ready_Layer_Eyepot(TAG_LAY(Layer_Monster)));
@@ -72,6 +72,12 @@ _int CScene_Stage1::Update(_double fDeltaTime)
 		FAILED_CHECK(Ready_Layer_BreakableObj(TAG_LAY(Layer_Breakable)));
 
 	
+
+	if (GetKeyState(VK_RETURN) & 0x8000)
+	{
+		FAILED_CHECK(GetSingle(CUtilityMgr)->Clear_RenderGroup_forSceneChange());
+		FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Loading::Create(m_pDevice, m_pDeviceContext, SCENEID::SCENE_BOSS), SCENEID::SCENE_LOADING));
+	}
 
 	return 0;
 }
@@ -343,12 +349,13 @@ HRESULT CScene_Stage1::Ready_Layer_StaticMapObj(const _tchar * pLayerTag)
 		{
 			//매쉬 바꿔주기 
 			pObject->Change_Component_by_NewAssign(SCENE_STAGE1, tData.MeshID, TAG_COM(Com_Model));
-
+			((CStaticMapObject*)pObject)->Set_FrustumSize(XMVectorGetX(XMVector3Length((tData.matTransform.XMatrix()).r[0])) * 7.f);
 
 
 			if ((!lstrcmp(tData.MeshID, TAG_CP(Prototype_Mesh_GloryTree_Main))) || (!lstrcmp(tData.MeshID, TAG_CP(Prototype_Mesh_GloryTree_MainB))))
 			{
 				((CStaticMapObject*)pObject)->Set_PassIndex(3);
+				((CStaticMapObject*)pObject)->Set_FrustumSize(50);
 			}
 
 		}

@@ -134,7 +134,7 @@ _int CDollMaker::LateUpdate(_double fDeltaTime)
 {
 	if (__super::LateUpdate(fDeltaTime) < 0)return -1;
 
-	FAILED_CHECK(Set_Monster_On_Terrain(m_pTransformCom, fDeltaTime));
+	//FAILED_CHECK(Set_Monster_On_Terrain(m_pTransformCom, fDeltaTime));
 
 
 	if (m_bIsOnScreen)

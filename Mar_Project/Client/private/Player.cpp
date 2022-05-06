@@ -744,6 +744,18 @@ HRESULT CPlayer::SetUp_Weapon()
 	return S_OK;
 }
 
+HRESULT CPlayer::Renew_Player(_float3 Position)
+{
+
+
+	m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, Position);
+
+
+
+
+	return S_OK;
+}
+
 HRESULT CPlayer::Ready_ParticleDesc()
 {
 

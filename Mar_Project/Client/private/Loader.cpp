@@ -69,6 +69,11 @@ _uint CALLBACK LoadingThread(void* _Prameter)
 		pLoader->Load_Scene_Stage1(tThreadArg.IsClientQuit, tThreadArg.CriSec);
 		break;
 
+	case SCENEID::SCENE_BOSS:
+		pLoader->Load_Scene_Boss(tThreadArg.IsClientQuit, tThreadArg.CriSec);
+		break;
+
+		
 	case SCENEID::SCENE_EDIT:
 
 		pLoader->Load_Scene_Edit(tThreadArg.IsClientQuit, tThreadArg.CriSec);
@@ -288,8 +293,8 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 	TransformMatrix = XMMatrixScaling(0.0001f, 0.0001f, 0.0001f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
 	//TransformMatrix = XMMatrixScaling(1.f, 1.f, 1.f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
 
-	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_DollMaker),
-		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "DollMaker", "DollMaker.FBX", TransformMatrix)));
+	//FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_DollMaker),
+	//	CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "DollMaker", "DollMaker.FBX", TransformMatrix)));
 	
 	//FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_Grunt),
 	//	CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Grunt", "Grunt.FBX", TransformMatrix)));
@@ -405,7 +410,7 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 
 	/* 테스트 알게락 */
 
-	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_AlgaeRock_Ledge),
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_AlgaeRock_Ledge),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "AlgaeRock", "AlgaeRock_Ledge.FBX", TransformMatrix)));
 
 
@@ -528,8 +533,6 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 
 	//몬스터
 
-	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_DollMaker),
-		CDollMaker::Create(m_pDevice, m_pDeviceContext)));
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_Executor),
 		CExecutor::Create(m_pDevice, m_pDeviceContext)));
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_Scythe),
@@ -568,6 +571,58 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 	m_bIsLoadingFinished = true;
 	LeaveCriticalSection(_CriSec);
 	m_bIsLoadingFinished = true;
+	return S_OK;
+}
+
+HRESULT CLoader::Load_Scene_Boss(_bool * _IsClientQuit, CRITICAL_SECTION * _CriSec)
+{
+
+
+
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	_Matrix TransformMatrix = XMMatrixScaling(0.0001f, 0.0001f, 0.0001f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_BOSS, TAG_CP(Prototype_Mesh_DollMaker),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "DollMaker", "DollMaker.FBX", TransformMatrix)));
+
+	TransformMatrix = XMMatrixScaling(0.05f, 0.05f, 0.05f);
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_BOSS, TAG_CP(Prototype_QueenTower_BrokenC),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "QueenTower", "QueenTower_BrokenC.FBX", TransformMatrix)));
+	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
+
+
+	TransformMatrix = XMMatrixScaling(0.0001f, 0.0001f, 0.0001f) * XMMatrixRotationY(XMConvertToRadians(90.0f));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_BOSS, TAG_CP(Prototype_Mesh_SkyBox),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "SkyBox", "SkyBox_0.FBX", TransformMatrix)));
+
+	//////////Terrain
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_BOSS, TAG_CP(Prototype_VIBuffer_Terrain),
+		CVIBuffer_Terrain::Create(m_pDevice, m_pDeviceContext, L"Height_Boss.bmp")));
+
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_BOSS, TAG_CP(Prototype_Texture_Terrain),
+		CTexture::Create(m_pDevice, m_pDeviceContext, L"Terrain.txt")));
+
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_BOSS, TAG_CP(Prototype_Texture_GamePlayScene),
+		CTexture::Create(m_pDevice, m_pDeviceContext, L"UI_GamePlay.txt")));
+
+
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_DollMaker),
+		CDollMaker::Create(m_pDevice, m_pDeviceContext)));
+
+
+
+
+	RELEASE_INSTANCE(CGameInstance);
+	EnterCriticalSection(_CriSec);
+	m_iLoadingMaxCount = 1;
+	m_iLoadingProgressCount = 0;
+	LeaveCriticalSection(_CriSec);
+
+	EnterCriticalSection(_CriSec);
+	m_bIsLoadingFinished = true;
+	LeaveCriticalSection(_CriSec);
+
+
 	return S_OK;
 }
 
@@ -768,6 +823,15 @@ HRESULT CLoader::Load_Scene_Edit(_bool * _IsClientQuit, CRITICAL_SECTION * _CriS
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "WaterLog", "WaterLogB.FBX", TransformMatrix)));
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_WaterLogC),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "WaterLog", "WaterLogC.FBX", TransformMatrix)));
+
+
+	//////////////////////////////////////////////////////////////////////////퀸타워
+	TransformMatrix = XMMatrixScaling(0.05f, 0.05f, 0.05f);
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_QueenTower_BrokenC),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "QueenTower", "QueenTower_BrokenC.FBX", TransformMatrix)));
+	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
+
+
 
 
 #pragma endregion
