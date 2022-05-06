@@ -22,6 +22,9 @@ public:
 	virtual _int Render()override;
 	virtual _int LateRender()override;
 
+
+public:
+	void Set_PassIndex(_uint iIndex) { m_iPassIndex = iIndex; };
 private:
 	CShader*			m_pShaderCom = nullptr;
 	CRenderer*			m_pRendererCom = nullptr;
@@ -31,6 +34,7 @@ private:
 
 private:
 	HRESULT SetUp_Components();
+	_uint m_iPassIndex = 1;
 
 public:
 	static CStaticMapObject* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, void* pArg = nullptr);

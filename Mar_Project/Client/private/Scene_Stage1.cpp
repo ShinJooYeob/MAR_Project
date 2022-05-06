@@ -2,7 +2,7 @@
 #include "..\Public\Scene_Stage1.h"
 #include "Scene_Loading.h"
 #include "Player.h"
-
+#include "StaticMapObject.h"
 #include "Camera_Main.h"
 
 
@@ -34,12 +34,12 @@ HRESULT CScene_Stage1::Initialize()
 	FAILED_CHECK(Ready_Layer_UI(TAG_LAY(Layer_UI_GamePlay)));
 	
 
-	//FAILED_CHECK(Ready_Layer_JumpPad(TAG_LAY(Layer_JumpPad)));
-	//FAILED_CHECK(Ready_Layer_SteamPad(TAG_LAY(Layer_SteamPad)));
+	FAILED_CHECK(Ready_Layer_JumpPad(TAG_LAY(Layer_JumpPad)));
+	FAILED_CHECK(Ready_Layer_SteamPad(TAG_LAY(Layer_SteamPad)));
 	FAILED_CHECK(Ready_Layer_HiddenPad(TAG_LAY(Layer_HiddenPad)));
-	//FAILED_CHECK(Ready_Layer_TeethObj(TAG_LAY(Layer_TeethObj)));
-	//FAILED_CHECK(Ready_Layer_RoseObj(TAG_LAY(Layer_RoseObj)));
-	//FAILED_CHECK(Ready_Layer_BreakableObj(TAG_LAY(Layer_Breakable)))
+	FAILED_CHECK(Ready_Layer_TeethObj(TAG_LAY(Layer_TeethObj)));
+	FAILED_CHECK(Ready_Layer_RoseObj(TAG_LAY(Layer_RoseObj)));
+	FAILED_CHECK(Ready_Layer_BreakableObj(TAG_LAY(Layer_Breakable)))
 	
 	
 	FAILED_CHECK(Ready_Layer_StaticMapObj(TAG_LAY(Layer_StaticMapObj)));
@@ -50,7 +50,7 @@ HRESULT CScene_Stage1::Initialize()
 	//FAILED_CHECK(Ready_Layer_Eyepot(TAG_LAY(Layer_Monster)));
 	//FAILED_CHECK(Ready_Layer_WaspInk(TAG_LAY(Layer_Monster)));
 	//FAILED_CHECK(Ready_Layer_WaspArrow(TAG_LAY(Layer_Monster)));
-	//FAILED_CHECK(Ready_Layer_Executor(TAG_LAY(Layer_Monster)));
+	FAILED_CHECK(Ready_Layer_Executor(TAG_LAY(Layer_Monster)));
 
 
 		
@@ -266,7 +266,106 @@ HRESULT CScene_Stage1::Ready_Layer_BreakableObj(const _tchar * pLayerTag)
 
 HRESULT CScene_Stage1::Ready_Layer_StaticMapObj(const _tchar * pLayerTag)
 {
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_StaticMapObject), &_float3(14, 22, 15)));
+	//FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_StaticMapObject), &_float3(14, 22, 15)));
+
+	
+	//../bin/Resources/Data/Map/
+	_tchar szFullPath[MAX_PATH] = L"../bin/Resources/Data/Map/Map_1.dat";
+	_tchar wFileName[MAX_PATH] = L"";
+
+	//MultiByteToWideChar(CP_UTF8, 0, szFileName, -1, wFileName, sizeof(wFileName));
+	//WideCharToMultiByte(CP_UTF8, 0, fd.name, -1, szFilename, sizeof(szFilename), NULL, NULL);
+	lstrcat(szFullPath, wFileName);
+
+
+
+	//HANDLE hFile = CreateFileW(szFullPath, GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+
+
+	HANDLE hFile = ::CreateFileW(szFullPath, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, 0, NULL);
+
+
+	if (INVALID_HANDLE_VALUE == hFile)
+		return E_FAIL;
+
+	DWORD	dwByte = 0;
+
+	CGameInstance* pInstance = g_pGameInstance;
+
+
+	_uint iIDLength = 0;
+
+	// 유니코드임을 알리는 BOM
+	//DWORD wc = 0xFF;
+	//ReadFile(hFile, &wc, 3, &dwByte, NULL);
+
+	while (true)
+	{
+		OBJELEMENT	tData{};
+		_tchar szBuffer[MAX_PATH] = L"";
+		// key 값 로드
+		ReadFile(hFile, &(iIDLength), sizeof(_uint), &dwByte, nullptr);
+		ReadFile(hFile, (tData.ObjectID), sizeof(_tchar) * iIDLength, &dwByte, nullptr);
+		//lstrcpy(tData.ObjectID, szBuffer);
+
+		ReadFile(hFile, &(iIDLength), sizeof(_uint), &dwByte, nullptr);
+		ReadFile(hFile, (tData.MeshID), sizeof(_tchar) * iIDLength, &dwByte, nullptr);
+		//lstrcpy(tData.MeshID, szBuffer);
+
+		ReadFile(hFile, &(iIDLength), sizeof(_uint), &dwByte, nullptr);
+		ReadFile(hFile, (tData.TexturePath), sizeof(_tchar) * iIDLength, &dwByte, nullptr);
+		//lstrcpy(tData.TexturePath, szBuffer);
+
+		ReadFile(hFile, &(iIDLength), sizeof(_uint), &dwByte, nullptr);
+		ReadFile(hFile, (tData.TextureKey), sizeof(_tchar) * iIDLength, &dwByte, nullptr);
+		//lstrcpy(tData.TextureKey, szBuffer);
+
+		ReadFile(hFile, &(tData.PassIndex), sizeof(_uint), &dwByte, nullptr);
+		ReadFile(hFile, &(tData.matSRT.m[0][0]), sizeof(_float) * 16, &dwByte, nullptr);
+		ReadFile(hFile, &(tData.matTransform.m[0][0]), sizeof(_float) * 16, &dwByte, nullptr);
+
+		if (0 == dwByte)
+			break;
+
+		//객채 생성해주기
+		if(!lstrcmp(tData.ObjectID, L"EditorCursor")) continue;
+
+		pInstance->Add_GameObject_To_Layer(SCENE_STAGE1,pLayerTag, tData.ObjectID);
+
+
+		CGameObject* pObject = pInstance->Get_GameObject_By_LayerLastIndex(SCENE_STAGE1, pLayerTag);
+
+		NULL_CHECK_RETURN(pObject, E_FAIL);
+
+
+		if (lstrcmp(tData.MeshID, TAG_CP(Prototype_Mesh_None)))
+		{
+			//매쉬 바꿔주기 
+			pObject->Change_Component_by_NewAssign(SCENE_STAGE1, tData.MeshID, TAG_COM(Com_Model));
+
+
+
+			if ((!lstrcmp(tData.MeshID, TAG_CP(Prototype_Mesh_GloryTree_Main))) || (!lstrcmp(tData.MeshID, TAG_CP(Prototype_Mesh_GloryTree_MainB))))
+			{
+				((CStaticMapObject*)pObject)->Set_PassIndex(3);
+			}
+
+		}
+
+		//트렌스폼
+		CTransform* pTrans = (CTransform*)(pObject->Get_Component(TAG_COM(Com_Transform)));
+		NULL_CHECK_RETURN(pTrans, E_FAIL);
+		pTrans->Set_Matrix(tData.matTransform);
+
+
+
+	}
+
+
+
+	CloseHandle(hFile);
+
+
 
 	return S_OK;
 }
@@ -274,12 +373,11 @@ HRESULT CScene_Stage1::Ready_Layer_StaticMapObj(const _tchar * pLayerTag)
 HRESULT CScene_Stage1::Ready_Layer_Executor(const _tchar * pLayerTag)
 {
 
-	for (_uint i = 0 ; i < 1; i ++)
-	{
-		FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_Executor), &_float3(6 + _float(i), 22, 8)));
 
-	}
+		FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_Executor), &_float3(210, 22, 45)));
+
 	
+
 	
 
 	return S_OK;

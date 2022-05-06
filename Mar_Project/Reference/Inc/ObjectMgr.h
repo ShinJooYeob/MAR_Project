@@ -29,6 +29,8 @@ public:
 
 	CComponent*		Get_Commponent_By_LayerIndex(_uint eSceneNum, const _tchar* tagLayer, const _tchar* tagComponet, _uint iLayerIndex);
 	CGameObject*	Get_GameObject_By_LayerIndex(_uint eSceneNum, const _tchar* tagLayer, _uint iLayerIndex);
+	CGameObject*	Get_GameObject_By_LayerLastIndex(_uint eSceneNum, const _tchar* tagLayer);
+	
 	list<CGameObject*>*			Get_ObjectList_from_Layer(_uint iSceneNum, const _tchar* tagLayer);
 
 public:

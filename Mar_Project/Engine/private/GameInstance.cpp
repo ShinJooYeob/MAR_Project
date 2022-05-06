@@ -224,6 +224,18 @@ CGameObject * CGameInstance::Get_GameObject_By_LayerIndex(_uint eSceneNum, const
 	return m_pObjectMgr->Get_GameObject_By_LayerIndex(eSceneNum, tagLayer,iLayerIndex);
 }
 
+CGameObject * CGameInstance::Get_GameObject_By_LayerLastIndex(_uint eSceneNum, const _tchar * tagLayer)
+{
+	if (tagLayer == nullptr || m_pObjectMgr == nullptr)
+	{
+		__debugbreak();
+		return nullptr;
+	}
+
+	return m_pObjectMgr->Get_GameObject_By_LayerLastIndex(eSceneNum, tagLayer);
+
+}
+
 list<CGameObject*>* CGameInstance::Get_ObjectList_from_Layer(_uint eSceneNum, const _tchar * tagLayer)
 {
 	if (tagLayer == nullptr || m_pObjectMgr == nullptr)

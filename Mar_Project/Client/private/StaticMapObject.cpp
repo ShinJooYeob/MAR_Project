@@ -51,7 +51,7 @@ _int CStaticMapObject::LateUpdate(_double fDeltaTime)
 	if (__super::LateUpdate(fDeltaTime) < 0)
 		return -1;
 
-	if (g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS),10.f))
+	if (g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS), 10 * XMVectorGetX(m_pTransformCom->Get_MatrixScale(CTransform::STATE_UP))))
 		FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this));
 
 
@@ -81,7 +81,7 @@ _int CStaticMapObject::Render()
 		for (_uint j = 0; j < AI_TEXTURE_TYPE_MAX; j++)
 			FAILED_CHECK(m_pModel->Bind_OnShader(m_pShaderCom, i, j, MODLETEXTYPE(j)));
 
-		FAILED_CHECK(m_pModel->Render(m_pShaderCom, 1,i));
+		FAILED_CHECK(m_pModel->Render(m_pShaderCom, m_iPassIndex,i));
 	}
 
 	return 0;

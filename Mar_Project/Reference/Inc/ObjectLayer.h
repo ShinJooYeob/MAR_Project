@@ -25,6 +25,8 @@ public:
 
 	CComponent* Get_Commponent_By_LayerIndex(const _tchar* tagComponet, _uint iLayerIndex);
 	CGameObject* Get_GameObject_By_LayerIndex(_uint iLayerIndex);
+	CGameObject* Get_GameObject_By_LayerLastIndex();
+	
 
 	HRESULT		Delete_GameObject_By_LayerIndex(_uint iIndex);
 	HRESULT		Delete_GameObject_By_LayerObject(CGameObject* obj);

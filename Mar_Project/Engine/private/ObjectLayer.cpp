@@ -91,6 +91,18 @@ CGameObject * CObjectLayer::Get_GameObject_By_LayerIndex(_uint iLayerIndex)
 	return (*iter);
 }
 
+CGameObject * CObjectLayer::Get_GameObject_By_LayerLastIndex()
+{
+
+	if (m_ObjectList.size() == 0)
+		return nullptr;
+
+	auto iter =(m_ObjectList.back());
+
+	return (iter);
+
+}
+
 HRESULT CObjectLayer::Delete_GameObject_By_LayerIndex(_uint iIndex)
 {
 	// 특정 오브젝트 삭제 / 인덱스번호

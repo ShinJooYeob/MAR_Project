@@ -51,6 +51,7 @@ public:/* For.ObjectMgr */
 	HRESULT			Add_GameObject_Out_of_Manager(CGameObject** ppOutGameObj, _uint eSceneNum, const _tchar* tagPrototype, void* pArg = nullptr);
 	CComponent*		Get_Commponent_By_LayerIndex(_uint eSceneNum, const _tchar* tagLayer, const _tchar* tagComponet, _uint iLayerIndex = 0);
 	CGameObject*	Get_GameObject_By_LayerIndex(_uint eSceneNum, const _tchar* tagLayer, _uint iLayerIndex = 0);
+	CGameObject*	Get_GameObject_By_LayerLastIndex(_uint eSceneNum, const _tchar* tagLayer);
 	list<CGameObject*>*	Get_ObjectList_from_Layer(_uint eSceneNum, const _tchar* tagLayer);
 	HRESULT			Delete_GameObject_To_Layer_Index(_uint eSceneNum, const _tchar* tagLayer, _uint index);
 	HRESULT			Delete_GameObject_To_Layer_Object(_uint eSceneNum, const _tchar* tagLayer, CGameObject* obj);

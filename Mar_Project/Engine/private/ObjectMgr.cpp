@@ -207,6 +207,24 @@ CGameObject * CObjectMgr::Get_GameObject_By_LayerIndex(_uint eSceneNum, const _t
 	return pLayer->Get_GameObject_By_LayerIndex(iLayerIndex);
 }
 
+CGameObject * CObjectMgr::Get_GameObject_By_LayerLastIndex(_uint eSceneNum, const _tchar * tagLayer)
+{
+	if (eSceneNum >= m_iMaxSceneNum || m_mapLayer == nullptr)
+		return nullptr;
+
+	CObjectLayer* pLayer = Find_Layer(eSceneNum, tagLayer);
+
+	if (pLayer == nullptr)
+	{
+		pLayer = Find_Layer(0, tagLayer);
+
+		if (pLayer == nullptr)
+			return nullptr;
+	}
+
+	return pLayer->Get_GameObject_By_LayerLastIndex();
+}
+
 
 
 

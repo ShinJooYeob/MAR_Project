@@ -101,7 +101,7 @@ _int CExecutor::Update(_double fDeltaTime)
 
 
 
-	m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
+	m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS),7.8f);
 	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime * ((m_bIsBerseked) ? 1.5f : 1.f), m_bIsOnScreen));
 	FAILED_CHECK(Adjust_AnimMovedTransform(fDeltaTime));
 	if (m_bIsOnScreen)
