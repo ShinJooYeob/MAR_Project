@@ -34,24 +34,11 @@ HRESULT CScene_Boss::Initialize()
 	FAILED_CHECK(Ready_Layer_UI(TAG_LAY(Layer_UI_GamePlay)));
 	
 
-	//FAILED_CHECK(Ready_Layer_JumpPad(TAG_LAY(Layer_JumpPad)));
-	//FAILED_CHECK(Ready_Layer_SteamPad(TAG_LAY(Layer_SteamPad)));
-	//FAILED_CHECK(Ready_Layer_HiddenPad(TAG_LAY(Layer_HiddenPad)));
-	//FAILED_CHECK(Ready_Layer_TeethObj(TAG_LAY(Layer_TeethObj)));
-	//FAILED_CHECK(Ready_Layer_RoseObj(TAG_LAY(Layer_RoseObj)));
-	//FAILED_CHECK(Ready_Layer_BreakableObj(TAG_LAY(Layer_Breakable)))
-	
-	
 	FAILED_CHECK(Ready_Layer_StaticMapObj(TAG_LAY(Layer_StaticMapObj)));
 
 
 	FAILED_CHECK(Ready_Layer_DollMaker(TAG_LAY(Layer_Monster)));
 	
-	//FAILED_CHECK(Ready_Layer_Grunt(TAG_LAY(Layer_Monster)));
-	//FAILED_CHECK(Ready_Layer_Eyepot(TAG_LAY(Layer_Monster)));
-	//FAILED_CHECK(Ready_Layer_WaspInk(TAG_LAY(Layer_Monster)));
-	//FAILED_CHECK(Ready_Layer_WaspArrow(TAG_LAY(Layer_Monster)));
-	//FAILED_CHECK(Ready_Layer_Executor(TAG_LAY(Layer_Monster)));
 
 
 		
@@ -67,9 +54,6 @@ _int CScene_Boss::Update(_double fDeltaTime)
 {
 	if (__super::Update(fDeltaTime) < 0)
 		return -1;
-
-	if (g_pGameInstance->Get_DIKeyState(DIK_P)&DIS_Down)
-		FAILED_CHECK(Ready_Layer_BreakableObj(TAG_LAY(Layer_Breakable)));
 
 	
 
@@ -210,63 +194,6 @@ HRESULT CScene_Boss::Ready_Layer_UI(const _tchar * pLayerTag)
 	return S_OK;
 }
 
-HRESULT CScene_Boss::Ready_Layer_JumpPad(const _tchar * pLayerTag)
-{
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_BOSS, pLayerTag, TAG_OP(Prototype_JumpPad),&_float3(7, 20, 7) ));
-
-	return S_OK;
-}
-
-HRESULT CScene_Boss::Ready_Layer_SteamPad(const _tchar * pLayerTag)
-{
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_BOSS, pLayerTag, TAG_OP(Prototype_SteamPad), &_float4(9, 22.5, 7, 5)));
-
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_BOSS, pLayerTag, TAG_OP(Prototype_SteamPad), &_float4(9, 22.5, 5, 10)));
-
-	return S_OK;
-}
-
-HRESULT CScene_Boss::Ready_Layer_HiddenPad(const _tchar * pLayerTag)
-{
-	///for (_uint i = 0; i < 4; i++)
-	///{
-	///	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_BOSS, pLayerTag, TAG_OP(Prototype_HiddenPad), &_float4(_float(11 + i *3), 22, _float(7 +i*2), _float(0 +i))));
-	///}
-
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_BOSS, pLayerTag, TAG_OP(Prototype_HiddenPad), &_float4(_float(11), 20, _float(7), _float(0))));
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_BOSS, pLayerTag, TAG_OP(Prototype_HiddenPad), &_float4(_float(95), 20, _float(85), _float(1))));
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_BOSS, pLayerTag, TAG_OP(Prototype_HiddenPad), &_float4(_float(100), 20, _float(90), _float(2))));
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_BOSS, pLayerTag, TAG_OP(Prototype_HiddenPad), &_float4(_float(105), 20, _float(95), _float(3))));
-
-	return S_OK;
-}
-
-HRESULT CScene_Boss::Ready_Layer_TeethObj(const _tchar * pLayerTag)
-{
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_BOSS, pLayerTag, TAG_OP(Prototype_TeethObj), &_float4(13, 22, 7,0)));
-
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_BOSS, pLayerTag, TAG_OP(Prototype_TeethObj), &_float4(13, 22, 9, 1)));
-
-
-	return S_OK;
-}
-
-HRESULT CScene_Boss::Ready_Layer_RoseObj(const _tchar * pLayerTag)
-{
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_BOSS, pLayerTag, TAG_OP(Prototype_RoseObj), &_float3(14, 22, 7)));
-
-	return S_OK;
-}
-
-HRESULT CScene_Boss::Ready_Layer_BreakableObj(const _tchar * pLayerTag)
-{
-
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_BOSS, pLayerTag, TAG_OP(Prototype_BreakableObj), &_float4(16, 21, 7, _float(Prototype_Mesh_BreakableBox))));
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_BOSS, pLayerTag, TAG_OP(Prototype_BreakableObj), &_float4(19, 21, 7, _float(Prototype_Mesh_BreakableBarrel))));
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_BOSS, pLayerTag, TAG_OP(Prototype_BreakableObj), &_float4(22, 21, 7, _float(Prototype_Mesh_GiftBasket))));
-
-	return S_OK;
-}
 
 HRESULT CScene_Boss::Ready_Layer_StaticMapObj(const _tchar * pLayerTag)
 {
@@ -378,51 +305,12 @@ HRESULT CScene_Boss::Ready_Layer_StaticMapObj(const _tchar * pLayerTag)
 	return S_OK;
 }
 
-HRESULT CScene_Boss::Ready_Layer_Executor(const _tchar * pLayerTag)
-{
 
-
-		FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_BOSS, pLayerTag, TAG_OP(Prototype_Executor), &_float3(210, 22, 45)));
-
-	
-
-	
-
-	return S_OK;
-}
-
-HRESULT CScene_Boss::Ready_Layer_Eyepot(const _tchar * pLayerTag)
-{
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_BOSS, pLayerTag, TAG_OP(Prototype_Eyepot), &_float3(6, 22, 8)));
-
-	return S_OK;
-}
-
-HRESULT CScene_Boss::Ready_Layer_Grunt(const _tchar * pLayerTag)
-{
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_BOSS, pLayerTag, TAG_OP(Prototype_Grunt), &_float3(6, 22, 8)));
-
-	return S_OK;
-}
-
-HRESULT CScene_Boss::Ready_Layer_WaspArrow(const _tchar * pLayerTag)
-{
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_BOSS, pLayerTag, TAG_OP(Prototype_WaspArrow), &_float3(0, 21, 4)));
-
-	return S_OK;
-}
-
-HRESULT CScene_Boss::Ready_Layer_WaspInk(const _tchar * pLayerTag)
-{
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_BOSS, pLayerTag, TAG_OP(Prototype_WaspInk), &_float3(6, 22, 8)));
-
-	return S_OK;
-}
 
 HRESULT CScene_Boss::Ready_Layer_DollMaker(const _tchar * pLayerTag)
 {
 
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_BOSS, pLayerTag, TAG_OP(Prototype_DollMaker), &_float3(50, 15, 16)));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_BOSS, pLayerTag, TAG_OP(Prototype_DollMaker), &_float3(77, 10, 56)));
 
 
 	return S_OK;

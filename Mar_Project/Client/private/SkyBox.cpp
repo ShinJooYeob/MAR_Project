@@ -35,7 +35,7 @@ _int CSkyBox::Update(_double fDeltaTime)
 	if (__super::Update(fDeltaTime) < 0)
 		return -1;
 
-
+	m_pTransformCom->Turn_CW(XMVectorSet(0, 1, 0, 0), fDeltaTime);
 
 
 
@@ -110,7 +110,7 @@ HRESULT CSkyBox::SetUp_Components()
 	CTransform::TRANSFORMDESC tDesc = {};
 
 	tDesc.fMovePerSec = 5;
-	tDesc.fRotationPerSec = XMConvertToRadians(60);
+	tDesc.fRotationPerSec = XMConvertToRadians(1.5f);
 	tDesc.fScalingPerSec = 1;
 	tDesc.vPivot = _float3(0, 0, 0);
 

@@ -38,6 +38,9 @@ HRESULT CDollMaker::Initialize_Clone(void * pArg)
 
 	FAILED_CHECK(SetUp_Weapon());
 
+
+	m_pTransformCom->LookAt(XMVectorSet(50, 10, 50,0));
+
 	return S_OK;
 }
 
@@ -47,10 +50,41 @@ _int CDollMaker::Update(_double fDeltaTime)
 	//m_pColliderCom->Update_ConflictPassedTime(fDeltaTime);
 	//Update_DmgCalculate(fDeltaTime);
 
-	//if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
-	//	m_pModel->Change_AnimIndex(0);
-	//if (g_pGameInstance->Get_DIKeyState(DIK_2)&DIS_Down)
-	//	Add_Dmg_to_Monster(10);
+	if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
+		m_pModel->Change_AnimIndex(0);
+
+	if (g_pGameInstance->Get_DIKeyState(DIK_2)&DIS_Down)
+	{
+		m_pModel->Change_AnimIndex_UntilNReturn_Must(1,4,0,0.15,true);
+	}
+	if (g_pGameInstance->Get_DIKeyState(DIK_3)&DIS_Down)
+	{
+		m_pModel->Change_AnimIndex_UntilNReturn_Must(5, 8, 0, 0.15, true);
+	}
+	if (g_pGameInstance->Get_DIKeyState(DIK_4)&DIS_Down)
+	{
+		m_pModel->Change_AnimIndex_UntilNReturn_Must(9, 12, 0, 0.15, true);
+	}
+	if (g_pGameInstance->Get_DIKeyState(DIK_5)&DIS_Down)
+	{
+		m_pModel->Change_AnimIndex_UntilNReturn_Must(14, 17, 0, 0.15, true);
+	}
+
+
+	{
+
+
+		_Vector TargetAt = m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS);
+
+		TargetAt = XMVectorSetY(TargetAt, m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS).y);
+
+		m_pTransformCom->LookAt(TargetAt);
+
+
+
+	}
+	
+
 
 	////m_pModel->Change_AnimIndex(16) // ½½·¥´õ
 	////walk 2.8 / 0.05f
