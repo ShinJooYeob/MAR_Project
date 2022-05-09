@@ -40,11 +40,12 @@ private:
 	_uint				m_iAdjMovedIndex = 0;
 	_bool				m_bIsDmgAnimUpdated[3];
 
-	ATTACHBONEMATRIX_PTR  m_ArrCollisionAttach[6];
+	ATTACHBONEMATRIX_PTR  m_ArrCollisionAttach[7];
 
 	vector<class CMonsterWeapon*>			m_vecWeapon;
 
 	_uint				m_pHanddyIndex = 0;
+	_bool				m_bSummonHandy = false;
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_Weapon();

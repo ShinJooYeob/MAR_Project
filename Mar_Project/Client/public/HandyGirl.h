@@ -27,6 +27,8 @@ public:
 	virtual _int Update_Pattern(_double fDeltaTime)override;
 	virtual void Add_Dmg_to_Monster(_float iDmgAmount)override;
 
+	virtual HRESULT Object_Function(void* pArg = nullptr) { return (m_pModel->Get_NowAnimIndex() == 35) ? S_FALSE: S_OK; };
+
 
 
 	void Make_Hand_PoleGrab();

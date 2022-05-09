@@ -55,18 +55,18 @@ _int CHandyGirl::Update(_double fDeltaTime)
 
 
 
-	if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
-	{
-		Make_Hand_PoleGrab();
-	}
-	if (g_pGameInstance->Get_DIKeyState(DIK_2)&DIS_Down)
-	{
-		Make_Hand_Free();
-	}
-	if (g_pGameInstance->Get_DIKeyState(DIK_3)&DIS_Down)
-	{
-		Enter_Hand();
-	}
+	//if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
+	//{
+	//	Make_Hand_PoleGrab();
+	//}
+	//if (g_pGameInstance->Get_DIKeyState(DIK_2)&DIS_Down)
+	//{
+	//	Make_Hand_Free();
+	//}
+	//if (g_pGameInstance->Get_DIKeyState(DIK_3)&DIS_Down)
+	//{
+	//	Enter_Hand();
+	//}
 
 
 	_uint NowIndex = m_pModel->Get_NowAnimIndex();
@@ -373,7 +373,7 @@ void CHandyGirl::Enter_Hand()
 	m_PatternDelayTime = 7;
 	m_bIsPatternFinished = true;
 	m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, m_PoleGrabPos);
-	m_pModel->Change_AnimIndex_ReturnTo_Must(37, 0, 0.15, true);
+	m_pModel->Change_AnimIndex_ReturnTo_Must(37, 0, 0, true);
 }
 
 HRESULT CHandyGirl::SetUp_Components()

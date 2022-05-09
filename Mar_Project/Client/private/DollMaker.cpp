@@ -2,6 +2,8 @@
 #include "..\public\DollMaker.h"
 #include "Scythe.h"
 #include "Terrain.h"
+#include "HandyBoy.h"
+#include "HandyGirl.h"
 
 
 
@@ -31,37 +33,24 @@ HRESULT CDollMaker::Initialize_Clone(void * pArg)
 
 
 	if (pArg != nullptr)
-		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, *((_float3*)pArg));
+		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, * ((_float3*)pArg));
 
-	m_fHP = m_fMaxHP = 96;
+	m_fHP = m_fMaxHP = 32;
 
 
 	FAILED_CHECK(SetUp_Weapon());
 
 	ZeroMemory(m_bIsDmgAnimUpdated, sizeof(_bool) * 3);
 	m_pTransformCom->LookAt(XMVectorSet(60, 10, 60,0));
-
+	m_bIsPatternFinished = true;
 	return S_OK;
 }
 
 _int CDollMaker::Update(_double fDeltaTime)
 {
 	if (__super::Update(fDeltaTime) < 0)return -1;
-	//m_pColliderCom->Update_ConflictPassedTime(fDeltaTime);
-	//Update_DmgCalculate(fDeltaTime);
-
-	if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
-		m_pModel->Change_AnimIndex(2);
-
-	if (g_pGameInstance->Get_DIKeyState(DIK_2)&DIS_Down)
-	{
-		m_pModel->Change_AnimIndex_UntilNReturn_Must(1,4,0,0.15,true);
-	}
-	if (g_pGameInstance->Get_DIKeyState(DIK_3)&DIS_Down)
-	{
-		m_pModel->Change_AnimIndex_UntilNReturn_Must(5, 8, 0, 0.15, true);
-	}
-
+	m_pColliderCom->Update_ConflictPassedTime(fDeltaTime);
+	Update_DmgCalculate(fDeltaTime);
 
 
 
@@ -75,241 +64,62 @@ _int CDollMaker::Update(_double fDeltaTime)
 	
 
 
-
+	if (m_PatternDelayTime > 0)
 	{
-		//Pivot  : -1.484999f , -0.020000f , -1.824999f , 1
-		//rot  : -88.699219f , 1.200000f , 10.100002f  
-		static _float3 testFloat3 = _float3(-1.484999f, -0.020000f, -1.824999f);
-		static _float3 RotFloat3 = _float3(1, 1, 1);
-		static _float value = 0.01f;
-		static _int kind = 0;
+		m_PatternDelayTime -= fDeltaTime;
 
-
-
-		CGameInstance* m_pInstance = g_pGameInstance;
-		if (m_pInstance->Get_DIKeyState(DIK_UP) & DIS_Press)
+		if (m_fHP < m_fMaxHP * 0.8f && m_pHanddyIndex == 0)
 		{
-			testFloat3.z += value;
-
-			string ttszLog = "//Pivot  : " + to_string(testFloat3.x) + "f , " + to_string(testFloat3.y) + "f , " + to_string(testFloat3.z) + "f , 1" + "\n" +
-				"//size  : " + to_string(RotFloat3.x) + "f , " + to_string(RotFloat3.y) + "f , " + to_string(RotFloat3.z) + "f  " + "\n";
-
-			wstring ttDebugLog;
-			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-
-			OutputDebugStringW(ttDebugLog.c_str());
-		}
-
-		else if (m_pInstance->Get_DIKeyState(DIK_DOWN) & DIS_Press)
-		{
-			testFloat3.z -= value;
-			string ttszLog = "//Pivot  : " + to_string(testFloat3.x) + "f , " + to_string(testFloat3.y) + "f , " + to_string(testFloat3.z) + "f , 1" + "\n" +
-				"//size  : " + to_string(RotFloat3.x) + "f , " + to_string(RotFloat3.y) + "f , " + to_string(RotFloat3.z) + "f  " + "\n";
-
-			wstring ttDebugLog;
-			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-
-			OutputDebugStringW(ttDebugLog.c_str());
-
-
-
-		}
-		else if (m_pInstance->Get_DIKeyState(DIK_LEFT) & DIS_Press)
-		{
-			testFloat3.x -= value;
-			string ttszLog = "//Pivot  : " + to_string(testFloat3.x) + "f , " + to_string(testFloat3.y) + "f , " + to_string(testFloat3.z) + "f , 1" + "\n" +
-				"//size  : " + to_string(RotFloat3.x) + "f , " + to_string(RotFloat3.y) + "f , " + to_string(RotFloat3.z) + "f  " + "\n";
-
-			wstring ttDebugLog;
-			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-
-			OutputDebugStringW(ttDebugLog.c_str());
-
-
-
-		}
-
-		else if (m_pInstance->Get_DIKeyState(DIK_RIGHT) & DIS_Press)
-		{
-			testFloat3.x += value;
-			string ttszLog = "//Pivot  : " + to_string(testFloat3.x) + "f , " + to_string(testFloat3.y) + "f , " + to_string(testFloat3.z) + "f , 1" + "\n" +
-				"//size  : " + to_string(RotFloat3.x) + "f , " + to_string(RotFloat3.y) + "f , " + to_string(RotFloat3.z) + "f  " + "\n";
-
-			wstring ttDebugLog;
-			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-
-			OutputDebugStringW(ttDebugLog.c_str());
-
-
-
-		}
-
-		else if (m_pInstance->Get_DIKeyState(DIK_DELETE) & DIS_Press)
-		{
-			testFloat3.y += value;
-
-			string ttszLog = "//Pivot  : " + to_string(testFloat3.x) + "f , " + to_string(testFloat3.y) + "f , " + to_string(testFloat3.z) + "f , 1" + "\n" +
-				"//size  : " + to_string(RotFloat3.x) + "f , " + to_string(RotFloat3.y) + "f , " + to_string(RotFloat3.z) + "f  " + "\n";
-
-			wstring ttDebugLog;
-			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-
-			OutputDebugStringW(ttDebugLog.c_str());
-
-
-
-		}
-
-		else if (m_pInstance->Get_DIKeyState(DIK_END) & DIS_Press)
-		{
-			testFloat3.y -= value;
-			string ttszLog = "//Pivot  : " + to_string(testFloat3.x) + "f , " + to_string(testFloat3.y) + "f , " + to_string(testFloat3.z) + "f , 1" + "\n" +
-				"//size  : " + to_string(RotFloat3.x) + "f , " + to_string(RotFloat3.y) + "f , " + to_string(RotFloat3.z) + "f  " + "\n";
-
-			wstring ttDebugLog;
-			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-
-			OutputDebugStringW(ttDebugLog.c_str());
-
-
-
-		}
-		else if (m_pInstance->Get_DIKeyState(DIK_PGUP) & DIS_Press)
-		{
-			switch (kind)
+			m_PatternDelayTime = 4;
+			if (!m_bSummonHandy)
 			{
-			case 0:
-				RotFloat3.x += value;
-				break;
-			case 1:
-				RotFloat3.y += value;
-				break;
-			case 2:
-				RotFloat3.z += value;
-				break;
-
-			default:
-				break;
+				m_bSummonHandy = true;
+				m_pModel->Change_AnimIndex_UntilNReturn_Must(9, 12, 0, 0.15, true);
 			}
-
-
-			string ttszLog = "//Pivot  : " + to_string(testFloat3.x) + "f , " + to_string(testFloat3.y) + "f , " + to_string(testFloat3.z) + "f , 1" + "\n" +
-				"//size  : " + to_string(RotFloat3.x) + "f , " + to_string(RotFloat3.y) + "f , " + to_string(RotFloat3.z) + "f  " + "\n";
-
-			wstring ttDebugLog;
-			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-
-			OutputDebugStringW(ttDebugLog.c_str());
-
-
-
 		}
-		else if (m_pInstance->Get_DIKeyState(DIK_PGDN) & DIS_Press)
+
+		if (m_fHP < m_fMaxHP * 0.6f && m_pHanddyIndex == 1)
 		{
-			switch (kind)
+			m_PatternDelayTime = 4;
+			if (!m_bSummonHandy)
 			{
-			case 0:
-				RotFloat3.x -= value;
-				break;
-			case 1:
-				RotFloat3.y -= value;
-				break;
-			case 2:
-				RotFloat3.z -= value;
-				break;
-
-			default:
-				break;
+				m_bSummonHandy = true;
+				m_pModel->Change_AnimIndex_UntilNReturn_Must(14, 17, 0, 0.15, true);
 			}
-
-			string ttszLog = "//Pivot  : " + to_string(testFloat3.x) + "f , " + to_string(testFloat3.y) + "f , " + to_string(testFloat3.z) + "f , 1" + "\n" +
-				"//size  : " + to_string(RotFloat3.x) + "f , " + to_string(RotFloat3.y) + "f , " + to_string(RotFloat3.z) + "f  " + "\n";
-
-			wstring ttDebugLog;
-			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-
-			OutputDebugStringW(ttDebugLog.c_str());
-
-
-
 		}
-		else if (m_pInstance->Get_DIKeyState(DIK_TAB) & DIS_Down)
-		{
-			kind++;
-			if (kind > 2)kind = 0;
+	}
+	else
+	{
+		_uint iChecker = 1;
 
-			string ttszLog = "kind  : " + to_string(kind) + "\n";
+		for (_uint i = 0; i < m_pHanddyIndex; i++)
+			iChecker *= m_vecWeapon[i]->Object_Function();
 
-			wstring ttDebugLog;
-			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+		if (iChecker || !m_bIsPatternFinished)
+			FAILED_CHECK(Update_Pattern(fDeltaTime));
+	}
 
-			OutputDebugStringW(ttDebugLog.c_str());
-		}
+	m_bIsOnScreen = true;
+	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime, m_bIsOnScreen));
+	FAILED_CHECK(Adjust_AnimMovedTransform(fDeltaTime));
 
-
-		//_Matrix tt = XMMatrixRotationX(XMConvertToRadians(RotFloat3.x))*
-		//	XMMatrixRotationY(XMConvertToRadians(RotFloat3.y))*
-		//	XMMatrixRotationZ(XMConvertToRadians(RotFloat3.z))*
-		//	XMMatrixTranslation(testFloat3.x, testFloat3.y, testFloat3.z);
-
-		//m_pTransformCom->Set_Matrix(tt);
-#define TestColliderNum 0
-		_Matrix tt = XMMatrixScaling(RotFloat3.x, RotFloat3.y, RotFloat3.z) *XMMatrixTranslation(testFloat3.x, testFloat3.y, testFloat3.z);
-
-
-		_Matrix			TransformMatrix = XMLoadFloat4x4(m_ArrCollisionAttach[TestColliderNum].pUpdatedNodeMat) * XMLoadFloat4x4(m_ArrCollisionAttach[TestColliderNum].pDefaultPivotMat);
-
+	for (_uint i = 0; i < 7; i++)
+	{
+		_Matrix			TransformMatrix = XMLoadFloat4x4(m_ArrCollisionAttach[i].pUpdatedNodeMat) * XMLoadFloat4x4(m_ArrCollisionAttach[i].pDefaultPivotMat);
 		TransformMatrix.r[0] = XMVector3Normalize(TransformMatrix.r[0]);
 		TransformMatrix.r[1] = XMVector3Normalize(TransformMatrix.r[1]);
 		TransformMatrix.r[2] = XMVector3Normalize(TransformMatrix.r[2]);
-
-
-		TransformMatrix = tt*TransformMatrix * m_pTransformCom->Get_WorldMatrix();
-		m_pColliderCom->Update_Transform(TestColliderNum, TransformMatrix);
-
-
+		m_pColliderCom->Update_Transform(i, TransformMatrix * m_pTransformCom->Get_WorldMatrix());
 	}
 
+	_uint NowIndex = m_pModel->Get_NowAnimIndex();
 
-
-
-
-
-	Update_DmgCalculate(fDeltaTime);
-
-	m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
-
-
-	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime, m_bIsOnScreen));
-	//FAILED_CHECK(Adjust_MovedTransform_byAnim(fDeltaTime));
-
-	if (m_bIsOnScreen)
-	{
-		for (_uint i = 0; i < TestColliderNum; i++)
-		{
-			_Matrix			TransformMatrix = XMLoadFloat4x4(m_ArrCollisionAttach[i].pUpdatedNodeMat) * XMLoadFloat4x4(m_ArrCollisionAttach[i].pDefaultPivotMat);
-			TransformMatrix.r[0] = XMVector3Normalize(TransformMatrix.r[0]);
-			TransformMatrix.r[1] = XMVector3Normalize(TransformMatrix.r[1]);
-			TransformMatrix.r[2] = XMVector3Normalize(TransformMatrix.r[2]);
-			m_pColliderCom->Update_Transform(i, TransformMatrix * m_pTransformCom->Get_WorldMatrix());
-		}
-
-
-
+	if((NowIndex >= 1 && NowIndex <= 3) || (NowIndex >= 5 && NowIndex <= 6))
 		g_pGameInstance->Add_CollisionGroup(CollisionType_Monster, this, m_pColliderCom);
-	}
 
 
-
-	//m_bIsOnScreen = true;
-	//FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime , m_bIsOnScreen));
-	//FAILED_CHECK(Adjust_AnimMovedTransform(fDeltaTime));
-	//
-	//for (_uint i = 0; i < m_pHanddyIndex; i++)
-	//	m_vecWeapon[i]->Update(fDeltaTime);
-	
-
-
+	for (_uint i = 0; i < m_pHanddyIndex; i++)
+		m_vecWeapon[i]->Update(fDeltaTime);
 
 
 	return _int();
@@ -319,19 +129,17 @@ _int CDollMaker::LateUpdate(_double fDeltaTime)
 {
 	if (__super::LateUpdate(fDeltaTime) < 0)return -1;
 
-	//FAILED_CHECK(Set_Monster_On_Terrain(m_pTransformCom, fDeltaTime));
-
 
 	if (m_bIsOnScreen)
 	{
 		FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this));
 
 		for (_uint i = 0; i < m_pHanddyIndex; i++)
-			m_vecWeapon[i]->Update(fDeltaTime);
-		//m_vecWeapon[0]->LateUpdate(fDeltaTime);
+			m_vecWeapon[i]->LateUpdate(fDeltaTime);
 	}
 
 	m_vOldPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+
 	return _int();
 }
 
@@ -342,9 +150,9 @@ _int CDollMaker::Render()
 
 	NULL_CHECK_RETURN(m_pModel, E_FAIL);
 
-//#ifdef _DEBUG
-//	m_pColliderCom->Render();
-//#endif // _DEBUG
+#ifdef _DEBUG
+	m_pColliderCom->Render();
+#endif // _DEBUG
 
 	FAILED_CHECK(m_pTransformCom->Bind_OnShader(m_pShaderCom, "g_WorldMatrix"));
 
@@ -357,8 +165,13 @@ _int CDollMaker::Render()
 	_uint NumMaterial = m_pModel->Get_NumMaterial();
 
 
+
+
 	for (_uint i = 0; i < NumMaterial; i++)
 	{
+		if (m_pHanddyIndex > 0 && i == 3)continue;
+		if (m_pHanddyIndex > 1 && i == 4)continue;
+
 		for (_uint j = 0; j < AI_TEXTURE_TYPE_MAX; j++)
 			FAILED_CHECK(m_pModel->Bind_OnShader(m_pShaderCom, i, j, MODLETEXTYPE(j)));
 
@@ -393,13 +206,13 @@ _int CDollMaker::Update_DmgCalculate(_double fDeltaTime)
 	_uint NowAnimIndex = m_pModel->Get_NowAnimIndex();
 
 
-	if (!m_bIsDmgAnimUpdated[0] && 5 < m_fDmgAmount && NowAnimIndex >= 1 && NowAnimIndex <=3 )
+	if (!m_bIsDmgAnimUpdated[0] && m_fDmgAmount > 3 && NowAnimIndex >= 1 && NowAnimIndex <=3 )
 	{
 
 		m_pModel->Change_AnimIndex_ReturnTo_Must(19, 4, 0.15, true);
 		m_bIsDmgAnimUpdated[0] = true;
 	}
-	if (!m_bIsDmgAnimUpdated[0] && 5 < m_fDmgAmount && NowAnimIndex >= 5 && NowAnimIndex <= 6)
+	if (!m_bIsDmgAnimUpdated[0] && m_fDmgAmount > 3 && NowAnimIndex >= 5 && NowAnimIndex <= 6)
 	{
 		m_pModel->Change_AnimIndex_ReturnTo_Must(20, 8, 0.15, true);
 		m_bIsDmgAnimUpdated[0] = true;
@@ -415,7 +228,32 @@ _int CDollMaker::Update_Pattern(_double fDeltaTime)
 
 	m_PatternPassedTime += fDeltaTime;
 
+	if (m_bIsPatternFinished)
+	{
+		m_ePattern += 1;
+		if (m_ePattern > 1) m_ePattern = 0;
+		m_bIsPatternFinished = false;
+		m_PatternPassedTime = 0;
+	}
 
+
+
+
+	switch (m_ePattern)
+	{
+	case 0:
+		if (!m_PatternPassedTime)		
+			m_pModel->Change_AnimIndex_UntilNReturn_Must(1, 4, 0, 0.15, true);
+
+		break;
+	case 1:
+		if (!m_PatternPassedTime)
+			m_pModel->Change_AnimIndex_UntilNReturn_Must(5, 8, 0, 0.15, true);
+		break;
+
+	default:
+		break;
+	}
 
 
 	
@@ -426,22 +264,10 @@ _int CDollMaker::Update_Pattern(_double fDeltaTime)
 
 void CDollMaker::Add_Dmg_to_Monster(_float iDmgAmount)
 {
-	m_DmgPassedTime = MonsterDmgTime;
+	m_DmgPassedTime = MonsterDmgTime * 5.f;
 	m_fDmgAmount += iDmgAmount;
 	m_fHP -= iDmgAmount;
 
-	if (m_fHP < m_fMaxHP * 0.8f && m_pHanddyIndex == 0)
-	{
-		m_pHanddyIndex = 1;
-		m_pModel->Change_AnimIndex_UntilNReturn_Must(9, 12, 0, 0.15, true);
-	}
-
-	if (m_fHP < m_fMaxHP * 0.6f && m_pHanddyIndex == 1)
-	{
-		m_pHanddyIndex = 2;		
-		m_pModel->Change_AnimIndex_UntilNReturn_Must(14, 17, 0, 0.15, true);
-
-	}
 }
 
 HRESULT CDollMaker::SetUp_Components()
@@ -474,14 +300,85 @@ HRESULT CDollMaker::SetUp_Components()
 	//ZeroMemory(&ColliderDesc, sizeof(COLLIDERDESC));
 
 
-	//Pivot  : -0.160000f , 0.000000f , -4.440007f , 1
-	//size  : 7.600080f , 1.000000f , 1.000000f  
-	ColliderDesc.vScale = _float3(1.);
+	//Pivot  : 0.030000f , -10.630148f , -10.410143f , 1
+	//size  : 6.080047f , 3.000000f , 3.000000f  
+	ColliderDesc.vScale = _float3(6.080047f, 3.000000f, 3.000000f);
 	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
-	ColliderDesc.vPosition = _float4(0,0,0, 1);
+	ColliderDesc.vPosition = _float4(0.030000f, -10.630148f, -10.410143f, 1);
 	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
 	m_ArrCollisionAttach[0] = m_pModel->Find_AttachMatrix_InHirarchyNode("Bone_Tough_Long_04");
 	NULL_CHECK_RETURN(m_ArrCollisionAttach[0].pDefaultPivotMat, E_FAIL);
+
+
+
+	ColliderDesc.vScale = _float3(1.3f);
+	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
+	ColliderDesc.vPosition = _float4(0.030000f, -10.630148f, -10.410143f, 1);
+	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
+	m_ArrCollisionAttach[1] = m_pModel->Find_AttachMatrix_InHirarchyNode("Bone_Tough_Long_04");
+	NULL_CHECK_RETURN(m_ArrCollisionAttach[1].pDefaultPivotMat, E_FAIL);
+	m_pColliderCom->Set_ParantBuffer();
+
+
+	//Pivot  :
+	//size  : 1.000000f , 1.000000f , 1.000000f  
+	ColliderDesc.vScale = _float3(1.3f);
+	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
+	ColliderDesc.vPosition = _float4(-0.070000f, -9.190115f, -10.170137f, 1);
+	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
+	m_ArrCollisionAttach[2] = m_pModel->Find_AttachMatrix_InHirarchyNode("Bone_Tough_Long_02");
+	NULL_CHECK_RETURN(m_ArrCollisionAttach[2].pDefaultPivotMat, E_FAIL);
+	m_pColliderCom->Set_ParantBuffer();
+
+
+	//Pivot  : -0.050000f , -9.880131f , -10.230139f , 1
+	//size  : 0.910000f , 1.000000f , 1.000000f  
+	ColliderDesc.vScale = _float3(1.3f);
+	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
+	ColliderDesc.vPosition = _float4(-0.050000f, -9.880131f, -10.230139f, 1);
+	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
+	m_ArrCollisionAttach[3] = m_pModel->Find_AttachMatrix_InHirarchyNode("Bone_Tough_Long_03");
+	NULL_CHECK_RETURN(m_ArrCollisionAttach[3].pDefaultPivotMat, E_FAIL);
+	m_pColliderCom->Set_ParantBuffer();
+
+
+
+	//Pivot  : 0.030000f , -11.570169f , -10.410143f , 1
+	//size  : 1.000000f , 1.000000f , 1.000000f  
+	ColliderDesc.vScale = _float3(1.3f);
+	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);	
+	ColliderDesc.vPosition = _float4(0.030000f, -11.570169f, -10.410143f, 1);
+	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
+	m_ArrCollisionAttach[4] = m_pModel->Find_AttachMatrix_InHirarchyNode("Bone_Tough_Long_05");
+	NULL_CHECK_RETURN(m_ArrCollisionAttach[4].pDefaultPivotMat, E_FAIL);
+	m_pColliderCom->Set_ParantBuffer();
+
+
+	//Pivot  : -0.010000f , -12.640194f , -10.480145f , 1
+	//size  : 1.000000f , 1.000000f , 1.000000f  
+	ColliderDesc.vScale = _float3(1.3f);
+	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
+	ColliderDesc.vPosition = _float4(-0.010000f, -12.640194f, -10.480145f, 1);
+
+	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
+	m_ArrCollisionAttach[5] = m_pModel->Find_AttachMatrix_InHirarchyNode("Bone_Tough_Long_06");
+	NULL_CHECK_RETURN(m_ArrCollisionAttach[5].pDefaultPivotMat, E_FAIL);
+	m_pColliderCom->Set_ParantBuffer();
+
+
+	//Pivot  : -0.010000f , -13.590216f , -10.570147f , 1
+	//size  : 1.000000f , 1.000000f , 1.000000f  
+	ColliderDesc.vScale = _float3(1.3f);
+	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
+	ColliderDesc.vPosition = _float4(-0.010000f, -13.590216f, -10.570147f, 1);
+
+	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
+	m_ArrCollisionAttach[6] = m_pModel->Find_AttachMatrix_InHirarchyNode("Bone_Tough_Long_07");
+	NULL_CHECK_RETURN(m_ArrCollisionAttach[6].pDefaultPivotMat, E_FAIL);
+	m_pColliderCom->Set_ParantBuffer();
+
+
+
 
 
 	////Pivot  : 0.000000f , 0.310000f , -2.019999f , 1
@@ -573,6 +470,26 @@ HRESULT CDollMaker::Adjust_AnimMovedTransform(_double fDeltatime)
 		case 0:
 			break;
 	
+
+		case 10:
+			if (PlayRate > 0.85 && m_pHanddyIndex == 0)
+			{
+				m_pHanddyIndex = 1;
+				((CHandyBoy*)(m_vecWeapon[0]))->Enter_Hand();
+				m_bSummonHandy = false;
+			}
+			break;
+
+		case 15:
+			if (PlayRate > 0.85 && m_pHanddyIndex == 1)
+			{
+				m_pHanddyIndex = 2;
+				((CHandyGirl*)(m_vecWeapon[1]))->Enter_Hand();
+				m_bSummonHandy = false;
+
+			}
+			break;
+
 		default:
 			break;
 		}
@@ -583,10 +500,22 @@ HRESULT CDollMaker::Adjust_AnimMovedTransform(_double fDeltatime)
 		{
 		case 4:
 			m_pModel->Change_AnimIndex(0, 0.15f, true);
+			m_PatternDelayTime = 4;
+			m_bIsPatternFinished = true;
+
+			if (m_pHanddyIndex > 0) ((CHandyBoy*)m_vecWeapon[0])->Make_Hand_Free();
+			if (m_pHanddyIndex > 1) ((CHandyGirl*)m_vecWeapon[1])->Make_Hand_Free();
+
 			break;
 
 		case 8:
 			m_pModel->Change_AnimIndex(0, 0.15f, true);
+			m_PatternDelayTime = 4;
+			m_bIsPatternFinished = true;
+
+			if (m_pHanddyIndex > 0) ((CHandyBoy*)m_vecWeapon[0])->Make_Hand_Free();
+			if (m_pHanddyIndex > 1) ((CHandyGirl*)m_vecWeapon[1])->Make_Hand_Free();
+
 			break;
 
 		default:
