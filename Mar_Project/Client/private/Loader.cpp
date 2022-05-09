@@ -42,6 +42,8 @@
 #include "DollMaker.h"
 
 #include "Scythe.h"
+#include "HandyBoy.h"
+#include "HandyGirl.h"
 
 //UI
 #include "GamePlayUI.h"
@@ -585,6 +587,12 @@ HRESULT CLoader::Load_Scene_Boss(_bool * _IsClientQuit, CRITICAL_SECTION * _CriS
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_BOSS, TAG_CP(Prototype_Mesh_DollMaker),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "DollMaker", "DollMaker.FBX", TransformMatrix)));
 
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_BOSS, TAG_CP(Prototype_Mesh_HandyBoy),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "DollMaker", "HandyBoy.FBX", TransformMatrix)));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_BOSS, TAG_CP(Prototype_Mesh_HandyGirl),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "DollMaker", "HandyGirl.FBX", TransformMatrix)));
+
+
 	TransformMatrix = XMMatrixScaling(0.05f, 0.05f, 0.05f);
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_BOSS, TAG_CP(Prototype_QueenTower_BrokenC),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "QueenTower", "QueenTower_BrokenC.FBX", TransformMatrix)));
@@ -594,6 +602,16 @@ HRESULT CLoader::Load_Scene_Boss(_bool * _IsClientQuit, CRITICAL_SECTION * _CriS
 	TransformMatrix = XMMatrixScaling(0.0005f, 0.0005f, 0.0005f) * XMMatrixRotationY(XMConvertToRadians(90.0f));
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_BOSS, TAG_CP(Prototype_Mesh_SkyBox),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "SkyBox", "SkyBox_Boss.FBX", TransformMatrix)));
+
+
+	//////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////
 
 	//////////Terrain
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_BOSS, TAG_CP(Prototype_VIBuffer_Terrain),
@@ -608,7 +626,10 @@ HRESULT CLoader::Load_Scene_Boss(_bool * _IsClientQuit, CRITICAL_SECTION * _CriS
 
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_DollMaker),
 		CDollMaker::Create(m_pDevice, m_pDeviceContext)));
-
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_HandyBoy),
+		CHandyBoy::Create(m_pDevice, m_pDeviceContext)));
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_HandyGirl),
+		CHandyGirl::Create(m_pDevice, m_pDeviceContext)));
 
 
 

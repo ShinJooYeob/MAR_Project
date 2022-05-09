@@ -38,8 +38,9 @@ HRESULT CScene_Boss::Initialize()
 
 
 	FAILED_CHECK(Ready_Layer_DollMaker(TAG_LAY(Layer_Monster)));
+	//FAILED_CHECK(Ready_Layer_HandyBoy(TAG_LAY(Layer_Monster)));
+	//FAILED_CHECK(Ready_Layer_HandyGirl(TAG_LAY(Layer_Monster)));
 	
-
 
 		
 			
@@ -55,7 +56,9 @@ _int CScene_Boss::Update(_double fDeltaTime)
 	if (__super::Update(fDeltaTime) < 0)
 		return -1;
 
-	
+	//if (g_pGameInstance->Get_DIKeyState(DIK_J)&DIS_Down)
+	//	FAILED_CHECK(Ready_Layer_HandyBoy(TAG_LAY(Layer_Monster)));
+
 
 	return 0;
 }
@@ -310,9 +313,21 @@ HRESULT CScene_Boss::Ready_Layer_StaticMapObj(const _tchar * pLayerTag)
 HRESULT CScene_Boss::Ready_Layer_DollMaker(const _tchar * pLayerTag)
 {
 
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_BOSS, pLayerTag, TAG_OP(Prototype_DollMaker), &_float3(77, 10, 56)));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_BOSS, pLayerTag, TAG_OP(Prototype_DollMaker), &_float3(85, 10, 78)));
 
 
+	return S_OK;
+}
+
+HRESULT CScene_Boss::Ready_Layer_HandyBoy(const _tchar * pLayerTag)
+{
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_BOSS, pLayerTag, TAG_OP(Prototype_HandyBoy), &_float3(76, 10, 63)));
+	return S_OK;
+}
+
+HRESULT CScene_Boss::Ready_Layer_HandyGirl(const _tchar * pLayerTag)
+{
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_BOSS, pLayerTag, TAG_OP(Prototype_HandyGirl), &_float3(67, 10, 78)));
 	return S_OK;
 }
 

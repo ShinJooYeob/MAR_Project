@@ -123,7 +123,8 @@ _int CPlayer::Update(_double fDeltaTime)
 		m_pColliderCom->Update_Transform(i, TransformMatrix * m_pTransformCom->Get_WorldMatrix());
 	}
 
-	g_pGameInstance->Add_CollisionGroup(CollisionType_Player, this, m_pColliderCom);
+	if (!m_bIsAttached)
+		g_pGameInstance->Add_CollisionGroup(CollisionType_Player, this, m_pColliderCom);
 
 	return _int();
 }
@@ -240,6 +241,8 @@ void CPlayer::Add_Dmg_to_Player(_uint iDmgAmount)
 	ZeroMemory(m_bAtkMoveMentChecker, sizeof(_bool) * 3);
 	m_bIsAttackClicked = false;
 	m_iAttackCount = 0;
+
+	if (m_bIsAttached) return;
 
 	switch (m_eNowWeapon)
 	{
@@ -589,6 +592,21 @@ HRESULT CPlayer::Calculate_Force(_bool * _IsClientQuit, CRITICAL_SECTION * _CriS
 
 
 	return S_OK;
+}
+
+_bool CPlayer::Set_IsAttached(_bool bBool)
+{
+	m_bIsAttached = bBool;
+	if (m_bIsAttached)
+	{
+		m_pModel->Change_AnimIndex(33, 0.15, true);
+	}
+	else
+	{
+		Add_Dmg_to_Player(6);
+	}
+
+	return _bool();
 }
 
 HRESULT CPlayer::SetUp_Components()
@@ -1350,7 +1368,8 @@ HRESULT CPlayer::Jump_Update(_double fDeltaTime, CGameInstance* pInstance)
 
 	}
 
-	if (m_LevitationTime != fDeltaTime &&fGravity < 0)
+	_uint iNowAnimIndex = m_pModel->Get_NowAnimIndex();
+	if (m_LevitationTime != fDeltaTime && fGravity < 0 && !m_bIsAttached && iNowAnimIndex !=42 && iNowAnimIndex !=43)
 		m_pModel->Change_AnimIndex(17);
 
 	m_pTransformCom->MovetoDir_bySpeed(XMVectorSet(0, 1.f, 0, 0), fGravity, fDeltaTime);
@@ -1434,56 +1453,56 @@ HRESULT CPlayer::Dash_Update(_double fDeltaTime, CGameInstance* pInstance, _floa
 
 HRESULT CPlayer::RockOn_Update(_double fDeltaTime, CGameInstance * pInstance)
 {
-	BYTE LTabState = pInstance->Get_DIKeyState(DIK_TAB);
+	//BYTE LTabState = pInstance->Get_DIKeyState(DIK_TAB);
 
-	if (LTabState & DIS_Down)
-	{
-		if (LTabState & DIS_DoubleDown)
-		{
-			Safe_Release(m_pRockOnMonster);
+	//if (LTabState & DIS_Down)
+	//{
+	//	if (LTabState & DIS_DoubleDown)
+	//	{
+	//		Safe_Release(m_pRockOnMonster);
 
-			m_bIsRockOn = false;
-		}
-		else 
-		{
-			_Vector vPlayerPos = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
-			_Vector vLookVector = XMVector3Normalize(XMVectorSetY(vPlayerPos, 0)
-				- XMVectorSetY(m_pMainCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_POS), 0));
+	//		m_bIsRockOn = false;
+	//	}
+	//	else 
+	//	{
+	//		_Vector vPlayerPos = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+	//		_Vector vLookVector = XMVector3Normalize(XMVectorSetY(vPlayerPos, 0)
+	//			- XMVectorSetY(m_pMainCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_POS), 0));
 
-			//나중에 몬스터 넣으면 몬스터로 바꾸자
-			list<CGameObject*>* MosterList = pInstance->Get_ObjectList_from_Layer(m_eNowSceneNum, TAG_LAY(Layer_JumpPad));
+	//		//나중에 몬스터 넣으면 몬스터로 바꾸자
+	//		list<CGameObject*>* MosterList = pInstance->Get_ObjectList_from_Layer(m_eNowSceneNum, TAG_LAY(Layer_JumpPad));
 
-			_float	fNear = 5.f;
-			_float Length = 0;
-			CGameObject* pNearMonster = nullptr;
-			
-			_Vector vMonsterPos;
+	//		_float	fNear = 5.f;
+	//		_float Length = 0;
+	//		CGameObject* pNearMonster = nullptr;
+	//		
+	//		_Vector vMonsterPos;
 
-			for (auto& pMonster : *MosterList)
-			{
-				vMonsterPos = ((CTransform*)(pMonster->Get_Component(TAG_COM(Com_Transform))))->Get_MatrixState(CTransform::STATE_POS);
+	//		for (auto& pMonster : *MosterList)
+	//		{
+	//			vMonsterPos = ((CTransform*)(pMonster->Get_Component(TAG_COM(Com_Transform))))->Get_MatrixState(CTransform::STATE_POS);
 
 
-				_float fCosValue = XMVectorGetX(XMVector3Dot(vLookVector, XMVector3Normalize
-				(XMVectorSetY(vMonsterPos, 0) - XMVectorSetY(vPlayerPos, 0))));
+	//			_float fCosValue = XMVectorGetX(XMVector3Dot(vLookVector, XMVector3Normalize
+	//			(XMVectorSetY(vMonsterPos, 0) - XMVectorSetY(vPlayerPos, 0))));
 
-				if (fCosValue > (sqrtf(3) / 2.f) && fNear > (Length = XMVectorGetX(XMVector3Length(vPlayerPos - vMonsterPos))))
-				{
-					fNear = Length;
-					pNearMonster = pMonster;
-				}
+	//			if (fCosValue > (sqrtf(3) / 2.f) && fNear > (Length = XMVectorGetX(XMVector3Length(vPlayerPos - vMonsterPos))))
+	//			{
+	//				fNear = Length;
+	//				pNearMonster = pMonster;
+	//			}
 
-			}
+	//		}
 
-			if (pNearMonster == nullptr)
-				return S_FALSE;
+	//		if (pNearMonster == nullptr)
+	//			return S_FALSE;
 
-			Safe_Release(m_pRockOnMonster);
-			m_pRockOnMonster = pNearMonster;
-			Safe_AddRef(m_pRockOnMonster);
-			m_bIsRockOn = true;
-		}
-	}
+	//		Safe_Release(m_pRockOnMonster);
+	//		m_pRockOnMonster = pNearMonster;
+	//		Safe_AddRef(m_pRockOnMonster);
+	//		m_bIsRockOn = true;
+	//	}
+	//}
 
 
 
@@ -1715,7 +1734,8 @@ HRESULT CPlayer::Jump_Update_Horse(_double fDeltaTime, CGameInstance * pInstance
 			fGravity = _float((m_LevitationTime) * (m_LevitationTime)* -29.4f);
 	}
 
-	if (m_LevitationTime != fDeltaTime &&fGravity < 0)
+	_uint iNowAnimIndex = m_pModel->Get_NowAnimIndex();
+	if (m_LevitationTime != fDeltaTime && fGravity < 0 && !m_bIsAttached && iNowAnimIndex != 42 && iNowAnimIndex != 43)
 		m_pModel->Change_AnimIndex(17);
 
 	m_pTransformCom->MovetoDir_bySpeed(XMVectorSet(0, 1.f, 0, 0), fGravity, fDeltaTime);
@@ -2175,7 +2195,8 @@ HRESULT CPlayer::Jump_Update_Teapot(_double fDeltaTime, CGameInstance * pInstanc
 		}
 	}
 
-	if (m_LevitationTime != fDeltaTime &&fGravity < 0)
+	_uint iNowAnimIndex = m_pModel->Get_NowAnimIndex();
+	if (m_LevitationTime != fDeltaTime && fGravity < 0 && !m_bIsAttached && iNowAnimIndex != 42 && iNowAnimIndex != 43)
 		m_pModel->Change_AnimIndex(17);
 
 	m_pTransformCom->MovetoDir_bySpeed(XMVectorSet(0, 1.f, 0, 0), fGravity, fDeltaTime);
@@ -2400,7 +2421,8 @@ HRESULT CPlayer::Jump_Update_Umbrella(_double fDeltaTime, CGameInstance * pInsta
 			fGravity = _float((m_LevitationTime) * (m_LevitationTime)* -29.4f);
 	}
 
-	if (m_LevitationTime != fDeltaTime &&fGravity < 0)
+	_uint iNowAnimIndex = m_pModel->Get_NowAnimIndex();
+	if (m_LevitationTime != fDeltaTime && fGravity < 0 && !m_bIsAttached && iNowAnimIndex != 42 && iNowAnimIndex != 43)
 		m_pModel->Change_AnimIndex(17);
 
 	m_pTransformCom->MovetoDir_bySpeed(XMVectorSet(0, 1.f, 0, 0), fGravity, fDeltaTime);
@@ -2560,7 +2582,8 @@ HRESULT CPlayer::Jump_Update_Knife(_double fDeltaTime, CGameInstance * pInstance
 			fGravity = _float((m_LevitationTime) * (m_LevitationTime)* -29.4f);
 	}
 
-	if (m_LevitationTime != fDeltaTime &&fGravity < 0)
+	_uint iNowAnimIndex = m_pModel->Get_NowAnimIndex();
+	if (m_LevitationTime != fDeltaTime && fGravity < 0 && !m_bIsAttached && iNowAnimIndex != 42 && iNowAnimIndex != 43)
 		m_pModel->Change_AnimIndex(17);
 
 	m_pTransformCom->MovetoDir_bySpeed(XMVectorSet(0, 1.f, 0, 0), fGravity, fDeltaTime);
@@ -3024,7 +3047,8 @@ HRESULT CPlayer::Jump_Update_Grinder(_double fDeltaTime, CGameInstance * pInstan
 			fGravity = _float((m_LevitationTime) * (m_LevitationTime)* -29.4f);
 	}
 
-	if (m_LevitationTime != fDeltaTime &&fGravity < 0)
+	_uint iNowAnimIndex = m_pModel->Get_NowAnimIndex();
+	if (m_LevitationTime != fDeltaTime && fGravity < 0 && !m_bIsAttached && iNowAnimIndex != 42 && iNowAnimIndex != 43)
 		m_pModel->Change_AnimIndex(17);
 
 	m_pTransformCom->MovetoDir_bySpeed(XMVectorSet(0, 1.f, 0, 0), fGravity, fDeltaTime);
@@ -3098,8 +3122,11 @@ HRESULT CPlayer::Set_Player_On_Terrain()
 			}
 			else
 			{
-				m_pModel->Change_AnimIndex_ReturnTo(19, 0, 0, true);
-				Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 10);
+				if (!m_bIsAttached)
+				{
+					m_pModel->Change_AnimIndex_ReturnTo(19, 0, 0, true);
+					Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 10);
+				}
 			}
 
 

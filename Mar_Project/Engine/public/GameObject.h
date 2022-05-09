@@ -19,7 +19,7 @@ public:
 	virtual _int Render();
 	virtual _int LateRender();
 
-	virtual void CollisionTriger(_uint iMyColliderIndex, CGameObject* pConflictedObj,_uint iConflictedObjColliderIndex,CollisionTypeID eConflictedObjCollisionType) {};
+	virtual void CollisionTriger(_uint iMyColliderIndex, CGameObject* pConflictedObj,class CCollider* pConflictedCollider ,_uint iConflictedObjColliderIndex,CollisionTypeID eConflictedObjCollisionType) {};
 
 	virtual void Set_NowSceneNum(_uint eNowSceneNum) {	m_eNowSceneNum = eNowSceneNum; };
 
@@ -35,7 +35,7 @@ public:
 
 	virtual HRESULT ReInitialize(void* pArg = nullptr) { return S_OK; };
 	virtual HRESULT Object_Function(void* pArg = nullptr) { return S_OK; };
-	virtual _int Obsever_On_Trigger(CGameObject* pDestObjects, _float3 fCollision_Distance, _float fDeltaTime) { return S_OK; };
+	//virtual _int Obsever_On_Trigger(CGameObject* pDestObjects, _float3 fCollision_Distance, _float fDeltaTime) { return S_OK; };
 
 	class CComponent* Get_Component(const _tchar* tagComponent);
 	class CComponent* Find_Components(const _tchar* tagComponent);

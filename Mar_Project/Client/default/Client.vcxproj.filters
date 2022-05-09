@@ -214,6 +214,9 @@
     <Filter Include="02.Scene\03.Scene_Gameplay\Scene_Boss">
       <UniqueIdentifier>{9c3f6788-5264-4916-bfa9-e72a81ed94dc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.GameObject\03.Monster\06.DollMaker\06.Handy">
+      <UniqueIdentifier>{c2e5afb3-f0c3-423d-9016-d2a496ecff8d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -432,6 +435,12 @@
     <ClInclude Include="..\public\Scene_Boss.h">
       <Filter>02.Scene\03.Scene_Gameplay\Scene_Boss</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\HandyBoy.h">
+      <Filter>01.GameObject\03.Monster\06.DollMaker\06.Handy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\HandyGirl.h">
+      <Filter>01.GameObject\03.Monster\06.DollMaker\06.Handy</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -625,6 +634,12 @@
     </ClCompile>
     <ClCompile Include="..\private\Scene_Boss.cpp">
       <Filter>02.Scene\03.Scene_Gameplay\Scene_Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\HandyBoy.cpp">
+      <Filter>01.GameObject\03.Monster\06.DollMaker\06.Handy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\HandyGirl.cpp">
+      <Filter>01.GameObject\03.Monster\06.DollMaker\06.Handy</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -47,10 +47,10 @@ _int CExecutor::Update(_double fDeltaTime)
 	m_pColliderCom->Update_ConflictPassedTime(fDeltaTime);
 	Update_DmgCalculate(fDeltaTime);
 
-	if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
-		m_pModel->Change_AnimIndex(0);
-	if (g_pGameInstance->Get_DIKeyState(DIK_2)&DIS_Down)
-		Add_Dmg_to_Monster(10);
+	//if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
+	//	m_pModel->Change_AnimIndex(0);
+	//if (g_pGameInstance->Get_DIKeyState(DIK_2)&DIS_Down)
+	//	Add_Dmg_to_Monster(10);
 
 	//m_pModel->Change_AnimIndex(16) // ½½·¥´õ
 	//walk 2.8 / 0.05f

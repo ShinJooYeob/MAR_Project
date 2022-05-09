@@ -29,6 +29,8 @@ private:
 	HRESULT Ready_Layer_StaticMapObj(const _tchar* pLayerTag);
 
 	HRESULT Ready_Layer_DollMaker(const _tchar* pLayerTag);
+	HRESULT Ready_Layer_HandyBoy(const _tchar* pLayerTag);
+	HRESULT Ready_Layer_HandyGirl(const _tchar* pLayerTag);
 
 
 

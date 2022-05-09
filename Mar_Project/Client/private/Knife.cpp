@@ -120,7 +120,7 @@ _int CKnife::LateRender()
 	return _int();
 }
 
-void CKnife::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedObj, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType)
+void CKnife::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedObj, CCollider* pConflictedCollider, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType)
 {
 	switch (eConflictedObjCollisionType)
 	{
@@ -128,8 +128,7 @@ void CKnife::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedOb
 	case Engine::CollisionType_Monster:
 	{
 		
-			CCollider* MonsterCollider = (CCollider*)(pConflictedObj->Get_Component(TAG_COM(Com_Collider)));
-			MonsterCollider->Set_Conflicted();
+			pConflictedCollider->Set_Conflicted();
 			GetSingle(CUtilityMgr)->SlowMotionStart();
 			((CMonster*)(pConflictedObj))->Add_Dmg_to_Monster(3);
 		

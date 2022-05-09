@@ -33,13 +33,13 @@ HRESULT CDollMaker::Initialize_Clone(void * pArg)
 	if (pArg != nullptr)
 		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, *((_float3*)pArg));
 
-	m_fHP = m_fMaxHP = 192;
+	m_fHP = m_fMaxHP = 96;
 
 
 	FAILED_CHECK(SetUp_Weapon());
 
-
-	m_pTransformCom->LookAt(XMVectorSet(50, 10, 50,0));
+	ZeroMemory(m_bIsDmgAnimUpdated, sizeof(_bool) * 3);
+	m_pTransformCom->LookAt(XMVectorSet(60, 10, 60,0));
 
 	return S_OK;
 }
@@ -51,7 +51,7 @@ _int CDollMaker::Update(_double fDeltaTime)
 	//Update_DmgCalculate(fDeltaTime);
 
 	if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
-		m_pModel->Change_AnimIndex(0);
+		m_pModel->Change_AnimIndex(2);
 
 	if (g_pGameInstance->Get_DIKeyState(DIK_2)&DIS_Down)
 	{
@@ -61,102 +61,253 @@ _int CDollMaker::Update(_double fDeltaTime)
 	{
 		m_pModel->Change_AnimIndex_UntilNReturn_Must(5, 8, 0, 0.15, true);
 	}
-	if (g_pGameInstance->Get_DIKeyState(DIK_4)&DIS_Down)
-	{
-		m_pModel->Change_AnimIndex_UntilNReturn_Must(9, 12, 0, 0.15, true);
-	}
-	if (g_pGameInstance->Get_DIKeyState(DIK_5)&DIS_Down)
-	{
-		m_pModel->Change_AnimIndex_UntilNReturn_Must(14, 17, 0, 0.15, true);
-	}
+
+
 
 
 	{
-
-
 		_Vector TargetAt = m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS);
 
 		TargetAt = XMVectorSetY(TargetAt, m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS).y);
 
 		m_pTransformCom->LookAt(TargetAt);
-
-
-
 	}
 	
 
 
-	////m_pModel->Change_AnimIndex(16) // 슬램더
-	////walk 2.8 / 0.05f
 
-	////run 5.5 / 0.1
-	//
-
-	//if (g_pGameInstance->Get_DIKeyState(DIK_F1)&DIS_Down)
-	//{
-	//	m_bIsPatternFinished = true;
-	//	m_PatternDelayTime = 0;
-	//	m_PatternPassedTime = 0;
-	//	m_ePattern = 0;
-
-	//	m_pModel->Change_AnimIndex_ReturnTo(15, 0, 0.15, true);
-
-	//	if (m_bIsBerseked)
-	//	{
-
-	//		m_bIsBerseked = false;
-	//		m_pTransformCom->Set_MoveSpeed(2.8f);
-	//	}
-	//	else
-	//	{
-	//		m_bIsBerseked = true;
-	//		m_pTransformCom->Set_MoveSpeed(5.5f);
-	//	}
-	//}
-
-
-	//if (m_pModel->Get_NowAnimIndex() != 19 && m_pModel->Get_NowAnimIndex() != 15)
-	//{
-
-	//	if (!m_bIsPatternFinished || Distance_BetweenPlayer(m_pTransformCom) < 10)
-	//	{
-	//		Update_Pattern(fDeltaTime);
-	//	}
-	//	else
-	//	{
-	//		if (!m_pModel->Get_IsUntillPlay())
-	//		{
-	//			m_pModel->Change_AnimIndex((m_bIsBerseked) ? 1 : 2);
-	//			FAILED_CHECK(__super::Update_WanderAround(m_pTransformCom, fDeltaTime, (m_bIsBerseked) ? 0.1f : 0.05f));
-	//		}
-	//	}
-
-	//}
+	{
+		//Pivot  : -1.484999f , -0.020000f , -1.824999f , 1
+		//rot  : -88.699219f , 1.200000f , 10.100002f  
+		static _float3 testFloat3 = _float3(-1.484999f, -0.020000f, -1.824999f);
+		static _float3 RotFloat3 = _float3(1, 1, 1);
+		static _float value = 0.01f;
+		static _int kind = 0;
 
 
 
-	m_bIsOnScreen = true;
-	//m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS),7.8f);
-	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime * ((m_bIsBerseked) ? 1.5f : 1.f), m_bIsOnScreen));
+		CGameInstance* m_pInstance = g_pGameInstance;
+		if (m_pInstance->Get_DIKeyState(DIK_UP) & DIS_Press)
+		{
+			testFloat3.z += value;
+
+			string ttszLog = "//Pivot  : " + to_string(testFloat3.x) + "f , " + to_string(testFloat3.y) + "f , " + to_string(testFloat3.z) + "f , 1" + "\n" +
+				"//size  : " + to_string(RotFloat3.x) + "f , " + to_string(RotFloat3.y) + "f , " + to_string(RotFloat3.z) + "f  " + "\n";
+
+			wstring ttDebugLog;
+			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+
+			OutputDebugStringW(ttDebugLog.c_str());
+		}
+
+		else if (m_pInstance->Get_DIKeyState(DIK_DOWN) & DIS_Press)
+		{
+			testFloat3.z -= value;
+			string ttszLog = "//Pivot  : " + to_string(testFloat3.x) + "f , " + to_string(testFloat3.y) + "f , " + to_string(testFloat3.z) + "f , 1" + "\n" +
+				"//size  : " + to_string(RotFloat3.x) + "f , " + to_string(RotFloat3.y) + "f , " + to_string(RotFloat3.z) + "f  " + "\n";
+
+			wstring ttDebugLog;
+			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+
+			OutputDebugStringW(ttDebugLog.c_str());
+
+
+
+		}
+		else if (m_pInstance->Get_DIKeyState(DIK_LEFT) & DIS_Press)
+		{
+			testFloat3.x -= value;
+			string ttszLog = "//Pivot  : " + to_string(testFloat3.x) + "f , " + to_string(testFloat3.y) + "f , " + to_string(testFloat3.z) + "f , 1" + "\n" +
+				"//size  : " + to_string(RotFloat3.x) + "f , " + to_string(RotFloat3.y) + "f , " + to_string(RotFloat3.z) + "f  " + "\n";
+
+			wstring ttDebugLog;
+			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+
+			OutputDebugStringW(ttDebugLog.c_str());
+
+
+
+		}
+
+		else if (m_pInstance->Get_DIKeyState(DIK_RIGHT) & DIS_Press)
+		{
+			testFloat3.x += value;
+			string ttszLog = "//Pivot  : " + to_string(testFloat3.x) + "f , " + to_string(testFloat3.y) + "f , " + to_string(testFloat3.z) + "f , 1" + "\n" +
+				"//size  : " + to_string(RotFloat3.x) + "f , " + to_string(RotFloat3.y) + "f , " + to_string(RotFloat3.z) + "f  " + "\n";
+
+			wstring ttDebugLog;
+			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+
+			OutputDebugStringW(ttDebugLog.c_str());
+
+
+
+		}
+
+		else if (m_pInstance->Get_DIKeyState(DIK_DELETE) & DIS_Press)
+		{
+			testFloat3.y += value;
+
+			string ttszLog = "//Pivot  : " + to_string(testFloat3.x) + "f , " + to_string(testFloat3.y) + "f , " + to_string(testFloat3.z) + "f , 1" + "\n" +
+				"//size  : " + to_string(RotFloat3.x) + "f , " + to_string(RotFloat3.y) + "f , " + to_string(RotFloat3.z) + "f  " + "\n";
+
+			wstring ttDebugLog;
+			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+
+			OutputDebugStringW(ttDebugLog.c_str());
+
+
+
+		}
+
+		else if (m_pInstance->Get_DIKeyState(DIK_END) & DIS_Press)
+		{
+			testFloat3.y -= value;
+			string ttszLog = "//Pivot  : " + to_string(testFloat3.x) + "f , " + to_string(testFloat3.y) + "f , " + to_string(testFloat3.z) + "f , 1" + "\n" +
+				"//size  : " + to_string(RotFloat3.x) + "f , " + to_string(RotFloat3.y) + "f , " + to_string(RotFloat3.z) + "f  " + "\n";
+
+			wstring ttDebugLog;
+			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+
+			OutputDebugStringW(ttDebugLog.c_str());
+
+
+
+		}
+		else if (m_pInstance->Get_DIKeyState(DIK_PGUP) & DIS_Press)
+		{
+			switch (kind)
+			{
+			case 0:
+				RotFloat3.x += value;
+				break;
+			case 1:
+				RotFloat3.y += value;
+				break;
+			case 2:
+				RotFloat3.z += value;
+				break;
+
+			default:
+				break;
+			}
+
+
+			string ttszLog = "//Pivot  : " + to_string(testFloat3.x) + "f , " + to_string(testFloat3.y) + "f , " + to_string(testFloat3.z) + "f , 1" + "\n" +
+				"//size  : " + to_string(RotFloat3.x) + "f , " + to_string(RotFloat3.y) + "f , " + to_string(RotFloat3.z) + "f  " + "\n";
+
+			wstring ttDebugLog;
+			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+
+			OutputDebugStringW(ttDebugLog.c_str());
+
+
+
+		}
+		else if (m_pInstance->Get_DIKeyState(DIK_PGDN) & DIS_Press)
+		{
+			switch (kind)
+			{
+			case 0:
+				RotFloat3.x -= value;
+				break;
+			case 1:
+				RotFloat3.y -= value;
+				break;
+			case 2:
+				RotFloat3.z -= value;
+				break;
+
+			default:
+				break;
+			}
+
+			string ttszLog = "//Pivot  : " + to_string(testFloat3.x) + "f , " + to_string(testFloat3.y) + "f , " + to_string(testFloat3.z) + "f , 1" + "\n" +
+				"//size  : " + to_string(RotFloat3.x) + "f , " + to_string(RotFloat3.y) + "f , " + to_string(RotFloat3.z) + "f  " + "\n";
+
+			wstring ttDebugLog;
+			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+
+			OutputDebugStringW(ttDebugLog.c_str());
+
+
+
+		}
+		else if (m_pInstance->Get_DIKeyState(DIK_TAB) & DIS_Down)
+		{
+			kind++;
+			if (kind > 2)kind = 0;
+
+			string ttszLog = "kind  : " + to_string(kind) + "\n";
+
+			wstring ttDebugLog;
+			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+
+			OutputDebugStringW(ttDebugLog.c_str());
+		}
+
+
+		//_Matrix tt = XMMatrixRotationX(XMConvertToRadians(RotFloat3.x))*
+		//	XMMatrixRotationY(XMConvertToRadians(RotFloat3.y))*
+		//	XMMatrixRotationZ(XMConvertToRadians(RotFloat3.z))*
+		//	XMMatrixTranslation(testFloat3.x, testFloat3.y, testFloat3.z);
+
+		//m_pTransformCom->Set_Matrix(tt);
+#define TestColliderNum 0
+		_Matrix tt = XMMatrixScaling(RotFloat3.x, RotFloat3.y, RotFloat3.z) *XMMatrixTranslation(testFloat3.x, testFloat3.y, testFloat3.z);
+
+
+		_Matrix			TransformMatrix = XMLoadFloat4x4(m_ArrCollisionAttach[TestColliderNum].pUpdatedNodeMat) * XMLoadFloat4x4(m_ArrCollisionAttach[TestColliderNum].pDefaultPivotMat);
+
+		TransformMatrix.r[0] = XMVector3Normalize(TransformMatrix.r[0]);
+		TransformMatrix.r[1] = XMVector3Normalize(TransformMatrix.r[1]);
+		TransformMatrix.r[2] = XMVector3Normalize(TransformMatrix.r[2]);
+
+
+		TransformMatrix = tt*TransformMatrix * m_pTransformCom->Get_WorldMatrix();
+		m_pColliderCom->Update_Transform(TestColliderNum, TransformMatrix);
+
+
+	}
+
+
+
+
+
+
+	Update_DmgCalculate(fDeltaTime);
+
+	m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
+
+
+	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime, m_bIsOnScreen));
+	//FAILED_CHECK(Adjust_MovedTransform_byAnim(fDeltaTime));
+
+	if (m_bIsOnScreen)
+	{
+		for (_uint i = 0; i < TestColliderNum; i++)
+		{
+			_Matrix			TransformMatrix = XMLoadFloat4x4(m_ArrCollisionAttach[i].pUpdatedNodeMat) * XMLoadFloat4x4(m_ArrCollisionAttach[i].pDefaultPivotMat);
+			TransformMatrix.r[0] = XMVector3Normalize(TransformMatrix.r[0]);
+			TransformMatrix.r[1] = XMVector3Normalize(TransformMatrix.r[1]);
+			TransformMatrix.r[2] = XMVector3Normalize(TransformMatrix.r[2]);
+			m_pColliderCom->Update_Transform(i, TransformMatrix * m_pTransformCom->Get_WorldMatrix());
+		}
+
+
+
+		g_pGameInstance->Add_CollisionGroup(CollisionType_Monster, this, m_pColliderCom);
+	}
+
+
+
+	//m_bIsOnScreen = true;
+	//FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime , m_bIsOnScreen));
 	//FAILED_CHECK(Adjust_AnimMovedTransform(fDeltaTime));
-	//if (m_bIsOnScreen)
-	//{
-
-	//	_Matrix			TransformMatrix = XMLoadFloat4x4(m_tCollisionAttachPtr.pUpdatedNodeMat) * XMLoadFloat4x4(m_tCollisionAttachPtr.pDefaultPivotMat);
-
-	//	TransformMatrix.r[0] = XMVector3Normalize(TransformMatrix.r[0]);
-	//	TransformMatrix.r[1] = XMVector3Normalize(TransformMatrix.r[1]);
-	//	TransformMatrix.r[2] = XMVector3Normalize(TransformMatrix.r[2]);
-
-	//	for (_uint i = 0 ; i < m_pColliderCom->Get_NumColliderBuffer() ; i++)
-	//		m_pColliderCom->Update_Transform(i, TransformMatrix * m_pTransformCom->Get_WorldMatrix());
-
-	//	
-
-	//	g_pGameInstance->Add_CollisionGroup(CollisionType_Monster, this, m_pColliderCom);
-
-	//	m_vecWeapon[0]->Update(fDeltaTime);
-	//}
+	//
+	//for (_uint i = 0; i < m_pHanddyIndex; i++)
+	//	m_vecWeapon[i]->Update(fDeltaTime);
+	
 
 
 
@@ -174,6 +325,9 @@ _int CDollMaker::LateUpdate(_double fDeltaTime)
 	if (m_bIsOnScreen)
 	{
 		FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this));
+
+		for (_uint i = 0; i < m_pHanddyIndex; i++)
+			m_vecWeapon[i]->Update(fDeltaTime);
 		//m_vecWeapon[0]->LateUpdate(fDeltaTime);
 	}
 
@@ -226,6 +380,7 @@ _int CDollMaker::Update_DmgCalculate(_double fDeltaTime)
 	{
 		if (m_fDmgAmount > 0)
 		{
+			ZeroMemory(m_bIsDmgAnimUpdated, sizeof(_bool) * 3);
 			m_fDmgAmount = 0;
 			m_DmgPassedTime = 0;
 		}
@@ -234,17 +389,23 @@ _int CDollMaker::Update_DmgCalculate(_double fDeltaTime)
 
 	m_DmgPassedTime -= fDeltaTime;
 
-	if (m_fDmgAmount != 0 )
-	{
-		m_pModel->Change_AnimIndex_ReturnTo_Must(19, 0, 0.15, true);
 
-		m_bIsPatternFinished = true;
-		m_PatternPassedTime = 0;
-		m_PatternDelayTime = 3;
-		m_fDmgAmount = 0;
-		Add_Force(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK)* -1, 10);
+	_uint NowAnimIndex = m_pModel->Get_NowAnimIndex();
+
+
+	if (!m_bIsDmgAnimUpdated[0] && 5 < m_fDmgAmount && NowAnimIndex >= 1 && NowAnimIndex <=3 )
+	{
+
+		m_pModel->Change_AnimIndex_ReturnTo_Must(19, 4, 0.15, true);
+		m_bIsDmgAnimUpdated[0] = true;
 	}
-	
+	if (!m_bIsDmgAnimUpdated[0] && 5 < m_fDmgAmount && NowAnimIndex >= 5 && NowAnimIndex <= 6)
+	{
+		m_pModel->Change_AnimIndex_ReturnTo_Must(20, 8, 0.15, true);
+		m_bIsDmgAnimUpdated[0] = true;
+	}
+
+
 
 	return 0;
 }
@@ -255,486 +416,6 @@ _int CDollMaker::Update_Pattern(_double fDeltaTime)
 	m_PatternPassedTime += fDeltaTime;
 
 
-
-
-	if (m_bIsBerseked)
-		//버닝 모드
-	{
-		if (m_bIsPatternFinished)
-		{
-			m_ePattern += 1;
-			if (m_ePattern > 4) m_ePattern = 0;
-			m_bIsPatternFinished = false;
-			m_PatternPassedTime = 0;
-			//m_pModel->Change_AnimIndex(2);
-		}
-
-
-		switch (m_ePattern)
-		{
-		case 0:
-
-		{
-
-			if (m_PatternDelayTime)
-			{
-				m_PatternDelayTime -= fDeltaTime;
-
-
-				_uint iAnimIndex = m_pModel->Get_NowAnimIndex();
-				if (!iAnimIndex && m_pModel->Get_PlayRate() >= 0.01)
-					m_pModel->Change_AnimIndex((m_bIsBerseked) ? 1 : 2);
-
-				if (iAnimIndex == 1 || iAnimIndex == 2)
-				{
-					m_vLookDir = XMVector3Normalize(XMVectorSetY(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS) - m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0));
-					if (iAnimIndex == 1)
-						m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.1f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.9f));
-					else
-						m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.05f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.95f));
-
-					m_pTransformCom->MovetoDir(m_vLookDir.XMVector(), fDeltaTime);
-				}
-
-
-				if (m_PatternDelayTime < 0)
-				{
-					m_bIsPatternFinished = true;
-					m_PatternDelayTime = 0;
-					m_PatternPassedTime = 0;
-				}
-
-			}
-			else
-			{
-
-				if (!m_bIsJumping)
-				{
-					m_pModel->Change_AnimIndex_UntilTo(4, 6, 0.15, true);
-					m_bIsJumping = true;
-				}
-				else if (m_pModel->Get_NowAnimIndex() == 5 && !m_bIsAddForceActived)
-				{
-					m_vLookDir = XMVector3Normalize(XMVectorSetY(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS) - m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0));
-					m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.15f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.85f));
-					Add_Force(m_pTransformCom, m_vLookDir.XMVector() * 0.25f + XMVectorSet(0, 1, 0, 0) * 0.25f, 100);
-					//Add_Force(m_pTransformCom, m_vLookDir.XMVector() * 0.75f + XMVectorSet(0, 1, 0, 0) * 0.25f, 100);
-				}
-			}
-
-		}
-
-		break;
-		case 1:
-		{
-			if (!m_PatternPassedTime)
-			{
-
-				m_pModel->Change_AnimIndex_UntilNReturn_Must(8, 9, 0, 0.15, true);
-			}
-			else
-			{
-				if (m_PatternDelayTime)
-				{
-					m_PatternDelayTime -= fDeltaTime;
-
-
-
-					_uint iAnimIndex = m_pModel->Get_NowAnimIndex();
-					if (!iAnimIndex && m_pModel->Get_PlayRate() >= 0.01)
-						m_pModel->Change_AnimIndex((m_bIsBerseked) ? 1 : 2);
-
-					if (iAnimIndex == 1 || iAnimIndex == 2)
-					{
-						m_vLookDir = XMVector3Normalize(XMVectorSetY(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS) - m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0));
-						if (iAnimIndex == 1)
-							m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.1f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.9f));
-						else
-							m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.05f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.95f));
-						m_pTransformCom->MovetoDir(m_vLookDir.XMVector(), fDeltaTime);
-					}
-
-
-					if (m_PatternDelayTime < 0)
-					{
-						m_bIsPatternFinished = true;
-						m_PatternDelayTime = 0;
-						m_PatternPassedTime = 0;
-					}
-				}
-				else
-				{
-					if (m_pModel->Get_NowAnimIndex() == 0)
-					{
-						m_PatternDelayTime = 2;
-					}
-				}
-			}
-
-
-		}
-		break;
-		case 2:
-
-		{
-			if (!m_PatternPassedTime)
-			{
-
-				m_pModel->Change_AnimIndex_UntilNReturn_Must(10, 11, 0, 0.15, true);
-			}
-			else
-			{
-				if (m_PatternDelayTime)
-				{
-					m_PatternDelayTime -= fDeltaTime;
-
-					_uint iAnimIndex = m_pModel->Get_NowAnimIndex();
-					if (!iAnimIndex && m_pModel->Get_PlayRate() >= 0.01)
-						m_pModel->Change_AnimIndex((m_bIsBerseked) ? 1 : 2);
-
-					if (iAnimIndex == 1 || iAnimIndex == 2)
-					{
-						m_vLookDir = XMVector3Normalize(XMVectorSetY(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS) - m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0));
-						if (iAnimIndex == 1)
-							m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.1f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.9f));
-						else
-							m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.05f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.95f));
-						m_pTransformCom->MovetoDir(m_vLookDir.XMVector(), fDeltaTime);
-					}
-
-					if (m_PatternDelayTime < 0)
-					{
-						m_bIsPatternFinished = true;
-						m_PatternDelayTime = 0;
-						m_PatternPassedTime = 0;
-					}
-				}
-				else
-				{
-					if (m_pModel->Get_NowAnimIndex() == 0)
-					{
-						m_PatternDelayTime = 2;
-					}
-				}
-			}
-
-
-		}
-
-		break;
-		case 3:
-		{
-			if (!m_PatternPassedTime)
-			{
-				m_pModel->Change_AnimIndex_ReturnTo_Must(13, 0, 0.15, true);
-			}
-			else
-			{
-				if (m_PatternDelayTime)
-				{
-					m_PatternDelayTime -= fDeltaTime;
-
-					_uint iAnimIndex = m_pModel->Get_NowAnimIndex();
-					if (!iAnimIndex && m_pModel->Get_PlayRate() >= 0.01)
-						m_pModel->Change_AnimIndex((m_bIsBerseked) ? 1 : 2);
-
-					if (iAnimIndex == 1 || iAnimIndex == 2)
-					{
-						m_vLookDir = XMVector3Normalize(XMVectorSetY(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS) - m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0));
-						if (iAnimIndex == 1)
-							m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.1f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.9f));
-						else
-							m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.05f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.95f));
-						m_pTransformCom->MovetoDir(m_vLookDir.XMVector(), fDeltaTime);
-					}
-
-					if (m_PatternDelayTime < 0)
-					{
-						m_bIsPatternFinished = true;
-						m_PatternDelayTime = 0;
-						m_PatternPassedTime = 0;
-					}
-				}
-				else
-				{
-					if (m_pModel->Get_NowAnimIndex() == 0)
-					{
-						m_PatternDelayTime = 2;
-					}
-				}
-			}
-		}
-		break;
-		case 4:
-		{
-			if (!m_PatternPassedTime)
-			{
-				m_pModel->Change_AnimIndex_ReturnTo_Must(14, 0, 0.15, true);
-			}
-			else
-			{
-				if (m_PatternDelayTime)
-				{
-					m_PatternDelayTime -= fDeltaTime;
-
-					_uint iAnimIndex = m_pModel->Get_NowAnimIndex();
-					if (!iAnimIndex && m_pModel->Get_PlayRate() >= 0.01)
-						m_pModel->Change_AnimIndex((m_bIsBerseked) ? 1 : 2);
-
-					if (iAnimIndex == 1 || iAnimIndex == 2)
-					{
-						m_vLookDir = XMVector3Normalize(XMVectorSetY(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS) - m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0));
-						if (iAnimIndex == 1)
-							m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.1f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.9f));
-						else
-							m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.05f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.95f));
-						m_pTransformCom->MovetoDir(m_vLookDir.XMVector(), fDeltaTime);
-					}
-
-					if (m_PatternDelayTime < 0)
-					{
-						m_bIsPatternFinished = true;
-						m_PatternDelayTime = 0;
-						m_PatternPassedTime = 0;
-					}
-				}
-				else
-				{
-					if (m_pModel->Get_NowAnimIndex() == 0)
-					{
-						m_PatternDelayTime = 2;
-					}
-				}
-			}
-		}
-		break;
-
-
-		default:
-			break;
-		}
-
-
-
-	}
-	else
-		//일반 모드
-	{
-		if (m_bIsPatternFinished)
-		{
-			m_ePattern += 1;
-			if (m_ePattern > 3) m_ePattern = 0;
-			m_bIsPatternFinished = false;
-			m_PatternPassedTime = 0;
-			m_PatternDelayTime = 0;
-		}
-
-
-		switch (m_ePattern)
-		{
-		case 0:
-
-		{
-
-			if (m_PatternDelayTime)
-			{
-				m_PatternDelayTime -= fDeltaTime;
-
-
-				_uint iAnimIndex = m_pModel->Get_NowAnimIndex();
-				if (!iAnimIndex && m_pModel->Get_PlayRate() >= 0.01)
-					m_pModel->Change_AnimIndex((m_bIsBerseked) ? 1 : 2);
-
-				if (iAnimIndex == 1 || iAnimIndex == 2)
-				{
-					m_vLookDir = XMVector3Normalize(XMVectorSetY(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS) - m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0));
-					if (iAnimIndex == 1)
-						m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.1f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.9f));
-					else
-						m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.05f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.95f));
-
-					m_pTransformCom->MovetoDir(m_vLookDir.XMVector(), fDeltaTime);
-				}
-
-
-				if (m_PatternDelayTime < 0)
-				{
-					m_bIsPatternFinished = true;
-					m_PatternDelayTime = 0;
-					m_PatternPassedTime = 0;
-				}
-
-			}
-			else
-			{
-
-				if (!m_bIsJumping)
-				{
-					m_pModel->Change_AnimIndex_UntilTo(4, 6, 0.15, true);
-					m_bIsJumping = true;
-				}
-				else if (m_pModel->Get_NowAnimIndex() == 5 && !m_bIsAddForceActived)
-				{
-					m_vLookDir = XMVector3Normalize(XMVectorSetY(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS) - m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0));
-					m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.15f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.85f));
-					Add_Force(m_pTransformCom, m_vLookDir.XMVector() * 0.25f + XMVectorSet(0, 1, 0, 0) * 0.25f, 100);
-					//Add_Force(m_pTransformCom, m_vLookDir.XMVector() * 0.75f + XMVectorSet(0, 1, 0, 0) * 0.25f, 100);
-				}
-			}
-
-		}
-
-			break;
-		case 1:
-		{
-			if (!m_PatternPassedTime)
-			{
-
-				m_pModel->Change_AnimIndex_UntilNReturn_Must(8, 8, 0, 0.15, true);
-			}
-			else
-			{
-				if (m_PatternDelayTime)
-				{
-					m_PatternDelayTime -= fDeltaTime;
-
-
-
-					_uint iAnimIndex = m_pModel->Get_NowAnimIndex();
-					if (!iAnimIndex && m_pModel->Get_PlayRate() >= 0.01)
-						m_pModel->Change_AnimIndex((m_bIsBerseked) ? 1 : 2);
-
-					if (iAnimIndex == 1 || iAnimIndex == 2)
-					{
-						m_vLookDir = XMVector3Normalize(XMVectorSetY(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS) - m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0));
-						if (iAnimIndex == 1)
-							m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.1f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.9f));
-						else
-							m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.05f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.95f));
-						m_pTransformCom->MovetoDir(m_vLookDir.XMVector(), fDeltaTime);
-					}
-
-
-					if (m_PatternDelayTime < 0)
-					{
-						m_bIsPatternFinished = true;
-						m_PatternDelayTime = 0;					
-						m_PatternPassedTime = 0;
-					}
-				}
-				else
-				{
-					if (m_pModel->Get_NowAnimIndex() == 0)
-					{
-						m_PatternDelayTime = 2;
-					}
-				}
-			}
-
-
-		}
-			break;
-		case 2:
-
-		{
-			if (!m_PatternPassedTime)
-			{
-
-				m_pModel->Change_AnimIndex_UntilNReturn_Must(10, 10, 0, 0.15, true);
-			}
-			else
-			{
-				if (m_PatternDelayTime)
-				{
-					m_PatternDelayTime -= fDeltaTime;
-
-					_uint iAnimIndex = m_pModel->Get_NowAnimIndex();
-					if (!iAnimIndex && m_pModel->Get_PlayRate() >= 0.01)
-						m_pModel->Change_AnimIndex((m_bIsBerseked) ? 1 : 2);
-
-					if (iAnimIndex == 1 || iAnimIndex == 2)
-					{
-						m_vLookDir = XMVector3Normalize(XMVectorSetY(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS) - m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0));
-						if (iAnimIndex == 1)
-							m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.1f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.9f));
-						else
-							m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.05f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.95f));
-						m_pTransformCom->MovetoDir(m_vLookDir.XMVector(), fDeltaTime);
-					}
-
-					if (m_PatternDelayTime < 0)
-					{
-						m_bIsPatternFinished = true;
-						m_PatternDelayTime = 0;
-						m_PatternPassedTime = 0;
-					}
-				}
-				else
-				{
-					if (m_pModel->Get_NowAnimIndex() == 0)
-					{
-						m_PatternDelayTime = 2;
-					}
-				}
-			}
-
-
-		}
-
-			break;
-		case 3:
-		{
-			if (!m_PatternPassedTime)
-			{
-				m_pModel->Change_AnimIndex_ReturnTo_Must(12, 0, 0.15, true);
-			}
-			else
-			{
-				if (m_PatternDelayTime)
-				{
-					m_PatternDelayTime -= fDeltaTime;
-
-					_uint iAnimIndex = m_pModel->Get_NowAnimIndex();
-					if (!iAnimIndex && m_pModel->Get_PlayRate() >= 0.01)
-						m_pModel->Change_AnimIndex((m_bIsBerseked) ? 1 : 2);
-
-					if (iAnimIndex == 1 || iAnimIndex == 2)
-					{
-						m_vLookDir = XMVector3Normalize(XMVectorSetY(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS) - m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0));
-						if (iAnimIndex == 1)
-							m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.1f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.9f));
-						else
-							m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.05f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.95f));
-						m_pTransformCom->MovetoDir(m_vLookDir.XMVector(), fDeltaTime);
-					}
-
-					if (m_PatternDelayTime < 0)
-					{
-						m_bIsPatternFinished = true;
-						m_PatternDelayTime = 0;
-						m_PatternPassedTime = 0;
-					}
-				}
-				else
-				{
-					if (m_pModel->Get_NowAnimIndex() == 0)
-					{
-						m_PatternDelayTime = 2;
-					}
-				}
-			}
-
-
-		}
-			break;
-
-
-		default:
-			break;
-		}
-
-
-	}
 
 
 	
@@ -749,11 +430,32 @@ void CDollMaker::Add_Dmg_to_Monster(_float iDmgAmount)
 	m_fDmgAmount += iDmgAmount;
 	m_fHP -= iDmgAmount;
 
-	if (m_fHP < m_fMaxHP * 0.5f) m_pTransformCom->Set_MoveSpeed(5.5f);
+	if (m_fHP < m_fMaxHP * 0.8f && m_pHanddyIndex == 0)
+	{
+		m_pHanddyIndex = 1;
+		m_pModel->Change_AnimIndex_UntilNReturn_Must(9, 12, 0, 0.15, true);
+	}
+
+	if (m_fHP < m_fMaxHP * 0.6f && m_pHanddyIndex == 1)
+	{
+		m_pHanddyIndex = 2;		
+		m_pModel->Change_AnimIndex_UntilNReturn_Must(14, 17, 0, 0.15, true);
+
+	}
 }
 
 HRESULT CDollMaker::SetUp_Components()
 {
+
+	CTransform::TRANSFORMDESC tDesc = {};
+	tDesc.fMovePerSec = 2.8f;
+	tDesc.fRotationPerSec = XMConvertToRadians(60);
+	tDesc.fScalingPerSec = 1;
+	tDesc.vPivot = _float3(0, 0, 0);
+
+	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Transform), TAG_COM(Com_Transform), (CComponent**)&m_pTransformCom, &tDesc));
+	__super::SetUp_WanderLook(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK));
+
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Renderer), TAG_COM(Com_Renderer), (CComponent**)&m_pRendererCom));
 
@@ -762,25 +464,24 @@ HRESULT CDollMaker::SetUp_Components()
 	FAILED_CHECK(Add_Component(m_eNowSceneNum, TAG_CP(Prototype_Mesh_DollMaker), TAG_COM(Com_Model), (CComponent**)&m_pModel));
 	FAILED_CHECK(m_pModel->Change_AnimIndex(0));
 
-	//m_tCollisionAttachPtr = m_pModel->Find_AttachMatrix_InHirarchyNode("Bip01-Spine1");
-	//NULL_CHECK_RETURN(m_tCollisionAttachPtr.pDefaultPivotMat, E_FAIL);
 
 
 
-	//FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Collider), TAG_COM(Com_Collider), (CComponent**)&m_pColliderCom));
+	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Collider), TAG_COM(Com_Collider), (CComponent**)&m_pColliderCom));
 
-	//COLLIDERDESC			ColliderDesc;
+	COLLIDERDESC			ColliderDesc;
 	///* For.Com_AABB */
 	//ZeroMemory(&ColliderDesc, sizeof(COLLIDERDESC));
 
 
-	////Pivot  : -0.160000f , 0.000000f , -4.440007f , 1
-	////size  : 7.600080f , 1.000000f , 1.000000f  
-	//ColliderDesc.vScale = _float3(7.600080f, 1.000000f, 1.000000f);
-	//ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
-	//ColliderDesc.vPosition = _float4(-0.160000f, 0.000000f, -4.440007f, 1);
-	//FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
-
+	//Pivot  : -0.160000f , 0.000000f , -4.440007f , 1
+	//size  : 7.600080f , 1.000000f , 1.000000f  
+	ColliderDesc.vScale = _float3(1.);
+	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
+	ColliderDesc.vPosition = _float4(0,0,0, 1);
+	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
+	m_ArrCollisionAttach[0] = m_pModel->Find_AttachMatrix_InHirarchyNode("Bone_Tough_Long_04");
+	NULL_CHECK_RETURN(m_ArrCollisionAttach[0].pDefaultPivotMat, E_FAIL);
 
 
 	////Pivot  : 0.000000f , 0.310000f , -2.019999f , 1
@@ -796,15 +497,6 @@ HRESULT CDollMaker::SetUp_Components()
 
 
 
-	CTransform::TRANSFORMDESC tDesc = {};
-	tDesc.fMovePerSec = 2.8f;
-	tDesc.fRotationPerSec = XMConvertToRadians(60);
-	tDesc.fScalingPerSec = 1;
-	tDesc.vPivot = _float3(0, 0, 0);
-
-	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Transform), TAG_COM(Com_Transform), (CComponent**)&m_pTransformCom, &tDesc));
-	__super::SetUp_WanderLook(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK));
-
 
 	return S_OK;
 }
@@ -817,17 +509,17 @@ HRESULT CDollMaker::SetUp_Weapon()
 	NULL_CHECK_RETURN(m_pModel, E_FAIL);
 	NULL_CHECK_RETURN(m_pTransformCom, E_FAIL);
 
-	//CMonsterWeapon::MONWEAPONDESC tWeaponDesc;
-	//tWeaponDesc.pModel = m_pModel;
-	//tWeaponDesc.pParantTransform = m_pTransformCom;
-	//tWeaponDesc.szHirarchyNodeName = "Bip01-Prop1";
 
-	//CMonsterWeapon* pWeapon = nullptr;
-	//pInstance->Add_GameObject_Out_of_Manager((CGameObject**)&pWeapon, m_eNowSceneNum, TAG_OP(Prototype_Scythe), &tWeaponDesc);
-	//NULL_CHECK_RETURN(pWeapon, E_FAIL);
 
-	//m_vecWeapon.push_back(pWeapon);
+	CMonsterWeapon* pWeapon = nullptr;
+	FAILED_CHECK(pInstance->Add_GameObject_Out_of_Manager((CGameObject**)&pWeapon, m_eNowSceneNum, TAG_OP(Prototype_HandyBoy), &_float3(76, 10, 63)));
+	NULL_CHECK_RETURN(pWeapon, E_FAIL);
+	m_vecWeapon.push_back(pWeapon);
 
+	pWeapon = nullptr;
+	FAILED_CHECK(pInstance->Add_GameObject_Out_of_Manager((CGameObject**)&pWeapon, m_eNowSceneNum, TAG_OP(Prototype_HandyGirl), &_float3(67, 10, 78)));
+	NULL_CHECK_RETURN(pWeapon, E_FAIL);
+	m_vecWeapon.push_back(pWeapon);
 
 	return S_OK;
 }
@@ -873,150 +565,34 @@ HRESULT CDollMaker::Adjust_AnimMovedTransform(_double fDeltatime)
 	if (iNowAnimIndex != m_iOldAnimIndex || PlayRate > 0.95)
 		m_iAdjMovedIndex = 0;
 
-	static float Power = 7.2f;
-	if (g_pGameInstance->Get_DIKeyState(DIK_UP)& DIS_Down)
-	{
-		Power += 0.2f;
-		string ttszLog = "//Power  : " + to_string(Power) + "\n";
-
-		wstring ttDebugLog;
-		ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-
-		OutputDebugStringW(ttDebugLog.c_str());
-
-	}
-	else if (g_pGameInstance->Get_DIKeyState(DIK_DOWN)& DIS_Down)
-	{
-		Power -= 0.2f;
-		string ttszLog = "//Power  : " + to_string(Power) + "\n";
-
-		wstring ttDebugLog;
-		ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-
-		OutputDebugStringW(ttDebugLog.c_str());
-	}
-
 
 	if (PlayRate <= 0.95)
 	{
 		switch (iNowAnimIndex)
 		{
-		case 8:
-			if (m_iAdjMovedIndex == 0 && PlayRate > 0.35714)
-			{
-				Add_Force(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 30);
-
-
-				m_iAdjMovedIndex++;
-			}
-			if (m_iAdjMovedIndex == 1 && PlayRate > 0.785714)
-			{
-				Add_Force_Smooth(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 5,0.4f / ((m_bIsBerseked) ? 1.5f : 1.f));
-				m_iAdjMovedIndex++;
-			}
-
-
-
+		case 0:
 			break;
-
-		case 9:
-			if (m_iAdjMovedIndex == 0 && PlayRate >= 0.296875)
-			{
-				Add_Force_Smooth(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 8.8f, 0.5f / ((m_bIsBerseked) ? 1.5f : 1.f));
-
-
-				m_iAdjMovedIndex++;
-			}
-			break;
-
-		case 10:
-			if (m_iAdjMovedIndex == 0 && PlayRate >= 0.001)
-			{
-				Add_Force_Smooth(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 7.2f, 1.f / ((m_bIsBerseked) ? 1.5f : 1.f));
-				m_iAdjMovedIndex++;
-			}
-			if (m_iAdjMovedIndex == 1 && PlayRate >= 0.58666)
-			{
-				Add_Force_Smooth(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 3, 0.4f / ((m_bIsBerseked) ? 1.5f : 1.f));
-				m_iAdjMovedIndex++;
-			}
-			
-			break;
-		case 11:
-			if (m_iAdjMovedIndex == 0 && PlayRate >= 0.44444)
-			{
-				Add_Force_Smooth(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 4.0, 0.4f / ((m_bIsBerseked) ? 1.5f : 1.f));
-				m_iAdjMovedIndex++;
-			}
-
-
-			break;
-
-		case 12://shout
-			if (m_iAdjMovedIndex == 0 && PlayRate >= 0.2777)
-			{
-
-				//공격 파장 소환
-				//Add_Force_Smooth(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 4.0, 0.4f / ((m_bIsBerseked) ? 1.5f : 1.f));
-				m_iAdjMovedIndex++;
-			}
-
-
-			break;
-
-		case 13://shoutNEQ
-			if (m_iAdjMovedIndex == 0 && PlayRate >= 0.1578947)
-			{
-
-				//공격 파장 소환
-				//Add_Force_Smooth(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 4.0, 0.4f / ((m_bIsBerseked) ? 1.5f : 1.f));
-				m_iAdjMovedIndex++;
-			}
-			if (m_iAdjMovedIndex == 1 && PlayRate >= 0.5864661)
-			{
-
-				//Eq 소환
-				//Add_Force_Smooth(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 4.0, 0.4f / ((m_bIsBerseked) ? 1.5f : 1.f));
-				m_iAdjMovedIndex++;
-			}
-
-
-			break;
-
-		case 14://shoutNSummon
-			if (m_iAdjMovedIndex == 0 && PlayRate >= 0.123076)
-			{
-
-				//공격 파장 소환
-				//Add_Force_Smooth(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 4.0, 0.4f / ((m_bIsBerseked) ? 1.5f : 1.f));
-				m_iAdjMovedIndex++;
-			}
-			if (m_iAdjMovedIndex == 1 && PlayRate >= 0.72180)
-			{
-
-				//몬스터 소환
-				//Add_Force_Smooth(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 4.0, 0.4f / ((m_bIsBerseked) ? 1.5f : 1.f));
-				m_iAdjMovedIndex++;
-			}
-
-
-			break;
-
-
-			
-			
-		case 19://Knockback
-			if (m_iAdjMovedIndex == 0 && PlayRate >= 0.01)
-			{
-
-				Add_Force_Smooth(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * -1 , 4.0, 0.4f / ((m_bIsBerseked) ? 1.5f : 1.f));
-				m_iAdjMovedIndex++;
-			}
-
-			break;
+	
 		default:
 			break;
 		}
+	}
+	else
+	{
+		switch (iNowAnimIndex)
+		{
+		case 4:
+			m_pModel->Change_AnimIndex(0, 0.15f, true);
+			break;
+
+		case 8:
+			m_pModel->Change_AnimIndex(0, 0.15f, true);
+			break;
+
+		default:
+			break;
+		}
+
 	}
 
 

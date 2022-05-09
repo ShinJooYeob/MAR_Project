@@ -121,7 +121,7 @@ _int CHorse::LateRender()
 	return _int();
 }
 
-void CHorse::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedObj, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType)
+void CHorse::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedObj, CCollider* pConflictedCollider, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType)
 {
 
 	switch (eConflictedObjCollisionType)
@@ -130,8 +130,7 @@ void CHorse::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedOb
 	case Engine::CollisionType_Monster:
 	{
 
-		CCollider* MonsterCollider = (CCollider*)(pConflictedObj->Get_Component(TAG_COM(Com_Collider)));
-		MonsterCollider->Set_Conflicted();
+		pConflictedCollider->Set_Conflicted();
 		GetSingle(CUtilityMgr)->SlowMotionStart();
 		//m_pModel->Change_AnimIndex_ReturnTo_Must(1, 0, 0, true);
 		((CMonster*)(pConflictedObj))->Add_Dmg_to_Monster(5);

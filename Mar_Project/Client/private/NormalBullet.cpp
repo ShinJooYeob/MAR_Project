@@ -137,7 +137,7 @@ _int CNormalBullet::LateRender()
 	return _int();
 }
 
-void CNormalBullet::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedObj, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType)
+void CNormalBullet::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedObj, CCollider* pConflictedCollider, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType)
 {
 	switch (eConflictedObjCollisionType)
 	{
@@ -145,8 +145,7 @@ void CNormalBullet::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConfl
 	case Engine::CollisionType_Monster:
 	{
 
-		CCollider* MonsterCollider = (CCollider*)(pConflictedObj->Get_Component(TAG_COM(Com_Collider)));
-		MonsterCollider->Set_Conflicted();
+		pConflictedCollider->Set_Conflicted();
 		//GetSingle(CUtilityMgr)->SlowMotionStart();
 		((CMonster*)(pConflictedObj))->Add_Dmg_to_Monster(1);
 

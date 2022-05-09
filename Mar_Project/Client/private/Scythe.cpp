@@ -123,16 +123,14 @@ _int CScythe::LateRender()
 	return _int();
 }
 
-void CScythe::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedObj, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType)
+void CScythe::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedObj, CCollider* pConflictedCollider, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType)
 {
 	switch (eConflictedObjCollisionType)
 	{
 
 	case Engine::CollisionType_Player:
 	{
-		
-		CCollider* PlayerCollider = (CCollider*)(pConflictedObj->Get_Component(TAG_COM(Com_Collider)));
-		PlayerCollider->Set_Conflicted();
+		pConflictedCollider->Set_Conflicted();
 		((CPlayer*)(pConflictedObj))->Add_Dmg_to_Player(rand()%2 + 3);
 		
 	}

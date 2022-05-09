@@ -342,7 +342,7 @@ _int CUmbrella::LateRender()
 	return _int();
 }
 
-void CUmbrella::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedObj, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType)
+void CUmbrella::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedObj, CCollider* pConflictedCollider, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType)
 {
 }
 

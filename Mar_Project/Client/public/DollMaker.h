@@ -38,10 +38,13 @@ private:
 
 	_uint				m_iOldAnimIndex = INT_MAX;
 	_uint				m_iAdjMovedIndex = 0;
+	_bool				m_bIsDmgAnimUpdated[3];
 
-	ATTACHBONEMATRIX_PTR m_tCollisionAttachPtr;
+	ATTACHBONEMATRIX_PTR  m_ArrCollisionAttach[6];
 
 	vector<class CMonsterWeapon*>			m_vecWeapon;
+
+	_uint				m_pHanddyIndex = 0;
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_Weapon();

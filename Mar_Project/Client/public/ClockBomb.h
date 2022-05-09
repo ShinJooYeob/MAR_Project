@@ -20,7 +20,7 @@ public:
 	virtual _int Render()override;
 	virtual _int LateRender()override;
 
-	virtual void CollisionTriger(_uint iMyColliderIndex, CGameObject* pConflictedObj, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType) override;
+	virtual void CollisionTriger(_uint iMyColliderIndex, CGameObject* pConflictedObj, CCollider* pConflictedCollider, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType) override;
 	CModel*	Get_WeaponModel() override { return m_pModel; };
 private:
 	CShader*			m_pShaderCom = nullptr;

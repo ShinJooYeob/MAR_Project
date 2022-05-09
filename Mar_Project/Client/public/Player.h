@@ -53,6 +53,9 @@ public:
 	_bool Get_IsNeedToTeapotCooling() { return m_bIsCoolTime; };
 	
 	_uint Get_NowWeaponIndex() {return m_iWeaponModelIndex;	}
+
+	_bool	Get_IsAttached() { return m_bIsAttached; };
+	_bool   Set_IsAttached(_bool bBool);
 	
 private:
 	CShader*			m_pShaderCom = nullptr;
@@ -125,6 +128,9 @@ private:
 
 	_float3					m_vBulletFirePos;
 	ATTACHBONEMATRIX_PTR m_tCollisionAttachPtr[2];
+
+	/*For Attached*/
+	_bool				m_bIsAttached = false;
 
 private:
 	HRESULT SetUp_Components();
