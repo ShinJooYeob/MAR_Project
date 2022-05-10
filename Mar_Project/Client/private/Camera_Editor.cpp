@@ -128,7 +128,8 @@ HRESULT CCamera_Editor::SetUp_Components()
 	return S_OK;
 }
 
-#define EASINGTYPE TYPE_QuadInOut
+//#define EASINGTYPE TYPE_QuadInOut
+#define EASINGTYPE TYPE_Linear
 
 HRESULT CCamera_Editor::Update_CamAction(_double fDeltaTime)
 {
@@ -137,6 +138,8 @@ HRESULT CCamera_Editor::Update_CamAction(_double fDeltaTime)
 
 	_Matrix NewCamMat = XMMatrixIdentity();
 	CGameInstance* pInstance = g_pGameInstance;
+
+	
 
 	m_ActionPassedTime += fDeltaTime;
 

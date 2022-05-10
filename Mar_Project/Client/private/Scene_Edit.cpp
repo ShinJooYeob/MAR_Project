@@ -1465,7 +1465,7 @@ HRESULT CScene_Edit::Input_KeyBoard(_double fDeltaTime)
 						//wstring ResultString = L"X : " + to_wstring(vResult.x) + L"	Y : " + to_wstring(vResult.y) + L"	Z : " + to_wstring(vResult.z) + L"\n";
 						//OutputDebugStringW(ResultString.c_str());
 						m_fPickingedPosition[0] = vResult.x;
-						m_fPickingedPosition[1] = vResult.y;
+						m_fPickingedPosition[1] = vResult.y + 1.5f;
 						m_fPickingedPosition[2] = vResult.z;
 						break;
 					}
@@ -1477,6 +1477,7 @@ HRESULT CScene_Edit::Input_KeyBoard(_double fDeltaTime)
 				{
 
 					CamDesc.vPosition = vResult;
+					CamDesc.vPosition.y += 1.5f;
 				}
 			}
 			else
@@ -1490,12 +1491,11 @@ HRESULT CScene_Edit::Input_KeyBoard(_double fDeltaTime)
 					_float3 vTargetPos = vCamPos + Scale * vRayDir;
 
 					m_fPickingedPosition[0] = vTargetPos.x;
-					m_fPickingedPosition[1] = vTargetPos.y;
+					m_fPickingedPosition[1] = vTargetPos.y + 1.5f;;
 					m_fPickingedPosition[2] = vTargetPos.z;
 
 					CamDesc.vPosition = vTargetPos;
-
-
+					CamDesc.vPosition.y += 1.5f;
 				}
 			}
 
