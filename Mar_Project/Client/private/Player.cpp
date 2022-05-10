@@ -147,9 +147,9 @@ _int CPlayer::LateUpdate(_double fDeltaTime)
 		FAILED_CHECK(Set_Player_On_Terrain());
 	}
 	else {
-		FAILED_CHECK(Set_Player_On_Terrain());
+		//FAILED_CHECK(Set_Player_On_Terrain());
 
-		//FAILED_CHECK(Set_Player_On_Slieder(fDeltaTime));
+		FAILED_CHECK(Set_Player_On_Slieder(fDeltaTime));
 	}
 	
 	FAILED_CHECK(Set_Camera_On_Player(fDeltaTime));
@@ -3168,9 +3168,10 @@ HRESULT CPlayer::Set_Player_On_Slieder(_double fDeltatime)
 	CTerrain* pTerrain = (CTerrain*)(pInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Terrain)));
 
 	_bool bIsOn = false;
-	_float3 vPlaneWorldNormal;
+	_float3 vPlaneSlideDir;
+	_uint	eTile = Tile_None;
 
-	_float3 CaculatedPos = pTerrain->PutOnTerrain(&bIsOn, m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), m_vOldPos.XMVector(),&vPlaneWorldNormal);
+	_float3 CaculatedPos = pTerrain->PutOnTerrain(&bIsOn, m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), m_vOldPos.XMVector(),&vPlaneSlideDir, &eTile);
 
 	if (bIsOn)
 	{
@@ -3178,35 +3179,41 @@ HRESULT CPlayer::Set_Player_On_Slieder(_double fDeltatime)
 		m_fJumpPower = -1.f;
 		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, CaculatedPos);
 
-		_Vector vRight;
 		_Matrix matScale = m_pTransformCom->Get_MatrixScale_All();
+		_Matrix NewMat = m_pTransformCom->Get_WorldMatrix();
+
+		//_Vector OldLook = m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK);
+		//_Vector NewLook = vPlaneSlideDir.Get_Nomalize();
+		//m_pTransformCom->LookDir(XMVector3Normalize(XMVectorLerp(OldLook, NewLook, 0.15f)));
+		
+
+		NewMat.r[1] = vPlaneSlideDir.XMVector();
 
 
-		_Vector vUp = vPlaneWorldNormal.XMVector();
-
-		m_pTransformCom->Set_MatrixState(CTransform::STATE_UP, vUp * matScale.r[CTransform::STATE_UP]);
-
-		if (XMVector3Equal( _float3(0, 1, 0).XMVector(), vUp))
+		if (XMVector3Equal(_float3(0, 1, 0).XMVector(), NewMat.r[1]))
 		{
-			//__debugbreak();
-			//MSGBOX("Can't Cross With Same Vector");
 #ifdef _DEBUG
 			OutputDebugString(TEXT("Error: Cross With Same Vector (Player)\n"));
 #endif // _DEBUG
 
 
-			vRight = XMVector3Normalize(XMVector3Cross(XMVectorSet(0.000001f, 1, 0, 0), vUp));
-			m_pTransformCom->Set_MatrixState(CTransform::STATE_RIGHT, vRight * matScale.r[CTransform::STATE_RIGHT]);
-
+			NewMat.r[0] = XMVector3Normalize(XMVector3Cross(XMVectorSet(0.000001f, 1, 0, 0), NewMat.r[1]));
 		}
 		else {
 
-			vRight = XMVector3Normalize(XMVector3Cross(XMVectorSet(0,1,0,0), vUp));
-			m_pTransformCom->Set_MatrixState(CTransform::STATE_RIGHT, vRight * matScale.r[CTransform::STATE_RIGHT]);
+			NewMat.r[0] = XMVector3Normalize(XMVector3Cross(XMVectorSet(0, 1, 0, 0), NewMat.r[1]));
 
 		}
 
-		m_pTransformCom->Set_MatrixState(CTransform::STATE_LOOK, XMVector3Normalize(XMVector3Cross(vRight, vUp))  * matScale.r[CTransform::STATE_LOOK]);
+		NewMat.r[2] = XMVector3Normalize(XMVector3Cross(NewMat.r[0], NewMat.r[1]));
+
+		_Matrix NowWorld = m_pTransformCom->Get_WorldMatrix();
+
+		for (_uint i = 0; i < 2; i++)
+			NewMat.r[i] = XMVector3Normalize(XMVectorLerp(NowWorld.r[i], NewMat.r[i], 0.15f)) * matScale.r[i];
+
+
+		m_pTransformCom->Set_Matrix(NewMat);
 
 
 		m_pTransformCom->Move_Forward(fDeltatime);

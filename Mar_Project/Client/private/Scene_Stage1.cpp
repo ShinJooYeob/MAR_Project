@@ -237,9 +237,9 @@ HRESULT CScene_Stage1::Ready_Layer_HiddenPad(const _tchar * pLayerTag)
 	///}
 
 	//FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_HiddenPad), &_float4(_float(11), 20, _float(7), _float(0))));
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_HiddenPad), &_float4(_float(95), 20, _float(85), _float(1))));
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_HiddenPad), &_float4(_float(100), 20, _float(90), _float(2))));
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_HiddenPad), &_float4(_float(105), 20, _float(95), _float(3))));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_HiddenPad), &_float4(_float(91), 20, _float(80), _float(1))));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_HiddenPad), &_float4(_float(96), 20, _float(85), _float(2))));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_HiddenPad), &_float4(_float(101), 20, _float(90), _float(3))));
 
 	return S_OK;
 }

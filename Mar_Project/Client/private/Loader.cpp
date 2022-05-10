@@ -464,6 +464,56 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_KelpWallBack),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "Kelp", "KelpWallBack.FBX", TransformMatrix)));
 
+	///////////////키홀 
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_KeyHole),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "Keyhole", "Keyhole_DollHouse.FBX", TransformMatrix)));
+
+	////////////////모아이 
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_Moai_Gate),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "Moai", "Moai_Gate.FBX", TransformMatrix)));
+
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_Moai_Plat),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "Moai", "Moai_Plat.FBX", TransformMatrix)));
+
+	/////////////////////우는소녀동상
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_TearsRock),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "TearsRock", "TearsRock.FBX", TransformMatrix)));
+
+
+	////////////////////해초 암석
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_GiantUnderseaRock_Holey),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "UnderSeaRock", "GiantUnderseaRock_Holey.FBX", TransformMatrix)));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_UnderseaRock_Ledge),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "UnderSeaRock", "UnderseaRock_Ledge.FBX", TransformMatrix)));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_UnderseaRock_Pile),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "UnderSeaRock", "UnderseaRock_Pile.FBX", TransformMatrix)));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_UnderseaRock_Pillar),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "UnderSeaRock", "UnderseaRock_Pillar.FBX", TransformMatrix)));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_UnderseaRock_Plat),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "UnderSeaRock", "UnderseaRock_Plat.FBX", TransformMatrix)));
+
+
+
+	//////////////////////바다 통나무
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_WaterLogA),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "WaterLog", "WaterLogA.FBX", TransformMatrix)));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_WaterLogB),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "WaterLog", "WaterLogB.FBX", TransformMatrix)));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_WaterLogC),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "WaterLog", "WaterLogC.FBX", TransformMatrix)));
+
+
+	//////////////QRocks
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_QRocksB),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "QRocks", "QRocksB.FBX", TransformMatrix)));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_QRocksC),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "QRocks", "QRocksC.FBX", TransformMatrix)));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_QRocksD),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "QRocks", "QRocksD.FBX", TransformMatrix)));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_QRocksE),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "QRocks", "QRocksE.FBX", TransformMatrix)));
+
+
 
 
 

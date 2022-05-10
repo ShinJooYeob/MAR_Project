@@ -7,10 +7,10 @@ BEGIN(Client)
 
 typedef struct tagObjectElement
 {
-	_tchar			ObjectID[128] = L"EditorCursor";
-	_tchar			MeshID[128] = L"Mesh_None";
-	_tchar			TexturePath[128] = L"TPath_None";
-	_tchar			TextureKey[128] = L"TKey_None";
+	_tchar			ObjectID[128] = L"";
+	_tchar			MeshID[128] = L"";
+	_tchar			TexturePath[128] = L"";
+	_tchar			TextureKey[128] = L"";
 	_uint			PassIndex = 0;
 	_float4x4		matSRT;
 	_float4x4		matTransform;
