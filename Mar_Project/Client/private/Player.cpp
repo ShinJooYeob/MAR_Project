@@ -4,6 +4,7 @@
 #include "Camera.h"
 #include "Terrain.h"
 #include "GamePlayUI.h"
+#include "ClockBomb.h"
 
 
 
@@ -1516,11 +1517,27 @@ HRESULT CPlayer::RockOn_Update(_double fDeltaTime, CGameInstance * pInstance)
 
 HRESULT CPlayer::Plant_ClockBomb(_double fDeltaTime, CGameInstance * pInstance)
 {
-	if (pInstance->Get_DIKeyState(DIK_E) & DIS_Down)
+
+	if (m_BombCoolTime > 0)
 	{
-		m_pModel->Change_AnimIndex_ReturnTo(44, 0, 0.15, true);
+		m_BombCoolTime -= fDeltaTime;
 
 	}
+	else
+	{
+		if (pInstance->Get_DIKeyState(DIK_E) & DIS_Down)
+		{
+			m_pModel->Change_AnimIndex_ReturnTo(44, 0, 0.15, true);
+
+			g_pGameInstance->Add_GameObject_To_Layer_By_Parameter(m_eNowSceneNum, TAG_LAY(Layer_ClockBomb), ((CClockBomb*)(m_vecWeapon[5]))->Clone2Clone(nullptr));
+
+			m_BombCoolTime = 10;
+		}
+
+	}
+
+
+
 	return S_OK;
 }
 

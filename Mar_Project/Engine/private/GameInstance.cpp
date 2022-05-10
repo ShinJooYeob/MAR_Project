@@ -195,6 +195,13 @@ HRESULT CGameInstance::Add_GameObject_To_Layer(_uint eSceneNum, const _tchar * t
 	return	m_pObjectMgr->Add_GameObject_To_Layer(eSceneNum, tagLayer, tagPrototype, pArg);
 }
 
+HRESULT CGameInstance::Add_GameObject_To_Layer_By_Parameter(_uint eSceneNum, const _tchar * tagLayer, CGameObject * pGameObject)
+{
+	NULL_CHECK_BREAK(m_pObjectMgr);
+
+	return m_pObjectMgr->Add_GameObject_To_Layer_By_Parameter(eSceneNum,tagLayer,pGameObject);
+}
+
 HRESULT CGameInstance::Add_GameObject_Out_of_Manager(CGameObject ** ppOutGameObj, _uint eSceneNum, const _tchar * tagPrototype, void * pArg)
 {
 	NULL_CHECK_BREAK(m_pObjectMgr);

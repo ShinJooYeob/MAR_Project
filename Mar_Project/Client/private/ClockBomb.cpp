@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "..\public\ClockBomb.h"
+#include "Terrain.h"
+#include "GamePlayUI.h"
 
 
 
@@ -11,6 +13,12 @@ CClockBomb::CClockBomb(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceCont
 
 CClockBomb::CClockBomb(const CClockBomb & rhs)
 	: CWeapon(rhs)
+{
+}
+
+CClockBomb::CClockBomb(const CClockBomb & rhs, _uint Clone2CloneChecker)
+	: CWeapon(rhs,1),
+	m_bHavetoMaking(true)
 {
 }
 
@@ -28,7 +36,16 @@ HRESULT CClockBomb::Initialize_Clone(void * pArg)
 
 	FAILED_CHECK(SetUp_Components());
 
-	
+	m_bHavetoMaking = true;
+	return S_OK;
+}
+
+HRESULT CClockBomb::Initialize_Clone2Clone(void * pArg)
+{
+
+	FAILED_CHECK(SetUp_Components());
+	m_SpwanPassedTime = 0;
+	m_bHavetoMaking = true;
 	return S_OK;
 }
 
@@ -39,22 +56,117 @@ _int CClockBomb::Update(_double fDeltaTime)
 	if (m_bIsDead) return 0;
 	m_pColliderCom->Update_ConflictPassedTime(fDeltaTime);
 
-	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime));
+
+	m_SpwanPassedTime += fDeltaTime;
+	if (!m_bIsOn && m_SpwanPassedTime < 1.3)
+	{
+		_Matrix Scale = m_pTransformCom->Get_MatrixScale_All();
+
+		_Matrix			TransformMatrix = XMLoadFloat4x4(m_tATBMat.pUpdatedNodeMat) * XMLoadFloat4x4(m_tATBMat.pDefaultPivotMat);
+		TransformMatrix.r[0] = XMVector3Normalize(TransformMatrix.r[0]);
+		TransformMatrix.r[1] = XMVector3Normalize(TransformMatrix.r[1]);
+		TransformMatrix.r[2] = XMVector3Normalize(TransformMatrix.r[2]);
 
 
-	_Matrix			TransformMatrix = XMLoadFloat4x4(m_tATBMat.pUpdatedNodeMat) * XMLoadFloat4x4(m_tATBMat.pDefaultPivotMat);
+		m_pTransformCom->Set_Matrix(TransformMatrix* m_tWeaponDesc.pParantTransform->Get_WorldMatrix());
 
-	TransformMatrix.r[0] = XMVector3Normalize(TransformMatrix.r[0]);
-	TransformMatrix.r[1] = XMVector3Normalize(TransformMatrix.r[1]);
-	TransformMatrix.r[2] = XMVector3Normalize(TransformMatrix.r[2]);
+		m_bIsOn = false;
+		m_LevitationTime = 0.3;
+		CGameInstance* pInstance = GetSingle(CGameInstance);
 
-	//m_BoneMatrix = TransformMatrix * m_tWeaponDesc.pParantTransform->Get_WorldMatrix();
-	//TransformMatrix = m_pTransformCom->Get_WorldMatrix()* TransformMatrix * m_tWeaponDesc.pParantTransform->Get_WorldMatrix();
-	m_BoneMatrix = TransformMatrix = m_pTransformCom->Get_WorldMatrix()* TransformMatrix * m_tWeaponDesc.pParantTransform->Get_WorldMatrix();
+		//m_LevitationTime += fDeltaTime;
+		//_float fGravity = _float((m_LevitationTime) * (m_LevitationTime)* -29.4f);
+
+		//m_pTransformCom->MovetoDir_bySpeed(XMVectorSet(0, 1.f, 0, 0), fGravity, fDeltaTime);
 
 
+		CTerrain* pTerrain = (CTerrain*)(pInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Terrain)));
+
+		_uint eNowTile = Tile_End;
+		_float3 CaculatedPos = pTerrain->PutOnTerrain(&m_bIsOn, m_pTransformCom->Get_MatrixState(CTransform::STATE_POS) + XMVectorSet(0,0.1f,0,0), m_vOldPos.XMVector(), nullptr, &eNowTile);
+
+		if (eNowTile == Tile_None)
+		{
+			m_bIsOn = true;
+			m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, CaculatedPos.XMVector() - XMVectorSet(0, 0.1f, 0, 0));
+		}
+		else if (m_bIsOn)
+		{
+			m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, CaculatedPos.XMVector() - XMVectorSet(0, 0.1f, 0, 0));
+		}
+	
+
+	}
+	else
+	{
+		if (!m_bIsOn)
+		{
+
+			CGameInstance* pInstance = GetSingle(CGameInstance);
+
+			m_LevitationTime += fDeltaTime;
+			_float fGravity = _float((m_LevitationTime) * (m_LevitationTime)* -29.4f);
+			m_pTransformCom->MovetoDir_bySpeed(XMVectorSet(0, 1.f, 0, 0), fGravity, fDeltaTime);
+
+
+			CTerrain* pTerrain = (CTerrain*)(pInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Terrain)));
+
+			_uint eNowTile = Tile_End;
+			_float3 CaculatedPos = pTerrain->PutOnTerrain(&m_bIsOn, m_pTransformCom->Get_MatrixState(CTransform::STATE_POS) + XMVectorSet(0, 0.1f, 0, 0), m_vOldPos.XMVector(), nullptr, &eNowTile);
+
+			if (eNowTile == Tile_None)
+			{
+				m_bIsOn = true;
+				m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, CaculatedPos.XMVector() - XMVectorSet(0, 0.1f, 0, 0));
+			}
+			else if (m_bIsOn)
+			{
+				m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, CaculatedPos.XMVector() - XMVectorSet(0, 0.1f, 0, 0));
+			}
+
+		}
+		else
+		{
+			if (m_pModel->Get_NowAnimIndex() == 4)
+				m_pModel->Change_AnimIndex_ReturnTo_Must(5, 0, 0.15, true);
+
+
+			 
+			if (m_ClockPassedTime > 0)
+			{
+				m_ClockPassedTime -= fDeltaTime;
+
+
+				if (m_ClockPassedTime < 2.5)
+					m_pModel->Change_AnimIndex(1, 0.15, true);
+
+
+				if (m_ClockPassedTime < 0)
+				{
+					Set_IsDead();
+				}
+
+
+			}
+
+		}
+
+
+	}
+
+
+
+
+
+
+
+
+	m_BoneMatrix = m_pTransformCom->Get_WorldMatrix();
 	for (_uint i = 0; i < m_pColliderCom->Get_NumColliderBuffer(); i++)
-		m_pColliderCom->Update_Transform(i, TransformMatrix);
+		m_pColliderCom->Update_Transform(i, m_BoneMatrix.XMatrix());
+
+	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime));
+	FAILED_CHECK(Adjust_AnimMovedTransform(fDeltaTime));
 
 	g_pGameInstance->Add_CollisionGroup(CollisionType_PlayerWeapon, this, m_pColliderCom);
 
@@ -87,6 +199,7 @@ _int CClockBomb::Render()
 
 
 
+
 	_float4x4 ShaderMat = m_BoneMatrix.TransposeXMatrix();
 	m_pShaderCom->Set_RawValue("g_AttechMatrix", &ShaderMat, sizeof(_float4x4));
 
@@ -94,9 +207,24 @@ _int CClockBomb::Render()
 
 	CGameInstance* pInstance = GetSingle(CGameInstance);
 
+	//FAILED_CHECK(m_pShaderCom->Set_RawValue("g_CamPosition", &pInstance->Get_TargetPostion_float4(PLV_CAMERA), sizeof(_float4)));
+	//FAILED_CHECK(m_pShaderCom->Set_RawValue("g_CamLookDir", &pInstance->Get_TargetPostion_float4(PLV_CAMLOOK), sizeof(_float4)));
+
+
+	//const LIGHTDESC* pLightDesc = pInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0);
+	//NULL_CHECK_RETURN(pLightDesc, -1);
+
+	//FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vLightVector", &(pLightDesc->vVector), sizeof(_float4)));
+	//FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4)));
+	//FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4)));
+	//FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4)));
+	//FAILED_CHECK(m_pTransformCom->Bind_OnShader(m_pShaderCom, "g_WorldMatrix"));
+
+
+
 	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ViewMatrix", &pInstance->Get_Transform_Float4x4_TP(PLM_VIEW), sizeof(_float4x4)));
 	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ProjMatrix", &pInstance->Get_Transform_Float4x4_TP(PLM_PROJ), sizeof(_float4x4)));
-
+	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_WorldMatrix", &XMMatrixIdentity(), sizeof(_float4x4)));
 
 	FAILED_CHECK(m_pTextureCom->Bind_OnShader(m_pShaderCom, "g_MskingTextrue", 0));
 	_uint NumMaterial = m_pModel->Get_NumMaterial();
@@ -104,10 +232,20 @@ _int CClockBomb::Render()
 	for (_uint i = 0; i < NumMaterial; i++)
 	{
 
+		if (m_bHavetoMaking && i > 0) continue;
+
 		for (_uint j = 0; j < AI_TEXTURE_TYPE_MAX; j++)
 			FAILED_CHECK(m_pModel->Bind_OnShader(m_pShaderCom, i, j, MODLETEXTYPE(j)));
 
-		FAILED_CHECK(m_pModel->Render(m_pShaderCom, 7, i, "g_BoneMatrices"));
+		
+		if (m_bHavetoMaking)
+		{
+			FAILED_CHECK(m_pModel->Render(m_pShaderCom, 7, i, "g_BoneMatrices"));
+		}
+		else 
+		{
+			FAILED_CHECK(m_pModel->Render(m_pShaderCom, 6, i, "g_BoneMatrices"));
+		}
 	}
 
 
@@ -131,6 +269,7 @@ HRESULT CClockBomb::SetUp_Components()
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Shader_VAM), TAG_COM(Com_Shader), (CComponent**)&m_pShaderCom));
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Mesh_ClockBomb), TAG_COM(Com_Model), (CComponent**)&m_pModel));
+	m_pModel->Change_AnimIndex(4, 0, true);
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Texture_MskTex), TAG_COM(Com_Texture), (CComponent**)&m_pTextureCom));
 	m_pTextureCom->Change_TextureLayer(L"ClockBomb");
@@ -155,6 +294,59 @@ HRESULT CClockBomb::SetUp_Components()
 	return S_OK;
 }
 
+HRESULT CClockBomb::Adjust_AnimMovedTransform(_double fDeltatime)
+{
+	_uint iNowAnimIndex = m_pModel->Get_NowAnimIndex();
+	_double PlayRate = m_pModel->Get_PlayRate();
+
+	if (iNowAnimIndex != m_iOldAnimIndex || PlayRate > 0.95)
+		m_iAdjMovedIndex = 0;
+
+
+
+	if (PlayRate <= 0.95)
+	{
+		switch (iNowAnimIndex)
+		{
+		case 5:
+			if (m_bHavetoMaking && PlayRate > 0.9)
+			{
+				m_ClockPassedTime = 5;
+
+				CGamePlayUI* pGameObj = (CGamePlayUI*)(g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_UI_GamePlay)));
+				NULL_CHECK_RETURN(pGameObj, E_FAIL);
+				pGameObj->Set_DrawClockBombUI();
+				
+				m_bHavetoMaking = false;
+			}
+			
+			break;
+		}
+	}
+	else
+	{
+		switch (iNowAnimIndex)
+		{
+		case 5:
+			if (m_bHavetoMaking)
+			{
+				m_ClockPassedTime = 5;
+
+				CGamePlayUI* pGameObj = (CGamePlayUI*)(g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_UI_GamePlay)));
+				NULL_CHECK_RETURN(pGameObj, E_FAIL);
+				pGameObj->Set_DrawClockBombUI();
+
+				m_bHavetoMaking = false;
+			}
+			
+			break;
+		}
+
+	}
+
+	return S_OK;
+}
+
 CClockBomb * CClockBomb::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
 {
 	CClockBomb*	pInstance = new CClockBomb(pDevice, pDeviceContext);
@@ -174,6 +366,18 @@ CGameObject * CClockBomb::Clone(void * pArg)
 	if (FAILED(pInstance->Initialize_Clone(pArg)))
 	{
 		MSGBOX("Failed to Created CClockBomb");
+		Safe_Release(pInstance);
+	}
+	return pInstance;
+}
+
+CGameObject * CClockBomb::Clone2Clone(void * pArg)
+{
+	CClockBomb*	pInstance = new CClockBomb(*this,0);
+
+	if (FAILED(pInstance->Initialize_Clone(pArg)))
+	{
+		MSGBOX("Failed to Created C2CClockBomb");
 		Safe_Release(pInstance);
 	}
 	return pInstance;

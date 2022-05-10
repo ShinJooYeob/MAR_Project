@@ -22,22 +22,23 @@ public:
 	virtual _int LateRender()override;
 	HRESULT Add_Dmg_to_Player(_uint iNowHP,_uint iDmg);
 
-
+	void Set_DrawClockBombUI();
 protected:
 	CRenderer*			m_pRendererCom = nullptr;
 	class CPlayer*			m_pPlayer = nullptr;
 
 	vector<CUI*>			m_vecUIContainer;
-
-
 	_float2				m_vOldMousePos;
 	
+	_bool				m_bDrawClockBomb = false;
+	_double				m_PassedClockBombTime = 0;
+
 protected:
 	HRESULT Change_WeaponUI();
 	HRESULT Update_CrossHead();
 	HRESULT Update_GrinderHUD();
 	HRESULT Update_TeapotHUD(_double fDeltaTime);
-	HRESULT Update_ClockBombHUD();
+	HRESULT Update_ClockBombHUD(_double fDeltaTime);
 
 protected:
 	HRESULT SetUp_Components();
@@ -51,6 +52,7 @@ protected:
 	HRESULT Ready_WeaponChageCursor(CGameInstance* pInstance);
 	HRESULT Ready_WeaponGrinderHUD(CGameInstance* pInstance);
 	HRESULT Ready_WeaponTeapotHUD(CGameInstance* pInstance);
+	HRESULT Ready_WeaponClockBombHUD(CGameInstance* pInstance);
 
 	HRESULT Ready_CrossHead(CGameInstance* pInstance);
 

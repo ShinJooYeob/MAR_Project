@@ -84,6 +84,8 @@ private:
 	_float				m_fDashPower= 0;
 	_float				m_fDashPassedTime = 0;
 
+	/*For Bomb*/
+	_double				m_BombCoolTime = 0;
 
 	/*For Rock On*/
 	_bool				m_bIsRockOn = false;

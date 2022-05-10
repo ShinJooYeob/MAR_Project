@@ -16,6 +16,7 @@ public:
 protected:
 	CWeapon(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	CWeapon(const CWeapon& rhs);
+	CWeapon(const CWeapon& rhs,_uint C2CChecker);
 	virtual ~CWeapon() = default;
 
 public:

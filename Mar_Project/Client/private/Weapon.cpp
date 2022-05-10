@@ -14,6 +14,17 @@ CWeapon::CWeapon(const CWeapon & rhs)
 {
 }
 
+CWeapon::CWeapon(const CWeapon & rhs, _uint C2CChecker)
+	: CGameObject(rhs),
+	m_tWeaponDesc(rhs.m_tWeaponDesc),
+	m_tATBMat(rhs.m_tATBMat),
+	m_BoneMatrix(rhs.m_BoneMatrix),
+	m_pPlayer(rhs.m_pPlayer)
+{
+
+
+}
+
 HRESULT CWeapon::Initialize_Prototype(void * pArg)
 {
 	__super::Initialize_Prototype(pArg);
@@ -36,7 +47,6 @@ HRESULT CWeapon::Initialize_Clone(void * pArg)
 	{
 		memcpy(&m_tWeaponDesc, pArg, sizeof(WEAPONDESC));
 		m_tATBMat = m_tWeaponDesc.pModel->Find_AttachMatrix_InHirarchyNode(m_tWeaponDesc.szHirarchyNodeName);
-
 	}
 
 	

@@ -339,6 +339,7 @@ enum LAYERID
 	Layer_SkyBox,
 	Layer_Player,
 	Layer_Bullet,
+	Layer_ClockBomb,
 
 	Layer_Monster,
 	Layer_Particle,
@@ -395,6 +396,9 @@ static const _tchar* Tag_Layer(LAYERID eTag)
 		break;
 	case Layer_Particle:
 		return TEXT("Layer_Particle");
+		break;
+	case Layer_ClockBomb:
+		return TEXT("Layer_ClockBomb");
 		break;
 		
 

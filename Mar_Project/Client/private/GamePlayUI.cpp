@@ -26,7 +26,7 @@ HRESULT CGamePlayUI::Initialize_Clone(void * pArg)
 	FAILED_CHECK(__super::Initialize_Clone(pArg));
 
 	FAILED_CHECK(SetUp_Components());
-
+	m_bDrawClockBomb = false;
 
 
 	return S_OK;
@@ -43,7 +43,7 @@ _int CGamePlayUI::Update(_double fDeltaTime)
 	FAILED_CHECK(Update_CrossHead());
 	FAILED_CHECK(Update_GrinderHUD());
 	FAILED_CHECK(Update_TeapotHUD(fDeltaTime));
-	FAILED_CHECK(Update_ClockBombHUD());
+	FAILED_CHECK(Update_ClockBombHUD(fDeltaTime));
 
 
 	for (auto& pUI : m_vecUIContainer)
@@ -142,6 +142,17 @@ HRESULT CGamePlayUI::Add_Dmg_to_Player(_uint iNowHP, _uint iDmg)
 
 
 	return S_OK;
+}
+
+void CGamePlayUI::Set_DrawClockBombUI()
+{
+	if (m_bDrawClockBomb) return;
+
+	m_bDrawClockBomb = true;
+	m_PassedClockBombTime = 0;
+
+	m_vecUIContainer[20]->Set_IsDraw(true);
+	m_vecUIContainer[21]->Set_IsDraw(true);
 }
 
 HRESULT CGamePlayUI::Change_WeaponUI()
@@ -320,6 +331,7 @@ HRESULT CGamePlayUI::Update_TeapotHUD(_double fDeltaTime)
 
 		}
 
+
 	}
 	else
 	{
@@ -337,10 +349,34 @@ HRESULT CGamePlayUI::Update_TeapotHUD(_double fDeltaTime)
 	return S_OK;
 }
 
-HRESULT CGamePlayUI::Update_ClockBombHUD()
+
+HRESULT CGamePlayUI::Update_ClockBombHUD(_double fDeltaTime)
 {
+	if (!m_bDrawClockBomb) return S_FALSE;
+
+
+	m_vecUIContainer[20]->Set_IsDraw(true);
+	m_vecUIContainer[21]->Set_IsDraw(true);
+
+	m_PassedClockBombTime += fDeltaTime;
+	_float EasedTime = g_pGameInstance->Easing(TYPE_Linear, 0, 360, _float(m_PassedClockBombTime), 5);
+
+
+	if (m_PassedClockBombTime > 5)
+	{
+		m_PassedClockBombTime = 0;
+		m_bDrawClockBomb = false;
+		m_vecUIContainer[20]->Set_IsDraw(false);
+		m_vecUIContainer[21]->Set_IsDraw(false);
+	}
+
+	m_vecUIContainer[21]->Set_Angle(EasedTime);
+
+
 	return S_OK;
 }
+
+
 
 
 HRESULT CGamePlayUI::SetUp_Components()
@@ -361,6 +397,7 @@ HRESULT CGamePlayUI::SetUp_Components()
 	FAILED_CHECK(Ready_CrossHead(pInstance));//12
 	FAILED_CHECK(Ready_WeaponGrinderHUD(pInstance));//13 - 15
 	FAILED_CHECK(Ready_WeaponTeapotHUD(pInstance));//16 - 19
+	FAILED_CHECK(Ready_WeaponClockBombHUD(pInstance));//20 - 21
 	
 	
 		
@@ -675,6 +712,70 @@ HRESULT CGamePlayUI::Ready_WeaponTeapotHUD(CGameInstance * pInstance)
 		m_vecUIContainer.push_back(pUI);
 
 	}
+
+	return S_OK;
+}
+
+HRESULT CGamePlayUI::Ready_WeaponClockBombHUD(CGameInstance * pInstance)
+{
+
+	{
+
+		CUI* pUI = nullptr;
+		FAILED_CHECK(pInstance->Add_GameObject_Out_of_Manager((CGameObject**)(&pUI), m_eNowSceneNum, TAG_OP(Prototype_UIImage)));
+
+		NULL_CHECK_RETURN(pUI, E_FAIL);
+
+		FAILED_CHECK(pUI->Change_Component_by_NewAssign(m_eNowSceneNum, TAG_CP(Prototype_Texture_GamePlayScene), TAG_COM(Com_Texture)));
+
+		FAILED_CHECK(pUI->Change_TextureLayer(L"Skill_Bomb"));
+		pUI->Set_TextureLayerIndex(0);
+		pUI->Set_IsDraw(false);
+
+		UIDESC tUIDesc;
+
+		tUIDesc.fX = 1115;
+		tUIDesc.fY = 78;
+		tUIDesc.fCX = 68;
+		tUIDesc.fCY = 130;
+
+		pUI->Apply_UI_To_MemberValue(tUIDesc);
+		pUI->Set_DrawingValueIsUIDesc(false);
+		FAILED_CHECK(pUI->Apply_UIDesc_To_Transform());
+
+		pUI->Set_UIDepth(_float(-20));
+
+		m_vecUIContainer.push_back(pUI);
+	}
+	{
+
+		CUI* pUI = nullptr;
+		FAILED_CHECK(pInstance->Add_GameObject_Out_of_Manager((CGameObject**)(&pUI), m_eNowSceneNum, TAG_OP(Prototype_UIImage)));
+
+		NULL_CHECK_RETURN(pUI, E_FAIL);
+
+		FAILED_CHECK(pUI->Change_Component_by_NewAssign(m_eNowSceneNum, TAG_CP(Prototype_Texture_GamePlayScene), TAG_COM(Com_Texture)));
+
+		FAILED_CHECK(pUI->Change_TextureLayer(L"Skill_Bomb"));
+		pUI->Set_TextureLayerIndex(1);
+		pUI->Set_IsDraw(false);
+		pUI->Set_PassIndex(6);
+		UIDESC tUIDesc;
+
+		tUIDesc.fX = 1115;
+		tUIDesc.fY = 107;
+		tUIDesc.fCX = 100;
+		tUIDesc.fCY = 45;
+
+		pUI->Apply_UI_To_MemberValue(tUIDesc);
+		pUI->Set_DrawingValueIsUIDesc(false);
+		FAILED_CHECK(pUI->Apply_UIDesc_To_Transform());
+
+		pUI->Set_UIDepth(_float(-21));
+
+		m_vecUIContainer.push_back(pUI);
+	}
+
 
 	return S_OK;
 }

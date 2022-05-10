@@ -109,6 +109,41 @@ HRESULT CObjectMgr::Add_GameObject_To_Layer(_uint eSceneNum, const _tchar * tagL
 	return S_OK;
 }
 
+HRESULT CObjectMgr::Add_GameObject_To_Layer_By_Parameter(_uint eSceneNum, const _tchar * tagLayer, CGameObject * pGameObject)
+{
+
+
+	CGameObject* pInstance = pGameObject;
+
+	NULL_CHECK_BREAK(pInstance);
+
+	pInstance->Set_NowSceneNum(eSceneNum);
+
+	if (pInstance->Get_NameTag() == nullptr)
+		pInstance->Set_NameTag(tagLayer);
+
+	CObjectLayer* pLayer = Find_Layer(eSceneNum, tagLayer);
+
+	if (pLayer == nullptr)
+	{
+		pLayer = CObjectLayer::Create();
+		NULL_CHECK_BREAK(pLayer);
+
+
+		FAILED_CHECK(pLayer->Add_GameObject(pInstance));
+
+		m_mapLayer[eSceneNum].emplace(tagLayer, pLayer);
+	}
+	else
+	{
+		FAILED_CHECK(pLayer->Add_GameObject(pInstance));
+
+		m_mapLayer[eSceneNum].emplace(tagLayer, pLayer);
+	}
+
+	return S_OK;
+}
+
 HRESULT CObjectMgr::Delete_GameObject_To_Layer_Index(_uint eSceneNum, const _tchar * tagLayer, int index)
 {
 	if (eSceneNum >= m_iMaxSceneNum || m_mapLayer == nullptr)
