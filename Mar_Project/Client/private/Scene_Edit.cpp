@@ -194,7 +194,7 @@ _int CScene_Edit::LateUpdate(_double fDeltaTime)
 	{
 		static _bool	 Show = true;
 
-		if (g_pGameInstance->Get_DIKeyState(DIK_0) & DIS_Down)Show = !Show;
+		if (g_pGameInstance->Get_DIKeyState(DIK_Q) & DIS_Down)Show = !Show;
 
 		if (Show)
 		{
@@ -249,7 +249,7 @@ _int CScene_Edit::LateUpdate(_double fDeltaTime)
 
 		static _bool	 Show = true;
 
-		if (g_pGameInstance->Get_DIKeyState(DIK_0) & DIS_Down)Show = !Show;
+		if (g_pGameInstance->Get_DIKeyState(DIK_Q) & DIS_Down)Show = !Show;
 
 		if (Show)
 		{

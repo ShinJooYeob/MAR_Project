@@ -27,9 +27,9 @@ public:
 	HRESULT Chage_TileKindsNHeight(_uint iTileKinds, _float3 PosNHeight);
 
 	_Vector Calculate_SlidingVector(_float3 OldPosOnTerrainLocal, _float3 PosOnTerrainLocal);
-	_Vector Calculate_SlidingVector_ForNoneTile(_float3 OldPosOnTerrainLocal, _float3 PosOnTerrainLocal);
+	_Vector Calculate_SlidingVector_ForNoneTile(_float3 OldPosOnTerrainLocal, _float3 PosOnTerrainLocal, _float Rate = 1.001f);
 	_bool   OutOfLine(_fVector StartPoint, _fVector EndPoint, _fVector OldPos, _gVector NowPos, _float3* pOutDirVec);
-	_bool   OutOfLine_ForNoneTile(_uint iStartIndex, _uint iEndIndex, _fVector OldPos, _gVector NowPos, _float3* pOutDirVec);
+	_bool   OutOfLine_ForNoneTile(_uint iStartIndex, _uint iEndIndex, _fVector OldPos, _gVector NowPos, _float3* pOutDirVec,_float Rate = 1.001f);
 
 	_Vector Pick_ByRay(_fVector vRayPos, _fVector vRayDir, _float2 vIndex, _bool* bIsPieck);
 	_float2 Get_NumVerticesXY() { return _float2(_float(m_iNumVerticesX), _float(m_iNumVerticesZ)); };
