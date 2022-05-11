@@ -561,6 +561,7 @@ enum COMPONENTPROTOTYPEID
 	Prototype_WaterLogC,
 
 	Prototype_QueenTower_BrokenC,
+	Prototype_QMaze,
 
 
 
@@ -890,9 +891,9 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 		break;
 
 		
-
-
-
+	case Prototype_QMaze:
+		return TEXT("QMaze");
+		break;
 
 
 

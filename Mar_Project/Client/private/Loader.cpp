@@ -70,6 +70,12 @@ _uint CALLBACK LoadingThread(void* _Prameter)
 	case SCENEID::SCENE_STAGE1:
 		pLoader->Load_Scene_Stage1(tThreadArg.IsClientQuit, tThreadArg.CriSec);
 		break;
+	case SCENEID::SCENE_STAGE2:
+		pLoader->Load_Scene_Stage2(tThreadArg.IsClientQuit, tThreadArg.CriSec);
+		break;
+	case SCENEID::SCENE_STAGE3:
+		pLoader->Load_Scene_Stage3(tThreadArg.IsClientQuit, tThreadArg.CriSec);
+		break;
 
 	case SCENEID::SCENE_BOSS:
 		pLoader->Load_Scene_Boss(tThreadArg.IsClientQuit, tThreadArg.CriSec);
@@ -184,7 +190,7 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 
 
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Player),
-		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Alice", "Alice.FBX", TransformMatrix, 2)));
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Alice", "Alice.FBX", TransformMatrix, 1)));
 
 	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Tornado1),
@@ -519,7 +525,7 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 
 	//////////Terrain
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_VIBuffer_Terrain),
-		CVIBuffer_Terrain::Create(m_pDevice, m_pDeviceContext, L"Height.bmp")));
+		CVIBuffer_Terrain::Create(m_pDevice, m_pDeviceContext, L"Height_1.bmp")));
 
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Texture_Terrain),
 		CTexture::Create(m_pDevice, m_pDeviceContext, L"Terrain.txt")));
@@ -623,6 +629,82 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 	m_bIsLoadingFinished = true;
 	LeaveCriticalSection(_CriSec);
 	m_bIsLoadingFinished = true;
+	return S_OK;
+}
+
+HRESULT CLoader::Load_Scene_Stage2(_bool * _IsClientQuit, CRITICAL_SECTION * _CriSec)
+{
+
+
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+
+
+#pragma region PROTOTYPE_COMPONENT
+#pragma endregion
+
+#pragma  region PROTOTYPE_GAMEOBJECT
+#pragma endregion
+
+	RELEASE_INSTANCE(CGameInstance);
+	EnterCriticalSection(_CriSec);
+	m_iLoadingMaxCount = 1;
+	m_iLoadingProgressCount = 0;
+	LeaveCriticalSection(_CriSec);
+
+	EnterCriticalSection(_CriSec);
+	m_bIsLoadingFinished = true;
+	LeaveCriticalSection(_CriSec);
+
+
+	return S_OK;
+}
+
+HRESULT CLoader::Load_Scene_Stage3(_bool * _IsClientQuit, CRITICAL_SECTION * _CriSec)
+{
+
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+
+
+#pragma region PROTOTYPE_COMPONENT
+
+	_Matrix TransformMatrix = XMMatrixScaling(0.00015f, 0.00015f, 0.00015f);
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_QMaze),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "QMaze", "QMaze.FBX", TransformMatrix)));
+
+
+	TransformMatrix = XMMatrixScaling(0.0005f, 0.0005f, 0.0005f) * XMMatrixRotationY(XMConvertToRadians(90.0f));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE3, TAG_CP(Prototype_Mesh_SkyBox),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "SkyBox", "SkyBox_aftnoon.FBX", TransformMatrix)));
+
+#pragma endregion
+
+#pragma  region PROTOTYPE_GAMEOBJECT
+
+	//////////Terrain
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE3, TAG_CP(Prototype_VIBuffer_Terrain),
+		CVIBuffer_Terrain::Create(m_pDevice, m_pDeviceContext, L"Height_3.bmp")));
+
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE3, TAG_CP(Prototype_Texture_Terrain),
+		CTexture::Create(m_pDevice, m_pDeviceContext, L"Terrain.txt")));
+
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE3, TAG_CP(Prototype_Texture_GamePlayScene),
+		CTexture::Create(m_pDevice, m_pDeviceContext, L"UI_GamePlay.txt")));
+
+#pragma endregion
+
+	RELEASE_INSTANCE(CGameInstance);
+	EnterCriticalSection(_CriSec);
+	m_iLoadingMaxCount = 1;
+	m_iLoadingProgressCount = 0;
+	LeaveCriticalSection(_CriSec);
+
+	EnterCriticalSection(_CriSec);
+	m_bIsLoadingFinished = true;
+	LeaveCriticalSection(_CriSec);
+
+
 	return S_OK;
 }
 
@@ -902,6 +984,11 @@ HRESULT CLoader::Load_Scene_Edit(_bool * _IsClientQuit, CRITICAL_SECTION * _CriS
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "QueenTower", "QueenTower_BrokenC.FBX", TransformMatrix)));
 	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
 
+
+	TransformMatrix = XMMatrixScaling(0.00015f, 0.00015f, 0.00015f);
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_QMaze),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "QMaze", "QMaze.FBX", TransformMatrix)));
+	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
 
 
 

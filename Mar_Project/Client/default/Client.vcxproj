@@ -189,6 +189,7 @@
     <ClInclude Include="..\public\ClockBomb.h" />
     <ClInclude Include="..\public\HandyGirl.h" />
     <ClInclude Include="..\public\HandyBoy.h" />
+    <ClInclude Include="..\public\Scene_Stage3.h" />
     <ClInclude Include="..\public\Scene_Boss.h" />
     <ClInclude Include="..\public\Scythe.h" />
     <ClInclude Include="..\public\MonsterWeapon.h" />
@@ -252,6 +253,7 @@
     <ClCompile Include="..\private\ClockBomb.cpp" />
     <ClCompile Include="..\private\HandyGirl.cpp" />
     <ClCompile Include="..\private\HandyBoy.cpp" />
+    <ClCompile Include="..\private\Scene_Stage3.cpp" />
     <ClCompile Include="..\private\Scene_Boss.cpp" />
     <ClCompile Include="..\private\Scythe.cpp" />
     <ClCompile Include="..\private\MonsterWeapon.cpp" />

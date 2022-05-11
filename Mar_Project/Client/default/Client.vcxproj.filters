@@ -441,6 +441,9 @@
     <ClInclude Include="..\public\HandyGirl.h">
       <Filter>01.GameObject\03.Monster\06.DollMaker\06.Handy</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Scene_Stage3.h">
+      <Filter>02.Scene\03.Scene_Gameplay\Scene_Stage3</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -640,6 +643,9 @@
     </ClCompile>
     <ClCompile Include="..\private\HandyGirl.cpp">
       <Filter>01.GameObject\03.Monster\06.DollMaker\06.Handy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Scene_Stage3.cpp">
+      <Filter>02.Scene\03.Scene_Gameplay\Scene_Stage3</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -54,6 +54,9 @@ _int CHandyBoy::Update(_double fDeltaTime)
 	Update_DmgCalculate(fDeltaTime);
 
 
+	if (g_pGameInstance->Get_DIKeyState(DIK_2) & DIS_Down)
+		Add_Dmg_to_Monster(m_fMaxHP + 1);
+
 	//if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
 	//{
 	//	Make_Hand_PoleGrab();
@@ -382,6 +385,7 @@ void CHandyBoy::Enter_Hand()
 {
 	m_PatternDelayTime = 7;
 	m_bIsPatternFinished = true;
+	m_fHP = m_fMaxHP;
 
 	m_pModel->Change_AnimIndex_ReturnTo_Must(27, 0, 0, true);
 }

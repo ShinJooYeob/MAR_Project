@@ -475,6 +475,15 @@ HRESULT CScene_Edit::Sava_Data(const char* szFileName, eDATATYPE iKinds)
 		//wc = 0xBF;
 		//WriteFile(hFile, &wc, 1, &dwByte, NULL);
 
+		lstrcpy(m_vecBatchedObject[0].ObjectID, L"EditorCursor");
+		lstrcpy(m_vecBatchedObject[0].MeshID, L"Mesh_None");
+		lstrcpy(m_vecBatchedObject[0].TexturePath, L"TPath_None");
+		lstrcpy(m_vecBatchedObject[0].TextureKey, L"TKey_None");
+
+
+
+
+
 		_int iIDLength = 0;
 
 		for (auto& tObjectElement : m_vecBatchedObject)

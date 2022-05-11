@@ -26,6 +26,8 @@ public:
 	HRESULT Load_Scene_Loby(_bool* _IsClientQuit, CRITICAL_SECTION* _CriSec);
 	HRESULT Load_Scene_StageSelect(_bool* _IsClientQuit, CRITICAL_SECTION* _CriSec);
 	HRESULT Load_Scene_Stage1(_bool* _IsClientQuit, CRITICAL_SECTION* _CriSec);
+	HRESULT Load_Scene_Stage2(_bool* _IsClientQuit, CRITICAL_SECTION* _CriSec);
+	HRESULT Load_Scene_Stage3(_bool* _IsClientQuit, CRITICAL_SECTION* _CriSec);
 
 
 	HRESULT Load_Scene_Boss(_bool* _IsClientQuit, CRITICAL_SECTION* _CriSec);

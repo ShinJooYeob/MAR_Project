@@ -54,6 +54,8 @@ _int CHandyGirl::Update(_double fDeltaTime)
 
 
 
+	if (g_pGameInstance->Get_DIKeyState(DIK_2) & DIS_Down)
+		Add_Dmg_to_Monster(m_fMaxHP - 1);
 
 	//if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
 	//{
@@ -366,6 +368,7 @@ void CHandyGirl::Make_Hand_Free()
 	m_PatternDelayTime = 5;
 	m_pTransformCom->Set_MoveSpeed(3.5f);
 	m_pModel->Change_AnimIndex_ReturnTo_Must(36, 0, 0.15, true);
+	m_fHP = m_fMaxHP;
 }
 
 void CHandyGirl::Enter_Hand()
@@ -374,6 +377,7 @@ void CHandyGirl::Enter_Hand()
 	m_bIsPatternFinished = true;
 	m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, m_PoleGrabPos);
 	m_pModel->Change_AnimIndex_ReturnTo_Must(37, 0, 0, true);
+	m_fHP = m_fMaxHP;
 }
 
 HRESULT CHandyGirl::SetUp_Components()
