@@ -68,7 +68,7 @@ _int CTornadoSwirl::LateUpdate(_double fDeltaTime)
 		return -1;
 
 
-	FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this));
+	FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_BLEND, this));
 	return 0;
 }
 

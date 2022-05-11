@@ -142,6 +142,9 @@ PS_OUT PS_MAIN_TERRAIN_DIRECTIONAL(PS_IN In)
 			+ (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
 
 
+		float  FogShaderRate = 1 - saturate(  max((3.f - In.vWorldPos.y), 0) / 3.f);
+		
+		Out.vColor.a *= FogShaderRate;
 	}
 
 	return Out;
@@ -292,7 +295,7 @@ technique11		DefaultTechnique
 {
 	pass Terrain_DirectionalLight // 0
 	{
-		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff); 
+		SetBlendState(AlphaBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 		SetDepthStencilState(ZTestAndWriteState, 0);
 		SetRasterizerState(CullMode_ccw);
 
@@ -323,7 +326,7 @@ technique11		DefaultTechnique
 	}
 	pass Terrain_EditTerrain // 3
 	{
-		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetBlendState(AlphaBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 		SetDepthStencilState(ZTestAndWriteState, 0);
 		SetRasterizerState(CullMode_ccw);
 

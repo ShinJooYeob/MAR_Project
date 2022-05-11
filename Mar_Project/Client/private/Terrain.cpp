@@ -49,7 +49,7 @@ _int CTerrain::LateUpdate(_double fDeltaTime)
 	if (__super::LateUpdate(fDeltaTime) < 0)
 		return -1;
 
-	FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_PRIORITY, this));
+	FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_PRIORITYBLEND, this));
 
 	return _int();
 }
@@ -184,24 +184,20 @@ HRESULT CTerrain::Chage_TileKindsNHeight(_fMatrix WorldPointsMat)
 {
 
 	_float4x4 PointsOnLocal = WorldPointsMat * m_pTransformCom->Get_InverseWorldMatrix();
-
+	_Matrix TempMat = PointsOnLocal.XMatrix();
 
 	RECT Points;
 
-	_float Height = PointsOnLocal._12;
 
-	_float LowHight = (min(min(min(PointsOnLocal._12, PointsOnLocal._22), PointsOnLocal._32), PointsOnLocal._42));
-	_float MaxHight = (max(max(max(PointsOnLocal._12, PointsOnLocal._22), PointsOnLocal._32), PointsOnLocal._42));
+	_Vector Plane = XMPlaneFromPoints(TempMat.r[0], TempMat.r[1], TempMat.r[2]);
 
 
 
 	Points.left = _uint(min(min(min(PointsOnLocal._11, PointsOnLocal._21), PointsOnLocal._31), PointsOnLocal._41) -1);
 	Points.bottom = _uint(min(min(min(PointsOnLocal._13, PointsOnLocal._23), PointsOnLocal._33), PointsOnLocal._43) -1);
 	Points.right = _uint(max(max(max(PointsOnLocal._11, PointsOnLocal._21), PointsOnLocal._31), PointsOnLocal._41) +1);
-	Points.top = _uint(max(max(max(PointsOnLocal._13, PointsOnLocal._23), PointsOnLocal._33), PointsOnLocal._43) +1);
+	Points.top = _uint(max(max(max(PointsOnLocal._13, PointsOnLocal._23), PointsOnLocal._33), PointsOnLocal._43) + 1);
 
-	_float HeightIndterver = (MaxHight - LowHight) / (Points.top - Points.bottom -2 ); 
-	
 		
 	for (_uint i = (_uint)Points.left; i <= (_uint)Points.right; i++)
 	{
@@ -212,8 +208,15 @@ HRESULT CTerrain::Chage_TileKindsNHeight(_fMatrix WorldPointsMat)
 				m_pVIBufferCom->Chage_TileKindsNHeight(Tile_JumpMovable, _float3((_float)i, -1, (_float)j));
 
 			else
-				m_pVIBufferCom->Chage_TileKindsNHeight(Tile_Movable, _float3((_float)i, LowHight + ((j - Points.bottom -1) * HeightIndterver), (_float)j));
+			{
+				_float TargetHeight = (i * XMVectorGetX(Plane) + j * XMVectorGetZ(Plane) + XMVectorGetW(Plane) )/ -XMVectorGetY(Plane);
+				m_pVIBufferCom->Chage_TileKindsNHeight(Tile_Movable, _float3((_float)i, TargetHeight, (_float)j));
 
+
+
+				//m_pVIBufferCom->Chage_TileKindsNHeight(Tile_Movable, _float3((_float)i, LowHight + ((j - Points.bottom - 1) * HeightIndterver), (_float)j));
+
+			}
 		}
 
 	}

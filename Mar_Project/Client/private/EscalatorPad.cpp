@@ -1,50 +1,44 @@
 #include "stdafx.h"
-#include "..\public\HiddenPad.h"
+#include "..\public\EscalatorPad.h"
 #include "Player.h"
 #include "Terrain.h"
 
 
 
-CHiddenPad::CHiddenPad(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
+CEscalatorPad::CEscalatorPad(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
 	:CMapObject(pDevice,pDeviceContext)
 {
 }
 
-CHiddenPad::CHiddenPad(const CHiddenPad & rhs)
+CEscalatorPad::CEscalatorPad(const CEscalatorPad & rhs)
 	: CMapObject(rhs)
 {
 }
 
-HRESULT CHiddenPad::Initialize_Prototype(void * pArg)
+HRESULT CEscalatorPad::Initialize_Prototype(void * pArg)
 {
 	FAILED_CHECK(__super::Initialize_Prototype(pArg));
 	return S_OK;
 }
 
-HRESULT CHiddenPad::Initialize_Clone(void * pArg)
+HRESULT CEscalatorPad::Initialize_Clone(void * pArg)
 {
 	FAILED_CHECK(__super::Initialize_Clone(pArg));
 
 	if (pArg != nullptr)
 	{
-		m_iKindsOfHiddenPad = _uint((*(_float4*)pArg).w);
+		memcpy(&m_tDesc, pArg, sizeof(ESCLATORDESC));
 	}
+
 	FAILED_CHECK(SetUp_Components());
 
-	if (pArg != nullptr)
-	{
-		_float3 Pos = *(_float3*)pArg;
-		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, Pos);
-	}
-	
-	m_pTransformCom->Scaled_All(_float3(2, 2, 2));
 
 	FAILED_CHECK(Set_TerrainTileKinds());
 
 	return S_OK;
 }
 
-_int CHiddenPad::Update(_double fDeltaTime)
+_int CEscalatorPad::Update(_double fDeltaTime)
 {
 	if (__super::Update(fDeltaTime) < 0)
 		return -1;
@@ -76,7 +70,7 @@ _int CHiddenPad::Update(_double fDeltaTime)
 	return _int();
 }
 
-_int CHiddenPad::LateUpdate(_double fDeltaTime)
+_int CEscalatorPad::LateUpdate(_double fDeltaTime)
 {
 	if (__super::LateUpdate(fDeltaTime) < 0)
 		return -1;
@@ -90,10 +84,12 @@ _int CHiddenPad::LateUpdate(_double fDeltaTime)
 	return _int();
 }
 
-_int CHiddenPad::Render()
+_int CEscalatorPad::Render()
 {
 	if (__super::Render() < 0)
 		return -1;
+
+
 
 
 
@@ -126,7 +122,7 @@ _int CHiddenPad::Render()
 	return _int();
 }
 
-_int CHiddenPad::LateRender()
+_int CEscalatorPad::LateRender()
 {
 	if (__super::LateRender() < 0)
 		return -1;
@@ -134,13 +130,15 @@ _int CHiddenPad::LateRender()
 	return _int();
 }
 
-HRESULT CHiddenPad::Set_TerrainTileKinds()
+HRESULT CEscalatorPad::Set_TerrainTileKinds()
 {
 	CTerrain* pTerrain = (CTerrain*)(g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Terrain)));
 	NULL_CHECK_RETURN(pTerrain, E_FAIL);
 
 
+
 	_Matrix WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+
 
 	_Matrix RectMatrix = XMMatrixIdentity();
 
@@ -148,6 +146,7 @@ HRESULT CHiddenPad::Set_TerrainTileKinds()
 	RectMatrix.r[1] = m_NevRectPoint[1].XMVector();
 	RectMatrix.r[2] = m_NevRectPoint[2].XMVector();
 	RectMatrix.r[3] = m_NevRectPoint[3].XMVector();
+
 
 
 	FAILED_CHECK(pTerrain->Chage_TileKindsNHeight(RectMatrix * WorldMatrix));
@@ -157,12 +156,14 @@ HRESULT CHiddenPad::Set_TerrainTileKinds()
 	return S_OK;
 }
 
-HRESULT CHiddenPad::Reset_TerrainTileKindsMovableNHeightZero()
+HRESULT CEscalatorPad::Reset_TerrainTileKindsMovableNHeightZero()
 {
 	CTerrain* pTerrain = (CTerrain*)(g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Terrain)));
 	NULL_CHECK_RETURN(pTerrain, E_FAIL);
 
+
 	_Matrix WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+
 
 	_Matrix RectMatrix = XMMatrixIdentity();
 
@@ -171,13 +172,15 @@ HRESULT CHiddenPad::Reset_TerrainTileKindsMovableNHeightZero()
 	RectMatrix.r[2] = m_NevRectPoint[2].XMVector();
 	RectMatrix.r[3] = m_NevRectPoint[3].XMVector();
 
+
+
 	FAILED_CHECK(pTerrain->Chage_TileKindsMovableNZero(RectMatrix * WorldMatrix));
 
 
 	return S_OK;
 }
 
-HRESULT CHiddenPad::SetUp_Components()
+HRESULT CEscalatorPad::SetUp_Components()
 {
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Renderer), TAG_COM(Com_Renderer), (CComponent**)&m_pRendererCom));
 
@@ -185,7 +188,7 @@ HRESULT CHiddenPad::SetUp_Components()
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Transform), TAG_COM(Com_Transform), (CComponent**)&m_pTransformCom));
 
-	_uint iKindofMesh = min(Prototype_Mesh_GiantToys_Die + m_iKindsOfHiddenPad, Prototype_Mesh_GiantToys_DominoStair);
+	/*_uint iKindofMesh = min(Prototype_Mesh_GiantToys_Die + m_iKindsOfHiddenPad, Prototype_Mesh_GiantToys_DominoStair);
 	FAILED_CHECK(Add_Component(m_eNowSceneNum, TAG_CP(COMPONENTPROTOTYPEID(iKindofMesh)), TAG_COM(Com_Model), (CComponent**)&m_pModel));
 
 
@@ -223,7 +226,7 @@ HRESULT CHiddenPad::SetUp_Components()
 
 	default:
 		break;
-	}
+	}*/
 
 
 
@@ -243,31 +246,31 @@ HRESULT CHiddenPad::SetUp_Components()
 	return S_OK;
 }
 
-CHiddenPad * CHiddenPad::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, void * pArg)
+CEscalatorPad * CEscalatorPad::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, void * pArg)
 {
-	CHiddenPad*	pInstance = new CHiddenPad(pDevice, pDeviceContext);
+	CEscalatorPad*	pInstance = new CEscalatorPad(pDevice, pDeviceContext);
 
 	if (FAILED(pInstance->Initialize_Prototype(pArg)))
 	{
-		MSGBOX("Failed to Created CHiddenPad");
+		MSGBOX("Failed to Created CEscalatorPad");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-CGameObject * CHiddenPad::Clone(void * pArg)
+CGameObject * CEscalatorPad::Clone(void * pArg)
 {
-	CHiddenPad*	pInstance = new CHiddenPad(*this);
+	CEscalatorPad*	pInstance = new CEscalatorPad(*this);
 
 	if (FAILED(pInstance->Initialize_Clone(pArg)))
 	{
-		MSGBOX("Failed to Created CHiddenPad");
+		MSGBOX("Failed to Created CEscalatorPad");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-void CHiddenPad::Free()
+void CEscalatorPad::Free()
 {
 	__super::Free();
 

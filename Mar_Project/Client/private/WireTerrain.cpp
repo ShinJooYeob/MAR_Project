@@ -56,7 +56,8 @@ _int CWireTerrain::LateUpdate(_double fDeltaTime)
 
 	FAILED_CHECK(Renew_FilterMap());
 
-	FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_PRIORITY, this));
+	FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_PRIORITYBLEND, this));
+	//FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_PRIORITY, this));
 
 	return _int();
 }

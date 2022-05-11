@@ -564,6 +564,62 @@ enum COMPONENTPROTOTYPEID
 	Prototype_QMaze,
 
 
+	Prototype_Mesh_ClockworkGears_DecoC,
+	Prototype_Mesh_GiantGearPlatsA,
+	Prototype_Mesh_HatterBlockC,
+	Prototype_Mesh_HatterBlocksE,
+	Prototype_Mesh_HatterBlocksG,
+	Prototype_Mesh_HatterBlocksH,
+	Prototype_Mesh_HatterBuildingE_Door,
+	Prototype_Mesh_HatterDoorA,
+	Prototype_Mesh_HatterDoorC,
+	Prototype_Mesh_HatterExtTowerA,
+	Prototype_Mesh_HatterExtTowerB,
+	Prototype_Mesh_HatterExtTowerD,
+	Prototype_Mesh_HatterExtWallB,
+	Prototype_Mesh_HatterExtWallB_Hole,
+	Prototype_Mesh_HatterExtWallC_LeftHole,
+	Prototype_Mesh_HatterExtWallC_RightHole,
+	Prototype_Mesh_HatterExtWallD,
+	Prototype_Mesh_HatterFloorSystem_OriginalShortA,
+	Prototype_Mesh_HatterFloorSystem_OriginalShortB,
+	Prototype_Mesh_HatterFloorSystem_OriginalShortE,
+	Prototype_Mesh_HatterFloorSystem_OriginalTallE,
+	Prototype_Mesh_HatterFloorSystem_TeaMakerPlat,
+	Prototype_Mesh_HatterJunk_M,
+	Prototype_Mesh_HatterJunk_S,
+	Prototype_Mesh_HatterLightsE,
+	Prototype_Mesh_HatterPillarsB_column,
+	Prototype_Mesh_HatterPillarsC_top,
+	Prototype_Mesh_HatterPillarsD_base,
+	Prototype_Mesh_HatterPillarsG,
+	Prototype_Mesh_HatterPlat_CheckeI,
+	Prototype_Mesh_HatterPlat_CheckerA,
+	Prototype_Mesh_HatterPlat_CheckerB,
+	Prototype_Mesh_HatterPlat_CheckerC,
+	Prototype_Mesh_HatterPlat_CheckerE,
+	Prototype_Mesh_HatterPlat_CheckerF,
+	Prototype_Mesh_HatterPlat_CheckerG,
+	Prototype_Mesh_HatterPlat_MetalSquare,
+	Prototype_Mesh_HatterWallBricks_ChunkB,
+	Prototype_Mesh_HatterWallBricks_HalfA,
+	Prototype_Mesh_HatterWallBricks_HalfB,
+	Prototype_Mesh_HatterWallBricks_Pillar,
+	Prototype_Mesh_HatterWallBricks_Rubble,
+	Prototype_Mesh_HatterWallBricks_Wall,
+	Prototype_Mesh_Keyhole_Hatter,
+	Prototype_Mesh_KeyHoleTurnnels3,
+	Prototype_Mesh_OrnateGearA,
+	Prototype_Mesh_OrnateGearC,
+	Prototype_Mesh_OrnateGrilleB,
+	Prototype_Mesh_OrnateJunkA,
+	Prototype_Mesh_OrnatePlatsA,
+	Prototype_Mesh_OrnatePlatsE,
+	Prototype_Mesh_PipeMachineB,
+	Prototype_Mesh_PipeMessA,
+	Prototype_Mesh_Weights_ChainLong,
+
+
 
 
 	Prototype_Mesh_Player,
@@ -894,6 +950,200 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 	case Prototype_QMaze:
 		return TEXT("QMaze");
 		break;
+
+
+	case Prototype_Mesh_ClockworkGears_DecoC:
+		return TEXT("ClockworkGears_DecoC");
+		break;
+
+	case Prototype_Mesh_GiantGearPlatsA:
+		return TEXT("GiantGearPlatsA");
+		break;
+
+	case Prototype_Mesh_HatterBlockC:
+		return TEXT("HatterBlockC");
+		break;
+
+	case Prototype_Mesh_HatterBlocksE:
+		return TEXT("HatterBlocksE");
+		break;
+
+	case Prototype_Mesh_HatterBlocksG:
+		return TEXT("HatterBlocksG");
+		break;
+
+	case Prototype_Mesh_HatterBlocksH:
+		return TEXT("HatterBlocksH");
+		break;
+
+
+
+	case Prototype_Mesh_HatterBuildingE_Door:
+		return TEXT("HatterBuildingE_Door");
+		break;
+
+	case Prototype_Mesh_HatterDoorA:
+		return TEXT("HatterDoorA");
+		break;
+
+	case Prototype_Mesh_HatterDoorC:
+		return TEXT("HatterDoorC");
+		break;
+
+	case Prototype_Mesh_HatterExtTowerA:
+		return TEXT("HatterExtTowerA");
+		break;
+
+
+	case Prototype_Mesh_HatterExtTowerB:
+		return TEXT("HatterExtTowerB");
+		break;
+
+	case Prototype_Mesh_HatterExtTowerD:
+		return TEXT("HatterExtTowerD");
+		break;
+
+	case Prototype_Mesh_HatterExtWallB:
+		return TEXT("HatterExtWallB");
+		break;
+	case Prototype_Mesh_HatterExtWallB_Hole:
+		return TEXT("HatterExtWallB_Hole");
+		break;
+	case Prototype_Mesh_HatterExtWallC_LeftHole:
+		return TEXT("HatterExtWallC_LeftHole");
+		break;
+	case Prototype_Mesh_HatterExtWallC_RightHole:
+		return TEXT("HatterExtWallC_RightHole");
+		break;
+	case Prototype_Mesh_HatterExtWallD:
+		return TEXT("HatterExtWallD");
+		break;
+	case Prototype_Mesh_HatterFloorSystem_OriginalShortA:
+		return TEXT("HatterFloorSystem_OriginalShortA");
+		break;
+	case Prototype_Mesh_HatterFloorSystem_OriginalShortB:
+		return TEXT("HatterFloorSystem_OriginalShortB");
+		break;
+
+
+	case Prototype_Mesh_HatterFloorSystem_OriginalShortE:
+		return TEXT("HatterFloorSystem_OriginalShortE");
+		break;
+	case Prototype_Mesh_HatterFloorSystem_OriginalTallE:
+		return TEXT("HatterFloorSystem_OriginalTallE");
+		break;
+	case Prototype_Mesh_HatterFloorSystem_TeaMakerPlat:
+		return TEXT("HatterFloorSystem_TeaMakerPlat");
+		break;
+	case Prototype_Mesh_HatterJunk_M:
+		return TEXT("HatterJunk_M");
+		break;
+	case Prototype_Mesh_HatterJunk_S:
+		return TEXT("HatterJunk_S");
+		break;
+	case Prototype_Mesh_HatterLightsE:
+		return TEXT("HatterLightsE");
+		break;
+	case Prototype_Mesh_HatterPillarsB_column:
+		return TEXT("HatterPillarsB_column");
+		break;
+
+
+	case Prototype_Mesh_HatterPillarsC_top:
+		return TEXT("HatterPillarsC_top");
+		break;
+	case Prototype_Mesh_HatterPillarsD_base:
+		return TEXT("HatterPillarsD_base");
+		break;
+	case Prototype_Mesh_HatterPillarsG:
+		return TEXT("HatterPillarsG");
+		break;
+
+
+
+	case Prototype_Mesh_HatterPlat_CheckeI:
+		return TEXT("HatterPlat_CheckeI");
+		break;
+	case Prototype_Mesh_HatterPlat_CheckerA:
+		return TEXT("HatterPlat_CheckerA");
+		break;
+	case Prototype_Mesh_HatterPlat_CheckerB:
+		return TEXT("HatterPlat_CheckerB");
+		break;
+	case Prototype_Mesh_HatterPlat_CheckerC:
+		return TEXT("HatterPlat_CheckerC");
+		break;
+	case Prototype_Mesh_HatterPlat_CheckerE:
+		return TEXT("HatterPlat_CheckerE");
+		break;
+	case Prototype_Mesh_HatterPlat_CheckerF:
+		return TEXT("HatterPlat_CheckerF");
+		break;
+	case Prototype_Mesh_HatterPlat_CheckerG:
+		return TEXT("HatterPlat_CheckerG");
+		break;
+	case Prototype_Mesh_HatterPlat_MetalSquare:
+		return TEXT("HatterPlat_MetalSquare");
+		break;
+	case Prototype_Mesh_HatterWallBricks_ChunkB:
+		return TEXT("HatterWallBricks_ChunkB");
+		break;
+	case Prototype_Mesh_HatterWallBricks_HalfA:
+		return TEXT("HatterWallBricks_HalfA");
+		break;
+	case Prototype_Mesh_HatterWallBricks_HalfB:
+		return TEXT("HatterWallBricks_HalfB");
+		break;
+
+	
+
+	case Prototype_Mesh_HatterWallBricks_Pillar:
+		return TEXT("HatterWallBricks_Pillar");
+		break;
+	case Prototype_Mesh_HatterWallBricks_Rubble:
+		return TEXT("HatterWallBricks_Rubble");
+		break;
+	case Prototype_Mesh_HatterWallBricks_Wall:
+		return TEXT("HatterWallBricks_Wall");
+		break;
+	case Prototype_Mesh_Keyhole_Hatter:
+		return TEXT("Keyhole_Hatter");
+		break;
+	case Prototype_Mesh_KeyHoleTurnnels3:
+		return TEXT("KeyHoleTurnnels3");
+		break;
+	case Prototype_Mesh_OrnateGearA:
+		return TEXT("OrnateGearA");
+		break;
+	case Prototype_Mesh_OrnateGearC:
+		return TEXT("OrnateGearC");
+		break;
+	case Prototype_Mesh_OrnateGrilleB:
+		return TEXT("OrnateGrilleB");
+		break;
+	case Prototype_Mesh_OrnateJunkA:
+		return TEXT("OrnateJunkA");
+		break;
+	case Prototype_Mesh_OrnatePlatsA:
+		return TEXT("OrnatePlatsA");
+		break;
+	case Prototype_Mesh_OrnatePlatsE:
+		return TEXT("OrnatePlatsE");
+		break;
+	case Prototype_Mesh_PipeMachineB:
+		return TEXT("PipeMachineB");
+		break;
+	case Prototype_Mesh_PipeMessA:
+		return TEXT("PipeMessA");
+		break;
+	case Prototype_Mesh_Weights_ChainLong:
+		return TEXT("Weights_ChainLong");
+		break;
+
+
+
+
+
 
 
 

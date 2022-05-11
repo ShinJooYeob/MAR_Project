@@ -217,6 +217,15 @@
     <Filter Include="01.GameObject\03.Monster\06.DollMaker\06.Handy">
       <UniqueIdentifier>{c2e5afb3-f0c3-423d-9016-d2a496ecff8d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.GameObject\07.MapObject\01.DynamicObj\08.EscalatorPad">
+      <UniqueIdentifier>{d2c8da81-5be3-4f43-b88e-bd82742a4042}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\07.MapObject\01.DynamicObj\09.ButtonPad">
+      <UniqueIdentifier>{11d0b988-ce21-4803-bddb-8d920e899fd4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\07.MapObject\01.DynamicObj\10.ShrinkFlower">
+      <UniqueIdentifier>{dcddca16-7015-42ab-8204-66f085e6002c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -444,6 +453,12 @@
     <ClInclude Include="..\public\Scene_Stage3.h">
       <Filter>02.Scene\03.Scene_Gameplay\Scene_Stage3</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Scene_Stage2.h">
+      <Filter>02.Scene\03.Scene_Gameplay\Scene_Stage2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\EscalatorPad.h">
+      <Filter>01.GameObject\07.MapObject\01.DynamicObj\08.EscalatorPad</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -646,6 +661,12 @@
     </ClCompile>
     <ClCompile Include="..\private\Scene_Stage3.cpp">
       <Filter>02.Scene\03.Scene_Gameplay\Scene_Stage3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Scene_Stage2.cpp">
+      <Filter>02.Scene\03.Scene_Gameplay\Scene_Stage2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\EscalatorPad.cpp">
+      <Filter>01.GameObject\07.MapObject\01.DynamicObj\08.EscalatorPad</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -5,6 +5,7 @@
 #include "Scene_Loby.h"
 #include "Scene_StageSelect.h"
 #include "Scene_Stage1.h"
+#include "Scene_Stage2.h"
 #include "Scene_Stage3.h"
 #include "Scene_Boss.h"
 
@@ -82,10 +83,10 @@ _int CScene_Loading::LateUpdate(_double fDeltaTime)
 			FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Stage1::Create(m_pDevice, m_pDeviceContext), m_eNextSceneIndex));
 			break;
 
-		//case SCENEID::SCENE_STAGE2:
-		//	FAILED_CHECK(GetSingle(CUtilityMgr)->Clear_RenderGroup_forSceneChange());
-		//	FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Stage2::Create(m_pDevice, m_pDeviceContext), m_eNextSceneIndex));
-		//	break;
+		case SCENEID::SCENE_STAGE2:
+			FAILED_CHECK(GetSingle(CUtilityMgr)->Clear_RenderGroup_forSceneChange());
+			FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Stage2::Create(m_pDevice, m_pDeviceContext), m_eNextSceneIndex));
+			break;
 		case SCENEID::SCENE_STAGE3:
 			FAILED_CHECK(GetSingle(CUtilityMgr)->Clear_RenderGroup_forSceneChange());
 			FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Stage3::Create(m_pDevice, m_pDeviceContext), m_eNextSceneIndex));

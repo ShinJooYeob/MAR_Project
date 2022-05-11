@@ -61,6 +61,8 @@ HRESULT CRenderer::Render_RenderGroup()
 
 	FAILED_CHECK(Render_NonAlpha());
 
+	FAILED_CHECK(Render_PriorityAlpha());
+
 	FAILED_CHECK(Render_Alpha());
 
 	FAILED_CHECK(Render_AfterObj());
@@ -116,6 +118,23 @@ HRESULT CRenderer::Render_NonAlpha()
 	}
 
 	m_RenderObjectList[RENDER_NONBLEND].clear();
+	return S_OK;
+}
+
+HRESULT CRenderer::Render_PriorityAlpha()
+{
+	for (auto& RenderObject : m_RenderObjectList[RENDER_PRIORITYBLEND])
+	{
+		if (RenderObject != nullptr)
+		{
+			FAILED_CHECK(RenderObject->Render());
+		}
+		Safe_Release(RenderObject);
+	}
+
+	m_RenderObjectList[RENDER_PRIORITYBLEND].clear();
+	return S_OK;
+
 	return S_OK;
 }
 
