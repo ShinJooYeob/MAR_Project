@@ -1115,6 +1115,8 @@ HRESULT CScene_Edit::Input_KeyBoard(_double fDeltaTime)
 			{
 				//m_fPickingRadius += _float(fWheelMove *0.021f * fDeltaTime);
 				m_fPickingHeight += _float(fWheelMove *0.021f * fDeltaTime);
+
+				m_fPickingHeight = min(max(m_fPickingHeight, 0), 255);
 			}
 			
 		}

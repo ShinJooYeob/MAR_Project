@@ -49,7 +49,33 @@ _int CTerrain::LateUpdate(_double fDeltaTime)
 	if (__super::LateUpdate(fDeltaTime) < 0)
 		return -1;
 
-	FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_PRIORITYBLEND, this));
+
+#ifdef _DEBUG
+
+	static _bool	IsDebug = false;
+
+	if (g_pGameInstance->Get_DIKeyState(DIK_F6)&DIS_Down)IsDebug = !IsDebug;
+
+	if (IsDebug)
+	{
+		FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_PRIORITYBLEND, this));
+	}
+	else if (m_eNowSceneNum != SCENE_STAGE2)
+	{
+		FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_PRIORITYBLEND, this));
+	}
+
+#else
+
+
+	if(m_eNowSceneNum != SCENE_STAGE2)
+	{
+		FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_PRIORITYBLEND, this));
+	}
+
+
+#endif
+
 
 	return _int();
 }
