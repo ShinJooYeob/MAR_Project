@@ -102,9 +102,9 @@ _int CPlayer::Update(_double fDeltaTime)
 
 
 	_uint iNowAnimIndex  = m_pModel->Get_NowAnimIndex();
-	if (iNowAnimIndex ==  15|| iNowAnimIndex == 20||
+	if (iNowAnimIndex ==  15|| iNowAnimIndex == 20|| iNowAnimIndex == 14 ||
 		(iNowAnimIndex >= Weapon_Knife + 8 && iNowAnimIndex <= Weapon_Knife + 16) ||
-		(iNowAnimIndex >= Weapon_Horse + 8 && iNowAnimIndex <= Weapon_Horse + 14))
+		(iNowAnimIndex >= Weapon_Horse + 8 && iNowAnimIndex <= Weapon_Horse + 14) )
 	{
 		FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime * 1.5));
 	}
@@ -624,6 +624,19 @@ void CPlayer::Set_NotLevitation()
 void CPlayer::Let_PlayerSliding(_bool bBool)
 {
 	m_bSlide = bBool;
+
+
+	if (m_bSlide)
+	{
+		m_pModel->Change_AnimIndex_UntilNReturn(10, 11,11, 0.15);
+	}
+	else
+	{
+		m_pModel->Change_AnimIndex_ReturnTo(14, 0, 0.15);
+
+
+
+	}
 }
 
 HRESULT CPlayer::SetUp_Components()
@@ -1295,14 +1308,14 @@ HRESULT CPlayer::Move_Update(_double fDeltaTime, CGameInstance* pInstance)
 				m_pTransformCom->MovetoDir(XMVector3Normalize(Dir), fDeltaTime);
 
 
-				if (!m_LevitationTime)
+				if (!m_LevitationTime && !m_bSlide)
 					m_pModel->Change_AnimIndex(8);
 			}
 
 
 		}
 		else {
-			if (!m_LevitationTime &&!m_fDashPassedTime)
+			if (!m_LevitationTime &&!m_fDashPassedTime && !m_bSlide)
 				m_pModel->Change_AnimIndex_UntilTo(0, 5);
 
 
