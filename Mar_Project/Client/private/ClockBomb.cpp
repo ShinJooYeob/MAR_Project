@@ -46,6 +46,8 @@ HRESULT CClockBomb::Initialize_Clone2Clone(void * pArg)
 	FAILED_CHECK(SetUp_Components());
 	m_SpwanPassedTime = 0;
 	m_bHavetoMaking = true;
+
+	m_szNameTag = TAG_LAY(Layer_ClockBomb);
 	return S_OK;
 }
 
@@ -261,6 +263,8 @@ _int CClockBomb::LateRender()
 void CClockBomb::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedObj, CCollider* pConflictedCollider, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType)
 {
 }
+
+
 
 HRESULT CClockBomb::SetUp_Components()
 {

@@ -672,7 +672,9 @@ enum COMPONENTPROTOTYPEID
 	Prototype_Mesh_PipeMessA,
 	Prototype_Mesh_Weights_ChainLong,
 
-	Prototype_Mesh_Slide,
+		Prototype_Mesh_Slide,
+		Prototype_Mesh_Button,
+		Prototype_Mesh_Button_Frame,
 
 
 
@@ -1200,9 +1202,12 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 		return TEXT("Slide");
 		break;
 
-		
-
-
+	case Prototype_Mesh_Button:
+		return TEXT("Button");
+		break;
+	case Prototype_Mesh_Button_Frame:
+		return TEXT("Button_Frame");
+		break;
 
 
 	case Prototype_Mesh_Player:
@@ -1472,6 +1477,7 @@ enum COMPONENTID
 	Com_Shader,
 	Com_ShaderSub,
 	Com_Model,
+	Com_SubModel,
 	Com_Collider,
 
 };
@@ -1507,6 +1513,10 @@ static const _tchar* Tag_Component(COMPONENTID eTag)
 	case Com_Model:
 		return TEXT("Com_Model");
 		break;
+	case Com_SubModel:
+		return TEXT("Com_SubModel");
+		break;
+
 	case Com_Collider:
 		return TEXT("Com_Collider");
 		break;

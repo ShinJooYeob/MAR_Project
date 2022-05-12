@@ -226,6 +226,9 @@
     <Filter Include="01.GameObject\07.MapObject\01.DynamicObj\10.ShrinkFlower">
       <UniqueIdentifier>{dcddca16-7015-42ab-8204-66f085e6002c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.GameObject\07.MapObject\01.DynamicObj\11.PresserObj">
+      <UniqueIdentifier>{c3b95fa9-60c1-4239-a4b3-3bb6f2ebcff3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -462,6 +465,9 @@
     <ClInclude Include="..\public\SlidePad.h">
       <Filter>01.GameObject\07.MapObject\01.DynamicObj\03.SlidePad</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\ButtonPad.h">
+      <Filter>01.GameObject\07.MapObject\01.DynamicObj\09.ButtonPad</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -673,6 +679,9 @@
     </ClCompile>
     <ClCompile Include="..\private\SlidePad.cpp">
       <Filter>01.GameObject\07.MapObject\01.DynamicObj\03.SlidePad</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\ButtonPad.cpp">
+      <Filter>01.GameObject\07.MapObject\01.DynamicObj\09.ButtonPad</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -285,7 +285,7 @@ HRESULT CTerrain::Chage_TileKindsNHeight(_fMatrix WorldPointsMat)
 	return S_OK;
 }
 
-HRESULT CTerrain::Chage_TileKindsNHeight_ForSlide(_fMatrix WorldPointsMat)
+HRESULT CTerrain::Chage_TileKindsNHeight_AvailEdge(_fMatrix WorldPointsMat, _float fExtra)
 {
 	_float4x4 PointsOnLocal = WorldPointsMat * m_pTransformCom->Get_InverseWorldMatrix();
 	_Matrix TempMat = PointsOnLocal.XMatrix();
@@ -297,10 +297,10 @@ HRESULT CTerrain::Chage_TileKindsNHeight_ForSlide(_fMatrix WorldPointsMat)
 
 
 
-	Points.left = _uint(min(min(min(PointsOnLocal._11, PointsOnLocal._21), PointsOnLocal._31), PointsOnLocal._41) - 1);
-	Points.bottom = _uint(min(min(min(PointsOnLocal._13, PointsOnLocal._23), PointsOnLocal._33), PointsOnLocal._43) - 1);
-	Points.right = _uint(max(max(max(PointsOnLocal._11, PointsOnLocal._21), PointsOnLocal._31), PointsOnLocal._41) + 1);
-	Points.top = _uint(max(max(max(PointsOnLocal._13, PointsOnLocal._23), PointsOnLocal._33), PointsOnLocal._43) + 1);
+	Points.left = _uint(min(min(min(PointsOnLocal._11, PointsOnLocal._21), PointsOnLocal._31), PointsOnLocal._41) - fExtra);
+	Points.bottom = _uint(min(min(min(PointsOnLocal._13, PointsOnLocal._23), PointsOnLocal._33), PointsOnLocal._43) - fExtra);
+	Points.right = _uint(max(max(max(PointsOnLocal._11, PointsOnLocal._21), PointsOnLocal._31), PointsOnLocal._41) + fExtra);
+	Points.top = _uint(max(max(max(PointsOnLocal._13, PointsOnLocal._23), PointsOnLocal._33), PointsOnLocal._43) + fExtra);
 
 
 	for (_uint i = (_uint)Points.left; i <= (_uint)Points.right; i++)
@@ -313,10 +313,10 @@ HRESULT CTerrain::Chage_TileKindsNHeight_ForSlide(_fMatrix WorldPointsMat)
 		}
 
 	}
-
-
 	return S_OK;
 }
+
+
 
 HRESULT CTerrain::Chage_TileKindsMovableNZero(_fMatrix WorldPointsMat)
 {

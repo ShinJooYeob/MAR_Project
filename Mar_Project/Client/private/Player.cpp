@@ -614,6 +614,13 @@ _bool CPlayer::Set_IsAttached(_bool bBool)
 	return _bool();
 }
 
+void CPlayer::Set_NotLevitation()
+{
+	m_iJumpCount = 0;
+	m_LevitationTime = 0;
+	m_fJumpPower = -1.f;
+}
+
 void CPlayer::Let_PlayerSliding(_bool bBool)
 {
 	m_bSlide = bBool;
@@ -1266,8 +1273,8 @@ HRESULT CPlayer::Move_Update(_double fDeltaTime, CGameInstance* pInstance)
 			//if (PressedChecker[3]) Dir += m_pTransformCom->Get_MatrixState_Normalized(CTransform::STATE_RIGHT);
 			*/
 
-			if (PressedChecker[0]) Dir += forword;
-			if (PressedChecker[1]) Dir -= forword;
+			if (PressedChecker[0] && !m_bSlide) Dir += forword;
+			if (PressedChecker[1] && !m_bSlide) Dir -= forword;
 			if (PressedChecker[2]) Dir -= right;
 			if (PressedChecker[3]) Dir += right;
 
@@ -3303,7 +3310,7 @@ HRESULT CPlayer::Set_Player_On_Slieder(_double fDeltatime)
 		m_pTransformCom->Set_Matrix(NewMat);
 
 
-		m_pTransformCom->Move_Forward(fDeltatime);
+		m_pTransformCom->Move_Forward(fDeltatime * 1.5);
 	}
 	return S_OK;
 }

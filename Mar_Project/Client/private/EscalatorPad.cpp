@@ -49,11 +49,6 @@ _int CEscalatorPad::Update(_double fDeltaTime)
 
 	FAILED_CHECK(Update_Escalating(fDeltaTime));
 
-	if (g_pGameInstance->Get_DIKeyState(DIK_1) & DIS_Down)
-	{
-		LetEscalatingToDest(!m_bMoveToDest);
-
-	}
 
 
 

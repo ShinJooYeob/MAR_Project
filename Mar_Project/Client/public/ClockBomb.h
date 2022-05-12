@@ -24,6 +24,8 @@ public:
 
 	virtual void CollisionTriger(_uint iMyColliderIndex, CGameObject* pConflictedObj, CCollider* pConflictedCollider, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType) override;
 	CModel*	Get_WeaponModel() override { return m_pModel; };
+	void Set_IsOn() { m_bIsOn = true; };
+	_bool Get_IsOn() { return m_bIsOn; };
 
 private:
 	CShader*			m_pShaderCom = nullptr;

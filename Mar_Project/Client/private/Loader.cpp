@@ -32,6 +32,7 @@
 #include "BreakablePiece.h"
 #include "EscalatorPad.h"
 #include "SlidePad.h"
+#include "ButtonPad.h"
 
 #include "StaticMapObject.h"
 
@@ -772,7 +773,14 @@ HRESULT CLoader::Load_Scene_Stage2(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 	TransformMatrix = XMMatrixScaling(0.0002f, 0.0001f, 0.0001f);
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE2, TAG_CP(Prototype_Mesh_Slide),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "Slide", "DUSlide_Straight.FBX", TransformMatrix)));
+	TransformMatrix = XMMatrixScaling(0.0002f, 0.0002f, 0.0002f)*XMMatrixTranslation(0, 0.3f, 0);
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE2, TAG_CP(Prototype_Mesh_Button),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "ButtonPad", "ButtonPad.FBX", TransformMatrix)));
+	TransformMatrix = XMMatrixScaling(0.0002f, 0.0002f, 0.0002f);
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE2, TAG_CP(Prototype_Mesh_Button_Frame),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "ButtonPad", "ButtonPad_Frame.FBX", TransformMatrix)));
 	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
+
 
 	//////////Terrain
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE2, TAG_CP(Prototype_VIBuffer_Terrain),
@@ -796,6 +804,8 @@ HRESULT CLoader::Load_Scene_Stage2(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_SlideObj),
 		CSlidePad::Create(m_pDevice, m_pDeviceContext)));
 
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_ButtonPad),
+		CButtonPad::Create(m_pDevice, m_pDeviceContext)));
 #pragma endregion
 
 	RELEASE_INSTANCE(CGameInstance);
@@ -1259,10 +1269,13 @@ HRESULT CLoader::Load_Scene_Edit(_bool * _IsClientQuit, CRITICAL_SECTION * _CriS
 	TransformMatrix = XMMatrixScaling(0.0002f, 0.0001f, 0.0001f);
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Slide),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "Slide", "DUSlide_Straight.FBX", TransformMatrix)));
+	TransformMatrix = XMMatrixScaling(0.0002f, 0.0002f, 0.0002f)*XMMatrixTranslation(0,0.3f,0);
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Button),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "ButtonPad", "ButtonPad.FBX", TransformMatrix)));
+	TransformMatrix = XMMatrixScaling(0.0002f, 0.0002f, 0.0002f);
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Button_Frame),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "ButtonPad", "ButtonPad_Frame.FBX", TransformMatrix)));
 	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
-
-
-
 
 
 #pragma endregion

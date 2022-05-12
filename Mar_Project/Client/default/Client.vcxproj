@@ -185,6 +185,7 @@
     <ClInclude Include="..\public\Client_Macro.h" />
     <ClInclude Include="..\public\Client_Struct.h" />
     <ClInclude Include="..\public\DollMaker.h" />
+    <ClInclude Include="..\public\ButtonPad.h" />
     <ClInclude Include="..\public\SlidePad.h" />
     <ClInclude Include="..\public\GamePlayUI.h" />
     <ClInclude Include="..\public\ClockBomb.h" />
@@ -252,6 +253,7 @@
     <ClCompile Include="..\private\Camera_Editor.cpp" />
     <ClCompile Include="..\private\Camera_Main.cpp" />
     <ClCompile Include="..\private\DollMaker.cpp" />
+    <ClCompile Include="..\private\ButtonPad.cpp" />
     <ClCompile Include="..\private\SlidePad.cpp" />
     <ClCompile Include="..\private\GamePlayUI.cpp" />
     <ClCompile Include="..\private\ClockBomb.cpp" />

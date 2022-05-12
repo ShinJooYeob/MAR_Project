@@ -6,6 +6,7 @@
 #include "Camera_Main.h"
 #include "EscalatorPad.h"
 #include "SlidePad.h"
+#include "ButtonPad.h"
 
 
 
@@ -41,6 +42,7 @@ HRESULT CScene_Stage2::Initialize()
 	FAILED_CHECK(Ready_Layer_HiddenPad(TAG_LAY(Layer_HiddenPad)));
 	FAILED_CHECK(Ready_Layer_EscalatorPad(TAG_LAY(Layer_EscalatorPad)));
 	FAILED_CHECK(Ready_Layer_SlidePad(TAG_LAY(Layer_SlideObj)));
+	FAILED_CHECK(Ready_Layer_ButtonPad(TAG_LAY(Layer_ButtonPad)));
 	
 	
 
@@ -341,8 +343,8 @@ HRESULT CScene_Stage2::Ready_Layer_EscalatorPad(const _tchar * pLayerTag)
 
 
 	tDesc.MoveSpeed = 2.f;
-	tDesc.vStartPos = _float3(149.232f, 40.9f, 141.812f);
-	tDesc.vDestPos = _float3(138.432f, 40.9f, 159.812f);
+	tDesc.vStartPos = _float3(138.432f, 40.9f, 159.812f);
+	tDesc.vDestPos = _float3(149.232f, 40.9f, 141.812f);
 
 	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_EscalatorPad), &tDesc));
 
@@ -355,15 +357,6 @@ HRESULT CScene_Stage2::Ready_Layer_SlidePad(const _tchar * pLayerTag)
 
 
 	CSlidePad::SLIDEDESC tDesc;
-
-
-	tDesc.vAngle = _float3(0);
-	tDesc.vPosition = _float3(70, 25.3f, 168);
-	tDesc.bStartCollider = true;
-	tDesc.bEndCollider = true;
-
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_SlideObj), &tDesc));
-	
 
 	tDesc.vAngle = _float3(25, 40, 36);
 	tDesc.vPosition = _float3(183.183f, 65.310f, 91.964f);
@@ -380,6 +373,35 @@ HRESULT CScene_Stage2::Ready_Layer_SlidePad(const _tchar * pLayerTag)
 
 
 
+
+	return S_OK;
+}
+
+HRESULT CScene_Stage2::Ready_Layer_ButtonPad(const _tchar * pLayerTag)
+{
+	CGameInstance* pInstance = g_pGameInstance;
+
+	list<CGameObject*>* ButtonList = pInstance->Get_ObjectList_from_Layer(SCENE_STAGE2, TAG_LAY(Layer_EscalatorPad));
+	NULL_CHECK_RETURN(ButtonList, E_FAIL);
+
+	auto iter = ButtonList->begin();
+
+	CButtonPad::BUTTONDESC tDesc;
+
+	tDesc.vAngle = _float3(0,180,0);
+	tDesc.vPosition = _float3(69.462f, 23.670f, 69.492f);
+	tDesc.eKindsOfObject = 0;
+	tDesc.pTargetObject = *iter;
+	iter++;
+	FAILED_CHECK(pInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_ButtonPad), &tDesc));
+
+
+	tDesc.vAngle = _float3(0,270,0);
+	tDesc.vPosition = _float3(133.142f, 43.2f, 129.99f);
+	tDesc.eKindsOfObject = 0;
+	tDesc.pTargetObject = *iter;
+	iter++;
+	FAILED_CHECK(pInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_ButtonPad), &tDesc));
 
 	return S_OK;
 }

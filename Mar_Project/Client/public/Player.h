@@ -57,7 +57,7 @@ public:
 	_bool	Get_IsAttached() { return m_bIsAttached; };
 	_bool   Set_IsAttached(_bool bBool);
 
-	void Set_LevitationTime(_float fTime) { m_LevitationTime = fTime; };
+	void Set_NotLevitation() ;
 	void Let_PlayerSliding(_bool bBool);
 private:
 	CShader*			m_pShaderCom = nullptr;
