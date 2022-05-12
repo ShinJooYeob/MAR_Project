@@ -32,6 +32,7 @@ public:
 
 	HRESULT Easing_Terrain_Curve(EasingTypeID eEasingType, _float3 vPosition, _float fTargetHeight, _float fRadius);
 	HRESULT Chage_Terrain_Tile(_float3 vPosition, _float fTargetKinds, _float fRadius);
+	HRESULT Chage_Terrain_Tile_Line(_float fTargetKinds, _float3 vPosition, _bool IsVerticle,  _uint iCount);
 	HRESULT Erasing_TerrainBuffer(_float3 vPosition, _float fRadius);
 	HRESULT Save_HeightMap(const _tchar* FileFullpath);;
 

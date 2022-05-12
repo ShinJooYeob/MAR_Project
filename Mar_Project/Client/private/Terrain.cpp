@@ -179,6 +179,40 @@ _float3 CTerrain::PutOnTerrain(_bool* pbIsObTerrain,_fVector ObjectWorldPos, _fV
 	return ObjectWorldPos;
 }
 
+_float3 CTerrain::PutOnTerrain_Stage2(_bool * pbIsObTerrain, _fVector ObjectWorldPos, _fVector ObjectOldWorldPos, _float3 * vOutPlaneNormalVec, _uint * eNowTile)
+{
+	_Matrix InverMat = m_InverseWorldMat.XMatrix();
+
+	_Vector CaculatedFloat3 = m_pVIBufferCom->Caculate_TerrainY(pbIsObTerrain,
+		(XMVector3TransformCoord(ObjectWorldPos, InverMat)), (XMVector3TransformCoord(ObjectOldWorldPos, InverMat)), vOutPlaneNormalVec, eNowTile);
+
+	if (*eNowTile == Tile_None)
+	{
+		if (vOutPlaneNormalVec != nullptr)
+			*vOutPlaneNormalVec = XMVector3TransformNormal(vOutPlaneNormalVec->XMVector(), m_pTransformCom->Get_WorldMatrix());
+
+		return XMVector3TransformCoord(CaculatedFloat3, m_pTransformCom->Get_WorldMatrix());
+	}
+
+	if (*eNowTile == Tile_JumpMovable)
+	{
+		return ObjectWorldPos;
+	}
+
+	if (XMVectorGetY(ObjectOldWorldPos) < XMVectorGetY(ObjectWorldPos))
+		return ObjectWorldPos;
+
+	if (*pbIsObTerrain)
+	{
+		if (vOutPlaneNormalVec != nullptr)
+			*vOutPlaneNormalVec = XMVector3TransformNormal(vOutPlaneNormalVec->XMVector(), m_pTransformCom->Get_WorldMatrix());
+
+		return XMVector3TransformCoord(CaculatedFloat3, m_pTransformCom->Get_WorldMatrix());
+	}
+
+	return ObjectWorldPos;
+}
+
 _bool CTerrain::Check_Movable_Terrain(_bool * pbIsMovable, _fVector ObjectNowPos, _fVector CheckPos, _float fMovableHeight)
 {
 	_Matrix InverMat = m_InverseWorldMat.XMatrix();

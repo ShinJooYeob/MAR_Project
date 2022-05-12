@@ -246,6 +246,43 @@ HRESULT CWireTerrain::Chage_Terrain_Tile(_float3 vPosition, _float fTargetKinds,
 	return S_OK;
 }
 
+HRESULT CWireTerrain::Chage_Terrain_Tile_Line(_float fTargetKinds, _float3 vPosition, _bool IsVerticle, _uint iCount)
+{
+	NULL_CHECK_RETURN(m_pVIBufferCom, E_FAIL);
+
+	_Matrix InverMat = m_InverseWorldMat.XMatrix();
+	_float3 vLocalPosition = XMVector3TransformCoord(vPosition.XMVector(), InverMat);
+
+
+
+	CGameInstance* pInstance = GetSingle(CGameInstance);
+
+	if (IsVerticle)
+	{
+		for (_uint i = 0 ; i < iCount; i++)
+		{
+			_float2 TargetPos = _float2(vPosition.x, vPosition.z + i);
+			m_pVIBufferCom->Chage_KindsOfTile(TargetPos, fTargetKinds);
+		}
+
+	}
+	else
+	{
+		for (_uint i = 0; i < iCount; i++)
+		{
+			_float2 TargetPos = _float2(vPosition.x + i, vPosition.z);
+			m_pVIBufferCom->Chage_KindsOfTile(TargetPos, fTargetKinds);
+		}
+	}
+
+
+
+	return S_OK;
+
+
+}
+
+
 
 HRESULT CWireTerrain::Erasing_TerrainBuffer(_float3 vPosition, _float fRadius)
 {

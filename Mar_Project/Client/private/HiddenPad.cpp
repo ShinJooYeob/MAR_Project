@@ -39,6 +39,13 @@ HRESULT CHiddenPad::Initialize_Clone(void * pArg)
 	
 	m_pTransformCom->Scaled_All(_float3(2, 2, 2));
 
+
+	if (m_eNowSceneNum == SCENE_STAGE2 && m_iKindsOfHiddenPad == 3)
+	{
+		//Ag  : 58.000000
+		m_pTransformCom->Rotation_CW(XMVectorSet(0, 1, 0, 0), XMConvertToRadians(58));
+	}
+
 	FAILED_CHECK(Set_TerrainTileKinds());
 
 	return S_OK;
@@ -49,23 +56,36 @@ _int CHiddenPad::Update(_double fDeltaTime)
 	if (__super::Update(fDeltaTime) < 0)
 		return -1;
 
+	//static float Angle = 0;
+	//if (g_pGameInstance->Get_DIKeyState(DIK_LEFT) & DIS_Press)
+	//{
+	// 	FAILED_CHECK( Reset_TerrainTileKindsMovableNHeightZero());
 
-	if (g_pGameInstance->Get_DIKeyState(DIK_LEFT) & DIS_Down)
-	{
-	 	FAILED_CHECK( Reset_TerrainTileKindsMovableNHeightZero());
+	//	Angle += 1;
 
-		m_pTransformCom->MovetoDir_bySpeed(XMVectorSet(-1, 0, 0, 0), 1, 1);
-		FAILED_CHECK(Set_TerrainTileKinds());
+	//	wstring ttDebugLog = L"//Ag  : " + to_wstring(Angle) + L"\n";
+	//	OutputDebugStringW(ttDebugLog.c_str());
 
-	}
-	if (g_pGameInstance->Get_DIKeyState(DIK_RIGHT) & DIS_Down)
-	{
-		FAILED_CHECK(Reset_TerrainTileKindsMovableNHeightZero());
 
-		m_pTransformCom->MovetoDir_bySpeed(XMVectorSet(1, 0, 0, 0), 1, 1);
-		FAILED_CHECK(Set_TerrainTileKinds());
+	//	m_pTransformCom->Rotation_CW(XMVectorSet(0, 1, 0, 0), XMConvertToRadians(Angle));
 
-	}
+	//	FAILED_CHECK(Set_TerrainTileKinds());
+
+	//}
+	//if (g_pGameInstance->Get_DIKeyState(DIK_RIGHT) & DIS_Press)
+	//{
+	//	FAILED_CHECK(Reset_TerrainTileKindsMovableNHeightZero());
+
+	//	Angle -= 1;
+
+	//	wstring ttDebugLog = L"//Ag  : " + to_wstring(Angle) + L"\n";
+	//	OutputDebugStringW(ttDebugLog.c_str());
+
+	//	m_pTransformCom->Rotation_CW(XMVectorSet(0, 1, 0, 0), XMConvertToRadians(Angle));
+
+	//	FAILED_CHECK(Set_TerrainTileKinds());
+
+	//}
 
 
 	if (m_pPlayer->Get_SmallVisualTime())

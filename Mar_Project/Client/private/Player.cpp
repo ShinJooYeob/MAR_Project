@@ -144,11 +144,16 @@ _int CPlayer::LateUpdate(_double fDeltaTime)
 
 	if (!test)
 	{
-		FAILED_CHECK(Set_Player_On_Terrain());
+		if (m_eNowSceneNum == SCENE_STAGE2)
+		{
+			FAILED_CHECK(Set_Player_On_Terrain_DontPutonJumpMovable());
+		}
+		else
+		{
+			FAILED_CHECK(Set_Player_On_Terrain());
+		}
 	}
 	else {
-		//FAILED_CHECK(Set_Player_On_Terrain());
-
 		FAILED_CHECK(Set_Player_On_Slieder(fDeltaTime));
 	}
 	
@@ -3158,6 +3163,84 @@ HRESULT CPlayer::Set_Player_On_Terrain()
 		m_fJumpPower = -1.f;
 		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, CaculatedPos);
 	}
+
+	return S_OK;
+}
+
+HRESULT CPlayer::Set_Player_On_Terrain_DontPutonJumpMovable()
+{
+	CGameInstance* pInstance = GetSingle(CGameInstance);
+
+	CTerrain* pTerrain = (CTerrain*)(pInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Terrain)));
+
+	_bool bIsOn = false;
+
+	_uint eNowTile = Tile_End;
+	_float3 CaculatedPos = pTerrain->PutOnTerrain_Stage2(&bIsOn, m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), m_vOldPos.XMVector(), nullptr, &eNowTile);
+
+	if (CaculatedPos.y < 3)
+	{
+
+		m_iJumpCount = 0;
+		m_LevitationTime = 0;
+		m_fJumpPower = -1.f;
+		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, _float3(70, 25.5f, 168));
+
+	}
+
+	if (eNowTile == Tile_JumpMovable)
+		return S_OK;
+
+
+	if (eNowTile == Tile_None)
+	{
+		//if (bIsOn)
+		//{
+		m_iJumpCount = 0;
+		m_LevitationTime = 0;
+		m_fJumpPower = -1.f;
+		//}
+
+		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, CaculatedPos);
+	}
+	else if (bIsOn)
+	{
+		if (m_LevitationTime > g_fDeltaTime)
+		{
+			if (m_LevitationTime < 0.9f)
+			{
+
+				//_uint iJumpIndex = (m_iJumpCount) ? 1: 0;
+				//m_pModel->Change_AnimIndex(0, 0.15,true);
+				////m_pModel->Change_AnimIndex(18 + m_iJumpCount * 5, 0,0.15);
+				//if (pInstance->Get_DIKeyState(DIK_SPACE) & DIS_Press)
+				//	m_pModel->Change_AnimIndex_ReturnTo(18 + iJumpIndex * 5, 0, g_fDeltaTime, true);
+				//else
+				//	m_pModel->Change_AnimIndex_ReturnTo(18 + iJumpIndex * 5, 0, g_fDeltaTime,true);
+
+			}
+			else
+			{
+				if (!m_bIsAttached)
+				{
+					m_pModel->Change_AnimIndex_ReturnTo(19, 0, 0, true);
+					Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 10);
+				}
+			}
+
+
+			ZeroMemory(m_bAtkMoveMentChecker, sizeof(_bool) * 3);
+			m_bIsAttackClicked = false;
+			m_iAttackCount = 0;
+		}
+
+
+		m_iJumpCount = 0;
+		m_LevitationTime = 0;
+		m_fJumpPower = -1.f;
+		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, CaculatedPos);
+	}
+
 
 	return S_OK;
 }

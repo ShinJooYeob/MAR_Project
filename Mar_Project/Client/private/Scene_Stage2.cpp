@@ -35,7 +35,8 @@ HRESULT CScene_Stage2::Initialize()
 	
 
 	FAILED_CHECK(Ready_Layer_StaticMapObj(TAG_LAY(Layer_StaticMapObj)));
-
+	FAILED_CHECK(Ready_Layer_SteamPad(TAG_LAY(Layer_SteamPad)));
+	FAILED_CHECK(Ready_Layer_HiddenPad(TAG_LAY(Layer_HiddenPad)));
 	
 
 
@@ -182,7 +183,7 @@ HRESULT CScene_Stage2::Ready_Layer_Player(const _tchar * pLayerTag)
 	NULL_CHECK_RETURN(pPlayer, E_FAIL);
 
 	pPlayer->Set_NowSceneNum(SCENE_STAGE2);
-	pPlayer->Renew_Player(_float3(66, 26, 168));
+	pPlayer->Renew_Player(_float3(70, 25.5f, 168));
 	
 
 	return S_OK;
@@ -300,6 +301,25 @@ HRESULT CScene_Stage2::Ready_Layer_StaticMapObj(const _tchar * pLayerTag)
 
 
 	((CStaticMapObject*)pInstance->Get_GameObject_By_LayerIndex(SCENE_STAGE2, pLayerTag))->Set_FrustumSize(3000);
+
+
+	return S_OK;
+}
+
+HRESULT CScene_Stage2::Ready_Layer_SteamPad(const _tchar * pLayerTag)
+{
+
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_SteamPad), &_float4(154.370285f, 50, 73.54129f, 10)));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_SteamPad), &_float4(151.148315f, 42, 76.820267f, 10)));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_SteamPad), &_float4(147.022751f, 34, 79.846466f, 10)));
+
+	return S_OK;
+}
+
+HRESULT CScene_Stage2::Ready_Layer_HiddenPad(const _tchar * pLayerTag)
+{
+
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_HiddenPad), &_float4(168.39f, 55.95f, 72.981f,_float(3))));
 
 
 	return S_OK;

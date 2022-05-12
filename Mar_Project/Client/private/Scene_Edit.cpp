@@ -4147,6 +4147,33 @@ HRESULT CScene_Edit::Widget_ChangeValue(_double fDeltatime)
 			m_pCreatedTerrain->Reset_BakeNavigateTerrain(Target);
 		}
 
+		Make_VerticalSpacing(2);
+
+		static int vTileStartPos[2] = {0,0};
+
+		if (g_pGameInstance->Get_DIMouseButtonState(CInput_Device::MBS_RBUTTON)&DIS_Press)
+		{
+			vTileStartPos[0] = (_int)m_fPickingedPosition[0];
+			vTileStartPos[1] = (_int)m_fPickingedPosition[2];
+		}
+		
+		ImGui::Text("Start Tile Pos");
+		ImGui::InputInt(" ", &vTileStartPos[0]); 
+		ImGui::InputInt("  ", &vTileStartPos[1]);
+
+		static bool IsVerticle = false;
+		ImGui::Checkbox("To Verticle", &IsVerticle);
+
+		static int iTileCount;
+		ImGui::InputInt("CountTileNum", &iTileCount);
+
+		if (ImGui::Button("Brush Line", ImVec2(-FLT_MIN, 30)))
+		{
+			m_pCreatedTerrain->Chage_Terrain_Tile_Line((_float)m_iKindsOfFilter, _float3((_float)vTileStartPos[0], 0,(_float)vTileStartPos[1]), IsVerticle, iTileCount);
+		}
+
+
+
 	}
 
 	Make_VerticalSpacing(3);

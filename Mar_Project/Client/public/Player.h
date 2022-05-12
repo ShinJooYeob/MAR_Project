@@ -185,6 +185,7 @@ private:
 	HRESULT Attack_Update_Umbrella(_double fDeltaTime, CGameInstance* pInstance);
 	
 	HRESULT Set_Player_On_Terrain();
+	HRESULT Set_Player_On_Terrain_DontPutonJumpMovable();
 	HRESULT Set_Player_On_Slieder(_double fDeltatime);
 	HRESULT Set_Camera_On_Player(_double fDeltaTime);
 
