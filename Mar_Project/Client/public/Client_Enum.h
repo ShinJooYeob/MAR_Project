@@ -672,6 +672,8 @@ enum COMPONENTPROTOTYPEID
 	Prototype_Mesh_PipeMessA,
 	Prototype_Mesh_Weights_ChainLong,
 
+	Prototype_Mesh_Slide,
+
 
 
 
@@ -1194,9 +1196,11 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 		break;
 
 
+	case Prototype_Mesh_Slide:
+		return TEXT("Slide");
+		break;
 
-
-
+		
 
 
 

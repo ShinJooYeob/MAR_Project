@@ -58,7 +58,7 @@ public:
 	_bool   Set_IsAttached(_bool bBool);
 
 	void Set_LevitationTime(_float fTime) { m_LevitationTime = fTime; };
-	
+	void Let_PlayerSliding(_bool bBool);
 private:
 	CShader*			m_pShaderCom = nullptr;
 	CRenderer*			m_pRendererCom = nullptr;
@@ -135,6 +135,9 @@ private:
 
 	/*For Attached*/
 	_bool				m_bIsAttached = false;
+
+	/*For Slide */
+	_bool				m_bSlide = false;
 
 private:
 	HRESULT SetUp_Components();

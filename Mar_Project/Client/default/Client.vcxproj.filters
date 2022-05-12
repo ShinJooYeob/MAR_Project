@@ -459,6 +459,9 @@
     <ClInclude Include="..\public\EscalatorPad.h">
       <Filter>01.GameObject\07.MapObject\01.DynamicObj\08.EscalatorPad</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\SlidePad.h">
+      <Filter>01.GameObject\07.MapObject\01.DynamicObj\03.SlidePad</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -667,6 +670,9 @@
     </ClCompile>
     <ClCompile Include="..\private\EscalatorPad.cpp">
       <Filter>01.GameObject\07.MapObject\01.DynamicObj\08.EscalatorPad</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\SlidePad.cpp">
+      <Filter>01.GameObject\07.MapObject\01.DynamicObj\03.SlidePad</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

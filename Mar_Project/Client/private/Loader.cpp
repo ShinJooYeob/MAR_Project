@@ -31,6 +31,7 @@
 #include "BreakableObj.h"
 #include "BreakablePiece.h"
 #include "EscalatorPad.h"
+#include "SlidePad.h"
 
 #include "StaticMapObject.h"
 
@@ -766,9 +767,12 @@ HRESULT CLoader::Load_Scene_Stage2(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE2, TAG_CP(Prototype_Mesh_SteamPad),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "SteamPad", "SteamPad.FBX", TransformMatrix)));
 
-#pragma endregion
 
-#pragma  region PROTOTYPE_GAMEOBJECT
+
+	TransformMatrix = XMMatrixScaling(0.0002f, 0.0001f, 0.0001f);
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE2, TAG_CP(Prototype_Mesh_Slide),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "Slide", "DUSlide_Straight.FBX", TransformMatrix)));
+	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
 
 	//////////Terrain
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE2, TAG_CP(Prototype_VIBuffer_Terrain),
@@ -781,9 +785,16 @@ HRESULT CLoader::Load_Scene_Stage2(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 		CTexture::Create(m_pDevice, m_pDeviceContext, L"UI_GamePlay.txt")));
 
 
+#pragma endregion
+
+#pragma  region PROTOTYPE_GAMEOBJECT
+
 
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_EscalatorPad),
 		CEscalatorPad::Create(m_pDevice, m_pDeviceContext)));
+
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_SlideObj),
+		CSlidePad::Create(m_pDevice, m_pDeviceContext)));
 
 #pragma endregion
 
@@ -819,9 +830,7 @@ HRESULT CLoader::Load_Scene_Stage3(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE3, TAG_CP(Prototype_Mesh_SkyBox),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "SkyBox", "SkyBox_aftnoon.FBX", TransformMatrix)));
 
-#pragma endregion
 
-#pragma  region PROTOTYPE_GAMEOBJECT
 
 	//////////Terrain
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE3, TAG_CP(Prototype_VIBuffer_Terrain),
@@ -832,6 +841,12 @@ HRESULT CLoader::Load_Scene_Stage3(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE3, TAG_CP(Prototype_Texture_GamePlayScene),
 		CTexture::Create(m_pDevice, m_pDeviceContext, L"UI_GamePlay.txt")));
+
+#pragma endregion
+
+#pragma  region PROTOTYPE_GAMEOBJECT
+
+
 
 #pragma endregion
 
@@ -1241,7 +1256,10 @@ HRESULT CLoader::Load_Scene_Edit(_bool * _IsClientQuit, CRITICAL_SECTION * _CriS
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Weights_ChainLong),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "Chapter2", "Weights_ChainLong.FBX", TransformMatrix)));
 
-
+	TransformMatrix = XMMatrixScaling(0.0002f, 0.0001f, 0.0001f);
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Slide),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "Slide", "DUSlide_Straight.FBX", TransformMatrix)));
+	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
 
 
 

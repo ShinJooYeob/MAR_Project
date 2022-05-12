@@ -138,11 +138,10 @@ _int CPlayer::LateUpdate(_double fDeltaTime)
 	if (__super::LateUpdate(fDeltaTime) < 0)
 		return -1;
 
-	static bool test = false;
 	if (g_pGameInstance->Get_DIKeyState(DIK_L)&DIS_Down)
-		test = !test;
+		m_bSlide = !m_bSlide;
 
-	if (!test)
+	if (!m_bSlide)
 	{
 		if (m_eNowSceneNum == SCENE_STAGE2)
 		{
@@ -613,6 +612,11 @@ _bool CPlayer::Set_IsAttached(_bool bBool)
 	}
 
 	return _bool();
+}
+
+void CPlayer::Let_PlayerSliding(_bool bBool)
+{
+	m_bSlide = bBool;
 }
 
 HRESULT CPlayer::SetUp_Components()

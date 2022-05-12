@@ -58,7 +58,7 @@ _int CEscalatorPad::Update(_double fDeltaTime)
 
 
 
-	m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS),16);
+	m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS),8);
 
 	if (m_bIsOnScreen)
 	{

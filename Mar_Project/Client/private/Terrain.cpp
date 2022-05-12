@@ -285,6 +285,39 @@ HRESULT CTerrain::Chage_TileKindsNHeight(_fMatrix WorldPointsMat)
 	return S_OK;
 }
 
+HRESULT CTerrain::Chage_TileKindsNHeight_ForSlide(_fMatrix WorldPointsMat)
+{
+	_float4x4 PointsOnLocal = WorldPointsMat * m_pTransformCom->Get_InverseWorldMatrix();
+	_Matrix TempMat = PointsOnLocal.XMatrix();
+
+	RECT Points;
+
+
+	_Vector Plane = XMPlaneFromPoints(TempMat.r[0], TempMat.r[1], TempMat.r[2]);
+
+
+
+	Points.left = _uint(min(min(min(PointsOnLocal._11, PointsOnLocal._21), PointsOnLocal._31), PointsOnLocal._41) - 1);
+	Points.bottom = _uint(min(min(min(PointsOnLocal._13, PointsOnLocal._23), PointsOnLocal._33), PointsOnLocal._43) - 1);
+	Points.right = _uint(max(max(max(PointsOnLocal._11, PointsOnLocal._21), PointsOnLocal._31), PointsOnLocal._41) + 1);
+	Points.top = _uint(max(max(max(PointsOnLocal._13, PointsOnLocal._23), PointsOnLocal._33), PointsOnLocal._43) + 1);
+
+
+	for (_uint i = (_uint)Points.left; i <= (_uint)Points.right; i++)
+	{
+		for (_uint j = (_uint)Points.bottom; j <= (_uint)Points.top; j++)
+		{
+			_float TargetHeight = (i * XMVectorGetX(Plane) + j * XMVectorGetZ(Plane) + XMVectorGetW(Plane)) / -XMVectorGetY(Plane);
+			m_pVIBufferCom->Chage_TileKindsNHeight(Tile_Movable, _float3((_float)i, TargetHeight, (_float)j));
+
+		}
+
+	}
+
+
+	return S_OK;
+}
+
 HRESULT CTerrain::Chage_TileKindsMovableNZero(_fMatrix WorldPointsMat)
 {
 	_float4x4 PointsOnLocal = WorldPointsMat * m_pTransformCom->Get_InverseWorldMatrix();
@@ -316,7 +349,7 @@ HRESULT CTerrain::Chage_TileKindsMovableNZero(_fMatrix WorldPointsMat)
 			//	m_pVIBufferCom->Chage_TileKindsNHeight(Tile_JumpMovable, _float3((_float)i, -1, (_float)j));
 
 			//else
-				m_pVIBufferCom->Chage_TileKindsNHeight(Tile_Movable, _float3((_float)i, 0, (_float)j));
+				m_pVIBufferCom->Chage_TileKindsNHeight(Tile_JumpMovable, _float3((_float)i, 0, (_float)j));
 
 		}
 

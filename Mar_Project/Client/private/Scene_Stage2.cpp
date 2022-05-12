@@ -5,6 +5,7 @@
 #include "StaticMapObject.h"
 #include "Camera_Main.h"
 #include "EscalatorPad.h"
+#include "SlidePad.h"
 
 
 
@@ -39,8 +40,9 @@ HRESULT CScene_Stage2::Initialize()
 	FAILED_CHECK(Ready_Layer_SteamPad(TAG_LAY(Layer_SteamPad)));
 	FAILED_CHECK(Ready_Layer_HiddenPad(TAG_LAY(Layer_HiddenPad)));
 	FAILED_CHECK(Ready_Layer_EscalatorPad(TAG_LAY(Layer_EscalatorPad)));
+	FAILED_CHECK(Ready_Layer_SlidePad(TAG_LAY(Layer_SlideObj)));
 	
-
+	
 
 	return S_OK;
 }
@@ -338,11 +340,46 @@ HRESULT CScene_Stage2::Ready_Layer_EscalatorPad(const _tchar * pLayerTag)
 	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_EscalatorPad), &tDesc));
 
 
-	tDesc.MoveSpeed = 1.f;
+	tDesc.MoveSpeed = 2.f;
 	tDesc.vStartPos = _float3(149.232f, 40.9f, 141.812f);
 	tDesc.vDestPos = _float3(138.432f, 40.9f, 159.812f);
 
 	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_EscalatorPad), &tDesc));
+
+	return S_OK;
+}
+
+HRESULT CScene_Stage2::Ready_Layer_SlidePad(const _tchar * pLayerTag)
+{
+
+
+
+	CSlidePad::SLIDEDESC tDesc;
+
+
+	tDesc.vAngle = _float3(0);
+	tDesc.vPosition = _float3(70, 25.3f, 168);
+	tDesc.bStartCollider = true;
+	tDesc.bEndCollider = true;
+
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_SlideObj), &tDesc));
+	
+
+	tDesc.vAngle = _float3(25, 40, 36);
+	tDesc.vPosition = _float3(183.183f, 65.310f, 91.964f);
+	tDesc.bStartCollider = true;
+	tDesc.bEndCollider = false;
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_SlideObj), &tDesc));
+
+
+	tDesc.vAngle = _float3(25, 40, 36);
+	tDesc.vPosition = _float3(170.083f, 55.810f, 105.564f);
+	tDesc.bStartCollider = false;
+	tDesc.bEndCollider = true;
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_SlideObj), &tDesc));
+
+
+
 
 	return S_OK;
 }
