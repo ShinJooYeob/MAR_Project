@@ -4,6 +4,7 @@
 #include "Player.h"
 #include "StaticMapObject.h"
 #include "Camera_Main.h"
+#include "EscalatorPad.h"
 
 
 
@@ -37,6 +38,7 @@ HRESULT CScene_Stage2::Initialize()
 	FAILED_CHECK(Ready_Layer_StaticMapObj(TAG_LAY(Layer_StaticMapObj)));
 	FAILED_CHECK(Ready_Layer_SteamPad(TAG_LAY(Layer_SteamPad)));
 	FAILED_CHECK(Ready_Layer_HiddenPad(TAG_LAY(Layer_HiddenPad)));
+	FAILED_CHECK(Ready_Layer_EscalatorPad(TAG_LAY(Layer_EscalatorPad)));
 	
 
 
@@ -321,6 +323,26 @@ HRESULT CScene_Stage2::Ready_Layer_HiddenPad(const _tchar * pLayerTag)
 
 	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_HiddenPad), &_float4(168.39f, 55.95f, 72.981f,_float(3))));
 
+
+	return S_OK;
+}
+
+HRESULT CScene_Stage2::Ready_Layer_EscalatorPad(const _tchar * pLayerTag)
+{
+	CEscalatorPad::ESCLATORDESC tDesc;
+
+	tDesc.MoveSpeed = 3.f;
+	tDesc.vStartPos = _float3(118.332f, 28.2f, 97.512f);
+	tDesc.vDestPos = _float3(95.632f, 22.5f, 89.112f);
+
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_EscalatorPad), &tDesc));
+
+
+	tDesc.MoveSpeed = 1.f;
+	tDesc.vStartPos = _float3(149.232f, 40.9f, 141.812f);
+	tDesc.vDestPos = _float3(138.432f, 40.9f, 159.812f);
+
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_EscalatorPad), &tDesc));
 
 	return S_OK;
 }

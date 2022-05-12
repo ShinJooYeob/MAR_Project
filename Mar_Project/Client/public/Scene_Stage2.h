@@ -29,6 +29,7 @@ private:
 	HRESULT Ready_Layer_StaticMapObj(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_SteamPad(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_HiddenPad(const _tchar* pLayerTag);
+	HRESULT Ready_Layer_EscalatorPad(const _tchar* pLayerTag);
 
 
 

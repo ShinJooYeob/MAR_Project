@@ -1293,9 +1293,9 @@ _Vector CVIBuffer_Terrain::Pick_ByRay(_fVector vRayPos, _fVector vRayDir, _float
 
 }
 
+#ifdef _DEBUG
 HRESULT CVIBuffer_Terrain::LoadHeightMap()
 {
-#ifdef _DEBUG
 	NULL_CHECK_RETURN(m_pDeviceContext, E_FAIL);
 
 
@@ -1373,7 +1373,6 @@ HRESULT CVIBuffer_Terrain::LoadHeightMap()
 
 	Safe_Release(pTexture);
 	Safe_Delete_Array(pPixel);
-#endif // _DEBUG
 	return S_OK;
 }
 
@@ -1386,6 +1385,7 @@ HRESULT CVIBuffer_Terrain::Bind_HeightMapOnShader(CShader * pShader, const char 
 	return pShader->Set_Texture(szValueName, m_pHeightMapSRV);;
 	return S_OK;
 }
+#endif // _DEBUG
 
 CVIBuffer_Terrain * CVIBuffer_Terrain::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, const _tchar* pHeightMap)
 {

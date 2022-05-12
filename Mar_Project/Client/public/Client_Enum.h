@@ -79,13 +79,19 @@ enum OBJECTPROTOTYPEID
 	Prototype_BreakableObj,
 	Prototype_BreakablePiece,
 	Prototype_SlideObj,
+	Prototype_EscalatorPad,
+	Prototype_ButtonPad,
+	Prototype_ShrinkFlower,
+	Prototype_Vent,
+	Prototype_MazeDoor,
+	Prototype_ShapeMemoryPad,
 
 
 	Prototype_StaticMapObject,
 
 
 
-	Object_Prototype_End,
+	Object_Prototype_End
 };
 
 
@@ -150,6 +156,26 @@ static const _tchar* Tag_Object_Prototype(OBJECTPROTOTYPEID eTag)
 		break;
 	case Prototype_Cannonball:
 		return TEXT("Prototype_Cannonball");
+		break;
+
+
+	case Prototype_EscalatorPad:
+		return TEXT("Prototype_EscalatorPad");
+		break;
+	case Prototype_ButtonPad:
+		return TEXT("Prototype_ButtonPad");
+		break;
+	case Prototype_ShrinkFlower:
+		return TEXT("Prototype_ShrinkFlower");
+		break;
+	case Prototype_Vent:
+		return TEXT("Prototype_Vent");
+		break;
+	case Prototype_MazeDoor:
+		return TEXT("Prototype_MazeDoor");
+		break;
+	case Prototype_ShapeMemoryPad:
+		return TEXT("Prototype_ShapeMemoryPad");
 		break;
 
 
@@ -357,6 +383,15 @@ enum LAYERID
 	Layer_BreakablePiece,
 	Layer_SlideObj,
 
+	Layer_EscalatorPad,
+	Layer_ButtonPad,
+	Layer_ShrinkFlower,
+	Layer_Vent,
+	Layer_MazeDoor,
+	Layer_ShapeMemoryPad,
+
+
+
 	Layer_StaticMapObj,
 
 
@@ -429,11 +464,29 @@ static const _tchar* Tag_Layer(LAYERID eTag)
 	case Layer_BreakablePiece:
 		return TEXT("Layer_BreakablePiece");
 		break;
-		
 	case Layer_SlideObj:
 		return TEXT("Layer_SlideObj");
 		break;
+	case Layer_EscalatorPad:
+		return TEXT("Layer_EscalatorPad");
+		break;
+	case Layer_ButtonPad:
+		return TEXT("Layer_ButtonPad");
+		break;
+	case Layer_ShrinkFlower:
+		return TEXT("Layer_ShrinkFlower");
+		break;
+	case Layer_Vent:
+		return TEXT("Layer_Vent");
+		break;
+	case Layer_MazeDoor:
+		return TEXT("Layer_MazeDoor");
+		break;
+	case Layer_ShapeMemoryPad:
+		return TEXT("Layer_ShapeMemoryPad");
+		break;
 
+	
 
 
 	case Layer_StaticMapObj:

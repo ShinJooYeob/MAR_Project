@@ -637,6 +637,17 @@ HRESULT CPlayer::SetUp_Components()
 	ColliderDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
 	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
 
+	 //Pivot  : 0.000000f , 0.000000f , -0.620000f , 1
+	 //size  : 0.960000f , 0.860000f , 0.550000f  
+	 ZeroMemory(&ColliderDesc, sizeof(COLLIDERDESC));
+	 ColliderDesc.vScale = _float3(0.480000f, 0.550000f,0.860000f);
+	 ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
+	 ColliderDesc.vPosition = _float4(0.000000f, 0.000000f, -0.620000f, 1);
+	 FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_OBB, &ColliderDesc));
+	 m_pColliderCom->Set_ParantBuffer();
+
+	 m_tCollisionAttachPtr[0] = m_pModel->Find_AttachMatrix_InHirarchyNode("Bip01-Pelvis");
+	 NULL_CHECK_RETURN(m_tCollisionAttachPtr[0].pDefaultPivotMat, E_FAIL);
 
 	//Pivot  : 0.000000f , 0.000000f , -1.379999f , 1
 	//size  : 0.630000f , 0.740000f , 0.270001f  
@@ -649,22 +660,11 @@ HRESULT CPlayer::SetUp_Components()
 	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_OBB, &ColliderDesc));
 	m_pColliderCom->Set_ParantBuffer();
 
-	 m_tCollisionAttachPtr[0]= m_pModel->Find_AttachMatrix_InHirarchyNode("Bip01-Spine2");
-	 NULL_CHECK_RETURN(m_tCollisionAttachPtr[0].pDefaultPivotMat, E_FAIL);
-
-
-
-	 //Pivot  : 0.000000f , 0.000000f , -0.620000f , 1
-	 //size  : 0.960000f , 0.860000f , 0.550000f  
-	 ZeroMemory(&ColliderDesc, sizeof(COLLIDERDESC));
-	 ColliderDesc.vScale = _float3(0.480000f, 0.550000f,0.860000f);
-	 ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
-	 ColliderDesc.vPosition = _float4(0.000000f, 0.000000f, -0.620000f, 1);
-	 FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_OBB, &ColliderDesc));
-	 m_pColliderCom->Set_ParantBuffer();
-
-	 m_tCollisionAttachPtr[1] = m_pModel->Find_AttachMatrix_InHirarchyNode("Bip01-Pelvis");
+	 m_tCollisionAttachPtr[1]= m_pModel->Find_AttachMatrix_InHirarchyNode("Bip01-Spine2");
 	 NULL_CHECK_RETURN(m_tCollisionAttachPtr[1].pDefaultPivotMat, E_FAIL);
+
+
+
 
 
 

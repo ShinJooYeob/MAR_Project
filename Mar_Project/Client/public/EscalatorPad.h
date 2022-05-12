@@ -34,11 +34,15 @@ public:
 	HRESULT Set_TerrainTileKinds();
 	HRESULT Reset_TerrainTileKindsMovableNHeightZero();
 
+	void	LetEscalatingToDest(_bool bBool);
+	virtual void CollisionTriger(_uint iMyColliderIndex, CGameObject* pConflictedObj, CCollider* pConflictedCollider, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType) override;
+
 private:
 	CShader*			m_pShaderCom = nullptr;
 	CRenderer*			m_pRendererCom = nullptr;
 	CTransform*			m_pTransformCom = nullptr;
 	CModel*				m_pModel = nullptr;
+	CCollider*			m_pColliderCom = nullptr;
 
 
 	
@@ -49,10 +53,13 @@ private:
 
 	ESCLATORDESC		m_tDesc;
 
+	_bool				m_bMoveToDest = false;
+	_double				m_PassedTime = 0;
+
 	_float4				m_NevRectPoint[4];
 private:
 	HRESULT SetUp_Components();
-
+	HRESULT Update_Escalating(_double fDeltaTime);
 
 public:
 	static CEscalatorPad* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, void* pArg = nullptr);

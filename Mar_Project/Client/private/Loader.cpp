@@ -30,6 +30,7 @@
 #include "RoseObj.h"
 #include "BreakableObj.h"
 #include "BreakablePiece.h"
+#include "EscalatorPad.h"
 
 #include "StaticMapObject.h"
 
@@ -778,6 +779,11 @@ HRESULT CLoader::Load_Scene_Stage2(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE2, TAG_CP(Prototype_Texture_GamePlayScene),
 		CTexture::Create(m_pDevice, m_pDeviceContext, L"UI_GamePlay.txt")));
+
+
+
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_EscalatorPad),
+		CEscalatorPad::Create(m_pDevice, m_pDeviceContext)));
 
 #pragma endregion
 

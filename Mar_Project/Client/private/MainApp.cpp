@@ -129,7 +129,7 @@ HRESULT CMainApp::Render()
 	//m_pCollision->Collision_Obsever_Release(); 
 
 #ifdef _DEBUG
-	if (m_pGameInstance->Get_DIKeyState(DIK_F6)& DIS_Down) g_bIsShowFPS = !g_bIsShowFPS;
+	if (m_pGameInstance->Get_DIKeyState(DIK_F7)& DIS_Down) g_bIsShowFPS = !g_bIsShowFPS;
 	if (g_bIsShowFPS)
 	{
 		++m_dwNumRender;
