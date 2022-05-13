@@ -36,8 +36,9 @@ HRESULT CScene_Stage3::Initialize()
 
 	FAILED_CHECK(Ready_Layer_StaticMapObj(TAG_LAY(Layer_StaticMapObj)));
 
-	
+	FAILED_CHECK(Ready_Layer_Executor(TAG_LAY(Layer_Monster)));
 
+	
 
 	return S_OK;
 }
@@ -182,7 +183,7 @@ HRESULT CScene_Stage3::Ready_Layer_Player(const _tchar * pLayerTag)
 	NULL_CHECK_RETURN(pPlayer, E_FAIL);
 
 	pPlayer->Set_NowSceneNum(SCENE_STAGE3);
-	pPlayer->Renew_Player(_float3(50, 11, 50));
+	pPlayer->Renew_Player(_float3(130,20,46));
 	
 
 	return S_OK;
@@ -300,6 +301,15 @@ HRESULT CScene_Stage3::Ready_Layer_StaticMapObj(const _tchar * pLayerTag)
 
 
 	((CStaticMapObject*)pInstance->Get_GameObject_By_LayerIndex(SCENE_STAGE3, pLayerTag))->Set_FrustumSize(3000);
+
+
+	return S_OK;
+}
+
+HRESULT CScene_Stage3::Ready_Layer_Executor(const _tchar * pLayerTag)
+{
+
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE3, pLayerTag, TAG_OP(Prototype_Executor), &_float3(130, 20, 46)));
 
 
 	return S_OK;

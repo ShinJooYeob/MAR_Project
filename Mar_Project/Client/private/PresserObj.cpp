@@ -135,6 +135,7 @@ void CPresserObj::LetEscalatingToDest(_bool bBool)
 
 void CPresserObj::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedObj, CCollider * pConflictedCollider, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType)
 {
+
 	switch (eConflictedObjCollisionType)
 	{
 

@@ -689,6 +689,28 @@ enum COMPONENTPROTOTYPEID
 
 
 
+		Prototype_Mesh_Gazebo_Piece01,
+		Prototype_Mesh_Gazebo_Piece02,
+		Prototype_Mesh_Gazebo_Piece03,
+		Prototype_Mesh_Gazebo_Piece04,
+		Prototype_Mesh_Gazebo_S,
+		Prototype_Mesh_QStone_PillarC_Broken,
+		Prototype_Mesh_Qstone_PlatsB,
+		Prototype_Mesh_Vent_Steam_Mesh,
+		Prototype_Mesh_VentQStone,
+
+		
+		
+		
+		
+		
+		
+		
+		
+		
+
+
+
 
 	Prototype_Mesh_Player,
 	Prototype_Mesh_PlayerLoby,
@@ -1220,6 +1242,38 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 	case Prototype_Mesh_Button_Frame:
 		return TEXT("Button_Frame");
 		break;
+
+
+
+	case Prototype_Mesh_Gazebo_Piece01:
+		return TEXT("Gazebo_Piece01");
+		break;
+	case Prototype_Mesh_Gazebo_Piece02:
+		return TEXT("Gazebo_Piece02");
+		break;
+	case Prototype_Mesh_Gazebo_Piece03:
+		return TEXT("Gazebo_Piece03");
+		break;
+	case Prototype_Mesh_Gazebo_Piece04:
+		return TEXT("Gazebo_Piece04");
+		break;
+	case Prototype_Mesh_Gazebo_S:
+		return TEXT("Gazebo_S");
+		break;
+	case Prototype_Mesh_QStone_PillarC_Broken:
+		return TEXT("QStone_PillarC_Broken");
+		break;
+	case Prototype_Mesh_Qstone_PlatsB:
+		return TEXT("Qstone_PlatsB");
+		break;
+	case Prototype_Mesh_Vent_Steam_Mesh:
+		return TEXT("Vent_Steam_Mesh");
+		break;
+	case Prototype_Mesh_VentQStone:
+		return TEXT("VentQStone");
+		break;
+
+
 
 
 
