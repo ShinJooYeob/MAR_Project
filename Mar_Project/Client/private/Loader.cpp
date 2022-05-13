@@ -36,6 +36,7 @@
 #include "ShapeMemoryPad.h"
 #include "ShpaeMemButton.h"
 #include "PresserObj.h"
+#include "ShrinkFlower.h"
 
 #include "StaticMapObject.h"
 
@@ -526,6 +527,11 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "QRocks", "QRocksE.FBX", TransformMatrix)));
 
 
+	TransformMatrix = XMMatrixScaling(0.0001f, 0.0001f, 0.0001f);
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_ShrinkFlower),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "ShrinkFlower", "ShrinkFlower.FBX", TransformMatrix)));
+
+
 
 
 
@@ -538,6 +544,8 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Texture_GamePlayScene),
 		CTexture::Create(m_pDevice, m_pDeviceContext, L"UI_GamePlay.txt")));
+
+
 
 
 
@@ -581,6 +589,10 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_RoseObj),
 		CRoseObj::Create(m_pDevice, m_pDeviceContext)));
+
+
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_ShrinkFlower),
+		CShrinkFlower::Create(m_pDevice, m_pDeviceContext)));
 
 
 

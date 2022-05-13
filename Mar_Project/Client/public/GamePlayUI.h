@@ -20,7 +20,7 @@ public:
 	virtual _int LateUpdate(_double fDeltaTime)override;
 	virtual _int Render()override;
 	virtual _int LateRender()override;
-	HRESULT Add_Dmg_to_Player(_uint iNowHP,_uint iDmg);
+	HRESULT Add_Dmg_to_Player(_uint iNowHP,_int iDmg);
 
 	void Set_DrawClockBombUI();
 protected:

@@ -38,6 +38,8 @@ public:
 	virtual _int LateRender()override;
 
 	void	Add_Dmg_to_Player(_uint iDmgAmount);
+	void	Heal_to_Player(_uint iDmgAmount);
+
 	void  Change_Weapon(_uint WeaponIndex);
 
 	_float3	Get_FirePos() { return m_vBulletFirePos; };
@@ -60,6 +62,11 @@ public:
 
 	void Set_NotLevitation() ;
 	void Let_PlayerSliding(_bool bBool);
+
+	void Set_TrappedFlower(_bool bBool);
+	_bool Get_TrapppedFlower() { return m_bTrappedbyFlower; };
+	void Set_PlayerPosition(_float3 vPos);
+
 private:
 	CShader*			m_pShaderCom = nullptr;
 	CRenderer*			m_pRendererCom = nullptr;
@@ -142,6 +149,7 @@ private:
 
 
 	_float3				m_vReturnPos = { 0,0,0 };
+	_bool				m_bTrappedbyFlower = false;
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ConstTable();
@@ -154,6 +162,7 @@ private:
 	/*All Weapon*/
 	HRESULT Dash_Update(_double fDeltaTime, CGameInstance* pInstance, _float TotalDashTime = 0.5f);
 	HRESULT RockOn_Update(_double fDeltaTime, CGameInstance* pInstance);
+	HRESULT TrappedbyFlower_Update(_double fDeltaTime, CGameInstance* pInstance);
 	
 	/*NoneWeapon*/
 	HRESULT Smalling_Update(_double fDeltaTime, CGameInstance* pInstance);

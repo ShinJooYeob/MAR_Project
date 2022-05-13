@@ -39,8 +39,9 @@ HRESULT CScene_Stage1::Initialize()
 	FAILED_CHECK(Ready_Layer_HiddenPad(TAG_LAY(Layer_HiddenPad)));
 	FAILED_CHECK(Ready_Layer_TeethObj(TAG_LAY(Layer_TeethObj)));
 	FAILED_CHECK(Ready_Layer_RoseObj(TAG_LAY(Layer_RoseObj)));
-	FAILED_CHECK(Ready_Layer_BreakableObj(TAG_LAY(Layer_Breakable)))
-	
+	FAILED_CHECK(Ready_Layer_BreakableObj(TAG_LAY(Layer_Breakable)));
+	FAILED_CHECK(Ready_Layer_ShrinkFlower(TAG_LAY(Layer_ShrinkFlower)));
+		
 	
 	FAILED_CHECK(Ready_Layer_StaticMapObj(TAG_LAY(Layer_StaticMapObj)));
 
@@ -267,6 +268,14 @@ HRESULT CScene_Stage1::Ready_Layer_BreakableObj(const _tchar * pLayerTag)
 	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_BreakableObj), &_float4(16, 21, 7, _float(Prototype_Mesh_BreakableBox))));
 	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_BreakableObj), &_float4(19, 21, 7, _float(Prototype_Mesh_BreakableBarrel))));
 	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_BreakableObj), &_float4(22, 21, 7, _float(Prototype_Mesh_GiftBasket))));
+
+	return S_OK;
+}
+
+HRESULT CScene_Stage1::Ready_Layer_ShrinkFlower(const _tchar * pLayerTag)
+{
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_ShrinkFlower), &_float3(24, 21, 7)));
+
 
 	return S_OK;
 }

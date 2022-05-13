@@ -200,6 +200,7 @@
     <ClInclude Include="..\public\Scene_Boss.h" />
     <ClInclude Include="..\public\Scythe.h" />
     <ClInclude Include="..\public\MonsterWeapon.h" />
+    <ClInclude Include="..\public\ShrinkFlower.h" />
     <ClInclude Include="..\public\Umbrella.h" />
     <ClInclude Include="..\public\Teapot.h" />
     <ClInclude Include="..\public\Grunt.h" />
@@ -271,6 +272,7 @@
     <ClCompile Include="..\private\Scene_Boss.cpp" />
     <ClCompile Include="..\private\Scythe.cpp" />
     <ClCompile Include="..\private\MonsterWeapon.cpp" />
+    <ClCompile Include="..\private\ShrinkFlower.cpp" />
     <ClCompile Include="..\private\Umbrella.cpp" />
     <ClCompile Include="..\private\Teapot.cpp" />
     <ClCompile Include="..\private\Grunt.cpp" />

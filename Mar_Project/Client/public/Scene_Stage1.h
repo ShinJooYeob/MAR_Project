@@ -31,6 +31,7 @@ private:
 	HRESULT Ready_Layer_TeethObj(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_RoseObj(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_BreakableObj(const _tchar* pLayerTag);
+	HRESULT Ready_Layer_ShrinkFlower(const _tchar* pLayerTag);
 
 	HRESULT Ready_Layer_StaticMapObj(const _tchar* pLayerTag);
 

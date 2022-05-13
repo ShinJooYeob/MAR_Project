@@ -725,7 +725,8 @@ enum COMPONENTPROTOTYPEID
 	Prototype_Mesh_BreakableBarrelPiece3,
 	Prototype_Mesh_BreakableBarrelPiece4,
 	Prototype_Mesh_BreakableBarrelPiece5,
-	Prototype_Mesh_GiftBasket,
+		Prototype_Mesh_GiftBasket,
+		Prototype_Mesh_ShrinkFlower,
 
 
 	Prototype_Mesh_Tornado1,
@@ -1221,6 +1222,9 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 		break;
 
 
+
+		
+
 	case Prototype_Mesh_Player:
 		return TEXT("Mesh_Player");
 		break;
@@ -1298,7 +1302,9 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 	case Prototype_Mesh_SteamPad:
 		return TEXT("Prototype_Mesh_SteamPad");
 		break;
-
+	case Prototype_Mesh_ShrinkFlower:
+		return TEXT("Prototype_Mesh_ShrinkFlower");
+		break;
 
 	case Prototype_Mesh_BreakableBox:
 		return TEXT("Prototype_Mesh_BreakableBox");

@@ -80,8 +80,8 @@ _int CPlayer::Update(_double fDeltaTime)
 		Add_Dmg_to_Player(5);
 	if (g_pGameInstance->Get_DIKeyState(DIK_6)&DIS_Down)
 		Add_Dmg_to_Player(6);
-	//if (g_pGameInstance->Get_DIKeyState(DIK_7)&DIS_Down)
-	//	m_pModel->Change_AnimIndex(6);
+	if (g_pGameInstance->Get_DIKeyState(DIK_7)&DIS_Down)
+		Heal_to_Player(3);
 	//if (g_pGameInstance->Get_DIKeyState(DIK_8)&DIS_Down)
 	//	m_pModel->Change_AnimIndex(7);
 	//if (g_pGameInstance->Get_DIKeyState(DIK_9)&DIS_Down)
@@ -161,7 +161,7 @@ _int CPlayer::LateUpdate(_double fDeltaTime)
 
 
 
-	if (!m_fDashPassedTime)
+	if (!m_fDashPassedTime && !m_bTrappedbyFlower)
 	{
 		FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this));
 		if (m_iWeaponModelIndex != 10 && !m_LevitationTime)
@@ -185,9 +185,6 @@ _int CPlayer::Render()
 	NULL_CHECK_RETURN(m_pModel, E_FAIL);
 
 
-#ifdef _DEBUG
-	m_pColliderCom->Render();
-#endif // _DEBUG
 
 
 
@@ -215,7 +212,10 @@ _int CPlayer::Render()
 
 	}
 
-	
+
+#ifdef _DEBUG
+	m_pColliderCom->Render();
+#endif // _DEBUG
 
 	
 	return _int();
@@ -407,6 +407,18 @@ void CPlayer::Add_Dmg_to_Player(_uint iDmgAmount)
 
 
 
+}
+
+void CPlayer::Heal_to_Player(_uint iDmgAmount)
+{
+	if (!iDmgAmount) return;
+
+	m_iHP += iDmgAmount;
+
+	if (m_iHP >= PlayerMaxHP) m_iHP = PlayerMaxHP;
+
+
+	((CGamePlayUI*)(g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_UI_GamePlay))))->Add_Dmg_to_Player(m_iHP, 0);
 }
 
 void CPlayer::Change_Weapon(_uint WeaponIndex)
@@ -637,6 +649,20 @@ void CPlayer::Let_PlayerSliding(_bool bBool)
 
 
 	}
+}
+
+void CPlayer::Set_TrappedFlower(_bool bBool)
+{
+	m_bTrappedbyFlower = bBool;
+	m_fSmallPassedTime = 0;
+}
+
+void CPlayer::Set_PlayerPosition(_float3 vPos)
+{
+	{ m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, vPos); };
+
+	m_vOldPos = vPos;
+
 }
 
 HRESULT CPlayer::SetUp_Components()
@@ -1088,6 +1114,9 @@ HRESULT CPlayer::Input_Keyboard(_double fDeltaTime)
 	if (m_eNowWeapon != CPlayer::Weapon_Umbrella)
 		FAILED_CHECK(Dash_Update(fDeltaTime, pInstance));
 	FAILED_CHECK(RockOn_Update(fDeltaTime, pInstance));
+	FAILED_CHECK(TrappedbyFlower_Update(fDeltaTime, pInstance));
+
+	if (m_bTrappedbyFlower)return S_FALSE;
 
 	switch (m_eNowWeapon)
 	{
@@ -1170,8 +1199,64 @@ HRESULT CPlayer::Input_Keyboard(_double fDeltaTime)
 
 
 
-	//FAILED_CHECK(Lunch_Bullet(fDeltaTime, pInstance));
-	//FAILED_CHECK(Lunch_Grenade(fDeltaTime, pInstance));
+	return S_OK;
+}
+
+HRESULT CPlayer::TrappedbyFlower_Update(_double fDeltaTime, CGameInstance * pInstance)
+{
+	if (m_bTrappedbyFlower)
+	{
+		if (m_fSmallPassedTime < 0.3f)
+		{
+
+			m_fSmallPassedTime += _float(fDeltaTime);
+			m_fSmallScale = pInstance->Easing(TYPE_QuarticOut, 1.f, PlayerSmallingSize, m_fSmallPassedTime, 0.3f);
+
+			if (m_fSmallPassedTime > 0.3f)
+			{
+				m_fSmallScale = PlayerSmallingSize;
+			}
+
+			m_fSmallVisualTime = (1 - m_fSmallScale) / (1 - PlayerSmallingSize);
+			FAILED_CHECK(pInstance->EasingDiffuseLightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0, XMVectorSet(0.6f, 0.6f, 1, 1), m_fSmallVisualTime));
+
+			m_pTransformCom->Scaled_All(_float3(m_fSmallScale));
+			m_pTransformCom->Set_MoveSpeed(PlayerMoveSpeed * m_fSmallScale);
+		}
+
+		if ((pInstance->Get_DIKeyState(DIK_SPACE) & DIS_Down) || (pInstance->Get_DIKeyState(DIK_LSHIFT) & DIS_Down))
+		{
+			m_fSmallPassedTime = 0;
+			m_bTrappedbyFlower = false;
+		}
+
+	}
+	else if (!(pInstance->Get_DIKeyState(DIK_LCONTROL) & DIS_Press))
+	{
+		
+		if (m_fSmallPassedTime < 0.3f)
+		{
+			m_fSmallPassedTime += _float(fDeltaTime);
+			m_fSmallScale = pInstance->Easing(TYPE_QuarticOut, PlayerSmallingSize, 1.f, m_fSmallPassedTime, 0.3f);
+
+			if (m_fSmallPassedTime > 0.3f)
+			{
+				m_fSmallScale = 1.f;
+			}
+
+			m_pTransformCom->Scaled_All(_float3(m_fSmallScale));
+			m_pTransformCom->Set_MoveSpeed(PlayerMoveSpeed * m_fSmallScale);
+
+		}
+
+		if (m_fSmallVisualTime > 0.f)
+		{
+			m_fSmallVisualTime -= _float(fDeltaTime);
+			if (m_fSmallVisualTime < 0) m_fSmallVisualTime = 0;
+			FAILED_CHECK(pInstance->EasingDiffuseLightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0, XMVectorSet(0.6f, 0.6f, 1, 1), m_fSmallVisualTime));
+
+		}
+	}
 
 
 
@@ -1220,31 +1305,6 @@ HRESULT CPlayer::Smalling_Update(_double fDeltaTime, CGameInstance* pInstance)
 					m_pTransformCom->Scaled_All(_float3(m_fSmallScale));
 					m_pTransformCom->Set_MoveSpeed(PlayerMoveSpeed * m_fSmallScale);
 				}
-
-			}
-		}
-		else {
-
-			if (m_fSmallPassedTime < 0.3f)
-			{
-				m_fSmallPassedTime += _float(fDeltaTime);
-				m_fSmallScale = pInstance->Easing(TYPE_QuarticOut, PlayerSmallingSize, 1.f, m_fSmallPassedTime, 0.3f);
-
-				if (m_fSmallPassedTime > 0.3f)
-				{
-					m_fSmallScale = 1.f;
-				}
-
-				m_pTransformCom->Scaled_All(_float3(m_fSmallScale));
-				m_pTransformCom->Set_MoveSpeed(PlayerMoveSpeed * m_fSmallScale);
-
-			}
-
-			if (m_fSmallVisualTime > 0.f)
-			{
-				m_fSmallVisualTime -= _float(fDeltaTime);
-				if (m_fSmallVisualTime < 0) m_fSmallVisualTime = 0;
-				FAILED_CHECK(pInstance->EasingDiffuseLightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0, XMVectorSet(0.6f, 0.6f, 1, 1), m_fSmallVisualTime));
 
 			}
 		}

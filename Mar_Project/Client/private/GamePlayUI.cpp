@@ -113,7 +113,7 @@ _int CGamePlayUI::LateRender()
 	return _int();
 }
 
-HRESULT CGamePlayUI::Add_Dmg_to_Player(_uint iNowHP, _uint iDmg)
+HRESULT CGamePlayUI::Add_Dmg_to_Player(_uint iNowHP, _int iDmg)
 {
 
 

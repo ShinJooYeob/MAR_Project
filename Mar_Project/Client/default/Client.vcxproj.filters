@@ -480,6 +480,9 @@
     <ClInclude Include="..\public\PresserObj.h">
       <Filter>01.GameObject\07.MapObject\01.DynamicObj\11.PresserObj</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\ShrinkFlower.h">
+      <Filter>01.GameObject\07.MapObject\01.DynamicObj\10.ShrinkFlower</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -703,6 +706,9 @@
     </ClCompile>
     <ClCompile Include="..\private\PresserObj.cpp">
       <Filter>01.GameObject\07.MapObject\01.DynamicObj\11.PresserObj</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\ShrinkFlower.cpp">
+      <Filter>01.GameObject\07.MapObject\01.DynamicObj\10.ShrinkFlower</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
