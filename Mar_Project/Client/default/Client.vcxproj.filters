@@ -229,6 +229,9 @@
     <Filter Include="01.GameObject\07.MapObject\01.DynamicObj\11.PresserObj">
       <UniqueIdentifier>{c3b95fa9-60c1-4239-a4b3-3bb6f2ebcff3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.GameObject\07.MapObject\01.DynamicObj\12.ShapeMemoryPad">
+      <UniqueIdentifier>{fc97afe5-8fff-4f2a-a13f-8c1a995ca00e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -468,6 +471,12 @@
     <ClInclude Include="..\public\ButtonPad.h">
       <Filter>01.GameObject\07.MapObject\01.DynamicObj\09.ButtonPad</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\ShapeMemoryPad.h">
+      <Filter>01.GameObject\07.MapObject\01.DynamicObj\12.ShapeMemoryPad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\ShpaeMemButton.h">
+      <Filter>01.GameObject\07.MapObject\01.DynamicObj\12.ShapeMemoryPad</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -682,6 +691,12 @@
     </ClCompile>
     <ClCompile Include="..\private\ButtonPad.cpp">
       <Filter>01.GameObject\07.MapObject\01.DynamicObj\09.ButtonPad</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\ShapeMemoryPad.cpp">
+      <Filter>01.GameObject\07.MapObject\01.DynamicObj\12.ShapeMemoryPad</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\ShpaeMemButton.cpp">
+      <Filter>01.GameObject\07.MapObject\01.DynamicObj\12.ShapeMemoryPad</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

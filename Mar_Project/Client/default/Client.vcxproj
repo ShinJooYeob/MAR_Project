@@ -178,6 +178,7 @@
     <ClInclude Include="..\bin\ShaderFiles\Shader_Define.hpp" />
     <ClInclude Include="..\public\BreakableObj.h" />
     <ClInclude Include="..\public\Bullet.h" />
+    <ClInclude Include="..\public\ShpaeMemButton.h" />
     <ClInclude Include="..\public\Camera_Editor.h" />
     <ClInclude Include="..\public\Camera_Main.h" />
     <ClInclude Include="..\public\Client_Define.h" />
@@ -186,6 +187,7 @@
     <ClInclude Include="..\public\Client_Struct.h" />
     <ClInclude Include="..\public\DollMaker.h" />
     <ClInclude Include="..\public\ButtonPad.h" />
+    <ClInclude Include="..\public\ShapeMemoryPad.h" />
     <ClInclude Include="..\public\SlidePad.h" />
     <ClInclude Include="..\public\GamePlayUI.h" />
     <ClInclude Include="..\public\ClockBomb.h" />
@@ -250,10 +252,12 @@
   <ItemGroup>
     <ClCompile Include="..\private\BreakableObj.cpp" />
     <ClCompile Include="..\private\Bullet.cpp" />
+    <ClCompile Include="..\private\ShpaeMemButton.cpp" />
     <ClCompile Include="..\private\Camera_Editor.cpp" />
     <ClCompile Include="..\private\Camera_Main.cpp" />
     <ClCompile Include="..\private\DollMaker.cpp" />
     <ClCompile Include="..\private\ButtonPad.cpp" />
+    <ClCompile Include="..\private\ShapeMemoryPad.cpp" />
     <ClCompile Include="..\private\SlidePad.cpp" />
     <ClCompile Include="..\private\GamePlayUI.cpp" />
     <ClCompile Include="..\private\ClockBomb.cpp" />

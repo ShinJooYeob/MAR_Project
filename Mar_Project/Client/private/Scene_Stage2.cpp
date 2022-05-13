@@ -7,6 +7,7 @@
 #include "EscalatorPad.h"
 #include "SlidePad.h"
 #include "ButtonPad.h"
+#include "ShapeMemoryPad.h"
 
 
 
@@ -43,6 +44,7 @@ HRESULT CScene_Stage2::Initialize()
 	FAILED_CHECK(Ready_Layer_EscalatorPad(TAG_LAY(Layer_EscalatorPad)));
 	FAILED_CHECK(Ready_Layer_SlidePad(TAG_LAY(Layer_SlideObj)));
 	FAILED_CHECK(Ready_Layer_ButtonPad(TAG_LAY(Layer_ButtonPad)));
+	FAILED_CHECK(Ready_Layer_ShapeMemPad(TAG_LAY(Layer_ButtonPad)));
 	
 	
 
@@ -290,6 +292,18 @@ HRESULT CScene_Stage2::Ready_Layer_StaticMapObj(const _tchar * pLayerTag)
 				((CStaticMapObject*)pObject)->Set_FrustumSize(50);
 			}
 
+			if ((!lstrcmp(tData.MeshID, TAG_CP(Prototype_Mesh_HatterPlat_CheckerA))) 
+				|| (!lstrcmp(tData.MeshID, TAG_CP(Prototype_Mesh_HatterPlat_CheckerB)))
+				|| (!lstrcmp(tData.MeshID, TAG_CP(Prototype_Mesh_HatterPlat_CheckerC)))
+				|| (!lstrcmp(tData.MeshID, TAG_CP(Prototype_Mesh_HatterPlat_CheckerE)))
+				|| (!lstrcmp(tData.MeshID, TAG_CP(Prototype_Mesh_HatterPlat_CheckerF))))
+			{
+				((CStaticMapObject*)pObject)->Set_PassIndex(2);
+			}
+
+
+			
+
 		}
 
 		//Æ®·»½ºÆû
@@ -405,6 +419,17 @@ HRESULT CScene_Stage2::Ready_Layer_ButtonPad(const _tchar * pLayerTag)
 
 	return S_OK;
 }
+
+HRESULT CScene_Stage2::Ready_Layer_ShapeMemPad(const _tchar * pLayerTag)
+{
+	CShapeMemoryPad::SHAPEMEMDESC tDesc;
+
+	tDesc.vStartPos = _float3(147.66f, 40.8f, 177.803f);
+
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_ShapeMemoryPad), &tDesc));
+
+	return S_OK;
+}	
 
 
 

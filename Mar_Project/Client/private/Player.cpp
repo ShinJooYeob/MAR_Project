@@ -102,7 +102,7 @@ _int CPlayer::Update(_double fDeltaTime)
 
 
 	_uint iNowAnimIndex  = m_pModel->Get_NowAnimIndex();
-	if (iNowAnimIndex ==  15|| iNowAnimIndex == 20|| iNowAnimIndex == 14 ||
+	if (iNowAnimIndex ==  15|| iNowAnimIndex == 20|| iNowAnimIndex == 14 || iNowAnimIndex == 10 ||
 		(iNowAnimIndex >= Weapon_Knife + 8 && iNowAnimIndex <= Weapon_Knife + 16) ||
 		(iNowAnimIndex >= Weapon_Horse + 8 && iNowAnimIndex <= Weapon_Horse + 14) )
 	{
