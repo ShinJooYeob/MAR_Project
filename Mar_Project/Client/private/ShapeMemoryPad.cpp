@@ -173,7 +173,7 @@ HRESULT CShapeMemoryPad::Reset_TerrainTileKindsMovableNHeightZero()
 
 HRESULT CShapeMemoryPad::Let_ReturntoShape(_bool bBool)
 {
-
+	if (m_PatternChangeTime < 13 || bBool == m_bReturnToShape) return S_FALSE;
 
 	m_bReturnToShape = bBool;
 
@@ -404,6 +404,11 @@ HRESULT CShapeMemoryPad::Ready_Piece()
 
 HRESULT CShapeMemoryPad::Update_PieceAngle(_double fDeltaTime)
 {
+	if (m_PatternChangeTime < 13)
+		m_PatternChangeTime += fDeltaTime;
+
+	
+
 
 	CGameInstance* pInstance = g_pGameInstance;
 

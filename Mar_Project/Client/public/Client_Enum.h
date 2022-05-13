@@ -85,6 +85,7 @@ enum OBJECTPROTOTYPEID
 	Prototype_Vent,
 	Prototype_MazeDoor,
 	Prototype_ShapeMemoryPad,
+	Prototype_ShapeMemBtn,
 
 
 	Prototype_StaticMapObject,
@@ -274,8 +275,10 @@ static const _tchar* Tag_Object_Prototype(OBJECTPROTOTYPEID eTag)
 		return TEXT("Prototype_SlideObj");
 		break;
 
-
-
+	case Prototype_ShapeMemBtn:
+		return TEXT("Prototype_ShapeMemBtn");
+		break;
+		
 
 
 	case Prototype_StaticMapObject:

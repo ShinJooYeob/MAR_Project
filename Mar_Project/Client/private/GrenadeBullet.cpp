@@ -43,6 +43,9 @@ HRESULT CGrenadeBullet::Initialize_Clone(void * pArg)
 	m_fTotalLifeTime = pUtilMgr->RandomFloat(2.f, 3.f);
 	m_vTargetDir = m_vTargetDir.XMVector() + pUtilMgr->RandomFloat3(-0.1f, 0.1f).XMVector();
 
+
+	m_szNameTag = L"Layer_GranadeBullet";
+
 	return S_OK;
 }
 

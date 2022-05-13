@@ -42,6 +42,8 @@ HRESULT CCollisionMgr::Inspect_Collision()
 
 	FAILED_CHECK(Inspect_PlayerWeapon_To_Monster());
 
+	FAILED_CHECK(Inspect_DynamicObject_To_PlayerNPlayerWeapon());
+	
 	FAILED_CHECK(Inspect_NPC_To_Player());
 
 	FAILED_CHECK(Inspect_Terrain_To_All());
@@ -129,6 +131,37 @@ HRESULT CCollisionMgr::Inspect_NPC_To_Player()
 			{
 				SrcElement.pCollisionObject->CollisionTriger(ConflictedIndex.x, DestElemet.pCollisionObject, DestElemet.pCollider, ConflictedIndex.y, CollisionType_Player);
 				DestElemet.pCollisionObject->CollisionTriger(ConflictedIndex.y, SrcElement.pCollisionObject, SrcElement.pCollider, ConflictedIndex.x, CollisionType_NPC);
+			}
+
+		}
+	}
+
+	return S_OK;
+}
+HRESULT CCollisionMgr::Inspect_DynamicObject_To_PlayerNPlayerWeapon()
+{
+	_uint2 ConflictedIndex;
+
+
+
+	for (auto& SrcElement : m_CollisionGroupList[CollisionType_DynaicObject])
+	{
+		for (auto& DestElemet : m_CollisionGroupList[CollisionType_Player])
+		{
+			if (SrcElement.pCollider->Inspect_Collision(DestElemet.pCollider, 0, 0, &ConflictedIndex))
+			{
+				SrcElement.pCollisionObject->CollisionTriger(ConflictedIndex.x, DestElemet.pCollisionObject, DestElemet.pCollider, ConflictedIndex.y, CollisionType_Player);
+				DestElemet.pCollisionObject->CollisionTriger(ConflictedIndex.y, SrcElement.pCollisionObject, SrcElement.pCollider, ConflictedIndex.x, CollisionType_DynaicObject);
+			}
+
+		}
+
+		for (auto& DestElemet : m_CollisionGroupList[CollisionType_PlayerWeapon])
+		{
+			if (SrcElement.pCollider->Inspect_Collision(DestElemet.pCollider, 0, 0, &ConflictedIndex))
+			{
+				SrcElement.pCollisionObject->CollisionTriger(ConflictedIndex.x, DestElemet.pCollisionObject, DestElemet.pCollider, ConflictedIndex.y, CollisionType_PlayerWeapon);
+				DestElemet.pCollisionObject->CollisionTriger(ConflictedIndex.y, SrcElement.pCollisionObject, SrcElement.pCollider, ConflictedIndex.x, CollisionType_DynaicObject);
 			}
 
 		}

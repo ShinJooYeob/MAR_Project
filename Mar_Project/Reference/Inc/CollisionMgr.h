@@ -33,6 +33,7 @@ public:
 private:
 	HRESULT Inspect_Player_To_MonsterWeapon();
 	HRESULT Inspect_PlayerWeapon_To_Monster();
+	HRESULT Inspect_DynamicObject_To_PlayerNPlayerWeapon();
 	HRESULT Inspect_NPC_To_Player();
 	HRESULT Inspect_Terrain_To_All();
 

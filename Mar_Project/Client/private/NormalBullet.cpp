@@ -46,6 +46,8 @@ HRESULT CNormalBullet::Initialize_Clone(void * pArg)
 
 	FAILED_CHECK(Ready_ParticleDesc());
 
+	m_szNameTag = L"Layer_NormalBullet";
+
 	return S_OK;
 }
 

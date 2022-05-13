@@ -8,7 +8,7 @@
 #include "SlidePad.h"
 #include "ButtonPad.h"
 #include "ShapeMemoryPad.h"
-
+#include "ShpaeMemButton.h"
 
 
 CScene_Stage2::CScene_Stage2(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
@@ -44,7 +44,8 @@ HRESULT CScene_Stage2::Initialize()
 	FAILED_CHECK(Ready_Layer_EscalatorPad(TAG_LAY(Layer_EscalatorPad)));
 	FAILED_CHECK(Ready_Layer_SlidePad(TAG_LAY(Layer_SlideObj)));
 	FAILED_CHECK(Ready_Layer_ButtonPad(TAG_LAY(Layer_ButtonPad)));
-	FAILED_CHECK(Ready_Layer_ShapeMemPad(TAG_LAY(Layer_ButtonPad)));
+	FAILED_CHECK(Ready_Layer_ShapeMemPad(TAG_LAY(Layer_ShapeMemoryPad)));
+	FAILED_CHECK(Ready_Layer_ShapeMemBtn(TAG_LAY(Layer_ButtonPad)));
 	
 	
 
@@ -429,7 +430,33 @@ HRESULT CScene_Stage2::Ready_Layer_ShapeMemPad(const _tchar * pLayerTag)
 	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_ShapeMemoryPad), &tDesc));
 
 	return S_OK;
-}	
+}
+
+HRESULT CScene_Stage2::Ready_Layer_ShapeMemBtn(const _tchar * pLayerTag)
+{
+	CGameInstance* pInstance = g_pGameInstance;
+
+	list<CGameObject*>* ButtonList = pInstance->Get_ObjectList_from_Layer(SCENE_STAGE2, TAG_LAY(Layer_ShapeMemoryPad));
+	NULL_CHECK_RETURN(ButtonList, E_FAIL);
+
+	auto iter = ButtonList->begin();
+
+	CShpaeMemButton::BUTTONDESC tDesc;
+
+	tDesc.vAngle = _float3(270.f, 0, 0.f);
+	tDesc.vPosition = _float3(151.467f, 51.6f, 189.276f);
+	tDesc.eKindsOfObject = 0;
+	tDesc.pTargetObject = *iter;
+	iter++;
+	FAILED_CHECK(pInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_ShapeMemBtn), &tDesc));
+
+
+
+	tDesc.vPosition = _float3(75, 33, 188);
+	FAILED_CHECK(pInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_ShapeMemBtn), &tDesc));
+
+	return S_OK;
+}
 
 
 

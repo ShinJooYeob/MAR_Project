@@ -34,6 +34,7 @@
 #include "SlidePad.h"
 #include "ButtonPad.h"
 #include "ShapeMemoryPad.h"
+#include "ShpaeMemButton.h"
 
 #include "StaticMapObject.h"
 
@@ -810,6 +811,10 @@ HRESULT CLoader::Load_Scene_Stage2(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_ShapeMemoryPad),
 		CShapeMemoryPad::Create(m_pDevice, m_pDeviceContext)));
+
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_ShapeMemBtn),
+		CShpaeMemButton::Create(m_pDevice, m_pDeviceContext)));
+	
 #pragma endregion
 
 	RELEASE_INSTANCE(CGameInstance);

@@ -3,27 +3,27 @@
 #include "Player.h"
 #include "Terrain.h"
 #include "ClockBomb.h"
-#include "EscalatorPad.h"
+#include "ShapeMemoryPad.h"
 
 
 
-CButtonPad::CButtonPad(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
+CShpaeMemButton::CShpaeMemButton(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
 	:CMapObject(pDevice,pDeviceContext)
 {
 }
 
-CButtonPad::CButtonPad(const CButtonPad & rhs)
+CShpaeMemButton::CShpaeMemButton(const CShpaeMemButton & rhs)
 	: CMapObject(rhs)
 {
 }
 
-HRESULT CButtonPad::Initialize_Prototype(void * pArg)
+HRESULT CShpaeMemButton::Initialize_Prototype(void * pArg)
 {
 	FAILED_CHECK(__super::Initialize_Prototype(pArg));
 	return S_OK;
 }
 
-HRESULT CButtonPad::Initialize_Clone(void * pArg)
+HRESULT CShpaeMemButton::Initialize_Clone(void * pArg)
 {
 	FAILED_CHECK(__super::Initialize_Clone(pArg));
 
@@ -33,14 +33,13 @@ HRESULT CButtonPad::Initialize_Clone(void * pArg)
 	}
 
 	FAILED_CHECK(SetUp_Components());
+	m_PassedTime = 16;
 
-
-	//FAILED_CHECK(Set_TerrainTileKinds());
 
 	return S_OK;
 }
 
-_int CButtonPad::Update(_double fDeltaTime)
+_int CShpaeMemButton::Update(_double fDeltaTime)
 {
 	if (__super::Update(fDeltaTime) < 0)
 		return -1;
@@ -58,18 +57,16 @@ _int CButtonPad::Update(_double fDeltaTime)
 		for (_uint i = 0; i < m_pColliderCom->Get_NumColliderBuffer(); i++)
 			m_pColliderCom->Update_Transform(i, m_pTransformCom->Get_WorldMatrix());
 
-		g_pGameInstance->Add_CollisionGroup(CollisionType_MonsterWeapon, this, m_pColliderCom);
-		g_pGameInstance->Add_CollisionGroup(CollisionType_Monster, this, m_pColliderCom);
+
+		if (m_PassedTime >= 15)
+			g_pGameInstance->Add_CollisionGroup(CollisionType_DynaicObject, this, m_pColliderCom);
 	}
 	else
 	{
-		if (m_bChecker)
-		{
-			g_pGameInstance->Add_CollisionGroup(CollisionType_MonsterWeapon, this, m_pColliderCom);
-			g_pGameInstance->Add_CollisionGroup(CollisionType_Monster, this, m_pColliderCom);
-		}
+		if (m_PassedTime >= 15)
+			g_pGameInstance->Add_CollisionGroup(CollisionType_DynaicObject, this, m_pColliderCom);
 
-
+		
 	}
 
 	m_bChecker = false;
@@ -77,12 +74,11 @@ _int CButtonPad::Update(_double fDeltaTime)
 	return _int();
 }
 
-_int CButtonPad::LateUpdate(_double fDeltaTime)
+_int CShpaeMemButton::LateUpdate(_double fDeltaTime)
 {
 	if (__super::LateUpdate(fDeltaTime) < 0)
 		return -1;
 
-	LetWorkButton(!m_bChecker);
 
 	if (m_bIsOnScreen)
 		FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this));
@@ -91,13 +87,14 @@ _int CButtonPad::LateUpdate(_double fDeltaTime)
 	return _int();
 }
 
-_int CButtonPad::Render()
+_int CShpaeMemButton::Render()
 {
 	if (__super::Render() < 0)
 		return -1;
 
 #ifdef _DEBUG
-	m_pColliderCom->Render();
+	if (m_PassedTime >= 15)
+		m_pColliderCom->Render();
 #endif // _DEBUG
 
 
@@ -122,7 +119,7 @@ _int CButtonPad::Render()
 
 	_float4x4		ShaderWorldMatrix;
 	_float4x4		ButtonMat = m_pTransformCom->Get_WorldFloat4x4();
-	ButtonMat._42 -= m_ButtonHight;
+	ButtonMat._43 += m_ButtonHight;
 
 	XMStoreFloat4x4(&ShaderWorldMatrix, ButtonMat.TransposeXMatrix());
 	m_pShaderCom->Set_RawValue("g_WorldMatrix", &ShaderWorldMatrix, sizeof(_float4x4));
@@ -142,7 +139,7 @@ _int CButtonPad::Render()
 	return _int();
 }
 
-_int CButtonPad::LateRender()
+_int CShpaeMemButton::LateRender()
 {
 	if (__super::LateRender() < 0)
 		return -1;
@@ -153,60 +150,23 @@ _int CButtonPad::LateRender()
 
 
 
-void CButtonPad::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedObj, CCollider * pConflictedCollider, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType)
+void CShpaeMemButton::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedObj, CCollider * pConflictedCollider, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType)
 {
 	switch (eConflictedObjCollisionType)
 	{
 
-	case Engine::CollisionType_Player:
-	{
 
-		if (m_pPlayerTransform->Get_MatrixState_Float3(CTransform::STATE_POS).y < m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS).y + 0.6f - m_ButtonHight)
-		{
-			m_bChecker = true;
-
-
-			_float3 PlayerPos = m_pPlayerTransform->Get_MatrixState_Float3(CTransform::STATE_POS);
-			PlayerPos.y = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS).y + 0.6f - m_ButtonHight;
-
-			m_pPlayer->Set_NotLevitation();
-			m_pPlayerTransform->Set_MatrixState(CTransform::STATE_POS, PlayerPos);
-		}
-
-
-
-	}
-	break;
 	case Engine::CollisionType_PlayerWeapon:
 	{
- 		if (!lstrcmp(pConflictedObj->Get_NameTag(), TAG_LAY(Layer_ClockBomb)))
+ 		if (!lstrcmp(pConflictedObj->Get_NameTag(), L"Layer_GranadeBullet"))
 		{
-			CClockBomb* pObject = (CClockBomb*)pConflictedObj;
-
-			CTransform* pTransform = (CTransform*)(pObject->Get_Component(TAG_COM(Com_Transform)));
-			_float3		ObjectPos = pTransform->Get_MatrixState_Float3(CTransform::STATE_POS);
-			if (pObject->Get_IsOn())
-			{
-				m_bChecker = true;
-
-				ObjectPos.y = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS).y + 0.6f - m_ButtonHight;
-				pTransform->Set_MatrixState(CTransform::STATE_POS, ObjectPos);
-
-			}
-			else
-			{
-				if (pTransform->Get_MatrixState_Float3(CTransform::STATE_POS).y < m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS).y + 0.6f - m_ButtonHight)
-				{
-					m_bChecker = true;
-
-
-					pObject->Set_IsOn();
-
-					ObjectPos.y = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS).y + 0.6f - m_ButtonHight;
-					pTransform->Set_MatrixState(CTransform::STATE_POS, ObjectPos);
-
-				}
-			}
+			Set_ButtonIsUp(false);
+		}
+		else if (!lstrcmp(pConflictedObj->Get_NameTag(), L"Layer_NormalBullet"))
+		{
+			m_iHP--;
+			if (m_iHP <= 0)
+				Set_ButtonIsUp(false);
 		}
 
 	}
@@ -219,17 +179,18 @@ void CButtonPad::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflict
 
 }
 
-void CButtonPad::LetWorkButton(_bool bBool)
+void CShpaeMemButton::Set_ButtonIsUp(_bool bBool)
 {
-	if (m_PassedTime > 1 && bBool != m_bIsUp)
+	if (m_PassedTime >= 15 && bBool != m_bIsUp)
 	{
 		m_bIsUp = bBool;
 		m_PassedTime = 0;
+		m_iHP = 5;
 	}
 
 }
 
-HRESULT CButtonPad::SetUp_Components()
+HRESULT CShpaeMemButton::SetUp_Components()
 {
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Renderer), TAG_COM(Com_Renderer), (CComponent**)&m_pRendererCom));
 
@@ -265,7 +226,7 @@ HRESULT CButtonPad::SetUp_Components()
 	/* For.Com_AABB */
 	ZeroMemory(&ColliderDesc, sizeof(COLLIDERDESC));
 
-	ColliderDesc.vScale = _float3(4., 1.0f, 1.f);
+	ColliderDesc.vScale = _float3(5.f, 1.0f, 1.f);
 	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
 	ColliderDesc.vPosition = _float4(0.f, 0, 0, 1);
 	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
@@ -273,7 +234,7 @@ HRESULT CButtonPad::SetUp_Components()
 
 	ColliderDesc.vScale = _float3(2.8f,2.8f, 2.8f);
 	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
-	ColliderDesc.vPosition = _float4(0, -0.475f, 0, 1);
+	ColliderDesc.vPosition = _float4(0, 0,0, 1);
 	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_AABB, &ColliderDesc));
 	m_pColliderCom->Set_ParantBuffer();
 
@@ -294,98 +255,67 @@ HRESULT CButtonPad::SetUp_Components()
 	return S_OK;
 }
 
-HRESULT CButtonPad::Update_ButtonAnim(_double fDeltaTime)
+HRESULT CShpaeMemButton::Update_ButtonAnim(_double fDeltaTime)
 {
-	if (m_PassedTime > 1)
+	if (!m_bIsUp)
 	{
-
-		switch (m_tDesc.eKindsOfObject)
+		if (m_PassedTime < 1)
 		{
-		case 0:
-			((CEscalatorPad*)m_tDesc.pTargetObject)->LetEscalatingToDest(!m_bIsUp);
-
-			break;
-
-		default:
-			break;
+			m_PassedTime += fDeltaTime;
+			m_ButtonHight = g_pGameInstance->Easing(TYPE_ExpoInOut, 0, 0.6f, (_float)m_PassedTime, 1);
+			if (m_ButtonHight > 0.5)
+				((CShapeMemoryPad*)m_tDesc.pTargetObject)->Let_ReturntoShape(true);
 		}
-
-		return S_FALSE;
-	}
-
-
-
-	m_PassedTime += fDeltaTime;
-
-	if (m_bIsUp)
-	{
-		m_ButtonHight = g_pGameInstance->Easing(TYPE_ExpoInOut, 0.3f, 0, (_float)m_PassedTime, 1);
-
-		if (m_ButtonHight < 0.1)
+		else if (m_PassedTime < 14)
 		{
+			m_PassedTime += fDeltaTime;
+			((CShapeMemoryPad*)m_tDesc.pTargetObject)->Let_ReturntoShape(true);
+		}
+		else if (m_PassedTime < 15) {
+			m_PassedTime += fDeltaTime;
+			m_ButtonHight = g_pGameInstance->Easing(TYPE_ExpoInOut, 0.6f, 0, (_float)m_PassedTime - 14.f, 1);
 
-			switch (m_tDesc.eKindsOfObject)
-			{
-			case 0:
-				((CEscalatorPad*)m_tDesc.pTargetObject)->LetEscalatingToDest(!m_bIsUp);
+			if (m_ButtonHight > 0.1)
+				((CShapeMemoryPad*)m_tDesc.pTargetObject)->Let_ReturntoShape(false);
 
-				break;
-
-			default:
-				break;
-			}
+		}
+		else
+		{
+			m_bIsUp = true;
 		}
 	}
-	else
-	{
-		m_ButtonHight = g_pGameInstance->Easing(TYPE_ExpoInOut, 0, 0.3f, (_float)m_PassedTime, 1);
 
-		if (m_ButtonHight > 0.2)
-		{
-
-			switch (m_tDesc.eKindsOfObject)
-			{
-			case 0:
-				((CEscalatorPad*)m_tDesc.pTargetObject)->LetEscalatingToDest(!m_bIsUp);
-
-				break;
-
-			default:
-				break;
-			}
-		}
-
-	}
+	
 
 	return S_OK;
 }
 
 
-CButtonPad * CButtonPad::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, void * pArg)
+CShpaeMemButton * CShpaeMemButton::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, void * pArg)
 {
-	CButtonPad*	pInstance = new CButtonPad(pDevice, pDeviceContext);
+	CShpaeMemButton*	pInstance = new CShpaeMemButton(pDevice, pDeviceContext);
 
 	if (FAILED(pInstance->Initialize_Prototype(pArg)))
 	{
-		MSGBOX("Failed to Created CButtonPad");
+		MSGBOX("Failed to Created CShpaeMemButton");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-CGameObject * CButtonPad::Clone(void * pArg)
+CGameObject * CShpaeMemButton::Clone(void * pArg)
 {
-	CButtonPad*	pInstance = new CButtonPad(*this);
+	CShpaeMemButton*	pInstance = new CShpaeMemButton(*this);
 
 	if (FAILED(pInstance->Initialize_Clone(pArg)))
 	{
-		MSGBOX("Failed to Created CButtonPad");
+		MSGBOX("Failed to Created CShpaeMemButton");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-void CButtonPad::Free()
+void CShpaeMemButton::Free()
 {
 	__super::Free();
 

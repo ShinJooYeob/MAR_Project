@@ -62,6 +62,8 @@ private:
 	CTransform*			m_pPlayerTransform = nullptr;
 	_bool				m_bIsPlayerCloser = false;
 
+	_double				m_PatternChangeTime = 0;
+
 	SHAPEMEMDESC		m_tDesc;
 
 	vector<SHAPEPIECEDESC>	m_vecPiece;
