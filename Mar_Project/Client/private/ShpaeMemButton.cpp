@@ -58,12 +58,12 @@ _int CShpaeMemButton::Update(_double fDeltaTime)
 			m_pColliderCom->Update_Transform(i, m_pTransformCom->Get_WorldMatrix());
 
 
-		if (m_PassedTime >= 15)
+		if (m_PassedTime >= 7)
 			g_pGameInstance->Add_CollisionGroup(CollisionType_DynaicObject, this, m_pColliderCom);
 	}
 	else
 	{
-		if (m_PassedTime >= 15)
+		if (m_PassedTime >= 7)
 			g_pGameInstance->Add_CollisionGroup(CollisionType_DynaicObject, this, m_pColliderCom);
 
 		
@@ -93,7 +93,7 @@ _int CShpaeMemButton::Render()
 		return -1;
 
 #ifdef _DEBUG
-	if (m_PassedTime >= 15)
+	if (m_PassedTime >= 7)
 		m_pColliderCom->Render();
 #endif // _DEBUG
 
@@ -158,6 +158,10 @@ void CShpaeMemButton::CollisionTriger(_uint iMyColliderIndex, CGameObject * pCon
 
 	case Engine::CollisionType_PlayerWeapon:
 	{
+
+		m_pPlayer->Set_ReturnPos(_float3(135.377f, 45.050f, 171.863f));
+
+
  		if (!lstrcmp(pConflictedObj->Get_NameTag(), L"Layer_GranadeBullet"))
 		{
 			Set_ButtonIsUp(false);
@@ -181,7 +185,7 @@ void CShpaeMemButton::CollisionTriger(_uint iMyColliderIndex, CGameObject * pCon
 
 void CShpaeMemButton::Set_ButtonIsUp(_bool bBool)
 {
-	if (m_PassedTime >= 15 && bBool != m_bIsUp)
+	if (m_PassedTime >= 7 && bBool != m_bIsUp)
 	{
 		m_bIsUp = bBool;
 		m_PassedTime = 0;
@@ -266,16 +270,16 @@ HRESULT CShpaeMemButton::Update_ButtonAnim(_double fDeltaTime)
 			if (m_ButtonHight > 0.5)
 				((CShapeMemoryPad*)m_tDesc.pTargetObject)->Let_ReturntoShape(true);
 		}
-		else if (m_PassedTime < 14)
+		else if (m_PassedTime < 6)
 		{
 			m_PassedTime += fDeltaTime;
 			((CShapeMemoryPad*)m_tDesc.pTargetObject)->Let_ReturntoShape(true);
 		}
-		else if (m_PassedTime < 15) {
+		else if (m_PassedTime < 7) {
 			m_PassedTime += fDeltaTime;
-			m_ButtonHight = g_pGameInstance->Easing(TYPE_ExpoInOut, 0.6f, 0, (_float)m_PassedTime - 14.f, 1);
+			m_ButtonHight = g_pGameInstance->Easing(TYPE_ExpoInOut, 0.6f, 0, (_float)m_PassedTime - 6.f, 1);
 
-			if (m_ButtonHight > 0.1)
+			if (m_ButtonHight < 0.1)
 				((CShapeMemoryPad*)m_tDesc.pTargetObject)->Let_ReturntoShape(false);
 
 		}

@@ -58,7 +58,7 @@ _int CSlidePad::Update(_double fDeltaTime)
 		for (_uint i = 0; i < m_pColliderCom->Get_NumColliderBuffer(); i++)
 			m_pColliderCom->Update_Transform(i, m_pTransformCom->Get_WorldMatrix());
 
-		g_pGameInstance->Add_CollisionGroup(CollisionType_DynaicObject, this, m_pColliderCom);
+		g_pGameInstance->Add_CollisionGroup(CollisionType_MonsterWeapon, this, m_pColliderCom);
 
 	}
 	return _int();
@@ -182,11 +182,13 @@ void CSlidePad::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflicte
 	{
 		if (m_tDesc.bStartCollider && iMyColliderIndex == m_iStartPointColliderIndex)
 		{
+			m_pPlayer->Set_ReturnPos({ 186.256f, 69.f, 86.939f });
 			m_pPlayer->Let_PlayerSliding(true);
 
 		}
 		else if (m_tDesc.bEndCollider &&iMyColliderIndex == m_iEndPointColliderIndex)
 		{
+			m_pPlayer->Set_ReturnPos({ 152.476f, 43.2f, 130.360f });
 
 			m_pPlayer->Let_PlayerSliding(false);
 

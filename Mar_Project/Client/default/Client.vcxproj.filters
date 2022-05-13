@@ -477,6 +477,9 @@
     <ClInclude Include="..\public\ShpaeMemButton.h">
       <Filter>01.GameObject\07.MapObject\01.DynamicObj\12.ShapeMemoryPad</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\PresserObj.h">
+      <Filter>01.GameObject\07.MapObject\01.DynamicObj\11.PresserObj</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -697,6 +700,9 @@
     </ClCompile>
     <ClCompile Include="..\private\ShpaeMemButton.cpp">
       <Filter>01.GameObject\07.MapObject\01.DynamicObj\12.ShapeMemoryPad</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\PresserObj.cpp">
+      <Filter>01.GameObject\07.MapObject\01.DynamicObj\11.PresserObj</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -34,6 +34,7 @@ private:
 	HRESULT Ready_Layer_ButtonPad(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_ShapeMemPad(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_ShapeMemBtn(const _tchar* pLayerTag);
+	HRESULT Ready_Layer_PresserObj(const _tchar* pLayerTag);
 
 
 

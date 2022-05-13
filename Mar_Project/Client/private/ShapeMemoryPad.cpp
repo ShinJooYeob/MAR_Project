@@ -173,7 +173,7 @@ HRESULT CShapeMemoryPad::Reset_TerrainTileKindsMovableNHeightZero()
 
 HRESULT CShapeMemoryPad::Let_ReturntoShape(_bool bBool)
 {
-	if (m_PatternChangeTime < 13 || bBool == m_bReturnToShape) return S_FALSE;
+	if (m_PatternChangeTime < 5.5f || bBool == m_bReturnToShape) return S_FALSE;
 
 	m_bReturnToShape = bBool;
 
@@ -195,45 +195,6 @@ HRESULT CShapeMemoryPad::Let_ReturntoShape(_bool bBool)
 	return S_OK;
 }
 
-
-
-void CShapeMemoryPad::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedObj, CCollider * pConflictedCollider, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType)
-{
-	switch (eConflictedObjCollisionType)
-	{
-
-	case Engine::CollisionType_Player:
-	{
-		//m_pPlayer->Set_LevitationTime((_float)g_fDeltaTime);
-		_Vector Dir = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS) - m_vOldPos.XMVector();
-		_float Lenth = XMVectorGetX(XMVector3Length(Dir));
-
-		m_pPlayerTransform->MovetoDir_bySpeed(Dir, Lenth, 1);
-
-
-
-		if (m_pPlayerTransform->Get_MatrixState_Float3(CTransform::STATE_POS).y < m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS).y + 2.5f)
-		{
-			_float3 PlayerPos = m_pPlayerTransform->Get_MatrixState_Float3(CTransform::STATE_POS);
-			PlayerPos.y = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS).y + 2.5f;
-
-			m_pPlayerTransform->Set_MatrixState(CTransform::STATE_POS, PlayerPos);
-		}
-
-		//pConflictedCollider->Set_Conflicted();
-		//((CPlayer*)(pConflictedObj))->Add_Dmg_to_Player(rand() % 2 + 3);
-
-	}
-	break;
-	case Engine::CollisionType_Terrain:
-		break;
-
-	default:
-		break;
-	}
-
-
-}
 
 HRESULT CShapeMemoryPad::SetUp_Components()
 {
@@ -404,7 +365,7 @@ HRESULT CShapeMemoryPad::Ready_Piece()
 
 HRESULT CShapeMemoryPad::Update_PieceAngle(_double fDeltaTime)
 {
-	if (m_PatternChangeTime < 13)
+	if (m_PatternChangeTime < 5.5f)
 		m_PatternChangeTime += fDeltaTime;
 
 	

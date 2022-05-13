@@ -9,6 +9,7 @@
 #include "ButtonPad.h"
 #include "ShapeMemoryPad.h"
 #include "ShpaeMemButton.h"
+#include "PresserObj.h"
 
 
 CScene_Stage2::CScene_Stage2(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
@@ -46,7 +47,7 @@ HRESULT CScene_Stage2::Initialize()
 	FAILED_CHECK(Ready_Layer_ButtonPad(TAG_LAY(Layer_ButtonPad)));
 	FAILED_CHECK(Ready_Layer_ShapeMemPad(TAG_LAY(Layer_ShapeMemoryPad)));
 	FAILED_CHECK(Ready_Layer_ShapeMemBtn(TAG_LAY(Layer_ButtonPad)));
-	
+	FAILED_CHECK(Ready_Layer_PresserObj(TAG_LAY(Layer_Presser)));
 	
 
 	return S_OK;
@@ -413,7 +414,7 @@ HRESULT CScene_Stage2::Ready_Layer_ButtonPad(const _tchar * pLayerTag)
 
 	tDesc.vAngle = _float3(0,270,0);
 	tDesc.vPosition = _float3(133.142f, 43.2f, 129.99f);
-	tDesc.eKindsOfObject = 0;
+	tDesc.eKindsOfObject = 1;
 	tDesc.pTargetObject = *iter;
 	iter++;
 	FAILED_CHECK(pInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_ButtonPad), &tDesc));
@@ -450,11 +451,30 @@ HRESULT CScene_Stage2::Ready_Layer_ShapeMemBtn(const _tchar * pLayerTag)
 	iter++;
 	FAILED_CHECK(pInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_ShapeMemBtn), &tDesc));
 
+	return S_OK;
+}
+
+HRESULT CScene_Stage2::Ready_Layer_PresserObj(const _tchar * pLayerTag)
+{
+
+	CPresserObj::PRESSERDESC tDesc;
+
+	tDesc.MoveSpeed = 0.5f;
+	tDesc.vStartPos = _float3(69.187f, 30.0f, 118.203f);
+	tDesc.vDestPos = _float3(69.187f, 40.5f, 118.203f);
+
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_Presser), &tDesc));
 
 
-	tDesc.vPosition = _float3(75, 33, 188);
-	FAILED_CHECK(pInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_ShapeMemBtn), &tDesc));
+	tDesc.vStartPos = _float3(69.187f, 30.0f, 107.803f);
+	tDesc.vDestPos = _float3(69.187f, 40.5f, 107.803f);
 
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_Presser), &tDesc));
+
+	tDesc.vStartPos = _float3(69.187f, 30.0f, 97.403f);
+	tDesc.vDestPos = _float3(69.187f, 40.5f, 97.403f);
+
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_Presser), &tDesc));
 	return S_OK;
 }
 

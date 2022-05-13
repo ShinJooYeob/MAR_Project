@@ -161,6 +161,18 @@ void CButtonPad::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflict
 
 		if (m_pPlayerTransform->Get_MatrixState_Float3(CTransform::STATE_POS).y < m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS).y + 0.6f - m_ButtonHight)
 		{
+			switch (m_tDesc.eKindsOfObject)
+			{
+			case 0:
+				m_pPlayer->Set_ReturnPos(_float3(75.830f, 23.670f, 77.509f));
+				break;
+			default:
+				break;
+			}
+
+
+			
+
 			m_bChecker = true;
 
 
@@ -300,6 +312,7 @@ HRESULT CButtonPad::Update_ButtonAnim(_double fDeltaTime)
 		switch (m_tDesc.eKindsOfObject)
 		{
 		case 0:
+		case 1:
 			((CEscalatorPad*)m_tDesc.pTargetObject)->LetEscalatingToDest(!m_bIsUp);
 
 			break;
@@ -325,6 +338,7 @@ HRESULT CButtonPad::Update_ButtonAnim(_double fDeltaTime)
 			switch (m_tDesc.eKindsOfObject)
 			{
 			case 0:
+			case 1:
 				((CEscalatorPad*)m_tDesc.pTargetObject)->LetEscalatingToDest(!m_bIsUp);
 
 				break;
@@ -344,6 +358,7 @@ HRESULT CButtonPad::Update_ButtonAnim(_double fDeltaTime)
 			switch (m_tDesc.eKindsOfObject)
 			{
 			case 0:
+			case 1:
 				((CEscalatorPad*)m_tDesc.pTargetObject)->LetEscalatingToDest(!m_bIsUp);
 
 				break;

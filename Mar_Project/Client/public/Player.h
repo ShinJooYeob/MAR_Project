@@ -30,6 +30,7 @@ public:
 	virtual HRESULT Initialize_Clone(void* pArg)override;
 	HRESULT SetUp_Weapon();
 	HRESULT Renew_Player(_float3 Position);
+	void Set_ReturnPos(_float3 Position) { m_vReturnPos = Position; };
 public:
 	virtual _int Update(_double fDeltaTime)override;
 	virtual _int LateUpdate(_double fDeltaTime)override;
@@ -139,6 +140,8 @@ private:
 	/*For Slide */
 	_bool				m_bSlide = false;
 
+
+	_float3				m_vReturnPos = { 0,0,0 };
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ConstTable();

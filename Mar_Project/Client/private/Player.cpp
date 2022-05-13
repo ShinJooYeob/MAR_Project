@@ -798,7 +798,7 @@ HRESULT CPlayer::Renew_Player(_float3 Position)
 
 	m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, Position);
 
-
+	m_vOldPos= m_vReturnPos = Position;
 
 
 	return S_OK;
@@ -3208,7 +3208,7 @@ HRESULT CPlayer::Set_Player_On_Terrain_DontPutonJumpMovable()
 		m_iJumpCount = 0;
 		m_LevitationTime = 0;
 		m_fJumpPower = -1.f;
-		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, _float3(70, 25.5f, 168));
+		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, m_vReturnPos);
 
 	}
 

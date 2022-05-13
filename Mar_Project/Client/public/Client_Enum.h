@@ -86,6 +86,7 @@ enum OBJECTPROTOTYPEID
 	Prototype_MazeDoor,
 	Prototype_ShapeMemoryPad,
 	Prototype_ShapeMemBtn,
+	Prototype_Presser,
 
 
 	Prototype_StaticMapObject,
@@ -279,6 +280,9 @@ static const _tchar* Tag_Object_Prototype(OBJECTPROTOTYPEID eTag)
 		return TEXT("Prototype_ShapeMemBtn");
 		break;
 		
+	case Prototype_Presser:
+		return TEXT("Prototype_Presser");
+		break;
 
 
 	case Prototype_StaticMapObject:
@@ -392,6 +396,7 @@ enum LAYERID
 	Layer_Vent,
 	Layer_MazeDoor,
 	Layer_ShapeMemoryPad,
+	Layer_Presser,
 
 
 
@@ -488,8 +493,11 @@ static const _tchar* Tag_Layer(LAYERID eTag)
 	case Layer_ShapeMemoryPad:
 		return TEXT("Layer_ShapeMemoryPad");
 		break;
+	case Layer_Presser:
+		return TEXT("Layer_Presser");
+		break;
 
-	
+
 
 
 	case Layer_StaticMapObj:
