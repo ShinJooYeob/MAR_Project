@@ -3,7 +3,7 @@
 
 namespace Engine {
 
-	enum TerrainTileID{	Tile_None,  Tile_JumpMovable, Tile_ShrinkMovable, Tile_Movable, Tile_End };
+	enum TerrainTileID{	Tile_None,  Tile_JumpMovable, Tile_ShrinkMovable, Tile_Movable, Tile_DynamicNoneTile, Tile_End };
 
 	enum CollisionTypeID{  CollisionType_Player, CollisionType_PlayerWeapon, CollisionType_Monster, CollisionType_MonsterWeapon,  CollisionType_NPC, CollisionType_DynaicObject, CollisionType_Terrain, CollisionType_END	};
 

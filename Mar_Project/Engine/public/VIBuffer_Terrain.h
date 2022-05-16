@@ -18,13 +18,15 @@ public:
 
 	_float Get_TerrainHeight(_bool* bIsMovable ,_float3 PosOnTerrainLocal);
 	_uint Get_TerrainKinds(_bool* bIsMovable, _float3 PosOnTerrainLocal);
-	_Vector Caculate_TerrainY(_bool* pbIsOnTerrain, _float3 PosOnTerrainLocal,_float3 OldPosOnTerrainLocal ,_float3* vLocalPlaneNormVector = nullptr, _uint* eNowTile = nullptr);
+	_Vector Caculate_TerrainY(_bool* pbIsOnTerrain, _float3 PosOnTerrainLocal, _float3 OldPosOnTerrainLocal, _float3* vLocalPlaneNormVector = nullptr, _uint* eNowTile = nullptr);
+	_Vector Caculate_TerrainY_IgnoreTile(_bool* pbIsOnTerrain, _float3 PosOnTerrainLocal, _float3 OldPosOnTerrainLocal, _float3* vLocalPlaneNormVector = nullptr, _uint* eNowTile = nullptr);
 	_Vector Caculate_Terrain_Pick_byRay(_bool* pbIsOnTerrain, _float3 PosOnTerrainLocal, _float3 OldPosOnTerrainLocal, _float3* vLocalPlaneNormVector = nullptr);
 	_float EquationPlane(_bool* pbIsOnTerrain, _float3 PosOnTerrainLocal, _float* CaculateY = nullptr, _float3* vNormVector = nullptr);
 	_float EquationPlane_Kinds_Of_NavigationTile(_uint* pOutKidsOfTile, _bool* pbIsOnTerrain, _float3 PosOnTerrainLocal,
 		_float* CaculateY = nullptr, _float3* vNormVector = nullptr);
 
 	HRESULT Chage_TileKindsNHeight(_uint iTileKinds, _float3 PosNHeight);
+	HRESULT Chage_SourTile_To_DestTile(_uint iSourTileKinds, _uint iDestTileKinds,  _float3 Position);
 
 	_Vector Calculate_SlidingVector(_float3 OldPosOnTerrainLocal, _float3 PosOnTerrainLocal);
 	_Vector Calculate_SlidingVector_ForNoneTile(_float3 OldPosOnTerrainLocal, _float3 PosOnTerrainLocal, _float Rate = 1.001f);

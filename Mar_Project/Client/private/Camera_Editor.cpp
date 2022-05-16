@@ -129,7 +129,7 @@ HRESULT CCamera_Editor::SetUp_Components()
 }
 
 //#define EASINGTYPE TYPE_QuadInOut
-#define EASINGTYPE TYPE_Linear
+#define EASINGTYPE TYPE_SinInOut
 
 HRESULT CCamera_Editor::Update_CamAction(_double fDeltaTime)
 {

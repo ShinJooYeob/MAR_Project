@@ -27,6 +27,9 @@ private:
 	HRESULT Ready_Layer_UI(const _tchar* pLayerTag);
 
 	HRESULT Ready_Layer_StaticMapObj(const _tchar* pLayerTag);
+	HRESULT Ready_VentObject(const _tchar* pLayerTag);
+	HRESULT Ready_MovableColum(const _tchar* pLayerTag);
+
 
 
 	HRESULT Ready_Layer_Executor(const _tchar* pLayerTag);

@@ -213,6 +213,28 @@ _float3 CTerrain::PutOnTerrain_Stage2(_bool * pbIsObTerrain, _fVector ObjectWorl
 	return ObjectWorldPos;
 }
 
+_float3 CTerrain::PutOnTerrain_IgnoreTile(_bool * pbIsObTerrain, _fVector ObjectWorldPos, _fVector ObjectOldWorldPos, _float3 * vOutPlaneNormalVec, _uint * eNowTile)
+{
+	_Matrix InverMat = m_InverseWorldMat.XMatrix();
+
+	_Vector CaculatedFloat3 = m_pVIBufferCom->Caculate_TerrainY_IgnoreTile(pbIsObTerrain,
+		(XMVector3TransformCoord(ObjectWorldPos, InverMat)), (XMVector3TransformCoord(ObjectOldWorldPos, InverMat)), vOutPlaneNormalVec, eNowTile);
+
+
+	if (XMVectorGetY(ObjectOldWorldPos) < XMVectorGetY(ObjectWorldPos))
+		return ObjectWorldPos;
+
+	if (*pbIsObTerrain)
+	{
+		if (vOutPlaneNormalVec != nullptr)
+			*vOutPlaneNormalVec = XMVector3TransformNormal(vOutPlaneNormalVec->XMVector(), m_pTransformCom->Get_WorldMatrix());
+
+		return XMVector3TransformCoord(CaculatedFloat3, m_pTransformCom->Get_WorldMatrix());
+	}
+
+	return ObjectWorldPos;
+}
+
 _bool CTerrain::Check_Movable_Terrain(_bool * pbIsMovable, _fVector ObjectNowPos, _fVector CheckPos, _float fMovableHeight)
 {
 	_Matrix InverMat = m_InverseWorldMat.XMatrix();
@@ -359,6 +381,43 @@ HRESULT CTerrain::Chage_TileKindsMovableNZero(_fMatrix WorldPointsMat)
 	return S_OK;
 }
 
+HRESULT CTerrain::Chage_SourTileKind_To_DestTileKind(_fMatrix WorldPointsMat, _uint iSourTileKind, _uint iDestTileKinds)
+{
+	_float4x4 PointsOnLocal = WorldPointsMat * m_pTransformCom->Get_InverseWorldMatrix();
+
+
+	RECT Points;
+
+	//_float Height = PointsOnLocal._12;
+
+	//_float LowHight = (min(min(min(PointsOnLocal._12, PointsOnLocal._22), PointsOnLocal._32), PointsOnLocal._42));
+	//_float MaxHight = (max(max(max(PointsOnLocal._12, PointsOnLocal._22), PointsOnLocal._32), PointsOnLocal._42));
+
+
+
+	Points.left = _uint(min(min(min(PointsOnLocal._11, PointsOnLocal._21), PointsOnLocal._31), PointsOnLocal._41) - 1);
+	Points.bottom = _uint(min(min(min(PointsOnLocal._13, PointsOnLocal._23), PointsOnLocal._33), PointsOnLocal._43) - 1);
+	Points.right = _uint(max(max(max(PointsOnLocal._11, PointsOnLocal._21), PointsOnLocal._31), PointsOnLocal._41) + 1);
+	Points.top = _uint(max(max(max(PointsOnLocal._13, PointsOnLocal._23), PointsOnLocal._33), PointsOnLocal._43) + 1);
+
+	//_float HeightIndterver = (MaxHight - LowHight) / (Points.top - Points.bottom - 2);
+
+
+	for (_uint i = (_uint)Points.left; i <= (_uint)Points.right; i++)
+	{
+		for (_uint j = (_uint)Points.bottom; j <= (_uint)Points.top; j++)
+		{
+			m_pVIBufferCom->Chage_SourTile_To_DestTile(iSourTileKind, iDestTileKinds,_float3((_float)i, 0, (_float)j));
+
+		}
+
+	}
+
+
+	return S_OK;
+}
+
+
 HRESULT CTerrain::SetUp_Components()
 {
 
@@ -416,7 +475,7 @@ HRESULT CTerrain::Ready_FilterMap()
 		strcpy_s(FileName, "Filter_1.bmp");
 		break;
 	case SCENE_STAGE3:
-		strcpy_s(FileName, "Filter_1.bmp");
+		strcpy_s(FileName, "Filter_3.bmp");
 		break;
 
 	case SCENE_BOSS:

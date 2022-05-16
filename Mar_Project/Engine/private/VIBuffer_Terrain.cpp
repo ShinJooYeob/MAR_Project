@@ -427,7 +427,8 @@ _uint CVIBuffer_Terrain::Get_TerrainKinds(_bool * bIsMovable, _float3 PosOnTerra
 		}
 
 
-		if (m_pNaviTerrain[iIndices[0]] == Tile_None || m_pNaviTerrain[iIndices[2]] == Tile_None || m_pNaviTerrain[iIndices[3]] == Tile_None)
+		if (m_pNaviTerrain[iIndices[0]] == Tile_None || m_pNaviTerrain[iIndices[2]] == Tile_None || m_pNaviTerrain[iIndices[3]] == Tile_None||
+			m_pNaviTerrain[iIndices[0]] == Tile_DynamicNoneTile || m_pNaviTerrain[iIndices[2]] == Tile_DynamicNoneTile || m_pNaviTerrain[iIndices[3]] == Tile_DynamicNoneTile)
 		{
 			return Tile_None;
 
@@ -496,7 +497,8 @@ _uint CVIBuffer_Terrain::Get_TerrainKinds(_bool * bIsMovable, _float3 PosOnTerra
 			return Tile_None;
 		}
 
-		if (m_pNaviTerrain[iIndices[0]] == Tile_None || m_pNaviTerrain[iIndices[2]] == Tile_None || m_pNaviTerrain[iIndices[1]] == Tile_None)
+		if (m_pNaviTerrain[iIndices[0]] == Tile_None || m_pNaviTerrain[iIndices[2]] == Tile_None || m_pNaviTerrain[iIndices[1]] == Tile_None||
+			m_pNaviTerrain[iIndices[0]] == Tile_DynamicNoneTile || m_pNaviTerrain[iIndices[2]] == Tile_DynamicNoneTile || m_pNaviTerrain[iIndices[1]] == Tile_DynamicNoneTile)
 		{
 			return Tile_None;
 		}
@@ -575,7 +577,7 @@ _Vector CVIBuffer_Terrain::Caculate_TerrainY(_bool* pbIsOnTerrain ,_float3 PosOn
 	_float3 vSlidingVec = XMVector3Normalize(PosOnTerrainLocal.XMVector() - OldPosOnTerrainLocal.XMVector());
 	_float CacluatedOld = EquationPlane_Kinds_Of_NavigationTile(&OldNaviTile, &IsOldOnTerrain, OldPosOnTerrainLocal,&CaculatedOldY,&vSlidingVec);
 	
-	if (NowNaviTile == Tile_None)
+	if (NowNaviTile == Tile_None || NowNaviTile == Tile_DynamicNoneTile)
 	{
 		if (eNowTile)*eNowTile = Tile_None;
 		*pbIsOnTerrain = false;
@@ -588,7 +590,7 @@ _Vector CVIBuffer_Terrain::Caculate_TerrainY(_bool* pbIsOnTerrain ,_float3 PosOn
 
 		for (_uint i = 1; i < 11; i++)
 		{
-			if (OldNaviTile != Tile_None) break;
+			if (OldNaviTile != Tile_None || OldNaviTile == Tile_DynamicNoneTile) break;
 
 			//Temp = OldPosOnTerrainLocal.XMVector() + Calculate_SlidingVector_ForNoneTile(OldPosOnTerrainLocal, PosOnTerrainLocal, 1.001f + (0.1f + (_float)i));
 			Temp = OldPosOnTerrainLocal.XMVector() + Calculate_SlidingVector_ForNoneTile(OldPosOnTerrainLocal, Temp);
@@ -647,6 +649,37 @@ _Vector CVIBuffer_Terrain::Caculate_TerrainY(_bool* pbIsOnTerrain ,_float3 PosOn
 		return PosOnTerrainLocal.XMVector();
 	}
 
+}
+
+_Vector CVIBuffer_Terrain::Caculate_TerrainY_IgnoreTile(_bool * pbIsOnTerrain, _float3 PosOnTerrainLocal, _float3 OldPosOnTerrainLocal, _float3 * vLocalPlaneNormVector, _uint * eNowTile)
+{
+	_float CaculatedY = 0;
+	_float CacluatedNow = EquationPlane(pbIsOnTerrain, PosOnTerrainLocal, &CaculatedY, vLocalPlaneNormVector);
+
+
+	_float CaculatedOldY = 0;
+	_bool IsOldOnTerrain = false;
+	_float3 vSlidingVec = XMVector3Normalize(PosOnTerrainLocal.XMVector() - OldPosOnTerrainLocal.XMVector());
+	_float CacluatedOld = EquationPlane(&IsOldOnTerrain, OldPosOnTerrainLocal, &CaculatedOldY, &vSlidingVec);
+
+
+
+	if (*pbIsOnTerrain == false) {
+		*pbIsOnTerrain = false;
+		return PosOnTerrainLocal.XMVector();
+	}
+
+	if (PosOnTerrainLocal.y <= CaculatedY && CacluatedOld >= -0.2f)
+	{
+		*pbIsOnTerrain = true;
+		return _float3(PosOnTerrainLocal.x, CaculatedY, PosOnTerrainLocal.z).XMVector();
+
+	}
+	else
+	{
+		*pbIsOnTerrain = false;
+		return PosOnTerrainLocal.XMVector();
+	}
 }
 
 
@@ -858,7 +891,8 @@ _float CVIBuffer_Terrain::EquationPlane_Kinds_Of_NavigationTile(_uint * pOutKids
 		}
 
 
-		if (m_pNaviTerrain[iIndices[0]] == Tile_None || m_pNaviTerrain[iIndices[2]] == Tile_None || m_pNaviTerrain[iIndices[3]] == Tile_None)
+		if (m_pNaviTerrain[iIndices[0]] == Tile_None || m_pNaviTerrain[iIndices[2]] == Tile_None || m_pNaviTerrain[iIndices[3]] == Tile_None||
+			m_pNaviTerrain[iIndices[0]] == Tile_DynamicNoneTile || m_pNaviTerrain[iIndices[2]] == Tile_DynamicNoneTile || m_pNaviTerrain[iIndices[3]] == Tile_DynamicNoneTile)
 		{
 			*pOutKidsOfTile = Tile_None;
 			*pbIsOnTerrain = false;
@@ -941,7 +975,8 @@ _float CVIBuffer_Terrain::EquationPlane_Kinds_Of_NavigationTile(_uint * pOutKids
 			return -FLT_MAX;
 		}
 
-		if (m_pNaviTerrain[iIndices[0]] == Tile_None || m_pNaviTerrain[iIndices[2]] == Tile_None || m_pNaviTerrain[iIndices[1]] == Tile_None)
+		if (m_pNaviTerrain[iIndices[0]] == Tile_None || m_pNaviTerrain[iIndices[2]] == Tile_None || m_pNaviTerrain[iIndices[1]] == Tile_None||
+			m_pNaviTerrain[iIndices[0]] == Tile_DynamicNoneTile || m_pNaviTerrain[iIndices[2]] == Tile_DynamicNoneTile || m_pNaviTerrain[iIndices[1]] == Tile_DynamicNoneTile)
 		{
 			*pOutKidsOfTile = Tile_None;
 			*pbIsOnTerrain = false;
@@ -1037,6 +1072,20 @@ HRESULT CVIBuffer_Terrain::Chage_TileKindsNHeight(_uint iTileKinds, _float3 PosN
 
 	return S_OK;
 }
+
+HRESULT CVIBuffer_Terrain::Chage_SourTile_To_DestTile(_uint iSourTileKinds, _uint iDestTileKinds, _float3 Position)
+{
+	if (Position.x < 0 || Position.x >= m_iNumVerticesX || Position.z < 0 || Position.z >= m_iNumVerticesZ)
+		return E_FAIL;
+
+
+	_uint iIndex = _uint(_uint(Position.z) * m_iNumVerticesX + Position.x);
+
+	if (m_pNaviTerrain[iIndex] == iSourTileKinds)
+		m_pNaviTerrain[iIndex] = _float(iDestTileKinds);
+	return S_OK;
+}
+
 
 _Vector CVIBuffer_Terrain::Calculate_SlidingVector(_float3 OldPosOnTerrainLocal, _float3 PosOnTerrainLocal)
 {

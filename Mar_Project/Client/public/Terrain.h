@@ -25,11 +25,15 @@ public:
 
 	_float3 PutOnTerrain(_bool* pbIsObTerrain, _fVector ObjectWorldPos, _fVector ObjectOldWorldPos, _float3* vOutPlaneNormalVec = nullptr, _uint* eNowTile = nullptr);
 	_float3 PutOnTerrain_Stage2(_bool* pbIsObTerrain, _fVector ObjectWorldPos, _fVector ObjectOldWorldPos, _float3* vOutPlaneNormalVec = nullptr, _uint* eNowTile = nullptr);
+	_float3 PutOnTerrain_IgnoreTile(_bool* pbIsObTerrain, _fVector ObjectWorldPos, _fVector ObjectOldWorldPos, _float3* vOutPlaneNormalVec = nullptr, _uint* eNowTile = nullptr);
 	_bool	Check_Movable_Terrain(_bool* pbIsMovable, _fVector ObjectNowPos, _fVector CheckPos,_float fMovableHeight = 1.f);
 
 	HRESULT Chage_TileKindsNHeight(_fMatrix WorldPointsMat);
 	HRESULT Chage_TileKindsNHeight_AvailEdge(_fMatrix WorldPointsMat, _float fExtra =1);
 	HRESULT Chage_TileKindsMovableNZero(_fMatrix WorldPointsMat);
+	HRESULT Chage_SourTileKind_To_DestTileKind(_fMatrix WorldPointsMat,_uint iSourTileKind, _uint iDestTileKinds);
+
+
 
 private:
 	CShader*			m_pShaderCom = nullptr;

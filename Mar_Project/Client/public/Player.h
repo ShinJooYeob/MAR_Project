@@ -2,9 +2,9 @@
 
 #include "GameObject.h"
 
-BEGIN(Engine)
-class CCamera;
-END
+//BEGIN(Engine)
+//class CCamera;
+//END
 
 
 BEGIN(Client)
@@ -15,8 +15,8 @@ class CPlayer final : public CGameObject
 public:
 	enum eWeaponState
 	{
-		Weapon_None = 0, Weapon_Knife = 47, Weapon_Grinder = 73, Weapon_Horse = 89, Weapon_Teapot = 113, Weapon_Umbrella = 134, Weapon_End
-		//Weapon_None = 0, Weapon_Knife =88888888, Weapon_Grinder = 45651, Weapon_Horse = 387137, Weapon_Teapot = 123123, Weapon_Umbrella = 47, Weapon_End
+		Weapon_None = 0, Weapon_Knife = 47, Weapon_Grinder = 73, Weapon_Horse = 89, Weapon_Teapot = 113, Weapon_Umbrella = 134, Weapon_Giant= 140, Weapon_End
+		//Weapon_None = 0, Weapon_Knife =88888888, Weapon_Grinder = 45651, Weapon_Horse = 387137, Weapon_Teapot = 123123, Weapon_Umbrella = 51613, Weapon_Giant= 47, Weapon_End
 	};
 
 
@@ -31,6 +31,10 @@ public:
 	HRESULT SetUp_Weapon();
 	HRESULT Renew_Player(_float3 Position);
 	void Set_ReturnPos(_float3 Position) { m_vReturnPos = Position; };
+
+	void Set_GettingBigger(_bool bBool);
+	_bool Get_IsGiant() { return m_bIsGiant; };
+
 public:
 	virtual _int Update(_double fDeltaTime)override;
 	virtual _int LateUpdate(_double fDeltaTime)override;
@@ -67,6 +71,8 @@ public:
 	_bool Get_TrapppedFlower() { return m_bTrappedbyFlower; };
 	void Set_PlayerPosition(_float3 vPos);
 
+
+	void Set_IsVenting(_bool bBool,_float3 vTargetLook);
 private:
 	CShader*			m_pShaderCom = nullptr;
 	CRenderer*			m_pRendererCom = nullptr;
@@ -75,7 +81,7 @@ private:
 	CCollider*			m_pColliderCom = nullptr;
 
 private:
-	CCamera*			m_pMainCamera = nullptr;
+	class CCamera_Main*			m_pMainCamera = nullptr;
 	_float3				m_CamDegreeAngle = _float3(20.f,0,-5.f);
 
 	/*For. Jump*/
@@ -150,6 +156,19 @@ private:
 
 	_float3				m_vReturnPos = { 0,0,0 };
 	_bool				m_bTrappedbyFlower = false;
+
+
+	/*For Giant*/
+	_bool			m_bGettingBigger = false;
+	_bool			m_bIsGiant = false;
+	_double			m_GiantingPassedTime = FLT_MAX;
+
+
+	/*For Venting*/
+
+	_bool			m_bIsVenting = false;
+	_float3			m_vVentingTargetLook;
+
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ConstTable();
@@ -201,7 +220,15 @@ private:
 	HRESULT Jump_Update_Umbrella(_double fDeltaTime, CGameInstance* pInstance);
 	HRESULT Attack_Update_Umbrella(_double fDeltaTime, CGameInstance* pInstance);
 	
+
+	/*Giant*/
+	HRESULT Giantting_Update(_double fDeltaTime, CGameInstance* pInstance);
+	HRESULT Move_Update_Giant(_double fDeltaTime, CGameInstance* pInstance);
+	HRESULT Jump_Update_Giant(_double fDeltaTime, CGameInstance* pInstance);
+	HRESULT Attack_Update_Giant(_double fDeltaTime, CGameInstance* pInstance);
+
 	HRESULT Set_Player_On_Terrain();
+	HRESULT Set_Player_On_Terrain_IgnoreTile();
 	HRESULT Set_Player_On_Terrain_DontPutonJumpMovable();
 	HRESULT Set_Player_On_Slieder(_double fDeltatime);
 	HRESULT Set_Camera_On_Player(_double fDeltaTime);

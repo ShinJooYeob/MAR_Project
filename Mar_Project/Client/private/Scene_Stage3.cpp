@@ -4,6 +4,8 @@
 #include "Player.h"
 #include "StaticMapObject.h"
 #include "Camera_Main.h"
+#include "VentObj.h"
+#include "MovableColum.h"
 
 
 
@@ -35,8 +37,11 @@ HRESULT CScene_Stage3::Initialize()
 	
 
 	FAILED_CHECK(Ready_Layer_StaticMapObj(TAG_LAY(Layer_StaticMapObj)));
+	FAILED_CHECK(Ready_VentObject(TAG_LAY(Layer_Vent)));
+	FAILED_CHECK(Ready_MovableColum(TAG_LAY(Layer_MazeDoor)));
+	
 
-	FAILED_CHECK(Ready_Layer_Executor(TAG_LAY(Layer_Monster)));
+	//FAILED_CHECK(Ready_Layer_Executor(TAG_LAY(Layer_Monster)));
 
 	
 
@@ -183,7 +188,7 @@ HRESULT CScene_Stage3::Ready_Layer_Player(const _tchar * pLayerTag)
 	NULL_CHECK_RETURN(pPlayer, E_FAIL);
 
 	pPlayer->Set_NowSceneNum(SCENE_STAGE3);
-	pPlayer->Renew_Player(_float3(130,20,46));
+	pPlayer->Renew_Player(_float3(128, 20.f, 88));
 	
 
 	return S_OK;
@@ -306,10 +311,59 @@ HRESULT CScene_Stage3::Ready_Layer_StaticMapObj(const _tchar * pLayerTag)
 	return S_OK;
 }
 
+HRESULT CScene_Stage3::Ready_VentObject(const _tchar * pLayerTag)
+{
+
+	CGameInstance* pInstance = g_pGameInstance;
+
+	list<CGameObject*>* VentList;
+	CVentObj::VENTDESC tDesc;
+
+	CVentObj* pSourceVent = nullptr;
+
+	tDesc.vPosition = _float3(147.f, 20.f, 140.6f);
+	tDesc.vTargetPosition = _float3(149.f, 20.f, 137.5f);
+
+	FAILED_CHECK(pInstance->Add_GameObject_To_Layer(SCENE_STAGE3, pLayerTag, TAG_OP(Prototype_Vent), &tDesc));
+	VentList = pInstance->Get_ObjectList_from_Layer(SCENE_STAGE3, pLayerTag);
+	NULL_CHECK_RETURN(VentList, E_FAIL);
+
+	pSourceVent = (CVentObj*)(VentList->back());
+	NULL_CHECK_RETURN(pSourceVent, E_FAIL);
+	pSourceVent->Load_ActionCam(L"Stage3_CameAction_0");
+
+	tDesc.vPosition = _float3(114.5f, 20.f, 129.f);
+	tDesc.vTargetPosition = _float3(114.5f, 20.f, 125.f);
+	tDesc.pTargetVent = pSourceVent;
+
+	FAILED_CHECK(pInstance->Add_GameObject_To_Layer(SCENE_STAGE3, pLayerTag, TAG_OP(Prototype_Vent), &tDesc));
+
+	((CVentObj*)(VentList->back()))->Load_ActionCam(L"Stage3_CameAction_1");
+	pSourceVent->Set_TargetVent((VentList->back()));
+
+
+
+	return S_OK;
+}
+
+HRESULT CScene_Stage3::Ready_MovableColum(const _tchar * pLayerTag)
+{
+	CMovableColum::CLOCKCOLUMDESC tDesc;
+
+	tDesc.vPosition = _float3(128, 20, 128);
+	tDesc.vAngle = _float3(0,180,0);
+
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE3, pLayerTag, TAG_OP(Prototype_MazeDoor), &tDesc));
+
+
+	return S_OK;
+}
+
 HRESULT CScene_Stage3::Ready_Layer_Executor(const _tchar * pLayerTag)
 {
 
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE3, pLayerTag, TAG_OP(Prototype_Executor), &_float3(130, 20, 46)));
+
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE3, pLayerTag, TAG_OP(Prototype_Executor), &_float3(128, 27.4f, 188)));
 
 
 	return S_OK;

@@ -37,6 +37,8 @@
 #include "ShpaeMemButton.h"
 #include "PresserObj.h"
 #include "ShrinkFlower.h"
+#include "VentObj.h"
+#include "MovableColum.h"
 
 #include "StaticMapObject.h"
 
@@ -197,7 +199,7 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 
 
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Player),
-		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Alice", "Alice.FBX", TransformMatrix, 1)));
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Alice", "Alice.FBX", TransformMatrix, 2)));
 
 	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Tornado1),
@@ -885,12 +887,52 @@ HRESULT CLoader::Load_Scene_Stage3(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 
 
 
+
+
+	
+	TransformMatrix = XMMatrixScaling(0.10f, 0.10f, 0.10f);
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE3, TAG_CP(Prototype_Mesh_Gazebo_Piece01),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "Chapter3", "Gazebo_Piece01.FBX", TransformMatrix)));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE3, TAG_CP(Prototype_Mesh_Gazebo_Piece02),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "Chapter3", "Gazebo_Piece02.FBX", TransformMatrix)));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE3, TAG_CP(Prototype_Mesh_Gazebo_Piece03),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "Chapter3", "Gazebo_Piece03.FBX", TransformMatrix)));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE3, TAG_CP(Prototype_Mesh_Gazebo_Piece04),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "Chapter3", "Gazebo_Piece04.FBX", TransformMatrix)));
+	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE3, TAG_CP(Prototype_Mesh_Gazebo_S),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "Chapter3", "Gazebo_S.FBX", TransformMatrix)));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE3, TAG_CP(Prototype_Mesh_QStone_PillarC_Broken),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "Chapter3", "QStone_PillarC_Broken.FBX", TransformMatrix)));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE3, TAG_CP(Prototype_Mesh_Qstone_PlatsB),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "Chapter3", "Qstone_PlatsB.FBX", TransformMatrix)));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE3, TAG_CP(Prototype_Mesh_Vent_Steam_Mesh),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "Chapter3", "Vent_Steam_Mesh.FBX", TransformMatrix)));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE3, TAG_CP(Prototype_Mesh_VentQStone),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "Chapter3", "VentQStone.FBX", TransformMatrix)));
+
+
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE3, TAG_CP(Prototype_Mesh_HatterWallBricks_HalfA),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "Chapter2", "HatterWallBricks_HalfA.FBX", TransformMatrix)));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE3, TAG_CP(Prototype_Mesh_HatterWallBricks_HalfB),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "Chapter2", "HatterWallBricks_HalfB.FBX", TransformMatrix)));
+
+
+
+
+	TransformMatrix = XMMatrixScaling(0.05f, 0.08f, 0.05f)*		XMMatrixRotationZ(XMConvertToRadians(90))* 		XMMatrixTranslation(-8.f, 0, 0);
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_HatterPillarsB_column),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "Chapter2", "HatterPillarsB_column.FBX", TransformMatrix)));
+
+
+
+
 	//////////Terrain
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE3, TAG_CP(Prototype_VIBuffer_Terrain),
 		CVIBuffer_Terrain::Create(m_pDevice, m_pDeviceContext, L"Height_3.bmp")));
 
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE3, TAG_CP(Prototype_Texture_Terrain),
-		CTexture::Create(m_pDevice, m_pDeviceContext, L"Terrain.txt")));
+		CTexture::Create(m_pDevice, m_pDeviceContext, L"Terrain_3.txt")));
 
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE3, TAG_CP(Prototype_Texture_GamePlayScene),
 		CTexture::Create(m_pDevice, m_pDeviceContext, L"UI_GamePlay.txt")));
@@ -898,6 +940,14 @@ HRESULT CLoader::Load_Scene_Stage3(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 #pragma endregion
 
 #pragma  region PROTOTYPE_GAMEOBJECT
+
+
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_Vent),
+		CVentObj::Create(m_pDevice, m_pDeviceContext)));
+
+
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_MazeDoor),
+		CMovableColum::Create(m_pDevice, m_pDeviceContext)));
 
 
 
@@ -1250,8 +1300,6 @@ HRESULT CLoader::Load_Scene_Edit(_bool * _IsClientQuit, CRITICAL_SECTION * _CriS
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "Chapter2", "HatterJunk_S.FBX", TransformMatrix)));
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_HatterLightsE),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "Chapter2", "HatterLightsE.FBX", TransformMatrix)));
-	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_HatterPillarsB_column),
-		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "Chapter2", "HatterPillarsB_column.FBX", TransformMatrix)));
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_HatterPillarsC_top),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "Chapter2", "HatterPillarsC_top.FBX", TransformMatrix)));
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_HatterPillarsD_base),
@@ -1340,7 +1388,10 @@ HRESULT CLoader::Load_Scene_Edit(_bool * _IsClientQuit, CRITICAL_SECTION * _CriS
 		
 		
 		
-		
+
+	TransformMatrix = XMMatrixScaling(0.05f, 0.08f, 0.05f)*		XMMatrixRotationZ(XMConvertToRadians(90))* 		XMMatrixTranslation(-8.f, 0, 0);
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_HatterPillarsB_column),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "Chapter2", "HatterPillarsB_column.FBX", TransformMatrix)));
 		
 		
 		
