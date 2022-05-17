@@ -26,16 +26,18 @@ HRESULT CJumpPad::Initialize_Clone(void * pArg)
 {
 	FAILED_CHECK(__super::Initialize_Clone(pArg));
 
-	FAILED_CHECK(SetUp_Components());
-
 	if (pArg != nullptr)
 	{
-		_float3 Pos = *(_float3*)pArg;
-		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, Pos);
+		memcpy(&m_tDesc, pArg, sizeof(JUMPPADDESC));
 	}
-	
+
+
+	FAILED_CHECK(SetUp_Components());
+
+	m_pModel->Change_AnimIndex(1);
 	m_pModel->Change_AnimIndex(0);
-	m_fRangeRadius = 0.707f;
+
+	m_fRangeRadius = 0.707f * (m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_RIGHT).Get_Lenth());
 	return S_OK;
 }
 
@@ -83,7 +85,7 @@ _int CJumpPad::Update(_double fDeltaTime)
 	{
 
 		m_pPlayerTransform->MovetoDir(XMVectorSet(0, 1, 0, 0), fDeltaTime);
-		m_pPlayer->Add_JumpForce(10,1);
+		m_pPlayer->Add_JumpForce(m_tDesc.fPower,1);
 		m_pModel->Change_AnimIndex_ReturnTo_Must(2,  0, 0.08, true);
 	}
 
@@ -158,6 +160,11 @@ HRESULT CJumpPad::SetUp_Components()
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Shader_VAM), TAG_COM(Com_Shader), (CComponent**)&m_pShaderCom));
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Transform), TAG_COM(Com_Transform), (CComponent**)&m_pTransformCom));
+
+	_Matrix WorldMatrix = XMMatrixScaling(m_tDesc.vScale.x, m_tDesc.vScale.y, m_tDesc.vScale.z) *
+		XMMatrixTranslation(m_tDesc.vPosition.x, m_tDesc.vPosition.y, m_tDesc.vPosition.z);
+
+	m_pTransformCom->Set_Matrix(WorldMatrix);
 
 	FAILED_CHECK(Add_Component(m_eNowSceneNum, TAG_CP(Prototype_Mesh_JumpPad), TAG_COM(Com_Model), (CComponent**)&m_pModel));
 

@@ -5,6 +5,15 @@ BEGIN(Client)
 
 class CJumpPad final :public CMapObject
 {
+public:
+	typedef struct tagJumpPadDesc
+	{
+		_float3 vPosition;
+		_float3 vScale =_float3(1);
+		_float fPower = 20;
+
+	}JUMPPADDESC;
+
 private:
 	CJumpPad(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	CJumpPad(const CJumpPad& rhs);
@@ -34,6 +43,8 @@ private:
 	CTransform*			m_pPlayerTransform = nullptr;
 	_bool				m_bIsPlayerCloser = false;
 	_float				m_fRangeRadius = 0.707f;
+
+	JUMPPADDESC			m_tDesc;
 
 private:
 	HRESULT SetUp_Components();

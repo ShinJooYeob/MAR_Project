@@ -420,6 +420,7 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_BreakableBarrelPiece5),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "BreakableBarrel", "HatterBarrelE.FBX", TransformMatrix)));
 
+		TransformMatrix = XMMatrixScaling(0.02f, 0.02f, 0.02f);
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_GiftBasket),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "GiftBasket", "GiftBasket.FBX", TransformMatrix)));
 
