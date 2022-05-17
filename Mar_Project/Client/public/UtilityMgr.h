@@ -8,6 +8,17 @@ class CUtilityMgr final :public CBase
 {
 	DECLARE_SINGLETON(CUtilityMgr)
 
+	enum ScreenEffectID
+	{
+		ScreenEffect_FadeIn,
+		ScreenEffect_FadeOut,
+		ScreenEffect_FadeInOut,
+		ScreenEffect_FadeOutIn,
+		ScreenEffect_CamShaking,
+		ScreenEffect_HitEffect,
+		ScreenEffect_END
+	};
+
 private:
 	explicit CUtilityMgr();
 	virtual ~CUtilityMgr() = default;
@@ -33,6 +44,11 @@ public:
 	_Vector ReflectVector(_Vector vDir, _Vector vVerticleVector);
 	_Vector SlideVector(_Vector vDir, _Vector vVerticleVector);
 
+
+	/*For Effect*/
+	HRESULT Start_ScreenEffect(ScreenEffectID eEffectType, _double EffectDuration, _float4 AdditionalParameter = _float4(1,1,1,1));
+
+
 public:
 	HRESULT Clear_RenderGroup_forSceneChange();
 	void Set_Renderer(CRenderer* pRenderer);
@@ -42,6 +58,8 @@ private:
 	ID3D11DeviceContext*	m_pDeviceContext = nullptr;
 	class CMainApp*			m_pMainApp = nullptr;
 	CRenderer*				m_pRenderer = nullptr;
+
+	class CFadeEffect*		m_pFadeEffect = nullptr;
 
 	_uint CountDigit(_uint iNum);
 public:

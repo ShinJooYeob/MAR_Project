@@ -241,6 +241,12 @@
     <Filter Include="01.GameObject\07.MapObject\01.DynamicObj\15.MovableBtn">
       <UniqueIdentifier>{aa546b08-9a46-46a7-a1e1-f60f0a33957c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.GameObject\97.Effect\ScreenEffect">
+      <UniqueIdentifier>{4ff44d19-e4a5-4190-b19d-7de6baafc6a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\97.Effect\ScreenEffect\Fade">
+      <UniqueIdentifier>{43990743-4ae5-4dfc-9ba1-becd09b9b4dc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -501,6 +507,9 @@
     <ClInclude Include="..\public\MovableColumBtn.h">
       <Filter>01.GameObject\07.MapObject\01.DynamicObj\15.MovableBtn</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\FadeEffect.h">
+      <Filter>01.GameObject\97.Effect\ScreenEffect\Fade</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -736,6 +745,9 @@
     </ClCompile>
     <ClCompile Include="..\private\MovableColumBtn.cpp">
       <Filter>01.GameObject\07.MapObject\01.DynamicObj\15.MovableBtn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\FadeEffect.cpp">
+      <Filter>01.GameObject\97.Effect\ScreenEffect\Fade</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

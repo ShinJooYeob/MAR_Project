@@ -820,6 +820,60 @@ HRESULT CPlayer::Renew_Player(_float3 Position)
 	m_vOldPos= m_vReturnPos = Position;
 
 
+
+	m_bIsRockOn = false;
+	Safe_Release(m_pRockOnMonster);
+
+	m_CamDegreeAngle = _float3(20.f, 0, -5.f);
+
+
+	m_LevitationTime = 0;
+	m_iJumpCount = 0;
+
+
+	m_fSmallScale = 1.f;
+	m_fSmallPassedTime = 0;
+	m_fSmallVisualTime = 0;
+
+
+	m_vDashDir = _float3(0);
+	m_fDashPower = 0;
+	m_fDashPassedTime = 0;
+
+	m_BombCoolTime = 0;
+
+	m_BulletNormalInterver = 0;
+
+	m_eNowWeapon = Weapon_None;
+
+	m_bIsAttackClicked = false;
+	m_iAttackCount = 0;
+	ZeroMemory(m_bAtkMoveMentChecker,sizeof(_bool)*3);
+
+	m_bIsZoom = false;
+	m_bIsCharged = false;
+	m_fCharedGauge = 0;
+	m_bIsCoolTime = false;
+	m_fUmbrellaIntro = 0;
+
+	m_fGrinderCoolTime = 0;
+	m_bNeedToGrinderCooling = false;
+
+	m_bIsActived = false;
+	m_vAddedForce = _float3(0, 0, 0);
+
+	m_iHP = 32;
+
+	m_iWeaponModelIndex = 10;
+
+	m_bIsAttached = false;
+	m_bSlide = false;
+	m_bTrappedbyFlower = false;
+	m_bGettingBigger = false;
+	m_bIsGiant = false;
+	m_GiantingPassedTime = FLT_MAX;
+	m_bIsVenting = false;
+
 	return S_OK;
 }
 

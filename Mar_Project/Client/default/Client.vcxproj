@@ -180,6 +180,7 @@
     <ClInclude Include="..\public\Bullet.h" />
     <ClInclude Include="..\public\MovableColumBtn.h" />
     <ClInclude Include="..\public\MovableColum.h" />
+    <ClInclude Include="..\public\FadeEffect.h" />
     <ClInclude Include="..\public\VentObj.h" />
     <ClInclude Include="..\public\PresserObj.h" />
     <ClInclude Include="..\public\ShpaeMemButton.h" />
@@ -259,6 +260,7 @@
     <ClCompile Include="..\private\Bullet.cpp" />
     <ClCompile Include="..\private\MovableColumBtn.cpp" />
     <ClCompile Include="..\private\MovableColum.cpp" />
+    <ClCompile Include="..\private\FadeEffect.cpp" />
     <ClCompile Include="..\private\VentObj.cpp" />
     <ClCompile Include="..\private\PresserObj.cpp" />
     <ClCompile Include="..\private\ShpaeMemButton.cpp" />

@@ -82,7 +82,7 @@ private:
 
 private:
 	class CCamera_Main*			m_pMainCamera = nullptr;
-	_float3				m_CamDegreeAngle = _float3(20.f,0,-5.f);
+	_float3						m_CamDegreeAngle = _float3(20.f,0,-5.f);
 
 	/*For. Jump*/
 	_float				m_fMaxJumpPower = 0;

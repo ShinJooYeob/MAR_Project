@@ -2,6 +2,28 @@
 #include "..\Public\Camera_Main.h"
 
 
+_uint CALLBACK CameraEffectThread(void* _Prameter)
+{
+	THREADARG tThreadArg{};
+	memcpy(&tThreadArg, _Prameter, sizeof(THREADARG));
+	delete _Prameter;
+
+
+	CCamera_Main* pCamemra = (CCamera_Main*)(tThreadArg.pArg);
+
+	switch (pCamemra->Get_EffectID())
+	{
+	case CCamera_Main::CAM_EFT_SHAKE:
+		pCamemra->Progress_Shaking_Thread(tThreadArg.IsClientQuit, tThreadArg.CriSec);
+		break;
+
+	default:
+		MSGBOX("worng Cam Eft");
+		break;
+	}
+
+	return 0;
+}
 
 CCamera_Main::CCamera_Main(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
 	:CCamera(pDevice,pDeviceContext)
@@ -95,6 +117,90 @@ _int CCamera_Main::LateRender()
 	return _int();
 }
 
+
+HRESULT CCamera_Main::Start_CameraShaking_Thread(_double TotalTime, _float Power)
+{
+	if (m_bIsStartedShaking) return S_FALSE;
+
+	m_eEffectID = CAM_EFT_SHAKE;
+	m_TargetTime = TotalTime;
+	m_fShakingPower = Power;
+	m_bIsStartedShaking = true;
+
+	GetSingle(CGameInstance)->PlayThread(CameraEffectThread, this);
+
+	return S_OK;
+}
+
+HRESULT CCamera_Main::Progress_Shaking_Thread(_bool * _IsClientQuit, CRITICAL_SECTION * _CriSec)
+{
+	DWORD  NowTick = GetTickCount();
+	DWORD  OldTick = NowTick;
+
+	CUtilityMgr* pUtil = GetSingle(CUtilityMgr);
+
+	_bool	bIsReturnVector = false;
+	_float3 vReturnVector = _float3(0);
+	_float  vReturnPower = 0;
+
+	_double ThreadPassedTime = 0;
+
+	while (true)
+	{
+		if (*_IsClientQuit == true)
+			return S_OK;
+
+		//if (m_bCamActionStart )	break;
+
+		NowTick = GetTickCount();
+		if ((NowTick - OldTick) <= g_fDeltaTime * 1000)
+			continue;
+		ThreadPassedTime += (NowTick - OldTick) * 0.001f;
+		OldTick = NowTick;
+
+
+
+		if (!bIsReturnVector)
+		{
+			_float Rate = pUtil->RandomFloat(0, 1);
+			vReturnPower = pUtil->RandomFloat(-m_fShakingPower, m_fShakingPower);
+
+
+			EnterCriticalSection(_CriSec);
+			vReturnVector = m_pTransform->Get_MatrixState(CTransform::STATE_RIGHT) * Rate + m_pTransform->Get_MatrixState(CTransform::STATE_UP) * (1 - Rate);
+			LeaveCriticalSection(_CriSec);
+
+			bIsReturnVector = true;
+		}
+		else
+		{
+			vReturnPower = -vReturnPower;
+			bIsReturnVector = false;
+		}
+
+
+		EnterCriticalSection(_CriSec);
+		m_pTransform->MovetoDir_bySpeed(vReturnVector.XMVector(), vReturnPower, 1);
+		LeaveCriticalSection(_CriSec);
+
+
+		if (m_TargetTime < ThreadPassedTime) break;
+
+	}
+
+	EnterCriticalSection(_CriSec);
+	m_bIsStartedShaking = false;
+	m_eEffectID = CAM_EFT_END;
+	LeaveCriticalSection(_CriSec);
+
+	return S_OK;
+
+
+
+
+
+	return S_OK;
+}
 
 HRESULT CCamera_Main::SetUp_Components()
 {

@@ -2,6 +2,8 @@
 #include "..\public\UtilityMgr.h"
 #include "ParticleObject.h"
 #include "MainApp.h"
+#include "Camera_Main.h"
+#include "FadeEffect.h"
 
 IMPLEMENT_SINGLETON(CUtilityMgr);
 
@@ -21,6 +23,15 @@ HRESULT CUtilityMgr::Initialize_UtilityMgr(ID3D11Device * pDevice, ID3D11DeviceC
 
 	Safe_AddRef(m_pDevice);
 	Safe_AddRef(m_pDeviceContext);
+
+	FAILED_CHECK(g_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Texture_ScreenEffectUI),
+		CTexture::Create(m_pDevice, m_pDeviceContext, L"ScreenEffectUI.txt")));
+
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_ScreenEffectUI),CFadeEffect::Create(m_pDevice,m_pDeviceContext)));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENEID::SCENE_STATIC, TAG_LAY(Layer_ScreenEffect),TAG_OP(Prototype_ScreenEffectUI)));
+	CFadeEffect* m_pFadeEffect = (CFadeEffect*)g_pGameInstance->Get_GameObject_By_LayerLastIndex(SCENEID::SCENE_STATIC, TAG_LAY(Layer_ScreenEffect));
+
+	NULL_CHECK_RETURN(m_pFadeEffect, E_FAIL);
 
 	return S_OK;
 }
@@ -139,6 +150,52 @@ _Vector CUtilityMgr::SlideVector(_Vector vDir, _Vector vVerticleVector)
 
 	return vDir+ vVerticVec;
 }
+
+HRESULT CUtilityMgr::Start_ScreenEffect(ScreenEffectID eEffectType, _double EffectDuration, _float4 AdditionalParameter)
+{
+	switch (eEffectType)
+	{
+	case Client::CUtilityMgr::ScreenEffect_FadeIn:
+	{
+		m_pFadeEffect->Start_FadeEffect(CFadeEffect::FadeID_FadeIn,  EffectDuration, AdditionalParameter);
+	}
+	break;
+	case Client::CUtilityMgr::ScreenEffect_FadeOut:
+	{
+		m_pFadeEffect->Start_FadeEffect(CFadeEffect::FadeID_FadeIn,  EffectDuration, AdditionalParameter);
+	}
+	break;
+	case Client::CUtilityMgr::ScreenEffect_FadeInOut:
+	{
+		m_pFadeEffect->Start_FadeEffect(CFadeEffect::FadeID_FadeIn,  EffectDuration, AdditionalParameter);
+	}
+	break;
+	case Client::CUtilityMgr::ScreenEffect_FadeOutIn:
+	{
+		m_pFadeEffect->Start_FadeEffect(CFadeEffect::FadeID_FadeIn,  EffectDuration, AdditionalParameter);
+	}
+	break;
+	case Client::CUtilityMgr::ScreenEffect_CamShaking:
+	{
+		CCamera_Main* pMainCam = (CCamera_Main*)g_pGameInstance->Get_GameObject_By_LayerLastIndex(SCENE_STATIC, TAG_LAY(Layer_Camera_Main));
+		NULL_CHECK_RETURN(pMainCam, E_FAIL);
+		pMainCam->Start_CameraShaking_Thread(EffectDuration, AdditionalParameter.x);
+	}
+	break;
+	case Client::CUtilityMgr::ScreenEffect_HitEffect:
+	{
+
+	}
+	break;
+	default:
+		break;
+	}
+
+
+	return S_OK;
+}
+
+
 
 HRESULT CUtilityMgr::Clear_RenderGroup_forSceneChange()
 {

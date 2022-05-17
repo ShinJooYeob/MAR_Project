@@ -117,7 +117,6 @@ _bool CMovableColum::Start_Turning_Colum(_uint iKinds)
 {
 	if (m_bIsTurning || m_iTuringKinds == iKinds) return false;
 	
-
 	m_PassedTime = 0;
 	m_fStartAngle = m_tDesc.vAngle.y;
 	(Set_TerrainTileKindsAToB(Tile_DynamicNoneTile, Tile_Movable));
@@ -140,8 +139,9 @@ _bool CMovableColum::Start_Turning_Colum(_uint iKinds)
 		break;
 	}
 
-	m_bIsTurning = true;
 
+	m_bIsTurning = true;
+	GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 5, _float4(0.5));
 
 	return _bool();
 }

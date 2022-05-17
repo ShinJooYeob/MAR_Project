@@ -42,11 +42,11 @@ HRESULT CMainApp::Initialize()
 
 	FAILED_CHECK(Default_Setting());
 
-	FAILED_CHECK(Ready_SingletonMgr());
-
 	FAILED_CHECK(Ready_Static_Component_Prototype());
 
 	FAILED_CHECK(Ready_Static_GameObject_Prototype());
+
+	FAILED_CHECK(Ready_SingletonMgr());
 
 	FAILED_CHECK(Scene_Change(SCENEID::SCENE_LOBY));
 

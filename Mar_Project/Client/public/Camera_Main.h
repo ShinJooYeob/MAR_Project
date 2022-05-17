@@ -6,15 +6,10 @@ BEGIN(Client)
 
 class CCamera_Main :public CCamera
 {
+public:
 	enum CameraEffectID
 	{
-		CAM_EFT_FADE_IN,
-		CAM_EFT_FADE_OUT,
-		CAM_EFT_HIT,
-
 		CAM_EFT_SHAKE,
-		CAM_EFT_ACTION,
-		CAM_EFT_VICTORY,
 		CAM_EFT_END
 	};
 
@@ -47,11 +42,27 @@ public:
 	virtual _int Render()override;
 	virtual _int LateRender()override;
 
-
-
 private:
+
 	HRESULT			SetUp_Components();
 	HRESULT			Update_CamAction(_double fDeltaTime);
+
+
+
+
+
+public:
+	HRESULT		Start_CameraShaking_Thread(_double TotalTime, _float Power);
+	HRESULT		Progress_Shaking_Thread(_bool* _IsClientQuit, CRITICAL_SECTION* _CriSec);
+	CameraEffectID Get_EffectID() { return m_eEffectID; }
+
+private:
+	_bool				m_bIsStartedShaking = false;
+	CameraEffectID		m_eEffectID = CAM_EFT_END;
+	_double				m_TargetTime = 0;
+	_float				m_fShakingPower = 0;
+
+
 public:
 	static CCamera_Main* Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, void* pArg = nullptr);
 	virtual CGameObject* Clone(void* pArg)override;

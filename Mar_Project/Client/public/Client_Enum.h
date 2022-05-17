@@ -22,6 +22,7 @@ enum OBJECTPROTOTYPEID
 {
 	Prototype_Bullet_Normal,
 	Prototype_Bullet_Grenade,
+	Prototype_ScreenEffectUI,
 
 	Prototype_UIImage,
 
@@ -104,6 +105,11 @@ static const _tchar* Tag_Object_Prototype(OBJECTPROTOTYPEID eTag)
 {
 	switch (eTag)
 	{
+
+		
+	case Prototype_ScreenEffectUI:
+		return TEXT("Prototype_ScreenEffectUI");
+		break;
 	case Prototype_Bullet_Normal:
 		return TEXT("Bullet_Normal");
 		break;
@@ -379,6 +385,7 @@ enum LAYERID
 {
 	Layer_Camera_Main,
 	Layer_Camera_Editor,
+	Layer_ScreenEffect,
 	Layer_SkyBox,
 	Layer_Player,
 	Layer_Bullet,
@@ -434,6 +441,11 @@ static const _tchar* Tag_Layer(LAYERID eTag)
 	case Layer_Camera_Editor:
 		return TEXT("Layer_Camera_Editor");
 		break;
+	case Layer_ScreenEffect:
+		return TEXT("Layer_ScreenEffect");
+		break;
+
+		
 
 	case Layer_Bullet:
 		return TEXT("Layer_Bullet");
@@ -794,6 +806,7 @@ enum COMPONENTPROTOTYPEID
 	Prototype_Texture_Terrain,
 	Prototype_Texture_Edit_Terrain,
 	Prototype_Texture_DefaultUI,
+	Prototype_Texture_ScreenEffectUI,
 	Prototype_Texture_PlayerEffect,
 	Prototype_Texture_GamePlayScene,
 	Prototype_Texture_LoadingScene,
@@ -1468,6 +1481,9 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 		break;
 	case Prototype_Texture_PlayerEffect:
 		return TEXT("Prototype_Texture_PlayerEffect");
+		break;
+	case Prototype_Texture_ScreenEffectUI:
+		return TEXT("Prototype_Texture_ScreenEffectUI");
 		break;
 		
 	case Prototype_Texture_SkyBox:
