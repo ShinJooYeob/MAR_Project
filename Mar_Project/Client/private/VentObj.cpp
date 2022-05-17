@@ -279,10 +279,16 @@ HRESULT CVentObj::SetUp_Components()
 	/* For.Com_AABB */
 	ZeroMemory(&ColliderDesc, sizeof(COLLIDERDESC));
 
-	ColliderDesc.vScale = _float3(5.f, 1.0f, 1.f);
+	ColliderDesc.vScale = _float3(5.0f, 1.0f, 1.f);
 	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
-	ColliderDesc.vPosition = _float4(0.f, 2.f, 0, 1);
+	static int i = 0;
+	if (i < 2)
+		ColliderDesc.vPosition = XMVectorSet(0, 1, 0, 0);
+	else
+		ColliderDesc.vPosition = XMVectorSet(0, 1, 0, 0) + XMVector3Normalize(m_tDesc.vTargetPosition.XMVector() - m_tDesc.vPosition.XMVector()) * 2;
+
 	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
+	i++;
 
 
 

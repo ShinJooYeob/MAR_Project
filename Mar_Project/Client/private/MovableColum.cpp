@@ -115,7 +115,8 @@ _int CMovableColum::LateRender()
 
 _bool CMovableColum::Start_Turning_Colum(_uint iKinds)
 {
-	if (m_bIsTurning) return false;
+	if (m_bIsTurning || m_iTuringKinds == iKinds) return false;
+	
 
 	m_PassedTime = 0;
 	m_fStartAngle = m_tDesc.vAngle.y;
@@ -123,13 +124,16 @@ _bool CMovableColum::Start_Turning_Colum(_uint iKinds)
 	switch (iKinds)
 	{
 	case 0:
-		m_fTargetAngle = 0;
+		m_fTargetAngle = 90;
+		m_iTuringKinds = 0;
 		break;
 	case 1:
 		m_fTargetAngle = 180;
+		m_iTuringKinds = 1;
 		break;
 	case 2:
 		m_fTargetAngle = 270;
+		m_iTuringKinds = 2;
 		break;
 
 	default:

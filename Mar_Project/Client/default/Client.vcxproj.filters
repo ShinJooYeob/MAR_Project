@@ -235,11 +235,11 @@
     <Filter Include="01.GameObject\07.MapObject\01.DynamicObj\13.Vent">
       <UniqueIdentifier>{9b3ed2cf-8f7c-4a9d-ae38-4656b1976c12}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.GameObject\07.MapObject\01.DynamicObj\15.MovableWall">
-      <UniqueIdentifier>{aa546b08-9a46-46a7-a1e1-f60f0a33957c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.GameObject\07.MapObject\01.DynamicObj\14.MovableColum">
       <UniqueIdentifier>{a9e95b47-37f4-426d-a423-d98718a522a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\07.MapObject\01.DynamicObj\15.MovableBtn">
+      <UniqueIdentifier>{aa546b08-9a46-46a7-a1e1-f60f0a33957c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -498,6 +498,9 @@
     <ClInclude Include="..\public\MovableColum.h">
       <Filter>01.GameObject\07.MapObject\01.DynamicObj\14.MovableColum</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\MovableColumBtn.h">
+      <Filter>01.GameObject\07.MapObject\01.DynamicObj\15.MovableBtn</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -730,6 +733,9 @@
     </ClCompile>
     <ClCompile Include="..\private\MovableColum.cpp">
       <Filter>01.GameObject\07.MapObject\01.DynamicObj\14.MovableColum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\MovableColumBtn.cpp">
+      <Filter>01.GameObject\07.MapObject\01.DynamicObj\15.MovableBtn</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

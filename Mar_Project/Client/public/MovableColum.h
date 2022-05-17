@@ -35,6 +35,7 @@ public:
 
 public:
 	HRESULT Set_TerrainTileKindsAToB(_uint iSour, _uint iDest);
+	_bool	IsSameNowTrunedKinds(_uint iKind) { return iKind == m_iTuringKinds; };
 
 private:
 	CShader*			m_pShaderCom = nullptr;
@@ -58,6 +59,7 @@ private:
 	_double				m_PassedTime = 0;
 	_float				m_fStartAngle = 0;
 	_float				m_fTargetAngle = 0;
+	_uint				m_iTuringKinds = INT_MAX;
 
 private:
 	HRESULT SetUp_Components();

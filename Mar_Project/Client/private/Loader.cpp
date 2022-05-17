@@ -39,6 +39,7 @@
 #include "ShrinkFlower.h"
 #include "VentObj.h"
 #include "MovableColum.h"
+#include "MovableColumBtn.h"
 
 #include "StaticMapObject.h"
 
@@ -199,7 +200,7 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 
 
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Player),
-		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Alice", "Alice.FBX", TransformMatrix, 2)));
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Alice", "Alice.FBX", TransformMatrix, 1)));
 
 	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Tornado1),
@@ -921,10 +922,16 @@ HRESULT CLoader::Load_Scene_Stage3(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 
 
 	TransformMatrix = XMMatrixScaling(0.05f, 0.08f, 0.05f)*		XMMatrixRotationZ(XMConvertToRadians(90))* 		XMMatrixTranslation(-8.f, 0, 0);
-	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_HatterPillarsB_column),
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE3, TAG_CP(Prototype_Mesh_HatterPillarsB_column),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "Chapter2", "HatterPillarsB_column.FBX", TransformMatrix)));
 
 
+	TransformMatrix = XMMatrixScaling(0.0002f, 0.0002f, 0.0002f)*XMMatrixTranslation(0, 0.3f, 0);
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE3, TAG_CP(Prototype_Mesh_Button),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "ButtonPad", "ButtonPad.FBX", TransformMatrix)));
+	TransformMatrix = XMMatrixScaling(0.0002f, 0.0002f, 0.0002f);
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE3, TAG_CP(Prototype_Mesh_Button_Frame),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "ButtonPad", "ButtonPad_Frame.FBX", TransformMatrix)));
 
 
 	//////////Terrain
@@ -948,6 +955,10 @@ HRESULT CLoader::Load_Scene_Stage3(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_MazeDoor),
 		CMovableColum::Create(m_pDevice, m_pDeviceContext)));
+
+
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_MazeDoorBtn),
+		CMovableColumBtn::Create(m_pDevice, m_pDeviceContext)));
 
 
 
@@ -993,6 +1004,7 @@ HRESULT CLoader::Load_Scene_Boss(_bool * _IsClientQuit, CRITICAL_SECTION * _CriS
 	TransformMatrix = XMMatrixScaling(0.0005f, 0.0005f, 0.0005f) * XMMatrixRotationY(XMConvertToRadians(90.0f));
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_BOSS, TAG_CP(Prototype_Mesh_SkyBox),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "SkyBox", "SkyBox_Boss.FBX", TransformMatrix)));
+
 
 
 	//////////////////////////////////////////////////////////////////////////////

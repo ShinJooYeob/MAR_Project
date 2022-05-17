@@ -6,6 +6,7 @@
 #include "Camera_Main.h"
 #include "VentObj.h"
 #include "MovableColum.h"
+#include "MovableColumBtn.h"
 
 
 
@@ -39,6 +40,7 @@ HRESULT CScene_Stage3::Initialize()
 	FAILED_CHECK(Ready_Layer_StaticMapObj(TAG_LAY(Layer_StaticMapObj)));
 	FAILED_CHECK(Ready_VentObject(TAG_LAY(Layer_Vent)));
 	FAILED_CHECK(Ready_MovableColum(TAG_LAY(Layer_MazeDoor)));
+	FAILED_CHECK(Ready_MovableColumBtn(TAG_LAY(Layer_ButtonPad)));
 	
 
 	//FAILED_CHECK(Ready_Layer_Executor(TAG_LAY(Layer_Monster)));
@@ -343,6 +345,35 @@ HRESULT CScene_Stage3::Ready_VentObject(const _tchar * pLayerTag)
 
 
 
+
+
+	pSourceVent = nullptr;
+
+	tDesc.vPosition = _float3(86.561f, 20.f, 145.772f);
+	tDesc.vTargetPosition = _float3(92.490f, 20.f, 143.29f);
+	
+
+	FAILED_CHECK(pInstance->Add_GameObject_To_Layer(SCENE_STAGE3, pLayerTag, TAG_OP(Prototype_Vent), &tDesc));
+	VentList = pInstance->Get_ObjectList_from_Layer(SCENE_STAGE3, pLayerTag);
+	NULL_CHECK_RETURN(VentList, E_FAIL);
+
+	pSourceVent = (CVentObj*)(VentList->back());
+	NULL_CHECK_RETURN(pSourceVent, E_FAIL);
+	pSourceVent->Load_ActionCam(L"Stage3_CameAction_2");
+
+	tDesc.vPosition = _float3(106.8f, 20.f, 125.828f);
+	tDesc.vTargetPosition = _float3(106.8f, 20.f, 131.935f);
+	tDesc.pTargetVent = pSourceVent;
+
+	FAILED_CHECK(pInstance->Add_GameObject_To_Layer(SCENE_STAGE3, pLayerTag, TAG_OP(Prototype_Vent), &tDesc));
+
+	((CVentObj*)(VentList->back()))->Load_ActionCam(L"Stage3_CameAction_3");
+	pSourceVent->Set_TargetVent((VentList->back()));
+
+
+
+
+
 	return S_OK;
 }
 
@@ -350,11 +381,42 @@ HRESULT CScene_Stage3::Ready_MovableColum(const _tchar * pLayerTag)
 {
 	CMovableColum::CLOCKCOLUMDESC tDesc;
 
-	tDesc.vPosition = _float3(128, 20, 128);
+	tDesc.vPosition = _float3(128, 22, 128);
 	tDesc.vAngle = _float3(0,180,0);
 
 	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE3, pLayerTag, TAG_OP(Prototype_MazeDoor), &tDesc));
 
+
+	return S_OK;
+}
+
+HRESULT CScene_Stage3::Ready_MovableColumBtn(const _tchar * pLayerTag)
+{
+	CGameInstance* pInstance = g_pGameInstance;
+
+	CMovableColumBtn::COLUMBTNDESC tDesc;
+
+
+	tDesc.pTargetObject = pInstance->Get_GameObject_By_LayerLastIndex(SCENE_STAGE3, TAG_LAY(Layer_MazeDoor));
+	NULL_CHECK_RETURN(tDesc.pTargetObject, E_FAIL);
+
+
+
+
+	tDesc.vPosition = _float3(140, 20, 90);
+	tDesc.eKindsOfObject = 0;
+	FAILED_CHECK(pInstance->Add_GameObject_To_Layer(SCENE_STAGE3, pLayerTag, TAG_OP(Prototype_MazeDoorBtn), &tDesc));
+
+
+
+	tDesc.vPosition = _float3(108, 20, 150.5f);
+	tDesc.eKindsOfObject = 1;
+	FAILED_CHECK(pInstance->Add_GameObject_To_Layer(SCENE_STAGE3, pLayerTag, TAG_OP(Prototype_MazeDoorBtn), &tDesc));
+
+
+	tDesc.vPosition = _float3(117.2f, 20, 137);
+	tDesc.eKindsOfObject = 2;
+	FAILED_CHECK(pInstance->Add_GameObject_To_Layer(SCENE_STAGE3, pLayerTag, TAG_OP(Prototype_MazeDoorBtn), &tDesc));
 
 	return S_OK;
 }

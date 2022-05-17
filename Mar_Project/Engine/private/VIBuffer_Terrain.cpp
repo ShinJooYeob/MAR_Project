@@ -590,7 +590,7 @@ _Vector CVIBuffer_Terrain::Caculate_TerrainY(_bool* pbIsOnTerrain ,_float3 PosOn
 
 		for (_uint i = 1; i < 11; i++)
 		{
-			if (OldNaviTile != Tile_None || OldNaviTile == Tile_DynamicNoneTile) break;
+			if (OldNaviTile != Tile_None || OldNaviTile != Tile_DynamicNoneTile) break;
 
 			//Temp = OldPosOnTerrainLocal.XMVector() + Calculate_SlidingVector_ForNoneTile(OldPosOnTerrainLocal, PosOnTerrainLocal, 1.001f + (0.1f + (_float)i));
 			Temp = OldPosOnTerrainLocal.XMVector() + Calculate_SlidingVector_ForNoneTile(OldPosOnTerrainLocal, Temp);
@@ -1259,7 +1259,8 @@ _bool CVIBuffer_Terrain::OutOfLine(_fVector StartPoint, _fVector EndPoint, _fVec
 _bool CVIBuffer_Terrain::OutOfLine_ForNoneTile(_uint iStartIndex, _uint iEndIndex, _fVector OldPos, _gVector NowPos, _float3 * pOutDirVec, _float Rate )
 {
 
-	if (!((m_pNaviTerrain[iStartIndex] != Tile_None && m_pNaviTerrain[iEndIndex] != Tile_None) || (m_pNaviTerrain[iStartIndex] == Tile_None && m_pNaviTerrain[iEndIndex] == Tile_None)))
+	if ((!((m_pNaviTerrain[iStartIndex] != Tile_None && m_pNaviTerrain[iEndIndex] != Tile_None) || (m_pNaviTerrain[iStartIndex] == Tile_None && m_pNaviTerrain[iEndIndex] == Tile_None))) || 
+		(!((m_pNaviTerrain[iStartIndex] != Tile_DynamicNoneTile && m_pNaviTerrain[iEndIndex] != Tile_DynamicNoneTile) || (m_pNaviTerrain[iStartIndex] == Tile_DynamicNoneTile && m_pNaviTerrain[iEndIndex] == Tile_DynamicNoneTile))))
 	{
 		return false;
 	}
