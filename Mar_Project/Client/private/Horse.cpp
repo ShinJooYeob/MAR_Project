@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "..\public\Horse.h"
 #include "Monster.h"
+#include "BreakableObj.h"
 
 
 
@@ -130,11 +131,21 @@ void CHorse::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedOb
 	case Engine::CollisionType_Monster:
 	{
 
-		pConflictedCollider->Set_Conflicted();
-		GetSingle(CUtilityMgr)->SlowMotionStart();
-		//m_pModel->Change_AnimIndex_ReturnTo_Must(1, 0, 0, true);
-		((CMonster*)(pConflictedObj))->Add_Dmg_to_Monster(5);
 
+		if (lstrcmp(pConflictedObj->Get_NameTag(), TAG_LAY(Layer_Breakable)))
+		{
+
+			pConflictedCollider->Set_Conflicted();
+			GetSingle(CUtilityMgr)->SlowMotionStart();
+			((CMonster*)(pConflictedObj))->Add_Dmg_to_Monster(5);
+
+		}
+		else
+		{
+			pConflictedCollider->Set_Conflicted();
+			GetSingle(CUtilityMgr)->SlowMotionStart();
+			((CBreakableObj*)(pConflictedObj))->Add_Dmg_To_BreakableObj(5);
+		}
 
 	}
 	break;

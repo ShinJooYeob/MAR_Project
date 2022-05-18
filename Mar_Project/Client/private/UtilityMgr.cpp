@@ -27,9 +27,9 @@ HRESULT CUtilityMgr::Initialize_UtilityMgr(ID3D11Device * pDevice, ID3D11DeviceC
 	FAILED_CHECK(g_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Texture_ScreenEffectUI),
 		CTexture::Create(m_pDevice, m_pDeviceContext, L"ScreenEffectUI.txt")));
 
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_ScreenEffectUI),CFadeEffect::Create(m_pDevice,m_pDeviceContext)));
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENEID::SCENE_STATIC, TAG_LAY(Layer_ScreenEffect),TAG_OP(Prototype_ScreenEffectUI)));
-	CFadeEffect* m_pFadeEffect = (CFadeEffect*)g_pGameInstance->Get_GameObject_By_LayerLastIndex(SCENEID::SCENE_STATIC, TAG_LAY(Layer_ScreenEffect));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_ScreenEffectUI), CFadeEffect::Create(m_pDevice, m_pDeviceContext)));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENEID::SCENE_STATIC, TAG_LAY(Layer_ScreenEffect), TAG_OP(Prototype_ScreenEffectUI)));
+	m_pFadeEffect = (CFadeEffect*)g_pGameInstance->Get_GameObject_By_LayerLastIndex(SCENEID::SCENE_STATIC, TAG_LAY(Layer_ScreenEffect));
 
 	NULL_CHECK_RETURN(m_pFadeEffect, E_FAIL);
 
@@ -119,7 +119,6 @@ HRESULT CUtilityMgr::Create_ParticleObject(_uint eSceneID, PARTICLEDESC tParticl
 		FAILED_CHECK(GetSingle(CGameInstance)->Add_GameObject_To_Layer(eSceneID, TAG_LAY(Layer_Particle), TEXT("ProtoType_GameObject_Object_particle_Cone"), &tParticleDesc));
 		break;
 		/*
-
 		case Client::Particle_Fountain:
 		FAILED_CHECK(GetSingle(CGameInstance)->Add_GameObject_To_Layer(eSceneID, TEXT("Layer_Particle"), TEXT("ProtoType_GameObject_Object_particle_Fountain"), &tParticleDesc));
 		break;
@@ -157,22 +156,27 @@ HRESULT CUtilityMgr::Start_ScreenEffect(ScreenEffectID eEffectType, _double Effe
 	{
 	case Client::CUtilityMgr::ScreenEffect_FadeIn:
 	{
-		m_pFadeEffect->Start_FadeEffect(CFadeEffect::FadeID_FadeIn,  EffectDuration, AdditionalParameter);
+		if (m_pFadeEffect->Start_FadeEffect(CFadeEffect::FadeID_FadeIn, EffectDuration, AdditionalParameter))
+		m_pFadeEffect->Chage_TextureIndex();
 	}
 	break;
 	case Client::CUtilityMgr::ScreenEffect_FadeOut:
 	{
-		m_pFadeEffect->Start_FadeEffect(CFadeEffect::FadeID_FadeIn,  EffectDuration, AdditionalParameter);
+		if (m_pFadeEffect->Start_FadeEffect(CFadeEffect::FadeID_FadeOut, EffectDuration, AdditionalParameter))
+		m_pFadeEffect->Chage_TextureIndex();
 	}
 	break;
 	case Client::CUtilityMgr::ScreenEffect_FadeInOut:
 	{
-		m_pFadeEffect->Start_FadeEffect(CFadeEffect::FadeID_FadeIn,  EffectDuration, AdditionalParameter);
+		if (m_pFadeEffect->Start_FadeEffect(CFadeEffect::FadeID_FadeInOut, EffectDuration, AdditionalParameter))
+		m_pFadeEffect->Chage_TextureIndex();
 	}
 	break;
 	case Client::CUtilityMgr::ScreenEffect_FadeOutIn:
 	{
-		m_pFadeEffect->Start_FadeEffect(CFadeEffect::FadeID_FadeIn,  EffectDuration, AdditionalParameter);
+		if (m_pFadeEffect->Start_FadeEffect(CFadeEffect::FadeID_FadeOutIn, EffectDuration, AdditionalParameter))
+			m_pFadeEffect->Chage_TextureIndex();
+		
 	}
 	break;
 	case Client::CUtilityMgr::ScreenEffect_CamShaking:
@@ -183,8 +187,14 @@ HRESULT CUtilityMgr::Start_ScreenEffect(ScreenEffectID eEffectType, _double Effe
 	}
 	break;
 	case Client::CUtilityMgr::ScreenEffect_HitEffect:
-	{
+	{ 
+		if (m_pFadeEffect->Start_FadeEffect(CFadeEffect::FadeID_FadeOutIn, EffectDuration * 2, AdditionalParameter)) 
+			m_pFadeEffect->Chage_TextureIndex(rand() % 5 + 1);
+		
 
+		CCamera_Main* pMainCam = (CCamera_Main*)g_pGameInstance->Get_GameObject_By_LayerLastIndex(SCENE_STATIC, TAG_LAY(Layer_Camera_Main));
+		NULL_CHECK_RETURN(pMainCam, E_FAIL);
+		pMainCam->Start_CameraShaking_Thread(EffectDuration, 0.2f);
 	}
 	break;
 	default:
@@ -201,7 +211,9 @@ HRESULT CUtilityMgr::Clear_RenderGroup_forSceneChange()
 {
 	NULL_CHECK_RETURN(m_pRenderer, E_FAIL);
 	g_pGameInstance->Clear_CollisionGroup();
-	return m_pRenderer->Clear_RenderGroup_forSceneChaging();
+	FAILED_CHECK(m_pRenderer->Clear_RenderGroup_forSceneChaging());
+	m_pFadeEffect->Add_RenderGroup_ForSceneChanging();
+	return  S_OK;
 }
 
 void CUtilityMgr::Set_Renderer(CRenderer * pRenderer)

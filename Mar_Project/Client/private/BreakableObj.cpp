@@ -58,6 +58,9 @@ HRESULT CBreakableObj::Initialize_Clone(void * pArg)
 		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, Pos);
 	}
 
+
+	m_szNameTag = TAG_LAY(Layer_Breakable);
+
 	return S_OK;
 }
 
@@ -67,57 +70,70 @@ _int CBreakableObj::Update(_double fDeltaTime)
 		return -1;
 
 
+	m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
 
-
-	if (m_fHP <= 0 || g_pGameInstance->Get_DIKeyState(DIK_O) & DIS_Down)
+	if (m_bIsOnScreen)
 	{
-		CGameInstance* pGameInstance = g_pGameInstance;
-		_float3 vPos = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
-		_uint iNumTeethCount = rand() % 3 + 2;
+		m_pColliderCom->Update_ConflictPassedTime(fDeltaTime);
 
 
-		if (m_iKindsOfMesh == Prototype_Mesh_GiftBasket)
-		{
-			_uint IsRoseNum = rand() % 2 + 1;
-
-			for (_uint i = 0; i < IsRoseNum; i++)
-			{
-				FAILED_CHECK(pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_RoseObj),
-					TAG_OP(Prototype_RoseObj), &_float3(vPos)));
-			}
-		}
-		else
-		{
-
-			for (_uint i = 0; i < iNumTeethCount; i++)
-			{
-				_uint IsGold = rand() % 5;
-				IsGold = (IsGold) ? 0 : 1;
-
-				FAILED_CHECK(pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_TeethObj),
-					TAG_OP(Prototype_TeethObj), &_float4(vPos, _float(IsGold))));
-			}
-
-		}
-
-		//////////////////////乔胶 积己
-
-		for (_uint i = m_iKindsOfMesh + 1; i < m_iKindsOfMesh + 1 + m_iPieceNum; i ++)
-		{
-			FAILED_CHECK(pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_BreakablePiece),
-				TAG_OP(Prototype_BreakablePiece), &_float4(vPos, _float(i))));
-		}
+		for (_uint i = 0; i < m_pColliderCom->Get_NumColliderBuffer(); i++)
+			m_pColliderCom->Update_Transform(i, m_pTransformCom->Get_WorldMatrix());
 
 
-
-		
-
-		Set_IsDead();
-		return 0;
+			g_pGameInstance->Add_CollisionGroup(CollisionType_Monster, this, m_pColliderCom);
 	}
 
 
-	m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
+
+	//if (m_fHP <= 0 || g_pGameInstance->Get_DIKeyState(DIK_O) & DIS_Down)
+	//{
+	//	CGameInstance* pGameInstance = g_pGameInstance;
+	//	_float3 vPos = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+	//	_uint iNumTeethCount = rand() % 3 + 2;
+
+
+	//	if (m_iKindsOfMesh == Prototype_Mesh_GiftBasket)
+	//	{
+	//		_uint IsRoseNum = rand() % 2 + 1;
+
+	//		for (_uint i = 0; i < IsRoseNum; i++)
+	//		{
+	//			FAILED_CHECK(pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_RoseObj),
+	//				TAG_OP(Prototype_RoseObj), &_float3(vPos)));
+	//		}
+	//	}
+	//	else
+	//	{
+
+	//		for (_uint i = 0; i < iNumTeethCount; i++)
+	//		{
+	//			_uint IsGold = rand() % 5;
+	//			IsGold = (IsGold) ? 0 : 1;
+
+	//			FAILED_CHECK(pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_TeethObj),
+	//				TAG_OP(Prototype_TeethObj), &_float4(vPos, _float(IsGold))));
+	//		}
+
+	//	}
+
+	//	//////////////////////乔胶 积己
+
+	//	for (_uint i = m_iKindsOfMesh + 1; i < m_iKindsOfMesh + 1 + m_iPieceNum; i ++)
+	//	{
+	//		FAILED_CHECK(pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_BreakablePiece),
+	//			TAG_OP(Prototype_BreakablePiece), &_float4(vPos, _float(i))));
+	//	}
+
+
+
+	//	
+
+	//	Set_IsDead();
+	//	return 0;
+	//}
+
+
 
 	return _int();
 }
@@ -141,6 +157,9 @@ _int CBreakableObj::Render()
 	if (__super::Render() < 0)
 		return -1;
 
+#ifdef _DEBUG
+	m_pColliderCom->Render();
+#endif // _DEBUG
 
 	NULL_CHECK_RETURN(m_pModel, E_FAIL);
 
@@ -175,6 +194,62 @@ _int CBreakableObj::LateRender()
 	return _int();
 }
 
+HRESULT CBreakableObj::Add_Dmg_To_BreakableObj(_uint iDmg)
+{
+	m_fHP -= iDmg;
+
+
+	if (m_fHP <= 0)
+	{
+		CGameInstance* pGameInstance = g_pGameInstance;
+		_float3 vPos = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+		_uint iNumTeethCount = rand() % 3 + 2;
+
+
+		if (m_iKindsOfMesh == Prototype_Mesh_GiftBasket)
+		{
+			_uint IsRoseNum = rand() % 2 + 1;
+
+			for (_uint i = 0; i < IsRoseNum; i++)
+			{
+				FAILED_CHECK(pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_RoseObj),
+					TAG_OP(Prototype_RoseObj), &_float3(vPos)));
+			}
+		}
+		else
+		{
+
+			for (_uint i = 0; i < iNumTeethCount; i++)
+			{
+				_uint IsGold = rand() % 5;
+				IsGold = (IsGold) ? 0 : 1;
+
+				FAILED_CHECK(pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_TeethObj),
+					TAG_OP(Prototype_TeethObj), &_float4(vPos, _float(IsGold))));
+			}
+
+		}
+
+		//////////////////////乔胶 积己
+
+		for (_uint i = m_iKindsOfMesh + 1; i < m_iKindsOfMesh + 1 + m_iPieceNum; i++)
+		{
+			FAILED_CHECK(pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_BreakablePiece),
+				TAG_OP(Prototype_BreakablePiece), &_float4(vPos, _float(i))));
+		}
+
+
+
+
+
+		Set_IsDead();
+
+		return S_OK;
+
+	}
+	return S_OK;
+}
+
 HRESULT CBreakableObj::SetUp_Components()
 {
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Renderer), TAG_COM(Com_Renderer), (CComponent**)&m_pRendererCom));
@@ -184,6 +259,19 @@ HRESULT CBreakableObj::SetUp_Components()
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Transform), TAG_COM(Com_Transform), (CComponent**)&m_pTransformCom));
 
 	FAILED_CHECK(Add_Component(m_eNowSceneNum, TAG_CP(COMPONENTPROTOTYPEID(m_iKindsOfMesh)), TAG_COM(Com_Model), (CComponent**)&m_pModel));
+
+
+	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Collider), TAG_COM(Com_Collider), (CComponent**)&m_pColliderCom));
+
+	COLLIDERDESC			ColliderDesc;
+	/* For.Com_AABB */
+	ZeroMemory(&ColliderDesc, sizeof(COLLIDERDESC));
+
+	ColliderDesc.vScale = _float3(2.f, 2.f, 2.f);
+	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
+	ColliderDesc.vPosition = _float4(0, 1, 0, 1.f);
+	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
+
 
 	return S_OK;
 }
@@ -221,4 +309,5 @@ void CBreakableObj::Free()
 	Safe_Release(m_pRendererCom);
 	Safe_Release(m_pModel);
 	Safe_Release(m_pShaderCom);
+	Safe_Release(m_pColliderCom);
 }

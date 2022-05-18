@@ -5,6 +5,7 @@
 #include "StaticMapObject.h"
 #include "Camera_Main.h"
 #include "JumpPad.h"
+#include "SceneChageTriger.h"
 
 
 
@@ -47,6 +48,12 @@ HRESULT CScene_Stage1::Initialize()
 	FAILED_CHECK(Ready_Layer_StaticMapObj(TAG_LAY(Layer_StaticMapObj)));
 
 
+
+	FAILED_CHECK(Ready_Layer_TriggerCollider(TAG_LAY(Layer_TriggerCollider)));
+
+	
+
+
 	//FAILED_CHECK(Ready_Layer_DollMaker(TAG_LAY(Layer_Monster)));
 	
 	//FAILED_CHECK(Ready_Layer_Grunt(TAG_LAY(Layer_Monster)));
@@ -59,7 +66,8 @@ HRESULT CScene_Stage1::Initialize()
 		
 			
 			
-		
+
+	GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeIn, 0.5, { 0,0,0,1 });
 			
 
 	return S_OK;
@@ -70,8 +78,8 @@ _int CScene_Stage1::Update(_double fDeltaTime)
 	if (__super::Update(fDeltaTime) < 0)
 		return -1;
 
-	if (g_pGameInstance->Get_DIKeyState(DIK_P)&DIS_Down)
-		FAILED_CHECK(Ready_Layer_BreakableObj(TAG_LAY(Layer_Breakable)));
+	//if (g_pGameInstance->Get_DIKeyState(DIK_P)&DIS_Down)
+	//	FAILED_CHECK(Ready_Layer_BreakableObj(TAG_LAY(Layer_Breakable)));
 
 	
 
@@ -88,6 +96,9 @@ _int CScene_Stage1::LateUpdate(_double fDeltaTime)
 {
 	if (__super::LateUpdate(fDeltaTime) < 0)
 		return -1;
+
+	if (m_bIsNeedToSceneChange)
+		return Change_to_NextScene();
 
 	return 0;
 }
@@ -111,6 +122,17 @@ _int CScene_Stage1::LateRender()
 		return -1;
 
 	return 0;
+}
+
+_int CScene_Stage1::Change_to_NextScene()
+{
+
+	FAILED_CHECK(GetSingle(CUtilityMgr)->Clear_RenderGroup_forSceneChange());
+	FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Loading::Create(m_pDevice, m_pDeviceContext, (SCENEID) m_eNextScene), SCENEID::SCENE_LOADING));
+
+
+	return _int();
+
 }
 
 
@@ -493,6 +515,21 @@ HRESULT CScene_Stage1::Ready_Layer_DollMaker(const _tchar * pLayerTag)
 
 	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_DollMaker), &_float3(210, 22, 45)));
 
+
+	return S_OK;
+}
+
+HRESULT CScene_Stage1::Ready_Layer_TriggerCollider(const _tchar * pLayerTag)
+{
+	CSceneChageTriger::SCNCHGTRGDESC tDesc;
+
+	tDesc.eTargetScene = SCENE_STAGE2;
+	tDesc.vPosition = _float3(144.293f,7.765f,45.142f);
+	tDesc.vScale = _float3(2, 2, 2);
+	tDesc.vTargetPosition = tDesc.vPosition;
+
+	 
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_TriggerCollider_SceneChager), &tDesc));
 
 	return S_OK;
 }

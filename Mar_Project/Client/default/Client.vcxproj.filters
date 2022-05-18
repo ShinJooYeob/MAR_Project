@@ -247,6 +247,12 @@
     <Filter Include="01.GameObject\97.Effect\ScreenEffect\Fade">
       <UniqueIdentifier>{43990743-4ae5-4dfc-9ba1-becd09b9b4dc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.GameObject\09.TriggerCollider">
+      <UniqueIdentifier>{8d1e2294-d614-491d-8e15-1ec2d8c85903}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\09.TriggerCollider\00.SceneChageTriger">
+      <UniqueIdentifier>{5098aa03-943b-4757-9ef4-b37a2ae6dad8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -510,6 +516,9 @@
     <ClInclude Include="..\public\FadeEffect.h">
       <Filter>01.GameObject\97.Effect\ScreenEffect\Fade</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\SceneChageTriger.h">
+      <Filter>01.GameObject\09.TriggerCollider\00.SceneChageTriger</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -748,6 +757,9 @@
     </ClCompile>
     <ClCompile Include="..\private\FadeEffect.cpp">
       <Filter>01.GameObject\97.Effect\ScreenEffect\Fade</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\SceneChageTriger.cpp">
+      <Filter>01.GameObject\09.TriggerCollider\00.SceneChageTriger</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

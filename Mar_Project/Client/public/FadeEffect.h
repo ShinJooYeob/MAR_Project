@@ -33,6 +33,9 @@ public:
 
 	
 	_bool	Start_FadeEffect(FadeID eFadeType,_double Duration, _float4 TargetColor = _float4(0, 0, 0, 1));
+	void Add_RenderGroup_ForSceneChanging();
+
+	void Chage_TextureIndex(_uint iIndex = 0);
 
 
 	 
@@ -45,9 +48,9 @@ protected:
 
 	_bool				m_bNeedToDraw = false;
 	FadeID				m_eKindsFade = FadeID_End;
-	_double				m_PassedTime = 0;
+	_double				m_PassedTime = FLT_MAX;
 	_double				m_TotalTime = 0;
-	_float4				m_vTargetColor = _float4(0,0,0,1);
+	_float4				m_vTargetColor = _float4(0,0,0,0);
 
 protected:
 	HRESULT SetUp_Components();

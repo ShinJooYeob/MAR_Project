@@ -23,6 +23,7 @@ enum OBJECTPROTOTYPEID
 	Prototype_Bullet_Normal,
 	Prototype_Bullet_Grenade,
 	Prototype_ScreenEffectUI,
+	Prototype_TriggerCollider_SceneChager,
 
 	Prototype_UIImage,
 
@@ -107,6 +108,9 @@ static const _tchar* Tag_Object_Prototype(OBJECTPROTOTYPEID eTag)
 	{
 
 		
+	case Prototype_TriggerCollider_SceneChager:
+		return TEXT("Prototype_TriggerCollider_SceneChager");
+		break;
 	case Prototype_ScreenEffectUI:
 		return TEXT("Prototype_ScreenEffectUI");
 		break;
@@ -418,6 +422,7 @@ enum LAYERID
 
 
 	Layer_StaticMapObj,
+	Layer_TriggerCollider,
 
 
 	Layer_UI_GamePlay,
@@ -444,7 +449,10 @@ static const _tchar* Tag_Layer(LAYERID eTag)
 	case Layer_ScreenEffect:
 		return TEXT("Layer_ScreenEffect");
 		break;
-
+	case Layer_TriggerCollider:
+		return TEXT("Layer_TriggerCollider");
+		break;
+		
 		
 
 	case Layer_Bullet:

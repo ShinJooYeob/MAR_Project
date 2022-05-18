@@ -196,8 +196,8 @@ void CSlidePad::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflicte
 		else//피격처리해주면됨
 		{
 
-
-
+			m_pPlayer->Add_Dmg_to_Player(1);
+			pConflictedCollider->Set_Conflicted();
 
 		}
 

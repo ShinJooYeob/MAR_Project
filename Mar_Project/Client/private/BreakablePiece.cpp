@@ -55,7 +55,7 @@ _int CBreakablePiece::Update(_double fDeltaTime)
 
 	m_fTurningTime += fDeltaTime;
 
-	if (m_fTurningTime > 0.07)
+	if (m_fTurningTime > 0.00)
 	{
 
 		m_fStartTimer += _float(fDeltaTime);

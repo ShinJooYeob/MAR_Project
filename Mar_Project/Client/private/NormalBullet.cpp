@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "..\public\NormalBullet.h"
 #include "Monster.h"
-
+#include "BreakableObj.h"
 
 
 CNormalBullet::CNormalBullet(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
@@ -147,10 +147,21 @@ void CNormalBullet::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConfl
 	case Engine::CollisionType_Monster:
 	{
 
-		pConflictedCollider->Set_Conflicted();
-		//GetSingle(CUtilityMgr)->SlowMotionStart();
-		((CMonster*)(pConflictedObj))->Add_Dmg_to_Monster(1);
 
+
+
+		if (lstrcmp(pConflictedObj->Get_NameTag(), TAG_LAY(Layer_Breakable)))
+		{
+			pConflictedCollider->Set_Conflicted();
+			((CMonster*)(pConflictedObj))->Add_Dmg_to_Monster(1);
+
+		}
+		else
+		{
+			pConflictedCollider->Set_Conflicted();
+			//GetSingle(CUtilityMgr)->SlowMotionStart();
+			((CBreakableObj*)(pConflictedObj))->Add_Dmg_To_BreakableObj(1);
+		}
 
 	}
 	break;

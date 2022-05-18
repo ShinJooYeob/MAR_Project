@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "..\public\GrenadeBullet.h"
 #include "Monster.h"
+#include "BreakableObj.h"
 
 
 
@@ -142,10 +143,20 @@ void CGrenadeBullet::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConf
 	case Engine::CollisionType_Monster:
 	{
 
-		pConflictedCollider->Set_Conflicted();
-		//GetSingle(CUtilityMgr)->SlowMotionStart();
-		((CMonster*)(pConflictedObj))->Add_Dmg_to_Monster(15);
 
+
+		if (lstrcmp(pConflictedObj->Get_NameTag(), TAG_LAY(Layer_Breakable)))
+		{
+			pConflictedCollider->Set_Conflicted();
+			((CMonster*)(pConflictedObj))->Add_Dmg_to_Monster(15);
+
+		}
+		else
+		{
+			pConflictedCollider->Set_Conflicted();
+			//GetSingle(CUtilityMgr)->SlowMotionStart();
+			((CBreakableObj*)(pConflictedObj))->Add_Dmg_To_BreakableObj(15);
+		}
 
 	}
 	break;

@@ -21,15 +21,17 @@ public:
 	virtual _int Render()override;
 	virtual _int LateRender()override;
 
-
+public:
+	HRESULT Add_Dmg_To_BreakableObj(_uint iDmg);
 
 private:
 	CShader*			m_pShaderCom = nullptr;
 	CRenderer*			m_pRendererCom = nullptr;
 	CTransform*			m_pTransformCom = nullptr;
 	CModel*				m_pModel = nullptr;
+	CCollider*			m_pColliderCom = nullptr;
 
-	_float				m_fHP = 3;
+	_float				m_fHP = 4;
 
 	_uint				m_iKindsOfMesh = 0;
 	_uint				m_iPieceNum = 0;

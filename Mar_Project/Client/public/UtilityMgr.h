@@ -46,7 +46,7 @@ public:
 
 
 	/*For Effect*/
-	HRESULT Start_ScreenEffect(ScreenEffectID eEffectType, _double EffectDuration, _float4 AdditionalParameter = _float4(1,1,1,1));
+	HRESULT Start_ScreenEffect(ScreenEffectID eEffectType, _double EffectDuration, _float4 AdditionalParameter = _float4(1, 1, 1, 1));
 
 
 public:

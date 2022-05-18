@@ -30,7 +30,8 @@ HRESULT CScene_Loby::Initialize()
 
 	
 		
-			
+
+	GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeIn, 0.5, { 0,0,0,1 });
 
 	return S_OK;
 }

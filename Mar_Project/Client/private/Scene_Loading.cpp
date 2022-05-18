@@ -40,8 +40,9 @@ HRESULT CScene_Loading::Initialize(SCENEID eSceneID)
 	if (FAILED(Ready_Layer_LoadingUI(TEXT("Layer_Loading"))))
 		return E_FAIL;
 
+	m_FadePassedTime = 0;
 
-
+	GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeIn, 0.5, { 0,0,0,1 });
 
 	return S_OK;
 }
@@ -65,52 +66,58 @@ _int CScene_Loading::LateUpdate(_double fDeltaTime)
 	//로딩이 끝낫을 경우
 	if ( m_pLoader->IsLoadFinished())
 	{
-		g_pGameInstance->Set_TargetSceneNum(m_eNextSceneIndex);
-		switch (m_eNextSceneIndex)
+		if (m_FadePassedTime < 0.6)
 		{
-		case SCENEID::SCENE_LOBY:
-			FAILED_CHECK(GetSingle(CUtilityMgr)->Clear_RenderGroup_forSceneChange());
-			FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Loby::Create(m_pDevice, m_pDeviceContext), m_eNextSceneIndex));
-			break;
+			if (m_FadePassedTime == 0)
+			{
+				GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeOut, 0.5, { 0,0,0,1 });
+			}
 
-		case SCENEID::SCENE_STAGESELECT:
-			FAILED_CHECK(GetSingle(CUtilityMgr)->Clear_RenderGroup_forSceneChange());
-			FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_StageSelect::Create(m_pDevice, m_pDeviceContext), m_eNextSceneIndex));
-			break;
+			m_FadePassedTime += fDeltaTime;
 
-		case SCENEID::SCENE_STAGE1:
+		}
+		else
+		{
+			g_pGameInstance->Set_TargetSceneNum(m_eNextSceneIndex);
 			FAILED_CHECK(GetSingle(CUtilityMgr)->Clear_RenderGroup_forSceneChange());
-			FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Stage1::Create(m_pDevice, m_pDeviceContext), m_eNextSceneIndex));
-			break;
 
-		case SCENEID::SCENE_STAGE2:
-			FAILED_CHECK(GetSingle(CUtilityMgr)->Clear_RenderGroup_forSceneChange());
-			FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Stage2::Create(m_pDevice, m_pDeviceContext), m_eNextSceneIndex));
-			break;
-		case SCENEID::SCENE_STAGE3:
-			FAILED_CHECK(GetSingle(CUtilityMgr)->Clear_RenderGroup_forSceneChange());
-			FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Stage3::Create(m_pDevice, m_pDeviceContext), m_eNextSceneIndex));
-			break;
+			switch (m_eNextSceneIndex)
+			{
+			case SCENEID::SCENE_LOBY:
+				FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Loby::Create(m_pDevice, m_pDeviceContext), m_eNextSceneIndex));
+				break;
 
-		case SCENEID::SCENE_BOSS:
-			FAILED_CHECK(GetSingle(CUtilityMgr)->Clear_RenderGroup_forSceneChange());
-			FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Boss::Create(m_pDevice, m_pDeviceContext), m_eNextSceneIndex));
-			break;
+			case SCENEID::SCENE_STAGESELECT:
+				FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_StageSelect::Create(m_pDevice, m_pDeviceContext), m_eNextSceneIndex));
+				break;
+
+			case SCENEID::SCENE_STAGE1:
+				FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Stage1::Create(m_pDevice, m_pDeviceContext), m_eNextSceneIndex));
+				break;
+
+			case SCENEID::SCENE_STAGE2:
+				FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Stage2::Create(m_pDevice, m_pDeviceContext), m_eNextSceneIndex));
+				break;
+			case SCENEID::SCENE_STAGE3:
+				FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Stage3::Create(m_pDevice, m_pDeviceContext), m_eNextSceneIndex));
+				break;
+
+			case SCENEID::SCENE_BOSS:
+				FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Boss::Create(m_pDevice, m_pDeviceContext), m_eNextSceneIndex));
+				break;
 
 #ifdef USE_IMGUI
-		case SCENEID::SCENE_EDIT:
-			FAILED_CHECK(GetSingle(CUtilityMgr)->Clear_RenderGroup_forSceneChange());
-			FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Edit::Create(m_pDevice, m_pDeviceContext), m_eNextSceneIndex));
-			break;
+			case SCENEID::SCENE_EDIT:
+				FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Edit::Create(m_pDevice, m_pDeviceContext), m_eNextSceneIndex));
+				break;
 #endif // USE_IMGUI
 
+			default:
+				MSGBOX("Failed to SceneChange");
+				break;
+			}
 
-
-		default:
-			MSGBOX("Failed to SceneChange");
-			break;
 		}
-
 
 	}
 

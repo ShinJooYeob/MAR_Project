@@ -41,6 +41,8 @@
 #include "MovableColum.h"
 #include "MovableColumBtn.h"
 
+#include "SceneChageTriger.h"
+
 #include "StaticMapObject.h"
 
 //Monster
@@ -147,9 +149,10 @@ HRESULT CLoader::Load_Scene_Loby(_bool * _IsClientQuit, CRITICAL_SECTION * _CriS
 #pragma  region PROTOTYPE_GAMEOBJECT
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_UILoby), CLobyUI::Create(m_pDevice, m_pDeviceContext)));
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_PlayerLoby), CLobyAlice::Create(m_pDevice, m_pDeviceContext)));
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_TriggerCollider_SceneChager), CSceneChageTriger::Create(m_pDevice, m_pDeviceContext)));
 
 
-
+	
 #pragma endregion
 
 	EnterCriticalSection(_CriSec);

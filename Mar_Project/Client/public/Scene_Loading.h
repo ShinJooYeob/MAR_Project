@@ -26,6 +26,8 @@ private:
 	SCENEID m_eNextSceneIndex = SCENEID::SCENE_END;
 	class CLoader*		m_pLoader;
 
+	_double				m_FadePassedTime = 0;
+
 
 public:
 	static CScene_Loading* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, SCENEID eTargetSceneID);

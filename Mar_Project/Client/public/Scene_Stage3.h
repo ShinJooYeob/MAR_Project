@@ -17,6 +17,7 @@ public:
 	virtual _int LateRender()override;
 
 
+	virtual _int Change_to_NextScene() override;
 
 private:
 	HRESULT Ready_Light();
@@ -32,6 +33,7 @@ private:
 	HRESULT Ready_MovableColumBtn(const _tchar* pLayerTag);
 
 
+	HRESULT Ready_Layer_TriggerCollider(const _tchar* pLayerTag);
 
 	HRESULT Ready_Layer_Executor(const _tchar* pLayerTag);
 

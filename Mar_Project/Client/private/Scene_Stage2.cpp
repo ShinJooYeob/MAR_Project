@@ -10,6 +10,7 @@
 #include "ShapeMemoryPad.h"
 #include "ShpaeMemButton.h"
 #include "PresserObj.h"
+#include "SceneChageTriger.h"
 
 
 CScene_Stage2::CScene_Stage2(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
@@ -48,8 +49,12 @@ HRESULT CScene_Stage2::Initialize()
 	FAILED_CHECK(Ready_Layer_ShapeMemPad(TAG_LAY(Layer_ShapeMemoryPad)));
 	FAILED_CHECK(Ready_Layer_ShapeMemBtn(TAG_LAY(Layer_ButtonPad)));
 	FAILED_CHECK(Ready_Layer_PresserObj(TAG_LAY(Layer_Presser)));
+
+	FAILED_CHECK(Ready_Layer_TriggerCollider(TAG_LAY(Layer_TriggerCollider)));
+	
 	
 
+	GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeIn, 0.5, { 0,0,0,1 });
 	return S_OK;
 }
 
@@ -76,6 +81,9 @@ _int CScene_Stage2::LateUpdate(_double fDeltaTime)
 	if (__super::LateUpdate(fDeltaTime) < 0)
 		return -1;
 
+	if (m_bIsNeedToSceneChange)
+		return Change_to_NextScene();
+
 	return 0;
 }
 
@@ -98,6 +106,15 @@ _int CScene_Stage2::LateRender()
 		return -1;
 
 	return 0;
+}
+
+_int CScene_Stage2::Change_to_NextScene()
+{
+
+	FAILED_CHECK(GetSingle(CUtilityMgr)->Clear_RenderGroup_forSceneChange());
+	FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Loading::Create(m_pDevice, m_pDeviceContext, (SCENEID)m_eNextScene), SCENEID::SCENE_LOADING));
+
+	return _int();
 }
 
 
@@ -475,6 +492,21 @@ HRESULT CScene_Stage2::Ready_Layer_PresserObj(const _tchar * pLayerTag)
 	tDesc.vDestPos = _float3(69.187f, 40.5f, 97.403f);
 
 	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_Presser), &tDesc));
+	return S_OK;
+}
+
+HRESULT CScene_Stage2::Ready_Layer_TriggerCollider(const _tchar * pLayerTag)
+{
+	CSceneChageTriger::SCNCHGTRGDESC tDesc;
+
+	tDesc.eTargetScene = SCENE_STAGE3;
+	tDesc.vPosition = _float3(190.1f, 25.16f, 175);
+	tDesc.vScale = _float3(2, 1, 13);
+	tDesc.vTargetPosition = _float3(194.1f, 25.16f, 175);
+
+
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_TriggerCollider_SceneChager), &tDesc));
+
 	return S_OK;
 }
 

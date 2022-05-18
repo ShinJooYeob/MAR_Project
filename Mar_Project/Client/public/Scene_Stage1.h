@@ -16,6 +16,8 @@ public:
 	virtual _int Render()override;
 	virtual _int LateRender()override;
 
+	virtual _int Change_to_NextScene() override;
+
 
 
 private:
@@ -42,6 +44,8 @@ private:
 	HRESULT Ready_Layer_WaspInk(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_DollMaker(const _tchar* pLayerTag);
 
+
+	HRESULT Ready_Layer_TriggerCollider(const _tchar* pLayerTag);
 
 
 private:

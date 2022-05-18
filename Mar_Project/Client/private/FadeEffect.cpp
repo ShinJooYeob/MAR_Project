@@ -35,10 +35,12 @@ HRESULT CFadeEffect::Initialize_Clone(void * pArg)
 	m_UIRect.bottom = g_iWinCY;
 
 
-	m_vColor = _float4(0, 0, 0, 0.5f);
+	m_vColor = _float4(0, 0, 0, 0.0f);
 	m_fDepth = -FLT_MAX;
 
 	m_bNeedToDraw = true;
+	m_PassIndex = 7;
+	m_iTextureLayerIndex = 0;
 
 	return S_OK;
 }
@@ -48,7 +50,76 @@ _int CFadeEffect::Update(_double fDeltaTime)
 	if (__super::Update(fDeltaTime) < 0)
 		return -1;
 
+	if (!m_bNeedToDraw || m_PassedTime > m_TotalTime) return 0;
 
+
+	switch (m_eKindsFade)
+	{
+	case Client::CFadeEffect::FadeID_FadeIn:
+	{
+		m_PassedTime += fDeltaTime;
+
+		_float EasedAlpha = g_pGameInstance->Easing(TYPE_Linear, m_vTargetColor.w, 0, (_float)m_PassedTime, (_float)m_TotalTime);
+
+		if (m_PassedTime > m_TotalTime)
+		{
+			EasedAlpha = 0;
+			m_bNeedToDraw = false;
+		}
+
+		m_vColor.w = EasedAlpha;
+	}
+	break;
+	case Client::CFadeEffect::FadeID_FadeOut:
+	{
+		m_PassedTime += fDeltaTime;
+
+		_float EasedAlpha = g_pGameInstance->Easing(TYPE_Linear, 0, m_vTargetColor.w, (_float)m_PassedTime, (_float)m_TotalTime);
+
+		if (m_PassedTime > m_TotalTime)
+		{
+			EasedAlpha = 1;
+		}
+
+		m_vColor.w = EasedAlpha;
+	}
+		break;
+	case Client::CFadeEffect::FadeID_FadeInOut:
+	{
+		m_PassedTime += fDeltaTime;
+
+		_float EasedAlpha = g_pGameInstance->Easing_Return(TYPE_QuadOut, TYPE_QuadIn, m_vTargetColor.w, 0, (_float)m_PassedTime, (_float)m_TotalTime);
+
+		if (m_PassedTime > m_TotalTime)
+		{
+			EasedAlpha = 0;
+		}
+
+		m_vColor.w = EasedAlpha;
+	}
+
+		break;
+	case Client::CFadeEffect::FadeID_FadeOutIn:
+	{
+		m_PassedTime += fDeltaTime;
+
+		_float EasedAlpha = g_pGameInstance->Easing_Return(TYPE_QuadOut, TYPE_QuadIn, 0, m_vTargetColor.w, (_float)m_PassedTime, (_float)m_TotalTime);
+
+		if (m_PassedTime > m_TotalTime)
+		{
+			m_bNeedToDraw = false;
+			EasedAlpha = 1;
+		}
+
+		m_vColor.w = EasedAlpha;
+	}
+		break;
+	default:
+		break;
+	}
+
+
+	m_vColor.w = min(max(m_vColor.w, 0),1);
 
 
 	return _int();
@@ -88,8 +159,7 @@ _int CFadeEffect::Render()
 
 _int CFadeEffect::LateRender()
 {
-	if (__super::LateRender() < 0)
-		return -1;
+
 
 
 	return _int();
@@ -97,7 +167,36 @@ _int CFadeEffect::LateRender()
 
 _bool CFadeEffect::Start_FadeEffect(FadeID eFadeType, _double Duration, _float4 TargetColor)
 {
-	return _bool();
+	if (m_PassedTime < m_TotalTime) return false;
+
+	m_bNeedToDraw = true;
+	m_eKindsFade = eFadeType;
+
+	m_PassedTime = 0;
+	m_TotalTime = Duration;
+	m_vColor = m_vTargetColor = TargetColor;
+
+	m_vTargetColor.x = min(max(m_vTargetColor.x, 0), 1);
+	m_vTargetColor.y = min(max(m_vTargetColor.y, 0), 1);
+	m_vTargetColor.z = min(max(m_vTargetColor.z, 0), 1);
+	m_vTargetColor.w = min(max(m_vTargetColor.w, 0), 1);
+
+
+	return true;
+}
+
+void CFadeEffect::Add_RenderGroup_ForSceneChanging()
+{
+
+	if (m_bNeedToDraw)
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI, this);
+}
+
+void CFadeEffect::Chage_TextureIndex(_uint iIndex)
+{
+	if (m_iTextureLayerIndex > 6) return;
+
+	m_iTextureLayerIndex = iIndex;
 }
 
 

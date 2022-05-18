@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "..\public\Knife.h"
 #include "Monster.h"
+#include "BreakableObj.h"
 
 
 
@@ -127,11 +128,21 @@ void CKnife::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedOb
 
 	case Engine::CollisionType_Monster:
 	{
-		
+		if (lstrcmp(pConflictedObj->Get_NameTag(), TAG_LAY(Layer_Breakable)))
+		{
+
 			pConflictedCollider->Set_Conflicted();
 			GetSingle(CUtilityMgr)->SlowMotionStart();
 			((CMonster*)(pConflictedObj))->Add_Dmg_to_Monster(3);
-		
+
+		}
+		else
+		{
+			pConflictedCollider->Set_Conflicted();
+			GetSingle(CUtilityMgr)->SlowMotionStart();
+			((CBreakableObj*)(pConflictedObj))->Add_Dmg_To_BreakableObj(1);
+		}
+
 	}
 		break;
 	case Engine::CollisionType_Terrain:

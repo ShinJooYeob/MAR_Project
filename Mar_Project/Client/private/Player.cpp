@@ -72,6 +72,10 @@ _int CPlayer::Update(_double fDeltaTime)
 	if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
 		Set_GettingBigger(!m_bIsGiant);
 
+	if (g_pGameInstance->Get_DIKeyState(DIK_2)&DIS_Down)
+		Add_Dmg_to_Player(1);
+
+
 
 	if (m_iWeaponModelIndex != 10)
 	{
@@ -227,12 +231,13 @@ void CPlayer::Add_Dmg_to_Player(_uint iDmgAmount)
 
 
 	((CGamePlayUI*)(g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_UI_GamePlay))))->Add_Dmg_to_Player(m_iHP,iDmgAmount);
+	GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_HitEffect, 0.2, { 1,0,0,0.4f });
 
 	ZeroMemory(m_bAtkMoveMentChecker, sizeof(_bool) * 3);
 	m_bIsAttackClicked = false;
 	m_iAttackCount = 0;
 
-	if (m_bIsAttached) return;
+	if (m_bIsAttached || m_bSlide) return;
 
 	switch (m_eNowWeapon)
 	{
@@ -834,7 +839,10 @@ HRESULT CPlayer::Renew_Player(_float3 Position)
 	m_fSmallScale = 1.f;
 	m_fSmallPassedTime = 0;
 	m_fSmallVisualTime = 0;
-
+	m_pTransformCom->Set_MoveSpeed(PlayerMoveSpeed);
+	m_pTransformCom->Scaled_All(_float3(m_fSmallScale));
+	m_pTransformCom->Set_MoveSpeed(PlayerMoveSpeed * m_fSmallScale);
+	FAILED_CHECK(g_pGameInstance->EasingDiffuseLightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0, XMVectorSet(0.6f, 0.6f, 1, 1), m_fSmallVisualTime));
 
 	m_vDashDir = _float3(0);
 	m_fDashPower = 0;

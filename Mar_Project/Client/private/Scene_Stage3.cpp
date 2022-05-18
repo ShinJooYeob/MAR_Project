@@ -7,6 +7,7 @@
 #include "VentObj.h"
 #include "MovableColum.h"
 #include "MovableColumBtn.h"
+#include "SceneChageTriger.h"
 
 
 
@@ -42,10 +43,12 @@ HRESULT CScene_Stage3::Initialize()
 	FAILED_CHECK(Ready_MovableColum(TAG_LAY(Layer_MazeDoor)));
 	FAILED_CHECK(Ready_MovableColumBtn(TAG_LAY(Layer_ButtonPad)));
 	
-
+	FAILED_CHECK(Ready_Layer_TriggerCollider(TAG_LAY(Layer_TriggerCollider)));
+	
 	//FAILED_CHECK(Ready_Layer_Executor(TAG_LAY(Layer_Monster)));
 
-	
+
+	GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeIn, 0.5, { 0,0,0,1 });
 
 	return S_OK;
 }
@@ -73,6 +76,9 @@ _int CScene_Stage3::LateUpdate(_double fDeltaTime)
 	if (__super::LateUpdate(fDeltaTime) < 0)
 		return -1;
 
+	if (m_bIsNeedToSceneChange)
+		return Change_to_NextScene();
+
 	return 0;
 }
 
@@ -95,6 +101,15 @@ _int CScene_Stage3::LateRender()
 		return -1;
 
 	return 0;
+}
+
+_int CScene_Stage3::Change_to_NextScene()
+{
+
+	FAILED_CHECK(GetSingle(CUtilityMgr)->Clear_RenderGroup_forSceneChange());
+	FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Loading::Create(m_pDevice, m_pDeviceContext, (SCENEID)m_eNextScene), SCENEID::SCENE_LOADING));
+
+	return _int();
 }
 
 
@@ -418,6 +433,21 @@ HRESULT CScene_Stage3::Ready_MovableColumBtn(const _tchar * pLayerTag)
 	tDesc.eKindsOfObject = 2;
 	FAILED_CHECK(pInstance->Add_GameObject_To_Layer(SCENE_STAGE3, pLayerTag, TAG_OP(Prototype_MazeDoorBtn), &tDesc));
 
+	return S_OK;
+}
+
+HRESULT CScene_Stage3::Ready_Layer_TriggerCollider(const _tchar * pLayerTag)
+{
+	CSceneChageTriger::SCNCHGTRGDESC tDesc;
+
+	tDesc.eTargetScene = SCENE_BOSS;
+	tDesc.vPosition = _float3(129.3f, 27.39f, 236.739f);
+	tDesc.vScale = _float3(17, 2, 1);
+	//tDesc.vTargetPosition = _float3(127.489f, 21.0f, 254.976f);
+	tDesc.vTargetPosition = _float3(127.489f, 27.39f, 254.976f);
+
+
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE3, pLayerTag, TAG_OP(Prototype_TriggerCollider_SceneChager), &tDesc));
 	return S_OK;
 }
 

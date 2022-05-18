@@ -102,9 +102,11 @@ _int CVentObj::LateUpdate(_double fDeltaTime)
 
 
 
+#ifdef _DEBUG
 
 	if (m_bIsOnScreen)
 		FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this));
+#endif // _DEBUG
 	m_vOldPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
 
 	return _int();
@@ -264,7 +266,9 @@ HRESULT CVentObj::Load_ActionCam(const _tchar * szPath)
 
 HRESULT CVentObj::SetUp_Components()
 {
+#ifdef _DEBUG
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Renderer), TAG_COM(Com_Renderer), (CComponent**)&m_pRendererCom));
+#endif // _DEBUG
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Transform), TAG_COM(Com_Transform), (CComponent**)&m_pTransformCom));
 
@@ -339,6 +343,9 @@ void CVentObj::Free()
 	m_vecLookPostions.clear();
 	
 	Safe_Release(m_pTransformCom);
-	Safe_Release(m_pRendererCom);
 	Safe_Release(m_pColliderCom);
+
+#ifdef _DEBUG
+    Safe_Release(m_pRendererCom);
+#endif // _DEBUG
 }
