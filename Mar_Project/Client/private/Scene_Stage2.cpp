@@ -52,6 +52,7 @@ HRESULT CScene_Stage2::Initialize()
 
 	FAILED_CHECK(Ready_Layer_TriggerCollider(TAG_LAY(Layer_TriggerCollider)));
 	
+	FAILED_CHECK(Ready_Layer_Eyepot(TAG_LAY(Layer_Monster)));
 	
 
 	//GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeIn, 0.5, { 0,0,0,1 });
@@ -212,7 +213,7 @@ HRESULT CScene_Stage2::Ready_Layer_Player(const _tchar * pLayerTag)
 	pPlayer->Set_NowSceneNum(SCENE_STAGE2);
 
 	
-	pPlayer->Renew_Player(_float3(70, 25.5f, 168), _float3(80, 25.5f, 168));
+	pPlayer->Renew_Player(_float3(70, 25.16f, 168), _float3(80, 25.16f, 168));
 	//pPlayer->Renew_Player(_float3(187.1f, 25.16f, 175), _float3(200.1f, 25.16f, 175));
 	
 
@@ -509,6 +510,15 @@ HRESULT CScene_Stage2::Ready_Layer_TriggerCollider(const _tchar * pLayerTag)
 
 
 	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_TriggerCollider_SceneChager), &tDesc));
+
+	return S_OK;
+}
+
+HRESULT CScene_Stage2::Ready_Layer_Eyepot(const _tchar * pLayerTag)
+{
+
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_Eyepot), &_float3(76.407188f, 23.67001f, 68.761749f)));
+
 
 	return S_OK;
 }

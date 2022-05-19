@@ -34,7 +34,7 @@ HRESULT CEyepot::Initialize_Clone(void * pArg)
 	m_pModel->Change_AnimIndex(25);
 	m_bStartPos = false;
 	ZeroMemory(m_bIsDmgAnimUpdated, sizeof(_bool) * 3);
-	m_fHP = m_fMaxHP = 128;
+	m_fHP = m_fMaxHP = 56;
 
 	m_iPatternCount = 0;
 	m_bIsJumping = false;
@@ -86,10 +86,7 @@ _int CEyepot::Update(_double fDeltaTime)
 	if (g_pGameInstance->Get_DIKeyState(DIK_C)&DIS_Down)
 		Add_Dmg_to_Monster(1);
 
-	if (g_pGameInstance->Get_DIKeyState(DIK_V)&DIS_Down)
-	{
-		Add_Force(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_UP), 30);
-	}
+
 
 
 	_uint AnimIndex = m_pModel->Get_NowAnimIndex();
@@ -99,12 +96,14 @@ _int CEyepot::Update(_double fDeltaTime)
 	{
 		if (m_bStartPos)
 		{
-			if (!m_bIsPatternFinished || Distance_BetweenPlayer(m_pTransformCom) < 3)
+			if (m_PatternDelayTime > 4 &&(!m_bIsPatternFinished || Distance_BetweenPlayer(m_pTransformCom) < 15))
 			{
 				Update_Pattern(fDeltaTime);
 			}
 			else
 			{
+				m_PatternDelayTime += fDeltaTime;
+
 				if (!m_pModel->Get_IsUntillPlay() && !m_pModel->Get_IsHavetoBlockAnimChange())
 				{
 					m_pModel->Change_AnimIndex(1);
@@ -116,11 +115,12 @@ _int CEyepot::Update(_double fDeltaTime)
 		{
 			if (!m_bIsPatternFinished)
 			{
-				if (Distance_BetweenPlayer(m_pTransformCom) < 3)
+				if (Distance_BetweenPlayer(m_pTransformCom) < 15)
 				{
 					m_pModel->Change_AnimIndex_ReturnTo_Must(24, 0, 0.15, true);
 					m_bIsPatternFinished = true;
 					m_PatternPassedTime = 0;
+					m_PatternDelayTime = 0;
 				}
 			}
 			else 
@@ -143,8 +143,17 @@ _int CEyepot::Update(_double fDeltaTime)
 	Update_DmgCalculate(fDeltaTime);
 
 	m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
+	_uint NowAnimIndex = m_pModel->Get_NowAnimIndex();
 
-	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime, m_bIsOnScreen));
+	if (NowAnimIndex >= 8 && NowAnimIndex <= 12)
+	{
+		FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime * 1.8f, m_bIsOnScreen));
+
+	}
+	else
+	{
+		FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime, m_bIsOnScreen));
+	}
 
 	if (m_bIsOnScreen)
 	{
@@ -152,6 +161,15 @@ _int CEyepot::Update(_double fDeltaTime)
 		for (_uint i = 0; i < m_pColliderCom->Get_NumColliderBuffer(); i++)
 			m_pColliderCom->Update_Transform(i, m_pTransformCom->Get_WorldMatrix());
 
+
+	}
+	if (!m_bIsPatternFinished && (m_ePattern == 0 || m_ePattern == 2))
+	{
+		g_pGameInstance->Add_CollisionGroup(CollisionType_MonsterWeapon, this, m_pColliderCom);
+
+	}
+	else
+	{
 		g_pGameInstance->Add_CollisionGroup(CollisionType_Monster, this, m_pColliderCom);
 
 	}
@@ -240,31 +258,57 @@ _int CEyepot::Update_DmgCalculate(_double fDeltaTime)
 	{
 		m_pModel->Change_AnimIndex_ReturnTo_Must(15, 2, 0.15, true);
 		m_bIsPatternFinished = true;
+		m_PatternDelayTime = 0;
 		m_PatternPassedTime = 0;
-		m_pTransformCom->Set_MoveSpeed(0.5);
+		m_pTransformCom->Set_MoveSpeed(1.5f);
 		m_bIsDmgAnimUpdated[0] = true;
 	}
-	else if (!m_bIsDmgAnimUpdated[1] && m_fMaxHP * 0.2 < m_fDmgAmount)
+	else if (!m_bIsDmgAnimUpdated[1] && m_fMaxHP * 0.15 < m_fDmgAmount)
 	{
 		m_pModel->Change_AnimIndex_ReturnTo_Must(16, 2, 0.15, true);
 		m_bIsPatternFinished = true;
 		m_PatternPassedTime = 0;
-		m_pTransformCom->Set_MoveSpeed(0.5);
+		m_PatternDelayTime = 0;
+		m_pTransformCom->Set_MoveSpeed(1.5f);
 		Add_Force(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK)* -1, 10);
 		m_bIsDmgAnimUpdated[1] = true;
 	}
-	else if (!m_bIsDmgAnimUpdated[2] && m_fMaxHP * 0.4 < m_fDmgAmount)
+	else if (!m_bIsDmgAnimUpdated[2] && m_fMaxHP * 0.2 < m_fDmgAmount)
 	{
 		m_pModel->Change_AnimIndex_UntilTo(17, 18, 0.15, true);
 		m_bIsPatternFinished = true;
 		m_PatternPassedTime = 0;
-		m_pTransformCom->Set_MoveSpeed(0.5);
+		m_PatternDelayTime = 0;
+		m_pTransformCom->Set_MoveSpeed(1.5f);
 		m_bIsDmgAnimUpdated[2] = true;
 		m_DmgPassedTime = 5;
 
 	}
 
 	return _int();
+}
+
+void CEyepot::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedObj, CCollider * pConflictedCollider, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType)
+{
+	switch (eConflictedObjCollisionType)
+	{
+
+	case Engine::CollisionType_Player:
+	{
+		if (!m_bIsPatternFinished && (m_ePattern == 0 || m_ePattern == 2))
+		{
+			pConflictedCollider->Set_Conflicted();
+			((CPlayer*)(pConflictedObj))->Add_Dmg_to_Player(rand() % 2 + 3);
+		}
+	}
+	break;
+	case Engine::CollisionType_Terrain:
+		break;
+
+	default:
+		break;
+	}
+
 }
 
 HRESULT CEyepot::Set_Monster_On_Terrain(CTransform * pTransform, _double fDeltaTime)
@@ -292,7 +336,7 @@ HRESULT CEyepot::Set_Monster_On_Terrain(CTransform * pTransform, _double fDeltaT
 		if (m_bIsJumping)
 		{
 			m_bIsJumping = false;
-			m_pModel->Change_AnimIndex_ReturnTo(7, 2, 0.15, true);
+			m_pModel->Change_AnimIndex_ReturnTo_Must(7, 2, 0.15, true);
 
 		}
 	}
@@ -303,6 +347,7 @@ HRESULT CEyepot::Set_Monster_On_Terrain(CTransform * pTransform, _double fDeltaT
 _int CEyepot::Update_Pattern(_double fDeltaTime)
 {
 	m_PatternPassedTime += fDeltaTime;
+
 	if (m_bIsPatternFinished)
 	{
 		m_ePattern += 1;
@@ -312,6 +357,7 @@ _int CEyepot::Update_Pattern(_double fDeltaTime)
 		m_iPatternCount = 0;
 		m_bIsJumping = false;
 		m_bIsFarPattern = false;
+		
 	}
 
 	switch (m_ePattern)
@@ -321,17 +367,30 @@ _int CEyepot::Update_Pattern(_double fDeltaTime)
 		{
 			if (m_iPatternCount < 3)
 			{
-				m_vLookDir = XMVector3Normalize(XMVectorSetY(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS) - m_pTransformCom->Get_MatrixState(CTransform::STATE_POS),0));
-				m_pModel->Change_AnimIndex_UntilTo(5, 6, 0.15, true);
-				m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.15f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.85f));
-				Add_Force(m_pTransformCom, m_vLookDir.XMVector() + XMVectorSet(0,1,0,0), 50);
-				m_bIsJumping = true;
-				m_iPatternCount++;
+				if (!m_iPatternCount)
+				{
+					m_vLookDir = XMVector3Normalize(XMVectorSetY(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS) - m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0));
+					m_pModel->Change_AnimIndex_UntilNReturn_Must(5, 6, 6, 0.15, true);
+					m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.15f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.85f));
+					Add_Force(m_pTransformCom, m_vLookDir.XMVector() + (XMVectorSet(0, 1, 0, 0)), 120);
+					m_bIsJumping = true;
+					m_iPatternCount++;
+				}
+				else if (m_pModel->Get_NowAnimIndex() == 2 && m_pModel->Get_PlayRate() > 0.1)
+				{
+					m_vLookDir = XMVector3Normalize(XMVectorSetY(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS) - m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0));
+					m_pModel->Change_AnimIndex_UntilNReturn_Must(5, 6, 6, 0.15, true);
+					m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.15f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.85f));
+					Add_Force(m_pTransformCom, m_vLookDir.XMVector() + (XMVectorSet(0, 1, 0, 0) * 3.f), 80);
+					m_bIsJumping = true;
+					m_iPatternCount++;
+				}
 			}
 			else
 			{
 				m_bIsPatternFinished = true;
 				m_PatternPassedTime = 0;
+				m_PatternDelayTime = 0;
 				m_iPatternCount = 0;
 				m_bIsJumping = false;
 			}
@@ -374,12 +433,12 @@ _int CEyepot::Update_Pattern(_double fDeltaTime)
 
 			if (m_bIsFarPattern)
 			{
-				if (Distance_BetweenPlayer(m_pTransformCom) < 8)
+				if (Distance_BetweenPlayer(m_pTransformCom) < 10)
 				{
 					if (!m_pModel->Get_IsHavetoBlockAnimChange())
 					{
 
-						m_pTransformCom->Set_MoveSpeed(5.5);
+						m_pTransformCom->Set_MoveSpeed(16.5f);
 						m_pModel->Change_AnimIndex(4, 0.15, false);
 						FAILED_CHECK(FarPatternWander(fDeltaTime));
 					}
@@ -387,13 +446,15 @@ _int CEyepot::Update_Pattern(_double fDeltaTime)
 				else
 				{
 					m_bIsFarPattern = false;
-					m_pTransformCom->Set_MoveSpeed(0.5);
-					m_pModel->Change_AnimIndex_UntilTo(8, 12, 0.15, true);
+					m_pTransformCom->Set_MoveSpeed(1.5f);
+					m_pModel->Change_AnimIndex_UntilTo(8, 12, 0.3, true);
 				}
 
 			}
 			else
 			{
+				_uint Temp = m_pModel->Get_NowAnimIndex();
+
 				if (m_pModel->Get_NowAnimIndex() == 9)
 				{
 					m_vLookDir = XMVector3Normalize(XMVectorSetY(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS) - m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0));
@@ -402,17 +463,18 @@ _int CEyepot::Update_Pattern(_double fDeltaTime)
 
 				if (m_pModel->Get_NowAnimIndex() == 12)
 				{
-					if (m_PatternPassedTime > 3)
+					if (m_pModel->Get_PlayRate() > 0.5)
 					{
 						m_PatternPassedTime = 0;
 						m_iPatternCount++;
 						if (m_iPatternCount < 4)
-							m_pModel->Change_AnimIndex_ReturnTo_Must(13, 12, 0.15, false);
+							m_pModel->Change_AnimIndex_ReturnTo_Must(13, 12, 0.3, false);
 					}
-					else if (Distance_BetweenPlayer(m_pTransformCom) < 5)
+					else if (Distance_BetweenPlayer(m_pTransformCom) < 30)
 					{
+						m_iPatternCount++;
 						m_bIsFarPattern = true;
-						m_pModel->Change_AnimIndex_ReturnTo_Must(14, 4, 0.15, true);
+						m_pModel->Change_AnimIndex_ReturnTo_Must(14, 4, 0.3, true);
 
 						_Vector Dir = XMVector3Normalize(XMVectorSetY(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS) - m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0));
 
@@ -442,6 +504,7 @@ _int CEyepot::Update_Pattern(_double fDeltaTime)
 			m_pModel->Set_BlockAnim(false);
 			m_pModel->Change_AnimIndex_ReturnTo(14,1, 0.15,true);
 			m_bIsPatternFinished = true;
+			m_PatternDelayTime = 0;
 			m_PatternPassedTime = 0;
 			m_iPatternCount = 0;
 			m_bIsJumping = false;
@@ -453,7 +516,7 @@ _int CEyepot::Update_Pattern(_double fDeltaTime)
 		if (!m_iPatternCount)
 		{
 			m_pModel->Change_AnimIndex(3, 0.15, true);
-			m_pTransformCom->Set_MoveSpeed(5.5);
+			m_pTransformCom->Set_MoveSpeed(16.5f);
 			m_vLookDir = XMVector3Normalize(XMVectorSetY(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS) - m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0));
 			m_iPatternCount++;
 		}
@@ -470,11 +533,12 @@ _int CEyepot::Update_Pattern(_double fDeltaTime)
 			{
 				m_pModel->Set_BlockAnim(false);
 				m_bIsPatternFinished = true;
+				m_PatternDelayTime = 0;
 				m_PatternPassedTime = 0;
 				m_iPatternCount = 0;
 				m_bIsJumping = false;
 				m_bIsFarPattern = false;
-				m_pTransformCom->Set_MoveSpeed(0.5);
+				m_pTransformCom->Set_MoveSpeed(1.5f);
 			}
 		}
 
@@ -499,8 +563,9 @@ void CEyepot::Add_Dmg_to_Monster(_float iDmgAmount)
 	{
 		m_pModel->Change_AnimIndex_ReturnTo_Must(19 + rand() % 2, 18, 0.15, true);
 		m_bIsPatternFinished = true;
+		m_PatternDelayTime = 0;
 		m_PatternPassedTime = 0;
-		m_pTransformCom->Set_MoveSpeed(0.5);
+		m_pTransformCom->Set_MoveSpeed(1.5f);
 		m_bIsDmgAnimUpdated[2] = true;
 	
 
@@ -535,30 +600,30 @@ HRESULT CEyepot::SetUp_Components()
 
 	//Pivot  : 0.000000f , 1.189999f , 0.000000f , 1
 	//size  : 2.969998f , 1.000000f , 1.000000f , 
-	ColliderDesc.vScale = _float3(2.969998f, 1.000000f, 1.000000f);
+	ColliderDesc.vScale = _float3(9.f, 1.000000f, 1.000000f);
 	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
 	ColliderDesc.vPosition = _float4(0.000000f, 1.189999f, 0.000000f, 1);
 	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
 
 	//size  : 1.529999f , 1.000000f , 1.000000f , 
-	ColliderDesc.vScale = _float3(1.529999f, 1.000000f, 1.000000f);
+	ColliderDesc.vScale = _float3(4.5f, 1.000000f, 1.000000f);
 	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);	
-	ColliderDesc.vPosition = _float4(0.000000f, 1.189999f, 0.000000f, 1);
+	ColliderDesc.vPosition = _float4(0.000000f, 3.54f, 0.000000f, 1);
 	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
 	m_pColliderCom->Set_ParantBuffer();
 
 	//size  : 1.210000f , 0.710000f , 1.180000f , 
 	//Pivot  : 0.000000f , 0.500000f , -0.100000f , 1
-	ColliderDesc.vScale = _float3(1.210000f, 0.710000f, 1.180000f);
+	ColliderDesc.vScale = _float3(5.00000f, 2.130000f, 5.0f);
 	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
-	ColliderDesc.vPosition = _float4(0.000000f, 0.500000f, -0.100000f, 1);
+	ColliderDesc.vPosition = _float4(0.000000f, 1.065000f, 0.f, 1);
 	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_OBB, &ColliderDesc));
 	m_pColliderCom->Set_ParantBuffer();
 
 
 	CTransform::TRANSFORMDESC tDesc = {};
 
-	tDesc.fMovePerSec = 0.6f;
+	tDesc.fMovePerSec = 1.5f;
 	tDesc.fRotationPerSec = XMConvertToRadians(60);
 	tDesc.fScalingPerSec = 1;
 	tDesc.vPivot = _float3(0, 0, 0);
@@ -579,7 +644,7 @@ HRESULT CEyepot::FarPatternWander(_double fDeltaTime)
 	if (!(Check_Movable_Terrain(m_pTransformCom, m_vLookDir.XMVector() * -1, 0.1f)))
 	{
 		m_bIsFarPattern = false;
-		m_pTransformCom->Set_MoveSpeed(0.5);
+		m_pTransformCom->Set_MoveSpeed(1.5f);
 		m_pModel->Change_AnimIndex_UntilTo(8, 12, 0.15, true);
 	}
 	else

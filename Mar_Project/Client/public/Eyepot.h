@@ -27,6 +27,9 @@ public:
 	virtual _int Update_Pattern(_double fDeltaTime)override;
 	virtual void Add_Dmg_to_Monster(_float iDmgAmount)override;
 	_int		Update_DmgCalculate(_double fDeltaTime);
+
+	virtual void CollisionTriger(_uint iMyColliderIndex, CGameObject* pConflictedObj, CCollider* pConflictedCollider, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType) override;
+
 private:
 	CShader*			m_pShaderCom = nullptr;
 	CRenderer*			m_pRendererCom = nullptr;
@@ -38,6 +41,7 @@ private:
 	_bool				m_bIsDmgAnimUpdated[3];
 	_bool				m_bStartPos = false;
 
+				
 	_uint				m_iPatternCount = 0;
 	_bool				m_bIsJumping = false;
 	_bool				m_bIsFarPattern = false;
