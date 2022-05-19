@@ -27,6 +27,7 @@ public:
 	virtual _int Update_Pattern(_double fDeltaTime)override;
 	virtual void Add_Dmg_to_Monster(_float iDmgAmount)override;
 
+	virtual void CollisionTriger(_uint iMyColliderIndex, CGameObject* pConflictedObj, CCollider* pConflictedCollider, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType) override;
 
 
 private:
@@ -36,8 +37,16 @@ private:
 	CTransform*			m_pTransformCom = nullptr;
 	CCollider*			m_pColliderCom = nullptr;
 
+	_bool				m_bSpwanAnimFinished = false;
+	_double				m_SpwanAnimPassedTime = 0;
+	_uint				m_SpwanAnimCount = 0;
+	_uint				m_SpwanKinds = INT_MAX;
+	_float3				m_SpwanMovingPos[5];
 
 	_bool				m_bIsDmgAnimUpdated[3];
+
+	_bool				m_bDeadAnimStart = false;
+
 private:
 	HRESULT SetUp_Components();
 

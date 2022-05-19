@@ -17,11 +17,8 @@ HRESULT CWaspInk::Initialize_Prototype(void * pArg)
 {
 	FAILED_CHECK(__super::Initialize_Prototype(pArg));
 
-	if (pArg != nullptr)
-		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, *((_float3*)pArg));
 
-	ZeroMemory(m_bIsDmgAnimUpdated, sizeof(_bool) * 3);
-	m_fHP = m_fMaxHP = 64;
+
 
 
 	return S_OK;
@@ -34,9 +31,67 @@ HRESULT CWaspInk::Initialize_Clone(void * pArg)
 	FAILED_CHECK(SetUp_Components());
 
 	if (pArg != nullptr)
+	{
 		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, *((_float3*)pArg));
+		_float Tempw = (*((_float4*)pArg)).w;
+		m_SpwanKinds = (_uint)Tempw;
+	}
 
+
+	ZeroMemory(m_bIsDmgAnimUpdated, sizeof(_bool) * 3);
+	m_fHP = m_fMaxHP = 32;
 	m_pTransformCom->Set_MoveSpeed(4.8f);
+
+
+	ZeroMemory(m_SpwanMovingPos, sizeof(_float3) * 5);
+
+	
+	switch (m_SpwanKinds)
+	{
+	case 0:
+		m_SpwanMovingPos[4] = _float3(225.749f, 20.f, 65.196f);
+		break;
+	case 1:
+		m_SpwanMovingPos[4] = _float3(211.348f, 20.f, 66.948f);
+		break;
+	case 2:
+		m_SpwanMovingPos[4] = _float3(223.403f, 19.f, 46.583f);
+		break;
+	case 3:
+		m_SpwanMovingPos[4] = _float3(213.09f, 20.f, 41.65f);
+		break;
+	default:
+		break;
+	}
+
+
+	CUtilityMgr* pUtil = GetSingle(CUtilityMgr);
+
+	m_SpwanMovingPos[0] = XMVectorSet(253.859f, 37.0f, 41.835f,0) + pUtil->RandomFloat3(-3,3).XMVector();
+	m_SpwanMovingPos[1]= XMVectorSet(208.f, 26.f, 41.835f,0) + pUtil->RandomFloat3(-3,3).XMVector();
+	m_SpwanMovingPos[2]= XMVectorSet(214.859f, 35.3f, 82.935f,0) + pUtil->RandomFloat3(-3,3).XMVector();
+	m_SpwanMovingPos[3]= XMVectorSet(220.017f, 71.0f, 56.0f,0) + pUtil->RandomFloat3(-3,3).XMVector();
+
+	m_SpwanAnimPassedTime = 0;
+
+
+	/*
+	253.859f,37.0f,41.835f
+
+	208.f,26.f,41.835f
+
+	214.859f,35.3f,82.935f
+
+	220.017f,71.0f,56.0f
+
+	//
+	225.749f,20.f,65.196f
+	211.348f,20.f,66.948f
+	223.403f,19.f,46.583f
+	213.09f, 20.f,41.65f
+	//
+	*/
+
 
 	return S_OK;
 }
@@ -48,19 +103,102 @@ _int CWaspInk::Update(_double fDeltaTime)
 	if (__super::Update(fDeltaTime) < 0)return -1;
 	m_pColliderCom->Update_ConflictPassedTime(fDeltaTime);
 
-	m_pTransformCom->Set_MoveSpeed(4.8f);
+
+	if (g_pGameInstance->Get_DIKeyState(DIK_O)&DIS_Down)
+		Add_Dmg_to_Monster(1000);
 
 
-	if (!m_bIsPatternFinished || Distance_BetweenPlayer(m_pTransformCom) < 10)
+	//m_pTransformCom->Set_MoveSpeed(4.8f);
+	if (m_bDeadAnimStart)
 	{
-		Update_Pattern(fDeltaTime);
+		if (m_pModel->Get_PlayRate() > 0.5)
+		{
+			Set_IsDead();
+			return 0;
+		}
+	}
+	else if (m_bSpwanAnimFinished)
+	{
+
+
+		if (!m_bIsPatternFinished || Distance_BetweenPlayer(m_pTransformCom) < 15)
+		{
+			Update_Pattern(fDeltaTime);
+		}
+		else
+		{
+			if (!m_pModel->Get_IsUntillPlay() && !m_pModel->Get_IsHavetoBlockAnimChange())
+			{
+				m_pModel->Change_AnimIndex(2);
+				FAILED_CHECK(__super::Update_WanderAround(m_pTransformCom, fDeltaTime, 0.2f));
+			}
+		}
 	}
 	else
 	{
-		if (!m_pModel->Get_IsUntillPlay() && !m_pModel->Get_IsHavetoBlockAnimChange())
+		m_SpwanAnimPassedTime += fDeltaTime;
+
+
+		if (m_SpwanAnimPassedTime < 2)
 		{
-			m_pModel->Change_AnimIndex(2);
-			FAILED_CHECK(__super::Update_WanderAround(m_pTransformCom, fDeltaTime, 0.2f));
+			_float3 EasedPos = g_pGameInstance->Easing_Vector(TYPE_ExpoInOut, m_SpwanMovingPos[0], m_SpwanMovingPos[1], (_float)m_SpwanAnimPassedTime, 2);
+			m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, EasedPos);
+
+			_Vector NewLook = XMVectorLerp(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK),
+				XMVector3Normalize(m_SpwanMovingPos[1].XMVector() - m_SpwanMovingPos[0].XMVector()), 0.1f);
+
+			m_pTransformCom->LookDir(NewLook);
+		}
+		else if (m_SpwanAnimPassedTime < 4)
+		{
+
+			_float3 EasedPos = g_pGameInstance->Easing_Vector(TYPE_ExpoInOut, m_SpwanMovingPos[1], m_SpwanMovingPos[2], (_float)m_SpwanAnimPassedTime - 2, 2);
+			m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, EasedPos);
+
+			_Vector NewLook = XMVectorLerp(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK),
+				XMVector3Normalize(m_SpwanMovingPos[2].XMVector() - m_SpwanMovingPos[1].XMVector()), 0.1f);
+
+			m_pTransformCom->LookDir(NewLook);
+
+		}
+		else if (m_SpwanAnimPassedTime < 6)
+		{
+
+			_float3 EasedPos = g_pGameInstance->Easing_Vector(TYPE_ExpoInOut, m_SpwanMovingPos[2], m_SpwanMovingPos[3], (_float)m_SpwanAnimPassedTime - 4, 2);
+			m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, EasedPos);
+			_Vector NewLook = XMVectorLerp(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK),
+				XMVector3Normalize(m_SpwanMovingPos[3].XMVector() - m_SpwanMovingPos[2].XMVector()), 0.1f);
+
+			m_pTransformCom->LookDir(NewLook);
+		}
+		else if (m_SpwanAnimPassedTime < 10)
+		{
+			_float3 EasedPos = g_pGameInstance->Easing_Vector(TYPE_ExpoIn, m_SpwanMovingPos[3], m_SpwanMovingPos[4], (_float)m_SpwanAnimPassedTime - 6, 4);
+			m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, EasedPos);
+
+
+			_Vector NewLook = XMVectorLerp(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK),
+				XMVector3Normalize(m_SpwanMovingPos[4].XMVector() - m_SpwanMovingPos[3].XMVector()), 0.1f);
+
+			m_pTransformCom->LookDir(NewLook);
+		}
+		else if(m_SpwanAnimPassedTime < 13)
+		{
+			if (!m_SpwanAnimCount)
+			{
+				m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, m_SpwanMovingPos[4]);
+				_float3 NewLook = GetSingle(CUtilityMgr)->RandomFloat3(-9999.f, 9999.f);
+				NewLook.y = 0;
+				m_pTransformCom->LookDir(NewLook.XMVector());
+				__super::SetUp_WanderLook(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK));
+				m_pModel->Change_AnimIndex(10);
+				m_SpwanAnimCount++;
+			}
+		}
+		else
+		{
+			m_bSpwanAnimFinished = true;
+
 		}
 	}
 
@@ -75,16 +213,21 @@ _int CWaspInk::Update(_double fDeltaTime)
 	{
 		for (_uint i = 0; i < m_pColliderCom->Get_NumColliderBuffer(); i++)
 			m_pColliderCom->Update_Transform(i, m_pTransformCom->Get_WorldMatrix());
-		g_pGameInstance->Add_CollisionGroup(CollisionType_Monster, this, m_pColliderCom);
 	}
+
+	if (m_bIsPatternFinished)
+		g_pGameInstance->Add_CollisionGroup(CollisionType_Monster, this, m_pColliderCom);
+	else
+		g_pGameInstance->Add_CollisionGroup(CollisionType_MonsterWeapon, this, m_pColliderCom);
+
 
 	return _int();
 }
 
 _int CWaspInk::LateUpdate(_double fDeltaTime)
 {
-
-	FAILED_CHECK(__super::Set_Monster_On_Terrain(m_pTransformCom, fDeltaTime));
+	if (m_bSpwanAnimFinished)
+		FAILED_CHECK(__super::Set_Monster_On_Terrain(m_pTransformCom, fDeltaTime));
 
 
 	if (m_bIsOnScreen)
@@ -155,6 +298,16 @@ _int CWaspInk::Update_DmgCalculate(_double fDeltaTime)
 	//}
 	//m_DmgPassedTime -= fDeltaTime;
 
+	if (m_fHP <= 0)
+	{
+		if (!m_bDeadAnimStart)
+		{
+			m_bDeadAnimStart = true;
+			m_pModel->Change_AnimIndex_ReturnTo_Must(11, 11, 0.15, true);
+		}
+		return 0;
+	}
+
 	if (!m_bIsDmgAnimUpdated[0])
 	{
 		m_pModel->Change_AnimIndex_ReturnTo_Must(8 + rand()%2, 0, 0.15, true);
@@ -174,7 +327,7 @@ _int CWaspInk::Update_Pattern(_double fDeltaTime)
 {
 	m_PatternPassedTime += fDeltaTime;
 
-	if (m_PatternPassedTime > 2.5 &&(!m_bIsPatternFinished || Distance_BetweenPlayer(m_pTransformCom) < 5))
+	if (m_PatternPassedTime > 2.5 &&(!m_bIsPatternFinished || Distance_BetweenPlayer(m_pTransformCom) < 10))
 	{
 		if (m_bIsPatternFinished)
 		{
@@ -222,6 +375,29 @@ void CWaspInk::Add_Dmg_to_Monster(_float iDmgAmount)
 	}
 }
 
+void CWaspInk::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedObj, CCollider * pConflictedCollider, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType)
+{
+	switch (eConflictedObjCollisionType)
+	{
+
+	case Engine::CollisionType_Player:
+	{
+		if (!m_bIsPatternFinished)
+		{
+			pConflictedCollider->Set_Conflicted();
+			((CPlayer*)(pConflictedObj))->Add_Dmg_to_Player(rand() % 2 + 3);
+		}
+	}
+	break;
+	case Engine::CollisionType_Terrain:
+		break;
+
+	default:
+		break;
+	}
+
+}
+
 HRESULT CWaspInk::SetUp_Components()
 {
 
@@ -240,9 +416,9 @@ HRESULT CWaspInk::SetUp_Components()
 	ZeroMemory(&ColliderDesc, sizeof(COLLIDERDESC));
 
 	//Pivot  : 0.000000f , 0.800000f , 0.000000f , 1
-	ColliderDesc.vScale = _float3(1);
+	ColliderDesc.vScale = _float3(3);
 	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
-	ColliderDesc.vPosition = _float4(0.000000f, 0.800000f, 0.000000f, 1);
+	ColliderDesc.vPosition = _float4(0.000000f, 1.5f, 0.000000f, 1);
 	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
 
 

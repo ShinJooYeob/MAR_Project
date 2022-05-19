@@ -43,6 +43,7 @@
 
 #include "SceneChageTriger.h"
 #include "Stage1_SpwanGrunt.h"
+#include "Stage1_SpwanWasp.h"
 
 #include "StaticMapObject.h"
 
@@ -204,7 +205,7 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 
 
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Player),
-		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Alice", "Alice.FBX", TransformMatrix, 8)));
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Alice", "Alice.FBX", TransformMatrix, 1)));
 
 	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Tornado1),
@@ -317,13 +318,14 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 
 	//FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_DollMaker),
 	//	CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "DollMaker", "DollMaker.FBX", TransformMatrix)));
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////Grunt
+	//FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_Grunt),
+	//	CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Grunt", "Grunt.FBX", TransformMatrix)));
+	//
+	//FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_GruntSwpanMesh),
+	//	CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Grunt", "GruntSpwanMesh.FBX", TransformMatrix)));
 	
-	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_Grunt),
-		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Grunt", "Grunt.FBX", TransformMatrix)));
-
-	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_GruntSwpanMesh),
-		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Grunt", "GruntSpwanMesh.FBX", TransformMatrix)));
-
 	TransformMatrix = XMMatrixScaling(0.0001f, 0.0001f, 0.0001f);
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, L"Grunt_StaticSwpanMesh",
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "Grunt", "GruntSpwanMesh2.FBX", TransformMatrix)));
@@ -337,10 +339,12 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 	//	CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Eyepot", "Eyepot.FBX", TransformMatrix)));
 	//
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////WaspInk
-	//FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_WaspInk),
-	//	CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "WaspInk", "WaspInk.FBX", TransformMatrix)));
-	//
-	//
+	TransformMatrix = XMMatrixScaling(0.0003f, 0.0003f, 0.0003f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_WaspInk),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "WaspInk", "WaspInk.FBX", TransformMatrix)));
+	TransformMatrix = XMMatrixScaling(0.0001f, 0.0001f, 0.0001f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
+
+
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////Executor
 	//TransformMatrix = XMMatrixScaling(0.00025f, 0.00025f, 0.00025f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
@@ -650,6 +654,8 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(L"Stage1_SpwanGrunt",
 		CStage1_SpwanGrunt::Create(m_pDevice, m_pDeviceContext)));
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(L"Stage1_SpwanWasp",
+		CStage1_SpwanWasp::Create(m_pDevice, m_pDeviceContext)));
 
 	
 #pragma endregion

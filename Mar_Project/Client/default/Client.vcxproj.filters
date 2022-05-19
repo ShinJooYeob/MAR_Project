@@ -256,6 +256,9 @@
     <Filter Include="01.GameObject\09.TriggerCollider\01.Stage1_SpwanGrunt">
       <UniqueIdentifier>{0d2c1f27-04a2-47c2-be8c-45aae7aeddc6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.GameObject\09.TriggerCollider\02.Stage1_SpwanWasp">
+      <UniqueIdentifier>{93d8e8af-1b29-4cc7-a339-f4164628037f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -525,6 +528,9 @@
     <ClInclude Include="..\public\Stage1_SpwanGrunt.h">
       <Filter>01.GameObject\09.TriggerCollider\01.Stage1_SpwanGrunt</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Stage1_SpwanWasp.h">
+      <Filter>01.GameObject\09.TriggerCollider\02.Stage1_SpwanWasp</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -769,6 +775,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Stage1_SpwanGrunt.cpp">
       <Filter>01.GameObject\09.TriggerCollider\01.Stage1_SpwanGrunt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Stage1_SpwanWasp.cpp">
+      <Filter>01.GameObject\09.TriggerCollider\02.Stage1_SpwanWasp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

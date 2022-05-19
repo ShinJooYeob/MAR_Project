@@ -1,32 +1,32 @@
 #include "stdafx.h"
-#include "..\public\Stage1_SpwanGrunt.h"
+#include "..\public\Stage1_SpwanWasp.h"
 #include "Player.h"
 #include "Terrain.h"
 #include "Camera_Main.h"
-#include "Grunt.h"
+#include "WaspInk.h"
 #include "JumpPad.h"
 
 
 
-CStage1_SpwanGrunt::CStage1_SpwanGrunt(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
+CStage1_SpwanWasp::CStage1_SpwanWasp(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
 	:CMapObject(pDevice,pDeviceContext)
 {
 }
 
-CStage1_SpwanGrunt::CStage1_SpwanGrunt(const CStage1_SpwanGrunt & rhs)
+CStage1_SpwanWasp::CStage1_SpwanWasp(const CStage1_SpwanWasp & rhs)
 	: CMapObject(rhs)
 {
 }
 
 
 
-HRESULT CStage1_SpwanGrunt::Initialize_Prototype(void * pArg)
+HRESULT CStage1_SpwanWasp::Initialize_Prototype(void * pArg)
 {
 	FAILED_CHECK(__super::Initialize_Prototype(pArg));
 	return S_OK;
 }
 
-HRESULT CStage1_SpwanGrunt::Initialize_Clone(void * pArg)
+HRESULT CStage1_SpwanWasp::Initialize_Clone(void * pArg)
 {
 	FAILED_CHECK(__super::Initialize_Clone(pArg));
 
@@ -37,8 +37,8 @@ HRESULT CStage1_SpwanGrunt::Initialize_Clone(void * pArg)
 
 	FAILED_CHECK(SetUp_Components());
 
-	FAILED_CHECK(Load_ActionCam(L"Stage1_CameAction_0"));
-	FAILED_CHECK(Load_ActionCam2(L"Stage1_CameAction_1"));
+	FAILED_CHECK(Load_ActionCam(L"Stage1_CameAction_2"));
+	FAILED_CHECK(Load_ActionCam2(L"Stage1_CameAction_3"));
 
 	
 	return S_OK;
@@ -46,212 +46,65 @@ HRESULT CStage1_SpwanGrunt::Initialize_Clone(void * pArg)
 
 
 
-_int CStage1_SpwanGrunt::Update(_double fDeltaTime)
+_int CStage1_SpwanWasp::Update(_double fDeltaTime)
 {
 	if (__super::Update(fDeltaTime) < 0)
 		return -1;
 
 	CGameInstance* pInstance = g_pGameInstance;
 
-#define GruntSwpanTiming 6
-	if (m_bSpwanStart )
+	if (m_bSpwanStart)
 	{
-		//163.5f,23.27f,151.58f
-	
-		if (m_SpwanPassedTime < 12)
+		if (m_SpwanPassedTime < 2.5)
 		{
-
 			m_SpwanPassedTime += fDeltaTime;
 
-			if (m_SpwanPassedTime > 12)
+			if (m_SpwanPassedTime > 2.5)
 			{
-				m_SpwanPassedTime = 13;
+				(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, TAG_LAY(Layer_Monster), TAG_OP(Prototype_WaspInk), &_float4(6, 22, 8, 0)));
+				(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, TAG_LAY(Layer_Monster), TAG_OP(Prototype_WaspInk), &_float4(6, 22, 8, 1)));
+				(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, TAG_LAY(Layer_Monster), TAG_OP(Prototype_WaspInk), &_float4(6, 22, 8, 2)));
+				(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, TAG_LAY(Layer_Monster), TAG_OP(Prototype_WaspInk), &_float4(6, 22, 8, 3)));
 
-				return 0;
-			}
-			else if (m_SpwanPassedTime > GruntSwpanTiming + 5.0)
-			{
-				m_bOilDropRender = false;
-
-			}
-			else if (m_SpwanPassedTime > GruntSwpanTiming + 3.0)
-			{
-				_float3 EasedScale = g_pGameInstance->Easing_Vector(TYPE_ExpoInOut, _float3(100.0f, 0.1f, 100.0f), _float3(1.0f, 0.1f, 1.0f)
-					, _float(m_SpwanPassedTime - (GruntSwpanTiming + 3.0)), 2.f);
-
-				m_pTransformCom->Scaled_All(EasedScale);
-			}
-			else if (m_SpwanPassedTime > GruntSwpanTiming - 0.5)
-			{
-
-
-				m_pTransformCom->Scaled_All(_float3(100.0f, 0.1f, 100.0f));
-
-			}
-			else if (m_SpwanPassedTime > GruntSwpanTiming - 1.5)
-			{
-				_float3 EasedScale = g_pGameInstance->Easing_Vector(TYPE_ExpoInOut, _float3(1.0f, 0.1f, 1.0f), _float3(100.0f, 0.1f, 100.0f)
-					, _float(m_SpwanPassedTime - (GruntSwpanTiming - 1.5)), 1.f);
-
-				m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, _float3(163.5f, 2.9f, 151.58f));
-				m_pTransformCom->Scaled_All(EasedScale);
-			}
-			else if (m_SpwanPassedTime > GruntSwpanTiming - 2.0)
-			{
-				m_bOilDropRender = true;
-
-
-				_float3 EasedPos = g_pGameInstance->Easing_Vector(TYPE_ExpoIn, _float3(163.5f, 23.27f, 151.58f), _float3(163.5f, 1.57f, 151.58f)
-					, _float(m_SpwanPassedTime - (GruntSwpanTiming - 2.0)), 0.5);
-
-				m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, EasedPos);
-
-			}
-
-
-
-
-			if (m_iChecker == 0)
-			{
-				list<CGameObject*>* MonsterLayer = g_pGameInstance->Get_ObjectList_from_Layer(SCENE_STAGE1, TAG_LAY(Layer_Monster));
-
-				if (MonsterLayer != nullptr)
-				{
-					for (auto& pObj : *MonsterLayer)
-					{
-						pObj->Set_IsDead();
-					}
-				}
-				m_iChecker++;
-			}
-			else if (m_iChecker == 1 && m_SpwanPassedTime > GruntSwpanTiming)
-			{
-				FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, TAG_LAY(Layer_Monster), TAG_OP(Prototype_Grunt), &_float3(160.f, 2.8701f, 147.668f)));
-				m_iChecker++;
-			}
-			else if (m_iChecker == 2 && m_SpwanPassedTime > GruntSwpanTiming + 0.3)
-			{
-
-				FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, TAG_LAY(Layer_Monster), TAG_OP(Prototype_Grunt), &_float3(158.576019f, 2.8701f, 156.82135f)));
-				m_iChecker++;
-			}
-			else if (m_iChecker == 3 && m_SpwanPassedTime > GruntSwpanTiming + 0.9)
-			{
-
-				FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, TAG_LAY(Layer_Monster), TAG_OP(Prototype_Grunt), &_float3(152.774f, 2.8701f, 145.700989f)));
-				m_iChecker++;
-			}
-			else if (m_iChecker == 4 && m_SpwanPassedTime > GruntSwpanTiming + 1.3)
-			{
-				FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, TAG_LAY(Layer_Monster), TAG_OP(Prototype_Grunt), &_float3(168.802f, 2.8701f, 142.16185f)));
-				m_iChecker++;
-			}
-			else if (m_iChecker == 5 && m_SpwanPassedTime > GruntSwpanTiming + 5.5)
-			{
-
-
-				list<CGameObject*>* MonsterLayer = g_pGameInstance->Get_ObjectList_from_Layer(SCENE_STAGE1, TAG_LAY(Layer_Monster));
-				for (auto& pObj : *MonsterLayer)
-				{
-					((CGrunt*)pObj)->Set_SpwanFinished();
-				}
-
+				m_SpwanPassedTime = 5;
 			}
 
 		}
 		else
 		{
+
 			list<CGameObject*>* MonsterLayer = g_pGameInstance->Get_ObjectList_from_Layer(SCENE_STAGE1, TAG_LAY(Layer_Monster));
 
 			NULL_CHECK_RETURN(MonsterLayer, E_FAIL);
 
 			if (MonsterLayer->size() == 0)
 			{
-				m_SpwanPassedTime += fDeltaTime;
+				CCamera_Main* pCamera = (CCamera_Main*)g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Camera_Main));
+				NULL_CHECK_BREAK(pCamera);
+
+				CAMERAACTION tDesc;
+
+				tDesc.vecCamPos = m_vecEndCamPositions;
+				tDesc.vecLookAt = m_vecEndLookPostions;
 
 
-				CJumpPad::JUMPPADDESC tDesc;
+				CAMACTDESC Return;
+				Return.fDuration = 0.5f;
+				Return.vPosition = pCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_POS);
+				tDesc.vecCamPos.push_back(Return);
 
-				if (!m_JumpPadSpwanCount)
-				{
+				Return.fDuration = 0.5f;
+				Return.vPosition = Return.vPosition.XMVector() + (pCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_LOOK));
+				tDesc.vecLookAt.push_back(Return);
 
+				pCamera->CamActionStart(tDesc);
 
-					CCamera_Main* pCamera = (CCamera_Main*)g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Camera_Main));
-					NULL_CHECK_BREAK(pCamera);
-
-					CAMERAACTION tDesc;
-
-
-					tDesc.vecCamPos = m_vecCamPositions2;
-					tDesc.vecLookAt = m_vecLookPostions2;
-
-
-					CAMACTDESC Return;
-					Return = tDesc.vecCamPos.back();
-					Return.fDuration = 1;
-					tDesc.vecCamPos.push_back(Return);
-
-					Return.fDuration = 0.5f;
-					Return.vPosition = pCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_POS);
-					tDesc.vecCamPos.push_back(Return);
-
-					Return.fDuration = 0.5f;
-					Return.vPosition = Return.vPosition.XMVector() + (pCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_LOOK));
-					tDesc.vecLookAt.push_back(Return);
-
-					pCamera->CamActionStart(tDesc);
-
-
-
-
-					m_JumpPadSpwanCount++;
-				}
-				else if (m_JumpPadSpwanCount == 1 && m_SpwanPassedTime > 13.8)
-				{
-
-
-					tDesc.vPosition = _float3(173.862762f, 2.87f, 138.3186f);
-					tDesc.vScale = _float3(2);
-					tDesc.fPower = 30;
-
-					FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, TAG_LAY(Layer_JumpPad), TAG_OP(Prototype_JumpPad), &tDesc));
-					m_JumpPadSpwanCount++;
-				}
-				else if (m_JumpPadSpwanCount == 2 && m_SpwanPassedTime > 15.8)
-				{
-					tDesc.vPosition = _float3(182.399017f, 10.f, 129.191116f);
-					tDesc.vScale = _float3(2);
-					tDesc.fPower = 45;
-
-					FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, TAG_LAY(Layer_JumpPad), TAG_OP(Prototype_JumpPad), &tDesc));
-					m_JumpPadSpwanCount++;
-
-
-				}
-				else if (m_JumpPadSpwanCount == 3 && m_SpwanPassedTime > 23.8)
-				{
-					tDesc.vPosition = _float3(209.339249f, 19.f, 102.125732f);
-					tDesc.vScale = _float3(2);
-					tDesc.fPower = 30;
-
-					FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, TAG_LAY(Layer_JumpPad), TAG_OP(Prototype_JumpPad), &tDesc));
-					m_JumpPadSpwanCount++;
-					Set_IsDead();
-					return 0;
-				}
-			
-
-
-
+				Set_IsDead();
 			}
-
 		}
 
 
 	}
-
-
-
 
 
 	for (_uint i = 0; i < m_pColliderCom->Get_NumColliderBuffer(); i++)
@@ -265,7 +118,7 @@ _int CStage1_SpwanGrunt::Update(_double fDeltaTime)
 	return _int();
 }
 
-_int CStage1_SpwanGrunt::LateUpdate(_double fDeltaTime)
+_int CStage1_SpwanWasp::LateUpdate(_double fDeltaTime)
 {
 	if (__super::LateUpdate(fDeltaTime) < 0)
 		return -1;
@@ -280,7 +133,7 @@ _int CStage1_SpwanGrunt::LateUpdate(_double fDeltaTime)
 	return _int();
 }
 
-_int CStage1_SpwanGrunt::Render()
+_int CStage1_SpwanWasp::Render()
 {
 	if (__super::Render() < 0)
 		return -1;
@@ -321,7 +174,7 @@ _int CStage1_SpwanGrunt::Render()
 	return _int();
 }
 
-_int CStage1_SpwanGrunt::LateRender()
+_int CStage1_SpwanWasp::LateRender()
 {
 	if (__super::LateRender() < 0)
 		return -1;
@@ -332,7 +185,7 @@ _int CStage1_SpwanGrunt::LateRender()
 
 
 
-void CStage1_SpwanGrunt::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedObj, CCollider * pConflictedCollider, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType)
+void CStage1_SpwanWasp::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedObj, CCollider * pConflictedCollider, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType)
 {
 	switch (eConflictedObjCollisionType)
 	{
@@ -340,7 +193,7 @@ void CStage1_SpwanGrunt::CollisionTriger(_uint iMyColliderIndex, CGameObject * p
 	case Engine::CollisionType_Player:
 	{
 		m_bSpwanStart = true;
-		m_pPlayer->Set_ReturnPos(_float3(144.58f, 10.f, 129.779f), _float3(160.f, 2.8701f, 147.668f));
+		m_pPlayer->Set_ReturnPos(_float3(208.26f,25.5f,94.086f), _float3(211.342f, 25.5f, 85.827f));
 		m_SpwanPassedTime = 0;
 
 
@@ -354,17 +207,15 @@ void CStage1_SpwanGrunt::CollisionTriger(_uint iMyColliderIndex, CGameObject * p
 
 
 		CAMACTDESC Return;
-		Return.fDuration = 3.5f;
+		Return.fDuration = 0.5f;
 		Return.vPosition = pCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_POS);
 		tDesc.vecCamPos.push_back(Return);
 
-		Return.fDuration = 5.5f;
+		Return.fDuration = 0.5f;
 		Return.vPosition = Return.vPosition.XMVector() + (pCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_LOOK));
 		tDesc.vecLookAt.push_back(Return);
 
 		pCamera->CamActionStart(tDesc);
-
-
 
 	}
 	break;
@@ -377,7 +228,7 @@ void CStage1_SpwanGrunt::CollisionTriger(_uint iMyColliderIndex, CGameObject * p
 }
 
 
-HRESULT CStage1_SpwanGrunt::Load_ActionCam(const _tchar * szPath)
+HRESULT CStage1_SpwanWasp::Load_ActionCam(const _tchar * szPath)
 {
 	{
 		{
@@ -443,14 +294,14 @@ HRESULT CStage1_SpwanGrunt::Load_ActionCam(const _tchar * szPath)
 	return S_OK;
 }
 
-HRESULT CStage1_SpwanGrunt::Load_ActionCam2(const _tchar * szPath)
+HRESULT CStage1_SpwanWasp::Load_ActionCam2(const _tchar * szPath)
 {
 
 
 	{
 		{
-			m_vecCamPositions2.clear();
-			m_vecLookPostions2.clear();
+			m_vecEndCamPositions.clear();
+			m_vecEndLookPostions.clear();
 		}
 
 
@@ -486,7 +337,7 @@ HRESULT CStage1_SpwanGrunt::Load_ActionCam2(const _tchar * szPath)
 			ReadFile(hFile, &(tDesc.fDuration), sizeof(_float), &dwByte, nullptr);
 			ReadFile(hFile, &(tDesc.vPosition), sizeof(_float3), &dwByte, nullptr);
 
-			m_vecCamPositions2.push_back(tDesc);
+			m_vecEndCamPositions.push_back(tDesc);
 
 		}
 
@@ -499,7 +350,7 @@ HRESULT CStage1_SpwanGrunt::Load_ActionCam2(const _tchar * szPath)
 			ReadFile(hFile, &(tDesc.fDuration), sizeof(_float), &dwByte, nullptr);
 			ReadFile(hFile, &(tDesc.vPosition), sizeof(_float3), &dwByte, nullptr);
 
-			m_vecLookPostions2.push_back(tDesc);
+			m_vecEndLookPostions.push_back(tDesc);
 		}
 
 
@@ -513,7 +364,7 @@ HRESULT CStage1_SpwanGrunt::Load_ActionCam2(const _tchar * szPath)
 }
 
 
-HRESULT CStage1_SpwanGrunt::SetUp_Components()
+HRESULT CStage1_SpwanWasp::SetUp_Components()
 {
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Renderer), TAG_COM(Com_Renderer), (CComponent**)&m_pRendererCom));
 
@@ -527,7 +378,7 @@ HRESULT CStage1_SpwanGrunt::SetUp_Components()
 
 	m_pTransformCom->Set_Matrix(WorldMatrix);
 
-	m_pTransformCom->Rotation_CW(XMVectorSet(0, 1, 0, 0), XMConvertToRadians(319));
+	m_pTransformCom->Rotation_CW(XMVectorSet(0, 1, 0, 0), XMConvertToRadians(154));
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Collider), TAG_COM(Com_Collider), (CComponent**)&m_pColliderCom));
 
@@ -535,13 +386,13 @@ HRESULT CStage1_SpwanGrunt::SetUp_Components()
 	/* For.Com_AABB */
 	ZeroMemory(&ColliderDesc, sizeof(COLLIDERDESC));
 
-	ColliderDesc.vScale = _float3(30);
+	ColliderDesc.vScale = _float3(40);
 	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
 	ColliderDesc.vPosition = _float4(0, 0.f, 0, 1);
 	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
 
 
-	ColliderDesc.vScale = _float3(3, 10, 30);
+	ColliderDesc.vScale = _float3(36.8f, 10, 1);
 	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
 	ColliderDesc.vPosition = _float4(0, 0, 0, 1);
 	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_OBB, &ColliderDesc));
@@ -561,31 +412,31 @@ HRESULT CStage1_SpwanGrunt::SetUp_Components()
 	return S_OK;
 }
 
-CStage1_SpwanGrunt * CStage1_SpwanGrunt::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, void * pArg)
+CStage1_SpwanWasp * CStage1_SpwanWasp::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, void * pArg)
 {
-	CStage1_SpwanGrunt*	pInstance = new CStage1_SpwanGrunt(pDevice, pDeviceContext);
+	CStage1_SpwanWasp*	pInstance = new CStage1_SpwanWasp(pDevice, pDeviceContext);
 
 	if (FAILED(pInstance->Initialize_Prototype(pArg)))
 	{
-		MSGBOX("Failed to Created CStage1_SpwanGrunt");
+		MSGBOX("Failed to Created CStage1_SpwanWasp");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-CGameObject * CStage1_SpwanGrunt::Clone(void * pArg)
+CGameObject * CStage1_SpwanWasp::Clone(void * pArg)
 {
-	CStage1_SpwanGrunt*	pInstance = new CStage1_SpwanGrunt(*this);
+	CStage1_SpwanWasp*	pInstance = new CStage1_SpwanWasp(*this);
 
 	if (FAILED(pInstance->Initialize_Clone(pArg)))
 	{
-		MSGBOX("Failed to Created CStage1_SpwanGrunt");
+		MSGBOX("Failed to Created CStage1_SpwanWasp");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-void CStage1_SpwanGrunt::Free()
+void CStage1_SpwanWasp::Free()
 {
 	__super::Free();
 

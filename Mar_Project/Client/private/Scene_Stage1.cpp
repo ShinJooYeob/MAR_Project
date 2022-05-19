@@ -229,7 +229,7 @@ HRESULT CScene_Stage1::Ready_Layer_Player(const _tchar * pLayerTag)
 	NULL_CHECK_RETURN(pPlayer, E_FAIL);
 	FAILED_CHECK(pPlayer->SetUp_Weapon());
 
-	pPlayer->Renew_Player(_float3(144.58f, 10.f, 129.779f), _float3(160.f, 2.8701f, 147.668f));
+	pPlayer->Renew_Player(_float3(208.26f, 25.5f, 94.086f), _float3(211.342f, 25.5f, 85.827f));
 	//pPlayer->Renew_Player(_float3(11.6105f, 20.f, 7.6433f), _float3(15.522085f, 21.487f, 28.628897f));
 
 	return S_OK;
@@ -524,6 +524,14 @@ HRESULT CScene_Stage1::Ready_Layer_TriggerCollider(const _tchar * pLayerTag)
 
 	tGruntSwpanDesc.vPosition = _float3(149.371f, 9.0f, 132.665f);
 	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag,L"Stage1_SpwanGrunt", &tGruntSwpanDesc));
+
+
+
+	tGruntSwpanDesc.vPosition = _float3(211.396f, 29.0f, 80.1f);
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, L"Stage1_SpwanWasp", &tGruntSwpanDesc));
+
+
+	
 
 	return S_OK;
 }
