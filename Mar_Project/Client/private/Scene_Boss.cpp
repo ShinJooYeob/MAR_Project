@@ -47,7 +47,7 @@ HRESULT CScene_Boss::Initialize()
 			
 		
 
-	GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeIn, 0.5, { 0,0,0,1 });
+	//GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeIn, 0.5, { 0,0,0,1 });
 
 	return S_OK;
 }
@@ -186,7 +186,7 @@ HRESULT CScene_Boss::Ready_Layer_Player(const _tchar * pLayerTag)
 	NULL_CHECK_RETURN(pPlayer, E_FAIL);
 
 	pPlayer->Set_NowSceneNum(SCENE_BOSS);
-	pPlayer->Renew_Player(_float3(50, 11, 50));
+	pPlayer->Renew_Player(_float3(50, 11, 50), _float3(85, 100, 78));
 	
 
 	return S_OK;

@@ -75,17 +75,13 @@ _int CSceneChageTriger::Update(_double fDeltaTime)
 
 
 
-	m_bIsOnScreen = pInstance->IsNeedToRender( m_pTransformCom->Get_MatrixState(CTransform::STATE_POS) ,5);
 
-	if (m_bIsOnScreen)
-	{
+	for (_uint i = 0; i < m_pColliderCom->Get_NumColliderBuffer(); i++)
+		m_pColliderCom->Update_Transform(i, m_pTransformCom->Get_WorldMatrix());
 
-		for (_uint i = 0; i < m_pColliderCom->Get_NumColliderBuffer(); i++)
-			m_pColliderCom->Update_Transform(i, m_pTransformCom->Get_WorldMatrix());
+	if (!m_bVentingStart)
+		pInstance->Add_CollisionGroup(CollisionType_DynaicObject, this, m_pColliderCom);
 
-		if (!m_bVentingStart)
-			pInstance->Add_CollisionGroup(CollisionType_DynaicObject, this, m_pColliderCom);
-	}
 
 
 	return _int();
@@ -151,19 +147,24 @@ void CSceneChageTriger::CollisionTriger(_uint iMyColliderIndex, CGameObject * pC
 			m_pPlayer->Set_IsVenting(true, m_vTempTargetPosition.XMVector() - m_vTempPlayerPosition.XMVector());
 
 
-			//CCamera_Main* pCamera =(CCamera_Main*)g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Camera_Main));
-			//NULL_CHECK_BREAK(pCamera);
+			CCamera_Main* pCamera = (CCamera_Main*)g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Camera_Main));
+			NULL_CHECK_BREAK(pCamera);
 
-			//CAMERAACTION tDesc;
+			CAMERAACTION tDesc;
 
-			//tDesc.vecCamPos = m_vecCamPositions;
-			//tDesc.vecLookAt = m_vecLookPostions;
-
-		
-			//pCamera->CamActionStart(tDesc);
+			tDesc.vecCamPos = m_vecCamPositions;
+			tDesc.vecLookAt = m_vecLookPostions;
 
 
+			CAMACTDESC Return;
+			Return.fDuration = 2;
+			Return.vPosition = pCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_POS) + (m_pPlayerTransform->Get_MatrixState(CTransform::STATE_LOOK) * -4.5f) ;
+			tDesc.vecCamPos.push_back(Return);
 
+			Return.vPosition = Return.vPosition.XMVector() + (pCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_LOOK));
+			tDesc.vecLookAt.push_back(Return);
+
+			pCamera->CamActionStart(tDesc);
 		}
 		
 

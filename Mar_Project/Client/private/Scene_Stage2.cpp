@@ -54,7 +54,7 @@ HRESULT CScene_Stage2::Initialize()
 	
 	
 
-	GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeIn, 0.5, { 0,0,0,1 });
+	//GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeIn, 0.5, { 0,0,0,1 });
 	return S_OK;
 }
 
@@ -210,7 +210,10 @@ HRESULT CScene_Stage2::Ready_Layer_Player(const _tchar * pLayerTag)
 	NULL_CHECK_RETURN(pPlayer, E_FAIL);
 
 	pPlayer->Set_NowSceneNum(SCENE_STAGE2);
-	pPlayer->Renew_Player(_float3(70, 25.5f, 168));
+
+	
+	pPlayer->Renew_Player(_float3(70, 25.5f, 168), _float3(80, 25.5f, 168));
+	//pPlayer->Renew_Player(_float3(187.1f, 25.16f, 175), _float3(200.1f, 25.16f, 175));
 	
 
 	return S_OK;
@@ -502,7 +505,7 @@ HRESULT CScene_Stage2::Ready_Layer_TriggerCollider(const _tchar * pLayerTag)
 	tDesc.eTargetScene = SCENE_STAGE3;
 	tDesc.vPosition = _float3(190.1f, 25.16f, 175);
 	tDesc.vScale = _float3(2, 1, 13);
-	tDesc.vTargetPosition = _float3(194.1f, 25.16f, 175);
+	tDesc.vTargetPosition = _float3(193.1f, 25.16f, 175);
 
 
 	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_TriggerCollider_SceneChager), &tDesc));

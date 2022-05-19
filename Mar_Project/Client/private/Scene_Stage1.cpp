@@ -6,6 +6,7 @@
 #include "Camera_Main.h"
 #include "JumpPad.h"
 #include "SceneChageTriger.h"
+#include "Stage1_SpwanGrunt.h"
 
 
 
@@ -67,7 +68,7 @@ HRESULT CScene_Stage1::Initialize()
 			
 			
 
-	GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeIn, 0.5, { 0,0,0,1 });
+	//GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeIn, 0.5, { 0,0,0,1 });
 			
 
 	return S_OK;
@@ -78,8 +79,8 @@ _int CScene_Stage1::Update(_double fDeltaTime)
 	if (__super::Update(fDeltaTime) < 0)
 		return -1;
 
-	//if (g_pGameInstance->Get_DIKeyState(DIK_P)&DIS_Down)
-	//	FAILED_CHECK(Ready_Layer_BreakableObj(TAG_LAY(Layer_Breakable)));
+	if (g_pGameInstance->Get_DIKeyState(DIK_P)&DIS_Down)
+		FAILED_CHECK(Ready_Layer_Grunt(TAG_LAY(Layer_Monster)));
 
 	
 
@@ -228,6 +229,9 @@ HRESULT CScene_Stage1::Ready_Layer_Player(const _tchar * pLayerTag)
 	NULL_CHECK_RETURN(pPlayer, E_FAIL);
 	FAILED_CHECK(pPlayer->SetUp_Weapon());
 
+	pPlayer->Renew_Player(_float3(144.58f, 10.f, 129.779f), _float3(160.f, 2.8701f, 147.668f));
+	//pPlayer->Renew_Player(_float3(11.6105f, 20.f, 7.6433f), _float3(15.522085f, 21.487f, 28.628897f));
+
 	return S_OK;
 }
 
@@ -240,29 +244,6 @@ HRESULT CScene_Stage1::Ready_Layer_UI(const _tchar * pLayerTag)
 HRESULT CScene_Stage1::Ready_Layer_JumpPad(const _tchar * pLayerTag)
 {
 	CJumpPad::JUMPPADDESC tDesc;
-
-	tDesc.vPosition = _float3(173.862762f,2.87f,138.3186f);
-	tDesc.vScale = _float3(2);
-	tDesc.fPower = 30;
-
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_JumpPad),&tDesc));
-
-
-	tDesc.vPosition = _float3(182.399017f, 10.f, 129.191116f);
-	tDesc.vScale = _float3(2);
-	tDesc.fPower = 45;
-
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_JumpPad), &tDesc));
-
-
-
-	tDesc.vPosition = _float3(209.339249f, 19.f, 102.125732f);
-	tDesc.vScale = _float3(2);
-	tDesc.fPower = 30;
-
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_JumpPad), &tDesc));
-
-
 
 	tDesc.vPosition = _float3(180.069580f, 20.f, 73.953476f);
 	tDesc.vScale = _float3(1);
@@ -491,7 +472,13 @@ HRESULT CScene_Stage1::Ready_Layer_Eyepot(const _tchar * pLayerTag)
 
 HRESULT CScene_Stage1::Ready_Layer_Grunt(const _tchar * pLayerTag)
 {
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_Grunt), &_float3(6, 22, 8)));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_Grunt), &_float3(160.f, 2.8701f, 147.668f)));
+
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_Grunt), &_float3(158.576019f, 2.8701f, 156.82135f)));
+
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_Grunt), &_float3(152.774f, 2.8701f, 145.700989f)));
+
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_Grunt), &_float3(168.802f, 2.8701f, 142.16185f)));
 
 	return S_OK;
 }
@@ -530,6 +517,13 @@ HRESULT CScene_Stage1::Ready_Layer_TriggerCollider(const _tchar * pLayerTag)
 
 	 
 	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_TriggerCollider_SceneChager), &tDesc));
+
+
+
+	CStage1_SpwanGrunt::SPWANTRIGGERDESC tGruntSwpanDesc;
+
+	tGruntSwpanDesc.vPosition = _float3(149.371f, 9.0f, 132.665f);
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag,L"Stage1_SpwanGrunt", &tGruntSwpanDesc));
 
 	return S_OK;
 }

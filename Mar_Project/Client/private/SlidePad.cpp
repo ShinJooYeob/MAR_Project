@@ -182,13 +182,13 @@ void CSlidePad::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflicte
 	{
 		if (m_tDesc.bStartCollider && iMyColliderIndex == m_iStartPointColliderIndex)
 		{
-			m_pPlayer->Set_ReturnPos({ 186.256f, 69.f, 86.939f });
+			m_pPlayer->Set_ReturnPos({ 186.256f, 69.f, 86.939f }, {185.839508f,69.f,90.557f});
 			m_pPlayer->Let_PlayerSliding(true);
 
 		}
 		else if (m_tDesc.bEndCollider &&iMyColliderIndex == m_iEndPointColliderIndex)
 		{
-			m_pPlayer->Set_ReturnPos({ 152.476f, 43.2f, 130.360f });
+			m_pPlayer->Set_ReturnPos({ 152.476f, 43.2f, 130.360f }, {150.38f,43.2f,133.09f});
 
 			m_pPlayer->Let_PlayerSliding(false);
 

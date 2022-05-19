@@ -29,8 +29,8 @@ public:
 	virtual HRESULT Initialize_Prototype(void* pArg)override;
 	virtual HRESULT Initialize_Clone(void* pArg)override;
 	HRESULT SetUp_Weapon();
-	HRESULT Renew_Player(_float3 Position);
-	void Set_ReturnPos(_float3 Position) { m_vReturnPos = Position; };
+	HRESULT Renew_Player(_float3 Position, _float3 ReturnLookAt);
+	void Set_ReturnPos(_float3 Position, _float3 ReturnLookAt) {	m_vReturnPos = Position; m_vReturnLookAt = ReturnLookAt;	};
 
 	void Set_GettingBigger(_bool bBool);
 	_bool Get_IsGiant() { return m_bIsGiant; };
@@ -73,6 +73,7 @@ public:
 
 
 	void Set_IsVenting(_bool bBool,_float3 vTargetLook);
+	void Set_PlayerDeadAnimStart();
 private:
 	CShader*			m_pShaderCom = nullptr;
 	CRenderer*			m_pRendererCom = nullptr;
@@ -155,6 +156,7 @@ private:
 
 
 	_float3				m_vReturnPos = { 0,0,0 };
+	_float3				m_vReturnLookAt = { 0,0,0 };
 	_bool				m_bTrappedbyFlower = false;
 
 
@@ -165,15 +167,24 @@ private:
 
 
 	/*For Venting*/
-
 	_bool			m_bIsVenting = false;
 	_float3			m_vVentingTargetLook;
+
+
+	_bool			m_bAliceSpwanAnimStart = false;
+	_double			m_SpwanAnimPassedTime = 0;
+
+	_bool			m_bAliceDeathAnimStart = false;
+	_double			m_DeathAnimPassedTime = 0;
+	_bool			m_bPlayerNotRender = false;
 
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ConstTable();
 	HRESULT Ready_ParticleDesc();
 	HRESULT Manage_CoolTime(_double fDeltaTime);
+	HRESULT Update_SpwanNDeathAnim(_double fDeltaTime);
+
 	
 
 	HRESULT Input_Keyboard(_double fDeltaTime);

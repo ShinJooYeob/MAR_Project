@@ -253,6 +253,9 @@
     <Filter Include="01.GameObject\09.TriggerCollider\00.SceneChageTriger">
       <UniqueIdentifier>{5098aa03-943b-4757-9ef4-b37a2ae6dad8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.GameObject\09.TriggerCollider\01.Stage1_SpwanGrunt">
+      <UniqueIdentifier>{0d2c1f27-04a2-47c2-be8c-45aae7aeddc6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -519,6 +522,9 @@
     <ClInclude Include="..\public\SceneChageTriger.h">
       <Filter>01.GameObject\09.TriggerCollider\00.SceneChageTriger</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Stage1_SpwanGrunt.h">
+      <Filter>01.GameObject\09.TriggerCollider\01.Stage1_SpwanGrunt</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -760,6 +766,9 @@
     </ClCompile>
     <ClCompile Include="..\private\SceneChageTriger.cpp">
       <Filter>01.GameObject\09.TriggerCollider\00.SceneChageTriger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Stage1_SpwanGrunt.cpp">
+      <Filter>01.GameObject\09.TriggerCollider\01.Stage1_SpwanGrunt</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

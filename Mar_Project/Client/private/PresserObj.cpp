@@ -141,7 +141,8 @@ void CPresserObj::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflic
 
 	case Engine::CollisionType_Player:
 	{
-		m_pPlayer->Renew_Player(_float3(102.431f, 26.70f, 130.580f));
+		m_pPlayer->Set_ReturnPos(_float3(102.431f, 26.70f, 130.580f), _float3(100.431f, 26.70f, 130.580f));
+		m_pPlayer->Add_Dmg_to_Player(1000);
 
 	}
 	break;

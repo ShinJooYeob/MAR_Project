@@ -62,10 +62,8 @@ _int CPlayer::Update(_double fDeltaTime)
 	m_pColliderCom->Update_ConflictPassedTime(fDeltaTime);
 
 
-
+	FAILED_CHECK(Update_SpwanNDeathAnim(fDeltaTime));
 	FAILED_CHECK(Manage_CoolTime(fDeltaTime));
-
-
 	FAILED_CHECK(Input_Keyboard(fDeltaTime));
 
 
@@ -76,6 +74,11 @@ _int CPlayer::Update(_double fDeltaTime)
 		Add_Dmg_to_Player(1);
 
 
+	if (g_pGameInstance->Get_DIKeyState(DIK_3)&DIS_Down)
+		Renew_Player(m_vReturnPos, m_vReturnLookAt);
+
+	if (g_pGameInstance->Get_DIKeyState(DIK_4)&DIS_Down)
+		Set_PlayerDeadAnimStart();
 
 	if (m_iWeaponModelIndex != 10)
 	{
@@ -87,7 +90,7 @@ _int CPlayer::Update(_double fDeltaTime)
 
 
 	_uint iNowAnimIndex  = m_pModel->Get_NowAnimIndex();
-	if (iNowAnimIndex ==  15|| iNowAnimIndex == 20|| iNowAnimIndex == 14 || iNowAnimIndex == 10 || iNowAnimIndex == Weapon_Giant + 4 || 
+	if (iNowAnimIndex ==  15|| iNowAnimIndex == 20|| iNowAnimIndex == 14 || iNowAnimIndex == 10 || iNowAnimIndex  == 37 || iNowAnimIndex == Weapon_Giant + 4 ||
 		(iNowAnimIndex >= Weapon_Knife + 8 && iNowAnimIndex <= Weapon_Knife + 16) ||
 		(iNowAnimIndex >= Weapon_Horse + 8 && iNowAnimIndex <= Weapon_Horse + 14) )
 	{
@@ -109,7 +112,7 @@ _int CPlayer::Update(_double fDeltaTime)
 		m_pColliderCom->Update_Transform(i, TransformMatrix * m_pTransformCom->Get_WorldMatrix());
 	}
 
-	if (!m_bIsAttached)
+	if (!m_bIsAttached && !m_bAliceSpwanAnimStart && !m_bAliceDeathAnimStart)
 		g_pGameInstance->Add_CollisionGroup(CollisionType_Player, this, m_pColliderCom);
 
 	return _int();
@@ -141,7 +144,8 @@ _int CPlayer::LateUpdate(_double fDeltaTime)
 			FAILED_CHECK(Set_Player_On_Terrain());
 		}
 	}
-	else {
+	else 
+	{
 		FAILED_CHECK(Set_Player_On_Slieder(fDeltaTime));
 	}
 	
@@ -150,7 +154,8 @@ _int CPlayer::LateUpdate(_double fDeltaTime)
 
 
 
-	if (!m_fDashPassedTime && !m_bTrappedbyFlower)
+
+	if (!m_fDashPassedTime && !m_bTrappedbyFlower && !m_bPlayerNotRender)
 	{
 		FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this));
 		if (m_iWeaponModelIndex != 10 && !m_LevitationTime)
@@ -159,6 +164,15 @@ _int CPlayer::LateUpdate(_double fDeltaTime)
 		}
 
 
+	}
+
+	if (m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS).y < 1)
+	{
+		m_iJumpCount = 0;
+		m_LevitationTime = 0;
+		m_fJumpPower = -1.f;
+		Set_PlayerDeadAnimStart();
+		return 0;
 	}
 
 	m_vOldPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
@@ -223,11 +237,14 @@ _int CPlayer::LateRender()
 
 void CPlayer::Add_Dmg_to_Player(_uint iDmgAmount)
 {
-	if (!iDmgAmount) return;
+	if (!iDmgAmount || m_bAliceSpwanAnimStart || m_bAliceDeathAnimStart ) return;
 
+	if (m_iHP <= iDmgAmount)
+	{
+		Set_PlayerDeadAnimStart();
+		return;
+	}
 	m_iHP -= iDmgAmount;
-
-	if (m_iHP <= 0)m_iHP = 32;
 
 
 	((CGamePlayUI*)(g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_UI_GamePlay))))->Add_Dmg_to_Player(m_iHP,iDmgAmount);
@@ -237,7 +254,7 @@ void CPlayer::Add_Dmg_to_Player(_uint iDmgAmount)
 	m_bIsAttackClicked = false;
 	m_iAttackCount = 0;
 
-	if (m_bIsAttached || m_bSlide) return;
+	if (m_bIsAttached || m_bSlide )return;
 
 	switch (m_eNowWeapon)
 	{
@@ -661,6 +678,21 @@ void CPlayer::Set_IsVenting(_bool bBool, _float3 vTargetLook)
 	m_vVentingTargetLook = vTargetLook;
 }
 
+void CPlayer::Set_PlayerDeadAnimStart()
+{
+	if (m_bAliceDeathAnimStart)return;
+
+	m_iHP = 0;
+	((CGamePlayUI*)(g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_UI_GamePlay))))->Add_Dmg_to_Player(m_iHP, 0);
+	GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_HitEffect, 0.2, { 1,0,0,0.4f });
+
+	m_pModel->Change_AnimIndex_ReturnTo_Must(37, 37, 0.15f, true);
+	m_bAliceDeathAnimStart = true;
+	m_DeathAnimPassedTime = 0;
+}
+
+
+
 
 
 HRESULT CPlayer::SetUp_Components()
@@ -816,20 +848,104 @@ HRESULT CPlayer::SetUp_Weapon()
 	return S_OK;
 }
 
-HRESULT CPlayer::Renew_Player(_float3 Position)
+HRESULT CPlayer::Renew_Player(_float3 Position , _float3 ReturnLookAt)
 {
 
 
 	m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, Position);
 
 	m_vOldPos= m_vReturnPos = Position;
+	m_vReturnLookAt = ReturnLookAt;
+
+	m_CamDegreeAngle = _float3(20.f, 0, -5.f);
+
+
+	_Vector LookDir = m_vReturnLookAt.XMVector() - m_vReturnPos.XMVector();
+	LookDir = XMVector3Normalize(XMVectorSetY(LookDir, 0));
+
+	_float CosAngle = XMVectorGetX(XMVector3Dot(LookDir, XMVectorSet(0, 0, 1, 0)));
+
+	CosAngle = XMConvertToDegrees(acosf(CosAngle));
+	
+	if (Position.x > ReturnLookAt.x)
+		CosAngle = (360) - CosAngle;
+	
+	m_CamDegreeAngle.y = CosAngle;
+
+
+	_Vector ObjLook = ReturnLookAt.XMVector();
+	ObjLook = XMVectorSetY(ObjLook, Position.y);
+
+	m_pTransformCom->LookAt(ObjLook);
+
+	//////////////////////////////////////////////////////////////////////////
+	/*Cam Action*/
+
+	vector<CAMACTDESC>		 vecCamPositions;
+	vector<CAMACTDESC>		 vecLookPostions;
+
+	CAMERAACTION tDesc;
+
+	tDesc.vecCamPos = vecCamPositions;
+	tDesc.vecLookAt = vecLookPostions;
+
+
+	CAMACTDESC Return;
+
+	Return.fDuration = 0.1f;
+	Return.vPosition = Position.XMVector() + (m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * 4.f) + XMVectorSet(0, 3, 0, 0);
+	tDesc.vecCamPos.push_back(Return);
+
+	Return.fDuration = 1.5f;
+	Return.vPosition = Position.XMVector() + (m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * 4.f) + XMVectorSet(0, 3, 0, 0);
+	tDesc.vecCamPos.push_back(Return);
+
+
+	_Matrix NewCamMatrix = XMMatrixTranslation(0, 1.5f * m_fSmallScale, m_CamDegreeAngle.z
+		* m_fSmallScale * (1 - m_fDashPower / PlayerMaxDashPower * 0.1f))
+		* XMMatrixRotationX(XMConvertToRadians(m_CamDegreeAngle.x))
+		* XMMatrixRotationY(XMConvertToRadians(m_CamDegreeAngle.y))
+		* XMMatrixTranslation(Position.x, Position.y, Position.z);
+
+	Return.fDuration = 1.0f;
+	Return.vPosition = NewCamMatrix.r[3];
+	tDesc.vecCamPos.push_back(Return);
+
+
+
+
+
+	Return.fDuration = 0.1f;
+	Return.vPosition = Position .XMVector() + XMVectorSet(0,5,0,0);
+	tDesc.vecLookAt.push_back(Return);
+
+
+	Return.fDuration = 1.5f;
+	Return.vPosition = Position.XMVector();
+	tDesc.vecLookAt.push_back(Return);
+
+
+
+	m_pMainCamera->CamActionStart(tDesc);
+
+
+	m_bAliceSpwanAnimStart = true;
+	m_SpwanAnimPassedTime = 0;
+	m_pModel->Change_AnimIndex_ReturnTo_Must(36, 0, 0., true);
+
+	m_bAliceDeathAnimStart = false;
+	m_DeathAnimPassedTime = 0;
+	m_bPlayerNotRender = false;
+
+	GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeIn, 1.5, { 0,0,0,1 });
+	//////////////////////////////////////////////////////////////////////////
+
 
 
 
 	m_bIsRockOn = false;
 	Safe_Release(m_pRockOnMonster);
 
-	m_CamDegreeAngle = _float3(20.f, 0, -5.f);
 
 
 	m_LevitationTime = 0;
@@ -837,7 +953,7 @@ HRESULT CPlayer::Renew_Player(_float3 Position)
 
 
 	m_fSmallScale = 1.f;
-	m_fSmallPassedTime = 0;
+	m_fSmallPassedTime = FLT_MAX;
 	m_fSmallVisualTime = 0;
 	m_pTransformCom->Set_MoveSpeed(PlayerMoveSpeed);
 	m_pTransformCom->Scaled_All(_float3(m_fSmallScale));
@@ -871,6 +987,9 @@ HRESULT CPlayer::Renew_Player(_float3 Position)
 	m_vAddedForce = _float3(0, 0, 0);
 
 	m_iHP = 32;
+	CGamePlayUI* pGamePlayUI = ((CGamePlayUI*)(g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_UI_GamePlay))));
+	if (pGamePlayUI !=nullptr)	pGamePlayUI->Add_Dmg_to_Player(m_iHP, 0);
+	
 
 	m_iWeaponModelIndex = 10;
 
@@ -892,7 +1011,51 @@ void CPlayer::Set_GettingBigger(_bool bBool)
 	if (bBool)
 	{
 		m_pModel->Change_AnimIndex(Weapon_Giant + 4, 0.0f, true);
-		 
+		
+		GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 2., _float4(0.5));
+
+
+
+		//////////////////////////////////////////////////////////////////////////
+
+
+		vector<CAMACTDESC>		 vecCamPositions;
+		vector<CAMACTDESC>		 vecLookPostions;
+
+		CAMERAACTION tDesc;
+
+		tDesc.vecCamPos = vecCamPositions;
+		tDesc.vecLookAt = vecLookPostions;
+
+
+		CAMACTDESC Return;
+
+		Return.fDuration = 0.1f;
+		Return.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS)
+			+ (XMVector3Normalize(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK)) * 10.f);
+		tDesc.vecCamPos.push_back(Return);
+
+		Return.fDuration = 1.4f;
+		Return.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS)
+			+ (XMVector3Normalize(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) )* 20.f)
+			+ XMVectorSet(0, 15, 0, 0);
+		tDesc.vecCamPos.push_back(Return);
+
+
+
+
+		Return.fDuration = 0.1f;
+		Return.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS) + XMVectorSet(0, 2, 0, 0);
+		tDesc.vecLookAt.push_back(Return);
+
+		Return.fDuration = 2.5f;
+		Return.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS)+ XMVectorSet(0, 30, 0, 0);
+		tDesc.vecLookAt.push_back(Return);
+
+
+		m_pMainCamera->CamActionStart(tDesc);
+
+		//////////////////////////////////////////////////////////////////////////
 
 		m_bIsGiant = true;
 		m_bGettingBigger = true;
@@ -901,6 +1064,51 @@ void CPlayer::Set_GettingBigger(_bool bBool)
 	else
 	{
 		m_pModel->Change_AnimIndex(Weapon_Giant + 4, 0.08f, true);
+
+
+		vector<CAMACTDESC>		 vecCamPositions;
+		vector<CAMACTDESC>		 vecLookPostions;
+
+		CAMERAACTION tDesc;
+
+		tDesc.vecCamPos = vecCamPositions;
+		tDesc.vecLookAt = vecLookPostions;
+
+
+		CAMACTDESC Return;
+
+		Return.fDuration = 0.1f;
+		Return.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS)
+			+ (XMVector3Normalize(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK)) * 20.f)
+			+ XMVectorSet(0, 15, 0, 0);
+		tDesc.vecCamPos.push_back(Return);
+
+		Return.fDuration = 2.5f;
+		Return.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS)
+			+ (XMVector3Normalize(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK)) * 5.f)
+			+ XMVectorSet(0, 2, 0, 0);
+		tDesc.vecCamPos.push_back(Return);
+
+		//Return.fDuration = 1.3f;
+		//Return.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS)
+		//	+ (XMVector3Normalize(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK)) * 4.999f)
+		//	+ XMVectorSet(0, 2, 0, 0);
+		//tDesc.vecCamPos.push_back(Return);
+
+
+
+		Return.fDuration = 0.1f;
+		Return.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS) + XMVectorSet(0, 30, 0, 0);
+		tDesc.vecLookAt.push_back(Return);
+
+		Return.fDuration = 1.25f;
+		Return.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS) + XMVectorSet(0, 2, 0, 0);
+		tDesc.vecLookAt.push_back(Return);
+
+
+		m_pMainCamera->CamActionStart(tDesc);
+
+
 
 		m_bGettingBigger = false;
 		m_GiantingPassedTime = 0;
@@ -1179,10 +1387,81 @@ HRESULT CPlayer::Manage_CoolTime(_double fDeltaTime)
 	}
 
 	return S_OK;
-}	
+}
+
+HRESULT CPlayer::Update_SpwanNDeathAnim(_double fDeltaTime)
+{
+	if (m_bAliceSpwanAnimStart)
+	{
+		m_SpwanAnimPassedTime += fDeltaTime;
+		static _double ParticleInterver = 0;
+		ParticleInterver += fDeltaTime;
+
+		if (ParticleInterver > 0.2)
+		{
+
+			m_vecParticleDesc[2].FollowingTarget = nullptr;
+			m_vecParticleDesc[4].FollowingTarget = nullptr;
+
+			_float EasedHeight = g_pGameInstance->Easing(TYPE_Linear, 5, 0, (_float)m_SpwanAnimPassedTime, 1.5);
+
+			m_vecParticleDesc[2].FixedTarget = m_vecParticleDesc[4].FixedTarget = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS) + XMVectorSet(0, EasedHeight, 0, 0);
+
+			GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[2]);
+			GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[4]);
+			g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerTornado),
+				&_float4(m_vecParticleDesc[2].FixedTarget, 1));
+			g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerTornado),
+				&_float4(m_vecParticleDesc[2].FixedTarget, 1));
+			g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerTornado),
+				&_float4(m_vecParticleDesc[2].FixedTarget, 1));
+			ParticleInterver = 0;
+		}
+
+		if (m_SpwanAnimPassedTime > 1.5f)
+		{
+			m_bAliceSpwanAnimStart = false;
+			m_vecParticleDesc[2].FollowingTarget = m_pTransformCom;
+			m_vecParticleDesc[4].FollowingTarget = m_pTransformCom;
+		}
+
+
+
+	}
+	else if (m_bAliceDeathAnimStart)
+	{
+		m_DeathAnimPassedTime+= fDeltaTime;
+
+		if (m_pModel->Get_PlayRate() > 0.603773 && !m_bPlayerNotRender)
+		{
+			m_bPlayerNotRender = true;
+
+			CUtilityMgr* pUtil = GetSingle(CUtilityMgr);
+
+			pUtil->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[1]);
+			pUtil->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[0]);
+			pUtil->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[1]);
+			pUtil->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[0]);
+			pUtil->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[1]);
+			pUtil->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[0]);
+			pUtil->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeOut, 1.0, { 0,0,0,1 });
+		}
+
+
+		if (m_DeathAnimPassedTime > 3.)
+		{
+			m_bAliceDeathAnimStart = false;
+			Renew_Player(m_vReturnPos, m_vReturnLookAt);
+		}
+
+	}
+
+	return S_OK;
+}
 
 HRESULT CPlayer::Input_Keyboard(_double fDeltaTime)
 {
+	if (m_bAliceDeathAnimStart || m_bAliceSpwanAnimStart)return S_FALSE;
 
 	CGameInstance* pInstance = GetSingle(CGameInstance);
 
@@ -3585,15 +3864,7 @@ HRESULT CPlayer::Set_Player_On_Terrain_DontPutonJumpMovable()
 	_uint eNowTile = Tile_End;
 	_float3 CaculatedPos = pTerrain->PutOnTerrain_Stage2(&bIsOn, m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), m_vOldPos.XMVector(), nullptr, &eNowTile);
 
-	if (CaculatedPos.y < 3)
-	{
 
-		m_iJumpCount = 0;
-		m_LevitationTime = 0;
-		m_fJumpPower = -1.f;
-		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, m_vReturnPos);
-
-	}
 
 	if (eNowTile == Tile_JumpMovable)
 		return S_OK;

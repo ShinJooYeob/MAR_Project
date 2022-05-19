@@ -159,7 +159,7 @@ void CShpaeMemButton::CollisionTriger(_uint iMyColliderIndex, CGameObject * pCon
 	case Engine::CollisionType_PlayerWeapon:
 	{
 
-		m_pPlayer->Set_ReturnPos(_float3(135.377f, 45.050f, 171.863f));
+		m_pPlayer->Set_ReturnPos(_float3(135.377f, 45.050f, 171.863f), _float3(166.329f, 39.12f, 171.863f));
 
 
  		if (!lstrcmp(pConflictedObj->Get_NameTag(), L"Layer_GranadeBullet"))

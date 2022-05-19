@@ -165,6 +165,9 @@ HRESULT CHorse::SetUp_Components()
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Shader_VAM), TAG_COM(Com_Shader), (CComponent**)&m_pShaderCom));
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Mesh_Horse), TAG_COM(Com_Model), (CComponent**)&m_pModel));
+	m_pModel->Change_AnimIndex(1);
+	m_pModel->Change_AnimIndex(0);
+
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Collider), TAG_COM(Com_Collider), (CComponent**)&m_pColliderCom));
 

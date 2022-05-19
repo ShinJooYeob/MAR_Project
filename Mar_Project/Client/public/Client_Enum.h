@@ -745,7 +745,8 @@ enum COMPONENTPROTOTYPEID
 	Prototype_Mesh_Player,
 	Prototype_Mesh_PlayerLoby,
 	Prototype_Mesh_Executor,
-	Prototype_Mesh_Grunt,
+		Prototype_Mesh_Grunt,
+		Prototype_Mesh_GruntSwpanMesh,
 	Prototype_Mesh_WaspArrow,
 	Prototype_Mesh_WaspInk,
 	Prototype_Mesh_Eyepot,
@@ -1347,6 +1348,13 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 	case Prototype_Mesh_Grunt:
 		return TEXT("Mesh_Grunt");
 		break;
+	case Prototype_Mesh_GruntSwpanMesh:
+		return TEXT("Prototype_Mesh_GruntSwpanMesh");
+		break;
+
+		
+
+
 	case Prototype_Mesh_WaspArrow:
 		return TEXT("Mesh_WaspArrow");
 		break;

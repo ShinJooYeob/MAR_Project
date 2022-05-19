@@ -164,7 +164,7 @@ void CButtonPad::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflict
 			switch (m_tDesc.eKindsOfObject)
 			{
 			case 0:
-				m_pPlayer->Set_ReturnPos(_float3(75.830f, 23.670f, 77.509f));
+				m_pPlayer->Set_ReturnPos(_float3(75.830f, 23.670f, 77.509f), _float3(84.321f, 23.670f, 95.669f));
 				break;
 			default:
 				break;

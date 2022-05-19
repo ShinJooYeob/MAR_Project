@@ -181,6 +181,7 @@
     <ClInclude Include="..\public\MovableColumBtn.h" />
     <ClInclude Include="..\public\MovableColum.h" />
     <ClInclude Include="..\public\FadeEffect.h" />
+    <ClInclude Include="..\public\Stage1_SpwanGrunt.h" />
     <ClInclude Include="..\public\SceneChageTriger.h" />
     <ClInclude Include="..\public\VentObj.h" />
     <ClInclude Include="..\public\PresserObj.h" />
@@ -262,6 +263,7 @@
     <ClCompile Include="..\private\MovableColumBtn.cpp" />
     <ClCompile Include="..\private\MovableColum.cpp" />
     <ClCompile Include="..\private\FadeEffect.cpp" />
+    <ClCompile Include="..\private\Stage1_SpwanGrunt.cpp" />
     <ClCompile Include="..\private\SceneChageTriger.cpp" />
     <ClCompile Include="..\private\VentObj.cpp" />
     <ClCompile Include="..\private\PresserObj.cpp" />

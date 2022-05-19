@@ -28,10 +28,24 @@ HRESULT CGrunt::Initialize_Clone(void * pArg)
 	FAILED_CHECK(SetUp_Components());
 
 	if (pArg != nullptr)
+	{
 		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, *((_float3*)pArg));
-
+	
+	}
 	ZeroMemory(m_bIsDmgAnimUpdated, sizeof(_bool) * 3);
-	m_fHP = m_fMaxHP = 128;
+	m_fHP = m_fMaxHP = 28;
+	m_SpwanedPassedTime = 0;
+	m_pModel->Change_AnimIndex_ReturnTo_Must(26, 0, 0.15, true);
+
+
+	_float3 RandDir = GetSingle(CUtilityMgr)->RandomFloat3(-9999.f, 9999.f);
+	RandDir.y = 0;
+	m_pTransformCom->LookDir(RandDir.Get_Nomalize());
+
+	__super::SetUp_WanderLook(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK));
+
+	m_iSpwanMeshRend = 0;
+
 
 	return S_OK;
 }
@@ -42,6 +56,9 @@ _int CGrunt::Update(_double fDeltaTime)
 	if (__super::Update(fDeltaTime) < 0)return -1;
 	m_pColliderCom->Update_ConflictPassedTime(fDeltaTime);
 
+
+	if (g_pGameInstance->Get_DIKeyState(DIK_O)&DIS_Down)
+		Add_Dmg_to_Monster(1000);
 	/*
 	static float testFloat = 1.;
 	if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
@@ -87,31 +104,82 @@ _int CGrunt::Update(_double fDeltaTime)
 	*/
 
 
+	if (m_bDeathAnimStart)
+	{
+		m_SpwanedPassedTime += fDeltaTime;
+		_float PlayRate = (_float)m_pSubModel->Get_PlayRate();
+
+		FAILED_CHECK(m_pSubModel->Update_AnimationClip(fDeltaTime, m_bIsOnScreen));
 
 
+		if (PlayRate > 0.4105263 && m_iSpwanMeshRend == 1)
+		{
+			m_iSpwanMeshRend = 0;
+		}
+		else if (PlayRate > 0.95)
+		{
+			Set_IsDead();
+			return 0;
+		}
+		
 
-	//_uint AnimIndex = m_pModel->Get_NowAnimIndex();
 
-	//if (AnimIndex == 1)
-	//	m_pModel->Set_NextAnim_Must(2);
+	}
+	else if (m_bSpwanedAnimFinished)
+	{
+		_uint AnimIndex = m_pModel->Get_NowAnimIndex();
 
-	//if (!(AnimIndex >= 23 && AnimIndex <= 25 || AnimIndex == 1))
-	//{
+		if (AnimIndex == 1)
+			m_pModel->Set_NextAnim_Must(2);
 
-	//	if (!m_bIsPatternFinished || Distance_BetweenPlayer(m_pTransformCom) < 3)
-	//	{
-	//		Update_Pattern(fDeltaTime);
-	//	}
-	//	else
-	//	{
-	//		if (!m_pModel->Get_IsUntillPlay())
-	//		{
-	//			m_pModel->Change_AnimIndex(2);
-	//			FAILED_CHECK(__super::Update_WanderAround(m_pTransformCom, fDeltaTime, 0.05f));
-	//		}
-	//	}
-	//}
+		if (!(AnimIndex >= 23 && AnimIndex <= 25 || AnimIndex == 1))
+		{
 
+			if (!m_bIsPatternFinished || Distance_BetweenPlayer(m_pTransformCom) < 3)
+			{
+				Update_Pattern(fDeltaTime);
+			}
+			else
+			{
+				if (!m_pModel->Get_IsUntillPlay())
+				{
+					m_pModel->Change_AnimIndex(2);
+					FAILED_CHECK(__super::Update_WanderAround(m_pTransformCom, fDeltaTime, 0.05f));
+				}
+			}
+		}
+
+	}
+	else
+	{
+		m_SpwanedPassedTime += fDeltaTime;
+		_float PlayRate = (_float)m_pSubModel->Get_PlayRate();
+
+		if (m_iSpwanMeshRend < 2)
+		{
+			FAILED_CHECK(m_pSubModel->Update_AnimationClip(fDeltaTime, m_bIsOnScreen));
+
+			m_SpwanMeshScale = 2;
+
+			if (PlayRate > 0.64285714 && !m_iSpwanMeshRend)
+			{
+				m_iSpwanMeshRend = 1;
+			}
+			else if (m_iSpwanMeshRend == 1 && PlayRate > 0.95)
+			{
+				m_iSpwanMeshRend = 2; 
+				GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.2f, _float4(0.2f));
+			}
+			else if (PlayRate > 0.82)
+			{
+				m_SpwanMeshScale = _float(2 * (5.1f - PlayRate * 5));
+			}
+
+
+		}
+
+
+	}
 
 
 
@@ -126,7 +194,9 @@ _int CGrunt::Update(_double fDeltaTime)
 	{
 		for (_uint i = 0; i < m_pColliderCom->Get_NumColliderBuffer(); i++)
 			m_pColliderCom->Update_Transform(i, m_pTransformCom->Get_WorldMatrix());
-		g_pGameInstance->Add_CollisionGroup(CollisionType_Monster, this, m_pColliderCom);
+
+		if (!m_bDeathAnimStart)
+			g_pGameInstance->Add_CollisionGroup(CollisionType_Monster, this, m_pColliderCom);
 	}
 
 	return _int();
@@ -134,8 +204,8 @@ _int CGrunt::Update(_double fDeltaTime)
 
 _int CGrunt::LateUpdate(_double fDeltaTime)
 {
-
-	FAILED_CHECK(__super::Set_Monster_On_Terrain(m_pTransformCom, fDeltaTime));
+	if (m_bSpwanedAnimFinished)
+		FAILED_CHECK(__super::Set_Monster_On_Terrain(m_pTransformCom, fDeltaTime));
 
 	if (m_bIsOnScreen)
 		FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this));
@@ -158,7 +228,6 @@ _int CGrunt::Render()
 #endif // _DEBUG
 
 
-	FAILED_CHECK(m_pTransformCom->Bind_OnShader(m_pShaderCom, "g_WorldMatrix"));
 
 	CGameInstance* pInstance = GetSingle(CGameInstance);
 
@@ -166,15 +235,35 @@ _int CGrunt::Render()
 	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ProjMatrix", &pInstance->Get_Transform_Float4x4_TP(PLM_PROJ), sizeof(_float4x4)));
 
 
-	_uint NumMaterial = m_pModel->Get_NumMaterial();
 
-
-	for (_uint i = 0; i < NumMaterial; i++)
+	if (m_iSpwanMeshRend < 2 && m_SpwanedPassedTime >0.1)
 	{
-		for (_uint j = 0; j < AI_TEXTURE_TYPE_MAX; j++)
-			FAILED_CHECK(m_pModel->Bind_OnShader(m_pShaderCom, i, j, MODLETEXTYPE(j)));
+		m_pTransformCom->Scaled_All({ m_SpwanMeshScale,m_SpwanMeshScale,m_SpwanMeshScale });
+		FAILED_CHECK(m_pTransformCom->Bind_OnShader(m_pShaderCom, "g_WorldMatrix"));
+		_uint NumMaterial = m_pSubModel->Get_NumMaterial();
 
-		FAILED_CHECK(m_pModel->Render(m_pShaderCom, 0, i, "g_BoneMatrices"));
+		for (_uint i = 0; i < NumMaterial; i++)
+		{
+			for (_uint j = 0; j < AI_TEXTURE_TYPE_MAX; j++)
+				FAILED_CHECK(m_pSubModel->Bind_OnShader(m_pShaderCom, i, j, MODLETEXTYPE(j)));
+
+			FAILED_CHECK(m_pSubModel->Render(m_pShaderCom, 0, i, "g_BoneMatrices"));
+		}
+
+		m_pTransformCom->Scaled_All({ 1, 1, 1 });
+	}
+	if (m_iSpwanMeshRend > 0)
+	{
+		FAILED_CHECK(m_pTransformCom->Bind_OnShader(m_pShaderCom, "g_WorldMatrix"));
+		_uint NumMaterial = m_pModel->Get_NumMaterial();
+
+		for (_uint i = 0; i < NumMaterial; i++)
+		{
+			for (_uint j = 0; j < AI_TEXTURE_TYPE_MAX; j++)
+				FAILED_CHECK(m_pModel->Bind_OnShader(m_pShaderCom, i, j, MODLETEXTYPE(j)));
+
+			FAILED_CHECK(m_pModel->Render(m_pShaderCom, 0, i, "g_BoneMatrices"));
+		}
 	}
 
 	return _int();
@@ -198,6 +287,20 @@ _int CGrunt::Update_DmgCalculate(_double fDeltaTime)
 		return 0;
 	}
 	m_DmgPassedTime -= fDeltaTime;
+
+	if (m_fHP <=0)
+	{
+		if (!m_bDeathAnimStart)
+		{
+			m_iSpwanMeshRend = 1;
+			m_SpwanMeshScale = 2;
+			m_SpwanedPassedTime = 0;
+			m_pSubModel->Change_AnimIndex(1, 0.15f, true);
+			m_pModel->Change_AnimIndex_ReturnTo_Must(27, 27, 0, true);
+			m_bDeathAnimStart = true;
+		}
+		return 0;
+	}
 
 	if (!m_bIsDmgAnimUpdated[0] && m_fMaxHP * 0.07 < m_fDmgAmount)
 	{
@@ -349,6 +452,11 @@ HRESULT CGrunt::SetUp_Components()
 	FAILED_CHECK(Add_Component(m_eNowSceneNum, TAG_CP(Prototype_Mesh_Grunt), TAG_COM(Com_Model), (CComponent**)&m_pModel));
 	FAILED_CHECK(m_pModel->Change_AnimIndex(2));
 
+	FAILED_CHECK(Add_Component(m_eNowSceneNum, TAG_CP(Prototype_Mesh_GruntSwpanMesh), TAG_COM(Com_SubModel), (CComponent**)&m_pSubModel));
+	FAILED_CHECK(m_pModel->Change_AnimIndex(1));
+	FAILED_CHECK(m_pModel->Change_AnimIndex(0));
+
+
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Collider), TAG_COM(Com_Collider), (CComponent**)&m_pColliderCom));
 	
 	COLLIDERDESC			ColliderDesc;
@@ -380,7 +488,7 @@ HRESULT CGrunt::SetUp_Components()
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Transform), TAG_COM(Com_Transform), (CComponent**)&m_pTransformCom, &tDesc));
 
-	__super::SetUp_WanderLook(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK));
+
 
 	return S_OK;
 }
@@ -417,6 +525,9 @@ void CGrunt::Free()
 	Safe_Release(m_pRendererCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModel);
+	Safe_Release(m_pSubModel);
+
+	
 	Safe_Release(m_pColliderCom);
 
 }
