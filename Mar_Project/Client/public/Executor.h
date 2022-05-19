@@ -39,6 +39,12 @@ private:
 	_uint				m_iOldAnimIndex = INT_MAX;
 	_uint				m_iAdjMovedIndex = 0;
 
+
+
+	_bool				m_bSpwanAnimFinished = false;
+	_double				m_SpwanPassedTime = 0;
+
+
 	ATTACHBONEMATRIX_PTR m_tCollisionAttachPtr;
 
 	vector<class CMonsterWeapon*>			m_vecWeapon;

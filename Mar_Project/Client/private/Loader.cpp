@@ -44,6 +44,7 @@
 #include "SceneChageTriger.h"
 #include "Stage1_SpwanGrunt.h"
 #include "Stage1_SpwanWasp.h"
+#include "Stage3_SpwanExecutor.h"
 
 #include "StaticMapObject.h"
 
@@ -986,6 +987,10 @@ HRESULT CLoader::Load_Scene_Stage3(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 		CMovableColumBtn::Create(m_pDevice, m_pDeviceContext)));
 
 
+
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(L"Stage3_SpwanExecutor",
+		CStage3_SpwanExecutor::Create(m_pDevice, m_pDeviceContext)));
+	
 
 #pragma endregion
 

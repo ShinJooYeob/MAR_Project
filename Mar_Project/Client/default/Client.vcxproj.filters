@@ -259,6 +259,9 @@
     <Filter Include="01.GameObject\09.TriggerCollider\02.Stage1_SpwanWasp">
       <UniqueIdentifier>{93d8e8af-1b29-4cc7-a339-f4164628037f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.GameObject\09.TriggerCollider\03.Stage3_SpwanExecutor">
+      <UniqueIdentifier>{a59ec47e-1508-4978-a0fe-04924e8ce9a6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -531,6 +534,9 @@
     <ClInclude Include="..\public\Stage1_SpwanWasp.h">
       <Filter>01.GameObject\09.TriggerCollider\02.Stage1_SpwanWasp</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Stage3_SpwanExecutor.h">
+      <Filter>01.GameObject\09.TriggerCollider\03.Stage3_SpwanExecutor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -778,6 +784,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Stage1_SpwanWasp.cpp">
       <Filter>01.GameObject\09.TriggerCollider\02.Stage1_SpwanWasp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Stage3_SpwanExecutor.cpp">
+      <Filter>01.GameObject\09.TriggerCollider\03.Stage3_SpwanExecutor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

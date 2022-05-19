@@ -8,6 +8,7 @@
 #include "MovableColum.h"
 #include "MovableColumBtn.h"
 #include "SceneChageTriger.h"
+#include "Stage3_SpwanExecutor.h"
 
 
 
@@ -205,7 +206,8 @@ HRESULT CScene_Stage3::Ready_Layer_Player(const _tchar * pLayerTag)
 	NULL_CHECK_RETURN(pPlayer, E_FAIL);
 
 	pPlayer->Set_NowSceneNum(SCENE_STAGE3);
-	pPlayer->Renew_Player(_float3(128, 20.f, 88) , _float3(128, 20.f, 108));
+	pPlayer->Renew_Player(_float3(128, 23.134f, 174.085f), _float3(128, 23.134f, 200.085f));
+	//pPlayer->Renew_Player(_float3(128, 20.f, 88) , _float3(128, 20.f, 108));
 	
 
 	return S_OK;
@@ -300,7 +302,7 @@ HRESULT CScene_Stage3::Ready_Layer_StaticMapObj(const _tchar * pLayerTag)
 
 
 
-			if ((!lstrcmp(tData.MeshID, TAG_CP(Prototype_Mesh_GloryTree_Main))) || (!lstrcmp(tData.MeshID, TAG_CP(Prototype_Mesh_GloryTree_MainB))))
+			if ((!lstrcmp(tData.MeshID, TAG_CP(Prototype_Mesh_Gazebo_S))))
 			{
 				((CStaticMapObject*)pObject)->Set_PassIndex(3);
 				((CStaticMapObject*)pObject)->Set_FrustumSize(50);
@@ -448,6 +450,17 @@ HRESULT CScene_Stage3::Ready_Layer_TriggerCollider(const _tchar * pLayerTag)
 
 
 	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE3, pLayerTag, TAG_OP(Prototype_TriggerCollider_SceneChager), &tDesc));
+
+
+
+	CStage3_SpwanExecutor::SPWANTRIGGERDESC tExcutorSwpanDesc;
+
+	tExcutorSwpanDesc.vPosition = _float3(126.581f, 35.59f, 187.311f);
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE3, pLayerTag, L"Stage3_SpwanExecutor", &tExcutorSwpanDesc));
+
+
+
+
 	return S_OK;
 }
 
@@ -455,7 +468,7 @@ HRESULT CScene_Stage3::Ready_Layer_Executor(const _tchar * pLayerTag)
 {
 
 
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE3, pLayerTag, TAG_OP(Prototype_Executor), &_float3(128, 27.4f, 188)));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE3, pLayerTag, TAG_OP(Prototype_Executor), &_float3(126.581f, 35.59f, 188)));
 
 
 	return S_OK;

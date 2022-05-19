@@ -33,7 +33,9 @@ HRESULT CExecutor::Initialize_Clone(void * pArg)
 	if (pArg != nullptr)
 		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, *((_float3*)pArg));
 
-	m_fHP = m_fMaxHP = 192;
+	m_fHP = m_fMaxHP = 96;
+
+	m_pModel->Change_AnimIndex(2);
 
 
 	FAILED_CHECK(SetUp_Weapon());
@@ -56,54 +58,159 @@ _int CExecutor::Update(_double fDeltaTime)
 	//walk 2.8 / 0.05f
 
 	//run 5.5 / 0.1
-	
-
-	if (g_pGameInstance->Get_DIKeyState(DIK_F1)&DIS_Down)
-	{
-		m_bIsPatternFinished = true;
-		m_PatternDelayTime = 0;
-		m_PatternPassedTime = 0;
-		m_ePattern = 0;
-
-		m_pModel->Change_AnimIndex_ReturnTo(15, 0, 0.15, true);
-
-		if (m_bIsBerseked)
-		{
-
-			m_bIsBerseked = false;
-			m_pTransformCom->Set_MoveSpeed(2.8f);
-		}
-		else
-		{
-			m_bIsBerseked = true;
-			m_pTransformCom->Set_MoveSpeed(5.5f);
-		}
-	}
-
-
-	if (m_pModel->Get_NowAnimIndex() != 19 && m_pModel->Get_NowAnimIndex() != 15)
+	if (m_bSpwanAnimFinished)
 	{
 
-		if (!m_bIsPatternFinished || Distance_BetweenPlayer(m_pTransformCom) < 10)
+
+		if (g_pGameInstance->Get_DIKeyState(DIK_F1)&DIS_Down)
 		{
-			Update_Pattern(fDeltaTime);
-		}
-		else
-		{
-			if (!m_pModel->Get_IsUntillPlay())
+			m_bIsPatternFinished = true;
+			m_PatternDelayTime = 0;
+			m_PatternPassedTime = 0;
+			m_ePattern = 0;
+
+			m_pModel->Change_AnimIndex_ReturnTo(15, 0, 0.15, true);
+
+			if (m_bIsBerseked)
 			{
-				m_pModel->Change_AnimIndex((m_bIsBerseked) ? 1 : 2);
-				FAILED_CHECK(__super::Update_WanderAround(m_pTransformCom, fDeltaTime, (m_bIsBerseked) ? 0.1f : 0.05f));
+
+				m_bIsBerseked = false;
+				m_pTransformCom->Set_MoveSpeed(2.8f);
+			}
+			else
+			{
+				m_bIsBerseked = true;
+				m_pTransformCom->Set_MoveSpeed(5.5f);
 			}
 		}
 
-	}
 
+		if (m_pModel->Get_NowAnimIndex() != 19 && m_pModel->Get_NowAnimIndex() != 15)
+		{
+
+			if (!m_bIsPatternFinished || Distance_BetweenPlayer(m_pTransformCom) < 10)
+			{
+				Update_Pattern(fDeltaTime);
+			}
+			else
+			{
+				if (!m_pModel->Get_IsUntillPlay())
+				{
+					m_pModel->Change_AnimIndex((m_bIsBerseked) ? 1 : 2);
+					FAILED_CHECK(__super::Update_WanderAround(m_pTransformCom, fDeltaTime, (m_bIsBerseked) ? 0.1f : 0.05f));
+				}
+			}
+
+		}
+
+	}
+	else
+	{
+		m_SpwanPassedTime += fDeltaTime;
+		if (m_SpwanPassedTime < 10)
+		{
+			_double PlayRate = m_pModel->Get_PlayRate();
+			static _uint iStartCounter = 0;
+			if (PlayRate < 0.1)
+			{
+				iStartCounter = 0;
+			}
+			else if (!iStartCounter  && PlayRate > 0.34 && m_pModel->Get_NowAnimIndex() == 2)
+			{
+				GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.2f, _float4(0.2f));
+
+				iStartCounter++;
+			}
+			else if (iStartCounter == 1 && PlayRate > 0.84&& m_pModel->Get_NowAnimIndex() == 2)
+			{
+				GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.2f, _float4(0.2f));
+				iStartCounter++;
+			}
+
+			_float3 EasedPos = g_pGameInstance->Easing_Vector(TYPE_Linear, _float3(128, 13.28f, 256), _float3(128, 24.28f, 244), (_float)m_SpwanPassedTime, 10);
+
+
+			m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, EasedPos);
+			m_pTransformCom->LookDir(XMVectorSet(0, 0, -1, 0));
+			//_float3(128, 13.28f, 256)
+			//_float3(128, 23.28f, 244)
+
+			//46.79f,236.659f
+			static _bool Jump = false;
+
+			if (m_SpwanPassedTime > 9 && !Jump)
+			{
+				Jump = true;
+				m_pModel->Change_AnimIndex_UntilNReturn_Must(16, 17, 17, 0.15, true);
+			}
+		}
+		else if (m_SpwanPassedTime < 11)
+		{
+			_float3 EasedPos = g_pGameInstance->Easing_Vector(TYPE_ExpoOut, _float3(128, 24.28f, 244), _float3(128, 46.79f, 236.659f), (_float)m_SpwanPassedTime - 10, 1);
+			m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, EasedPos);
+		}
+		else if (m_SpwanPassedTime < 11.5)
+		{
+			_float3 EasedPos = g_pGameInstance->Easing_Vector(TYPE_ExpoIn, _float3(128, 46.79f, 236.659f), _float3(128, 27.39f, 226.782f), (_float)m_SpwanPassedTime - 11, 0.5);
+			m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, EasedPos);
+
+			static _bool Land = false;
+
+			if (m_SpwanPassedTime > 11.35 && !Land)
+			{
+				Land = true;
+				m_pModel->Change_AnimIndex(18);
+			}
+		}
+		else if (m_SpwanPassedTime < 14)
+		{
+			static _uint iChecker = 0;
+
+			if (m_pModel->Get_PlayRate() > 0.1568627 && !iChecker && m_pModel->Get_NowAnimIndex() == 18)
+			{
+				iChecker++;
+				GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.5f, _float4(1.f));
+			}
+			if (m_pModel->Get_PlayRate() > 0.95 && iChecker ==1 && m_pModel->Get_NowAnimIndex() == 18)
+			{
+				m_pModel->Change_AnimIndex(0,0.15,true);
+				iChecker++;
+			}
+
+			m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, _float3(128, 27.39f, 226.782f));
+
+			if (iChecker==2 && m_SpwanPassedTime > 13.8)
+			{
+				iChecker++;
+				m_pModel->Change_AnimIndex_UntilNReturn_Must(20, 22, 14, 0.08f, true);
+			}
+		}
+		else
+		{
+			static _uint iChecker = 0;
+			if (!iChecker&& m_pModel->Get_NowAnimIndex() == 14 && m_pModel->Get_PlayRate() > 0.1230769)
+			{
+
+				GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 2.f, _float4(1.3f));
+				iChecker++;
+			}
+
+			if (iChecker == 1&& m_pModel->Get_NowAnimIndex() == 14 && m_pModel->Get_PlayRate() > 0.95)
+			{
+				m_bSpwanAnimFinished = true;
+				iChecker++;
+			}
+		}
+
+
+
+	}
 
 
 	m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS),7.8f);
 	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime * ((m_bIsBerseked) ? 1.5f : 1.f), m_bIsOnScreen));
 	FAILED_CHECK(Adjust_AnimMovedTransform(fDeltaTime));
+
 	if (m_bIsOnScreen)
 	{
 
@@ -133,8 +240,10 @@ _int CExecutor::LateUpdate(_double fDeltaTime)
 {
 	if (__super::LateUpdate(fDeltaTime) < 0)return -1;
 
-	FAILED_CHECK(Set_Monster_On_Terrain(m_pTransformCom, fDeltaTime));
-
+	if (m_bSpwanAnimFinished)
+	{
+		FAILED_CHECK(Set_Monster_On_Terrain(m_pTransformCom, fDeltaTime));
+	}
 
 	if (m_bIsOnScreen)
 	{
@@ -832,6 +941,8 @@ HRESULT CExecutor::Set_Monster_On_Terrain(CTransform * pTransform, _double fDelt
 
 HRESULT CExecutor::Adjust_AnimMovedTransform(_double fDeltatime)
 {
+	if (!m_bSpwanAnimFinished) return S_FALSE;
+
 	_uint iNowAnimIndex = m_pModel->Get_NowAnimIndex();
 	_double PlayRate = m_pModel->Get_PlayRate();
 
