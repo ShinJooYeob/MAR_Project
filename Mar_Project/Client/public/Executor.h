@@ -44,6 +44,10 @@ private:
 	_bool				m_bSpwanAnimFinished = false;
 	_double				m_SpwanPassedTime = 0;
 
+	_bool				 m_bDeathAnimStart = false;
+	_double				m_DeathAnimPassedTime = 0;
+	_bool				m_bIsDmgAnimUpdated[3];
+
 
 	ATTACHBONEMATRIX_PTR m_tCollisionAttachPtr;
 

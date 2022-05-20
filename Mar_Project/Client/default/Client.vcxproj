@@ -177,14 +177,20 @@
     <ClInclude Include="..\..\Reference\Inc\imstb_truetype.h" />
     <ClInclude Include="..\bin\ShaderFiles\Shader_Define.hpp" />
     <ClInclude Include="..\public\BreakableObj.h" />
+    <ClInclude Include="..\public\DustWindCurvedMove.h" />
+    <ClInclude Include="..\public\ExecutorThron.h" />
+    <ClInclude Include="..\public\BreakedGazebo.h" />
+    <ClInclude Include="..\public\CardPeice.h" />
     <ClInclude Include="..\public\Bullet.h" />
     <ClInclude Include="..\public\MovableColumBtn.h" />
     <ClInclude Include="..\public\MovableColum.h" />
     <ClInclude Include="..\public\FadeEffect.h" />
+    <ClInclude Include="..\public\EntireCard.h" />
     <ClInclude Include="..\public\Stage3_SpwanExecutor.h" />
     <ClInclude Include="..\public\Stage1_SpwanWasp.h" />
     <ClInclude Include="..\public\Stage1_SpwanGrunt.h" />
     <ClInclude Include="..\public\SceneChageTriger.h" />
+    <ClInclude Include="..\public\DustWind.h" />
     <ClInclude Include="..\public\VentObj.h" />
     <ClInclude Include="..\public\PresserObj.h" />
     <ClInclude Include="..\public\ShpaeMemButton.h" />
@@ -261,14 +267,20 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\BreakableObj.cpp" />
+    <ClCompile Include="..\private\DustWindCurvedMove.cpp" />
+    <ClCompile Include="..\private\ExecutorThron.cpp" />
+    <ClCompile Include="..\private\BreakedGazebo.cpp" />
+    <ClCompile Include="..\private\CardPeice.cpp" />
     <ClCompile Include="..\private\Bullet.cpp" />
     <ClCompile Include="..\private\MovableColumBtn.cpp" />
     <ClCompile Include="..\private\MovableColum.cpp" />
     <ClCompile Include="..\private\FadeEffect.cpp" />
+    <ClCompile Include="..\private\EntireCard.cpp" />
     <ClCompile Include="..\private\Stage3_SpwanExecutor.cpp" />
     <ClCompile Include="..\private\Stage1_SpwanWasp.cpp" />
     <ClCompile Include="..\private\Stage1_SpwanGrunt.cpp" />
     <ClCompile Include="..\private\SceneChageTriger.cpp" />
+    <ClCompile Include="..\private\DustWind.cpp" />
     <ClCompile Include="..\private\VentObj.cpp" />
     <ClCompile Include="..\private\PresserObj.cpp" />
     <ClCompile Include="..\private\ShpaeMemButton.cpp" />

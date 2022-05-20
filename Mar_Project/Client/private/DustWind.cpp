@@ -1,48 +1,44 @@
 #include "stdafx.h"
-#include "..\public\TornadoSwirl.h"
+#include "..\public\DustWind.h"
+#include "Player.h"
 
 
 
-
-CTornadoSwirl::CTornadoSwirl(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
+CDustWind::CDustWind(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
 	:CGameObject(pDevice, pDeviceContext)
 {
 }
 
-CTornadoSwirl::CTornadoSwirl(const CTornadoSwirl & rhs)
+CDustWind::CDustWind(const CDustWind & rhs)
 	: CGameObject(rhs)
 {
 }
 
-HRESULT CTornadoSwirl::Initialize_Prototype(void * pArg)
+HRESULT CDustWind::Initialize_Prototype(void * pArg)
 {
 	FAILED_CHECK(__super::Initialize_Prototype(pArg));
 	return S_OK;
 }
 
-HRESULT CTornadoSwirl::Initialize_Clone(void * pArg)
+HRESULT CDustWind::Initialize_Clone(void * pArg)
 {
 	FAILED_CHECK(__super::Initialize_Clone(pArg));
 
 	if (pArg != nullptr)
-		m_iKindsOfSwirl =_uint((*(_float4*)pArg).w);
+	{
+		memcpy(&m_tDesc, pArg, sizeof(DUSTWINDDESC));
+	}
 	
-
 	FAILED_CHECK(SetUp_Components());
 
+	
 
-	if (pArg != nullptr)
-	{
-		_float3 vPos = *(_float3*)pArg;
-		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, vPos);
-	}
-	m_TargetTime = _double(GetSingle(CUtilityMgr)->RandomFloat(0.3f, 0.5f));
 	m_PassedTime = 0;
 	m_iRand = rand();
 	return S_OK;
 }
 
-_int CTornadoSwirl::Update(_double fDeltaTime)
+_int CDustWind::Update(_double fDeltaTime)
 {
 	if (__super::Update(fDeltaTime) < 0)
 		return -1;
@@ -53,16 +49,41 @@ _int CTornadoSwirl::Update(_double fDeltaTime)
 	else
 		m_pTransformCom->Turn_CW(XMVectorSet(0, -1, 0, 0), fDeltaTime);
 
-	m_pTransformCom->Scaling(CTransform::STATE_LOOK, fDeltaTime);
-	m_pTransformCom->Scaling(CTransform::STATE_RIGHT, fDeltaTime);
 
-	if (m_PassedTime > m_TargetTime)Set_IsDead();
+	if (m_PassedTime < m_tDesc.ToTalLifeTime)
+	{
+		_float3 EasedScale = g_pGameInstance->Easing_Vector(m_tDesc.eEasingType, m_tDesc.StartScale, m_tDesc.TargetScale, (_float)m_PassedTime, (_float)m_tDesc.ToTalLifeTime);
+		m_pTransformCom->Scaled_All(EasedScale);
+
+	}
+	else {
+		Set_IsDead();
+	}
+
+
+	//m_pTransformCom->Scaling(CTransform::STATE_LOOK, fDeltaTime);
+	//m_pTransformCom->Scaling(CTransform::STATE_RIGHT, fDeltaTime);
+	//
+	//if (m_PassedTime > m_TargetTime)Set_IsDead();
+
+	_float DistBtwPlayer = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS).Get_Distance(m_pPlayerTransform->Get_MatrixState(CTransform::STATE_POS));
+	_float Scale = XMVectorGetX(m_pTransformCom->Get_MatrixScale(CTransform::STATE_RIGHT));
+
+	if (DistBtwPlayer >= 2 * Scale && DistBtwPlayer <= 3 * Scale)
+	{
+		CCollider* pPlayerCollider =((CCollider*)(m_pPlayer->Get_Component(TAG_COM(Com_Collider))));
+		if (pPlayerCollider != nullptr && !pPlayerCollider->Get_Conflicted())
+		{
+			pPlayerCollider->Set_Conflicted();
+			m_pPlayer->Add_Dmg_to_Player(1);
+		}
+	}
 
 
 	return _int();
 }
 
-_int CTornadoSwirl::LateUpdate(_double fDeltaTime)
+_int CDustWind::LateUpdate(_double fDeltaTime)
 {
 	if (__super::LateUpdate(fDeltaTime) < 0)
 		return -1;
@@ -72,7 +93,7 @@ _int CTornadoSwirl::LateUpdate(_double fDeltaTime)
 	return 0;
 }
 
-_int CTornadoSwirl::Render()
+_int CDustWind::Render()
 {
 	if (__super::Render() < 0)
 		return -1;
@@ -81,9 +102,9 @@ _int CTornadoSwirl::Render()
 	NULL_CHECK_RETURN(m_pModel, E_FAIL);
 
 
+	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vMixColor", &m_tDesc.vColor, sizeof(_float4)));
 	FAILED_CHECK(m_pTransformCom->Bind_OnShader(m_pShaderCom, "g_WorldMatrix"));
 	FAILED_CHECK(SetUp_ConstTable());
-	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vMixColor", &_float4(1, 0.6f, 1, 1), sizeof(_float4)));
 
 
 	_uint NumMaterial = m_pModel->Get_NumMaterial();
@@ -100,7 +121,7 @@ _int CTornadoSwirl::Render()
 	return _int();
 }
 
-_int CTornadoSwirl::LateRender()
+_int CDustWind::LateRender()
 {
 	if (__super::LateRender() < 0)
 		return -1;
@@ -111,7 +132,7 @@ _int CTornadoSwirl::LateRender()
 	return _int();
 }
 
-HRESULT CTornadoSwirl::SetUp_Components()
+HRESULT CDustWind::SetUp_Components()
 {
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Renderer), TAG_COM(Com_Renderer), (CComponent**)&m_pRendererCom));
 
@@ -122,7 +143,6 @@ HRESULT CTornadoSwirl::SetUp_Components()
 	CUtilityMgr* pUtil = GetSingle(CUtilityMgr);
 	tDesc.fMovePerSec = 1;
 	tDesc.fRotationPerSec = XMConvertToRadians(pUtil->RandomFloat(1080, 1440));
-	tDesc.fScalingPerSec = 0.8f;
 	//tDesc.vPivot = _float3(0, 0.3f, 0);
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Transform), TAG_COM(Com_Transform), (CComponent**)&m_pTransformCom, &tDesc));
@@ -133,15 +153,26 @@ HRESULT CTornadoSwirl::SetUp_Components()
 	m_pTransformCom->Rotation_CW(RotAxis, XMConvertToRadians(Angle));
 	Angle = pUtil->RandomFloat(0, 360);
 	m_pTransformCom->Turn_CW(XMVectorSet(0,1,0,0), XMConvertToRadians(Angle));
-	m_pTransformCom->Scaled_All(_float3(pUtil->RandomFloat(0.7f, 1)));
+	m_pTransformCom->Scaled_All(m_tDesc.StartScale);
+	m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, m_tDesc.vPosition);
+	
 
-	FAILED_CHECK(Add_Component(m_eNowSceneNum, TAG_CP(COMPONENTPROTOTYPEID(Prototype_Mesh_Tornado1 + m_iKindsOfSwirl * 2 + rand() % 2)), TAG_COM(Com_Model), (CComponent**)&m_pModel));
+	FAILED_CHECK(Add_Component(m_eNowSceneNum, TAG_CP(Prototype_Mesh_DustTornado), TAG_COM(Com_Model), (CComponent**)&m_pModel));
+
+
+
+	m_pPlayer = (CPlayer*)(g_pGameInstance->Get_GameObject_By_LayerIndex(SCENE_STATIC, TAG_LAY(Layer_Player)));
+	NULL_CHECK_RETURN(m_pPlayer, E_FAIL);
+	m_pPlayerTransform = (CTransform*)(m_pPlayer->Get_Component(TAG_COM(Com_Transform)));
+
+	NULL_CHECK_RETURN(m_pPlayerTransform, E_FAIL);
+
 
 
 	return S_OK;
 }
 
-HRESULT CTornadoSwirl::SetUp_ConstTable()
+HRESULT CDustWind::SetUp_ConstTable()
 {
 	CGameInstance* pInstance = GetSingle(CGameInstance);
 	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ViewMatrix", &pInstance->Get_Transform_Float4x4_TP(PLM_VIEW), sizeof(_float4x4)));
@@ -164,31 +195,31 @@ HRESULT CTornadoSwirl::SetUp_ConstTable()
 	return S_OK;
 }
 
-CTornadoSwirl * CTornadoSwirl::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, void * pArg)
+CDustWind * CDustWind::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, void * pArg)
 {
-	CTornadoSwirl*	pInstance = new CTornadoSwirl(pDevice, pDeviceContext);
+	CDustWind*	pInstance = new CDustWind(pDevice, pDeviceContext);
 
 	if (FAILED(pInstance->Initialize_Prototype(pArg)))
 	{
-		MSGBOX("Failed to Created CTornadoSwirl");
+		MSGBOX("Failed to Created CDustWind");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-CGameObject * CTornadoSwirl::Clone(void * pArg)
+CGameObject * CDustWind::Clone(void * pArg)
 {
-	CTornadoSwirl*	pInstance = new CTornadoSwirl(*this);
+	CDustWind*	pInstance = new CDustWind(*this);
 
 	if (FAILED(pInstance->Initialize_Clone(pArg)))
 	{
-		MSGBOX("Failed to Created CTornadoSwirl");
+		MSGBOX("Failed to Created CDustWind");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-void CTornadoSwirl::Free()
+void CDustWind::Free()
 {
 	__super::Free();
 

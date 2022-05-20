@@ -53,6 +53,14 @@ enum OBJECTPROTOTYPEID
 	Prototype_WaspInk,
 
 	Prototype_Scythe,
+	Prototype_EntireCard,
+	Prototype_CardPiece,
+	Prototype_BreakedGazbo,
+	Prototype_ExplosiveParticle,
+	Prototype_Thron,
+	Prototype_DustWind,
+
+
 	Prototype_Bow,
 	Prototype_Arrow,
 	Prototype_FireBall,
@@ -106,8 +114,14 @@ static const _tchar* Tag_Object_Prototype(OBJECTPROTOTYPEID eTag)
 {
 	switch (eTag)
 	{
-
 		
+
+	case Prototype_DustWind:
+		return TEXT("Prototype_DustWind");
+		break;
+	case Prototype_BreakedGazbo:
+		return TEXT("Prototype_BreakedGazbo");
+		break;
 	case Prototype_TriggerCollider_SceneChager:
 		return TEXT("Prototype_TriggerCollider_SceneChager");
 		break;
@@ -198,6 +212,20 @@ static const _tchar* Tag_Object_Prototype(OBJECTPROTOTYPEID eTag)
 
 	case Prototype_BreakableWall:
 		return TEXT("Prototype_BreakableWall");
+		break;
+
+
+	case Prototype_EntireCard:
+		return TEXT("Prototype_EntireCard");
+		break;
+	case Prototype_CardPiece:
+		return TEXT("Prototype_CardPiece");
+		break;
+	case Prototype_ExplosiveParticle:
+		return TEXT("Prototype_ExplosiveParticle");
+		break;
+	case Prototype_Thron:
+		return TEXT("Prototype_Thron");
 		break;
 
 
@@ -396,6 +424,7 @@ enum LAYERID
 	Layer_ClockBomb,
 
 	Layer_Monster,
+	Layer_MonsterBullet,
 	Layer_Particle,
 
 	Layer_Terrain,
@@ -478,6 +507,12 @@ static const _tchar* Tag_Layer(LAYERID eTag)
 	case Layer_Monster:
 		return TEXT("Layer_Monster");
 		break;
+
+	case Layer_MonsterBullet:
+		return TEXT("Layer_MonsterBullet");
+		break;
+
+
 	case Layer_Player:
 		return TEXT("Layer_Player");
 		break;
@@ -730,11 +765,15 @@ enum COMPONENTPROTOTYPEID
 		Prototype_Mesh_VentQStone,
 
 		
+
+		Prototype_Mesh_CardPiece1,
+		Prototype_Mesh_CardPiece2,
+		Prototype_Mesh_CardPiece3,
+		Prototype_Mesh_CardPiece4,
 		
 		
 		
-		
-		
+
 		
 		
 		
@@ -799,6 +838,7 @@ enum COMPONENTPROTOTYPEID
 		Prototype_Mesh_ClockBomb,
 
 
+		Prototype_Mesh_DustTornado,
 		Prototype_Mesh_Scythe,
 		Prototype_Mesh_Bow,
 		Prototype_Mesh_Arrow,
@@ -807,6 +847,7 @@ enum COMPONENTPROTOTYPEID
 
 
 	Prototype_Mesh_SkyBox,
+
 
 	//////////////////////////////////////////////////////////////////////////
 	Prototype_Texture_Player,
@@ -1306,6 +1347,18 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 		break;
 
 
+	case Prototype_Mesh_CardPiece1:
+		return TEXT("Prototype_Mesh_CardPiece1");
+		break;
+	case Prototype_Mesh_CardPiece2:
+		return TEXT("Prototype_Mesh_CardPiece2");
+		break;
+	case Prototype_Mesh_CardPiece3:
+		return TEXT("Prototype_Mesh_CardPiece3");
+		break;
+	case Prototype_Mesh_CardPiece4:
+		return TEXT("Prototype_Mesh_CardPiece4");
+		break;
 
 
 
@@ -1354,6 +1407,11 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 
 		
 
+		
+
+	case Prototype_Mesh_DustTornado:
+		return TEXT("Prototype_Mesh_DustTornado");
+		break;
 
 	case Prototype_Mesh_WaspArrow:
 		return TEXT("Mesh_WaspArrow");

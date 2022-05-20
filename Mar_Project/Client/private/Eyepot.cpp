@@ -382,6 +382,8 @@ _int CEyepot::Update_Pattern(_double fDeltaTime)
 					m_pModel->Change_AnimIndex_UntilNReturn_Must(5, 6, 6, 0.15, true);
 					m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.15f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.85f));
 					Add_Force(m_pTransformCom, m_vLookDir.XMVector() + (XMVectorSet(0, 1, 0, 0) * 3.f), 80);
+					m_LevitationTime = 0.5f;
+
 					m_bIsJumping = true;
 					m_iPatternCount++;
 				}

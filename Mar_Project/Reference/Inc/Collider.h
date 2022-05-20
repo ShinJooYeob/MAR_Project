@@ -26,6 +26,7 @@ public:
 	_uint Get_NumColliderBuffer() { return _uint(m_vecColliderBuffer.size()); };
 	_int Add_ColliderBuffer(COLLIDERTYPE eColliderType, COLLIDERDESC* pColliderDesc = nullptr);
 	void Set_Conflicted(_double TotalTime = 0.5);
+	_bool Get_Conflicted() {return m_bIsConflicted;}
 
 #ifdef _DEBUG
 public:

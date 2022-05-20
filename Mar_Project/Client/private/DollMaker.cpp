@@ -53,7 +53,7 @@ _int CDollMaker::Update(_double fDeltaTime)
 	Update_DmgCalculate(fDeltaTime);
 
 
-	if (g_pGameInstance->Get_DIKeyState(DIK_1) & DIS_Down)
+	if (g_pGameInstance->Get_DIKeyState(DIK_3) & DIS_Down)
 		Add_Dmg_to_Monster(10);
 
 

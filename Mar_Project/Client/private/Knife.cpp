@@ -170,6 +170,7 @@ HRESULT CKnife::SetUp_Components()
 
 	ColliderDesc.vScale = _float3(1.f, 1.f, 1.f);
 	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);	
+	//ColliderDesc.vPosition = _float4(0, 0, 0, 1.f);
 	ColliderDesc.vPosition = _float4(-0.85f, 0.08f, -1.305f, 1.f);
 	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
 
@@ -178,8 +179,7 @@ HRESULT CKnife::SetUp_Components()
 	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
 	m_pColliderCom->Set_ParantBuffer();
 
-
-	//ColliderDesc.vPosition = _float4(-0.79f, 0.11f, -1.29f, 1.f);
+	//ColliderDesc.vPosition = _float4(-0.85f, 0.08f, -1.305f, 1.f);
 	ColliderDesc.vPosition = _float4(-0.85f, 0.08f, -1.305f, 1.f);
 	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
 	m_pColliderCom->Set_ParantBuffer();

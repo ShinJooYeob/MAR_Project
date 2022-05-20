@@ -74,11 +74,9 @@ _int CPlayer::Update(_double fDeltaTime)
 		Add_Dmg_to_Player(1);
 
 
-	if (g_pGameInstance->Get_DIKeyState(DIK_3)&DIS_Down)
-		Renew_Player(m_vReturnPos, m_vReturnLookAt);
 
-	if (g_pGameInstance->Get_DIKeyState(DIK_4)&DIS_Down)
-		Set_PlayerDeadAnimStart();
+
+
 
 	if (m_iWeaponModelIndex != 10)
 	{

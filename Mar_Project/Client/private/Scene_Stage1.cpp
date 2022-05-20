@@ -229,8 +229,8 @@ HRESULT CScene_Stage1::Ready_Layer_Player(const _tchar * pLayerTag)
 	NULL_CHECK_RETURN(pPlayer, E_FAIL);
 	FAILED_CHECK(pPlayer->SetUp_Weapon());
 
-	pPlayer->Renew_Player(_float3(208.26f, 25.5f, 94.086f), _float3(211.342f, 25.5f, 85.827f));
-	//pPlayer->Renew_Player(_float3(11.6105f, 20.f, 7.6433f), _float3(15.522085f, 21.487f, 28.628897f));
+	//pPlayer->Renew_Player(_float3(208.26f, 25.5f, 94.086f), _float3(211.342f, 25.5f, 85.827f));
+	pPlayer->Renew_Player(_float3(11.6105f, 20.f, 7.6433f), _float3(15.522085f, 21.487f, 28.628897f));
 
 	return S_OK;
 }

@@ -64,6 +64,11 @@ _int CStage3_SpwanExecutor::Update(_double fDeltaTime)
 			{
 				iChecker++;
 				FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE3, TAG_LAY(Layer_Monster), TAG_OP(Prototype_Executor), &_float3(128, 13.28f, 256)));
+			
+			/*	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE3, TAG_LAY(Layer_Monster), TAG_OP(Prototype_Executor), &_float3(128, 27.39f, 226.782f)));
+				Set_IsDead();
+				*/
+
 			}
 			else if (iChecker == 1 && m_SpwanPassedTime > 15.4)
 			{

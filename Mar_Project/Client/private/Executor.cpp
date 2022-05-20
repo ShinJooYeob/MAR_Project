@@ -2,7 +2,11 @@
 #include "..\public\Executor.h"
 #include "Scythe.h"
 #include "Terrain.h"
-
+#include "EntireCard.h"
+#include "BreakedGazebo.h"
+#include "ExecutorThron.h"
+#include "DustWind.h"
+#include "DustWindCurvedMove.h"
 
 
 CExecutor::CExecutor(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
@@ -33,12 +37,13 @@ HRESULT CExecutor::Initialize_Clone(void * pArg)
 	if (pArg != nullptr)
 		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, *((_float3*)pArg));
 
-	m_fHP = m_fMaxHP = 96;
+	m_fHP = m_fMaxHP = 64;
 
 	m_pModel->Change_AnimIndex(2);
 
 
 	FAILED_CHECK(SetUp_Weapon());
+	ZeroMemory(m_bIsDmgAnimUpdated, sizeof(_bool) * 3);
 
 	return S_OK;
 }
@@ -49,6 +54,9 @@ _int CExecutor::Update(_double fDeltaTime)
 	m_pColliderCom->Update_ConflictPassedTime(fDeltaTime);
 	Update_DmgCalculate(fDeltaTime);
 
+	
+
+
 	//if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
 	//	m_pModel->Change_AnimIndex(0);
 	//if (g_pGameInstance->Get_DIKeyState(DIK_2)&DIS_Down)
@@ -58,6 +66,7 @@ _int CExecutor::Update(_double fDeltaTime)
 	//walk 2.8 / 0.05f
 
 	//run 5.5 / 0.1
+
 	if (m_bSpwanAnimFinished)
 	{
 
@@ -88,7 +97,7 @@ _int CExecutor::Update(_double fDeltaTime)
 		if (m_pModel->Get_NowAnimIndex() != 19 && m_pModel->Get_NowAnimIndex() != 15)
 		{
 
-			if (!m_bIsPatternFinished || Distance_BetweenPlayer(m_pTransformCom) < 10)
+			if (!m_bIsPatternFinished || Distance_BetweenPlayer(m_pTransformCom) < 20)
 			{
 				Update_Pattern(fDeltaTime);
 			}
@@ -106,7 +115,14 @@ _int CExecutor::Update(_double fDeltaTime)
 	}
 	else
 	{
+		////////////////////////////////////////////////////////////////////////////
+		//m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, _float3(128, 27.39f, 226.782f));
+		//m_bSpwanAnimFinished = true;
+		//return 0;
+		////////////////////////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////////////////////////
 		m_SpwanPassedTime += fDeltaTime;
+
 		if (m_SpwanPassedTime < 10)
 		{
 			_double PlayRate = m_pModel->Get_PlayRate();
@@ -300,24 +316,35 @@ _int CExecutor::Update_DmgCalculate(_double fDeltaTime)
 	{
 		if (m_fDmgAmount > 0)
 		{
+			ZeroMemory(m_bIsDmgAnimUpdated, sizeof(_bool) * 3);
 			m_fDmgAmount = 0;
 			m_DmgPassedTime = 0;
 		}
 		return 0;
 	}
-
 	m_DmgPassedTime -= fDeltaTime;
 
-	if (m_fDmgAmount != 0 )
+	if (m_fHP <= 0)
 	{
-		m_pModel->Change_AnimIndex_ReturnTo_Must(19, 0, 0.15, true);
+		if (!m_bDeathAnimStart)
+		{
+			m_DeathAnimPassedTime = 0; 
+			m_pModel->Change_AnimIndex_ReturnTo_Must(19, 0, 0.15, true);
+			m_bDeathAnimStart = true;
+		}
+		return 0;
+	}
 
+	if (!m_bIsDmgAnimUpdated[0] && m_fMaxHP * 0.1 < m_fDmgAmount)
+	{
 		m_bIsPatternFinished = true;
 		m_PatternPassedTime = 0;
 		m_PatternDelayTime = 3;
-		m_fDmgAmount = 0;
+		m_bIsDmgAnimUpdated[0] = true;
 		Add_Force(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK)* -1, 10);
 	}
+
+
 	
 
 	return 0;
@@ -337,6 +364,9 @@ _int CExecutor::Update_Pattern(_double fDeltaTime)
 		if (m_bIsPatternFinished)
 		{
 			m_ePattern += 1;
+
+
+
 			if (m_ePattern > 4) m_ePattern = 0;
 			m_bIsPatternFinished = false;
 			m_PatternPassedTime = 0;
@@ -391,8 +421,9 @@ _int CExecutor::Update_Pattern(_double fDeltaTime)
 				{
 					m_vLookDir = XMVector3Normalize(XMVectorSetY(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS) - m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0));
 					m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.15f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.85f));
-					Add_Force(m_pTransformCom, m_vLookDir.XMVector() * 0.25f + XMVectorSet(0, 1, 0, 0) * 0.25f, 100);
+					Add_Force(m_pTransformCom, m_vLookDir.XMVector() * 0.25f + XMVectorSet(0, 1, 0, 0) * 0.5f, 200);
 					//Add_Force(m_pTransformCom, m_vLookDir.XMVector() * 0.75f + XMVectorSet(0, 1, 0, 0) * 0.25f, 100);
+					m_LevitationTime = 0.5f;
 				}
 			}
 
@@ -597,6 +628,8 @@ _int CExecutor::Update_Pattern(_double fDeltaTime)
 		if (m_bIsPatternFinished)
 		{
 			m_ePattern += 1;
+			//m_ePattern = 3;
+
 			if (m_ePattern > 3) m_ePattern = 0;
 			m_bIsPatternFinished = false;
 			m_PatternPassedTime = 0;
@@ -651,7 +684,8 @@ _int CExecutor::Update_Pattern(_double fDeltaTime)
 				{
 					m_vLookDir = XMVector3Normalize(XMVectorSetY(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS) - m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0));
 					m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.15f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.85f));
-					Add_Force(m_pTransformCom, m_vLookDir.XMVector() * 0.25f + XMVectorSet(0, 1, 0, 0) * 0.25f, 100);
+					Add_Force(m_pTransformCom, m_vLookDir.XMVector() * 0.25f + XMVectorSet(0, 1, 0, 0) * 0.5f, 200);
+					m_LevitationTime = 0.5f;
 					//Add_Force(m_pTransformCom, m_vLookDir.XMVector() * 0.75f + XMVectorSet(0, 1, 0, 0) * 0.25f, 100);
 				}
 			}
@@ -930,6 +964,8 @@ HRESULT CExecutor::Set_Monster_On_Terrain(CTransform * pTransform, _double fDelt
 
 		if (m_bIsJumping && m_pModel->Get_NowAnimIndex() != 4 && m_pModel->Get_NowAnimIndex() != 5)
 		{
+			GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.2f, _float4(0.3f));
+
 			m_bIsJumping = false;
 			m_PatternDelayTime = 3;
 			m_pModel->Change_AnimIndex_ReturnTo_Must(7, 0, 0, true);
@@ -977,6 +1013,34 @@ HRESULT CExecutor::Adjust_AnimMovedTransform(_double fDeltatime)
 	{
 		switch (iNowAnimIndex)
 		{
+		case 1:
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.4)
+			{
+				GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.1f, _float4(0.1f));
+				m_iAdjMovedIndex++;
+			}
+			if (m_iAdjMovedIndex == 1 && PlayRate > 0.93)
+			{
+				GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.1f, _float4(0.1f));
+				m_iAdjMovedIndex++;
+			}
+
+			break;
+		case 2:
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.34)
+			{
+				GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.1f, _float4(0.1f));
+				m_iAdjMovedIndex++;
+			}
+			if (m_iAdjMovedIndex == 1 && PlayRate > 0.86)
+			{
+				GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.1f, _float4(0.1f));
+				m_iAdjMovedIndex++;
+			}
+
+			break;
+
+
 		case 8:
 			if (m_iAdjMovedIndex == 0 && PlayRate > 0.35714)
 			{
@@ -1003,6 +1067,23 @@ HRESULT CExecutor::Adjust_AnimMovedTransform(_double fDeltatime)
 
 				m_iAdjMovedIndex++;
 			}
+
+			if (m_iAdjMovedIndex == 1 && PlayRate >= 0.40625)
+			{
+				GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.3, _float4(0.5));
+
+				CGameInstance* pInstance =  g_pGameInstance;
+				CBreakedGazebo::BREAKEDGAZBODESC tDesc;
+				tDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * 5;
+				for (_uint i = 0 ; i< 10; i++)
+				{
+					tDesc.MeshKinds = rand() % 2 + Prototype_QBattleTowerParticleA;
+					pInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_BreakedGazbo), &tDesc);
+				}
+
+
+				m_iAdjMovedIndex++;
+			}
 			break;
 
 		case 10:
@@ -1019,7 +1100,18 @@ HRESULT CExecutor::Adjust_AnimMovedTransform(_double fDeltatime)
 			
 			break;
 		case 11:
-			if (m_iAdjMovedIndex == 0 && PlayRate >= 0.44444)
+			if (m_iAdjMovedIndex == 0 && PlayRate >= 0.01)
+			{
+
+				CEntireCard::ENTIRECARDDESC tDesc;
+				tDesc.vMonsterPos = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+				tDesc.vStartPos = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * 3;
+
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_EntireCard), &tDesc);
+
+				m_iAdjMovedIndex++;
+			}
+			if (m_iAdjMovedIndex == 1 && PlayRate >= 0.44444)
 			{
 				Add_Force_Smooth(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 4.0, 0.4f / ((m_bIsBerseked) ? 1.5f : 1.f));
 				m_iAdjMovedIndex++;
@@ -1031,6 +1123,20 @@ HRESULT CExecutor::Adjust_AnimMovedTransform(_double fDeltatime)
 		case 12://shout
 			if (m_iAdjMovedIndex == 0 && PlayRate >= 0.2777)
 			{
+
+				GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.7f, _float4(0.3f));
+
+				CDustWind::DUSTWINDDESC tDesc;
+
+				tDesc.vPosition = (m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
+				tDesc.ToTalLifeTime = 1.5f;
+				tDesc.StartScale = _float3(2, 10, 2);
+				tDesc.TargetScale = _float3(15, 0.5f, 15);
+				tDesc.eEasingType = TYPE_ExpoIn;
+
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_DustWind), &(tDesc));
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_DustWind), &(tDesc));
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_DustWind), &(tDesc));
 
 				//공격 파장 소환
 				//Add_Force_Smooth(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 4.0, 0.4f / ((m_bIsBerseked) ? 1.5f : 1.f));
@@ -1044,15 +1150,48 @@ HRESULT CExecutor::Adjust_AnimMovedTransform(_double fDeltatime)
 			if (m_iAdjMovedIndex == 0 && PlayRate >= 0.1578947)
 			{
 
+				GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.7f, _float4(0.3f));
+
+				CDustWind::DUSTWINDDESC tDesc;
+
+				tDesc.vPosition = (m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
+				tDesc.ToTalLifeTime = 1.5f;
+				tDesc.StartScale = _float3(2, 10, 2);
+				tDesc.TargetScale = _float3(15, 0.5f, 15);
+				tDesc.eEasingType = TYPE_ExpoIn;
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_DustWind), &(tDesc));
+				tDesc.vColor = GetSingle(CUtilityMgr)->RandomFloat3(0, 1);
+				tDesc.vColor.w = 1; tDesc.vColor.y *= 0.25f;
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_DustWind), &(tDesc));
+				tDesc.vColor = GetSingle(CUtilityMgr)->RandomFloat3(0, 1);
+				tDesc.vColor.w = 1; tDesc.vColor.y *= 0.25f;
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_DustWind), &(tDesc));
+
+				
 				//공격 파장 소환
 				//Add_Force_Smooth(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 4.0, 0.4f / ((m_bIsBerseked) ? 1.5f : 1.f));
 				m_iAdjMovedIndex++;
 			}
-			if (m_iAdjMovedIndex == 1 && PlayRate >= 0.5864661)
+			if (m_iAdjMovedIndex == 1 && PlayRate >= 0.4962406)
+			{
+				GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.1f, _float4(1.f));
+
+				m_iAdjMovedIndex++;
+			}
+			if (m_iAdjMovedIndex == 2 && PlayRate >= 0.503759)
 			{
 
 				//Eq 소환
 				//Add_Force_Smooth(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 4.0, 0.4f / ((m_bIsBerseked) ? 1.5f : 1.f));
+				CExecutorThron::THRONDESC tDesc;
+				tDesc.MoveDir = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_LOOK);
+
+				tDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS) + tDesc.MoveDir.XMVector() * 3;
+				tDesc.MeshKinds = 0;
+
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_Thron), &tDesc);
+
+
 				m_iAdjMovedIndex++;
 			}
 
@@ -1063,6 +1202,54 @@ HRESULT CExecutor::Adjust_AnimMovedTransform(_double fDeltatime)
 			if (m_iAdjMovedIndex == 0 && PlayRate >= 0.123076)
 			{
 
+				GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.7f, _float4(0.3f));
+
+				CDustWind::DUSTWINDDESC tDesc;
+
+				tDesc.vPosition = (m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
+				tDesc.ToTalLifeTime = 1.5f;
+				tDesc.StartScale = _float3(2, 10, 2);
+				tDesc.TargetScale = _float3(4, 0.5f, 4);
+				tDesc.eEasingType = TYPE_ExpoIn;
+
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_DustWind), &(tDesc));
+				tDesc.vColor = GetSingle(CUtilityMgr)->RandomFloat3(0, 1);
+				tDesc.vColor.y *= 0.25f;
+				tDesc.vColor.w = 1;
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_DustWind), &(tDesc));
+				tDesc.vColor = GetSingle(CUtilityMgr)->RandomFloat3(0, 1);
+				tDesc.vColor.y *= 0.25f;
+				tDesc.vColor.w = 1;
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_DustWind), &(tDesc));
+
+
+
+				CDustWindCurvedMove::DUSTWINDDESC CurvedDesc;
+
+				CurvedDesc.StartScale = _float3(1.5f, 0.5f, 1.5f);
+				CurvedDesc.ToTalLifeTime = 2.8f;
+				CurvedDesc.vColor = _float4(0, 0, 0, 1);
+				CurvedDesc.vTargetPosition = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+
+				CurvedDesc.vPosition = _float3(108.9478f, 27.39f, 222.205826f);
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), L"Prototype_DustCurved", &(CurvedDesc));
+
+				CurvedDesc.vPosition = _float3(128.586273f, 27.39f, 231.820633f);
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), L"Prototype_DustCurved", &(CurvedDesc));
+
+				CurvedDesc.vPosition = _float3(145.696915f, 27.39f, 221.406021f);
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), L"Prototype_DustCurved", &(CurvedDesc));
+
+				CurvedDesc.vPosition = _float3(145.431885f, 27.39f, 200.339203f);
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), L"Prototype_DustCurved", &(CurvedDesc));
+
+				CurvedDesc.vPosition = _float3(126.985931f, 27.39f, 188.308807f);
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), L"Prototype_DustCurved", &(CurvedDesc));
+
+				CurvedDesc.vPosition = _float3(108.9478f, 27.39f, 202.73001f);
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), L"Prototype_DustCurved", &(CurvedDesc));
+
+
 				//공격 파장 소환
 				//Add_Force_Smooth(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 4.0, 0.4f / ((m_bIsBerseked) ? 1.5f : 1.f));
 				m_iAdjMovedIndex++;
@@ -1070,8 +1257,38 @@ HRESULT CExecutor::Adjust_AnimMovedTransform(_double fDeltatime)
 			if (m_iAdjMovedIndex == 1 && PlayRate >= 0.72180)
 			{
 
+				GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 1.3f, _float4(0.3f));
+
 				//몬스터 소환
 				//Add_Force_Smooth(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 4.0, 0.4f / ((m_bIsBerseked) ? 1.5f : 1.f));
+				m_iAdjMovedIndex++;
+			}
+
+
+			break;
+
+		case 15://버서크
+			if (m_iAdjMovedIndex == 0 && PlayRate >= 0.1)
+			{
+
+				GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 3.5f, _float4(1.f));
+
+				CDustWind::DUSTWINDDESC tDesc;
+				tDesc.vPosition = (m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
+				tDesc.ToTalLifeTime = 3.5f;
+				tDesc.StartScale = _float3(2, 10, 2);
+				tDesc.TargetScale = _float3(15, 0.5f, 15);
+				tDesc.eEasingType = TYPE_ExpoIn;
+
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_DustWind), &(tDesc));
+				tDesc.vColor = GetSingle(CUtilityMgr)->RandomFloat3(0, 1);
+				tDesc.vColor.w = 1; tDesc.vColor.y *= 0.25f;
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_DustWind), &(tDesc));
+				tDesc.vColor = GetSingle(CUtilityMgr)->RandomFloat3(0, 1);
+				tDesc.vColor.w = 1; tDesc.vColor.y *= 0.25f;
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_DustWind), &(tDesc));
+
+
 				m_iAdjMovedIndex++;
 			}
 
