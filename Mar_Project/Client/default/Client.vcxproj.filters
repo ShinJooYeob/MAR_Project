@@ -277,6 +277,12 @@
     <Filter Include="01.GameObject\03.Monster\99.MonsterWeapon\06.DustWind">
       <UniqueIdentifier>{dfe4642d-4dc2-4be3-a10b-567310f207d0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.GameObject\03.Monster\99.MonsterWeapon\01.Grunt">
+      <UniqueIdentifier>{c01e823d-8adb-440e-a3ed-cc173db4c0de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\03.Monster\99.MonsterWeapon\01.Grunt\01.ChainExplosion">
+      <UniqueIdentifier>{7f563d40-a625-4ce8-9f26-d28da6b335e4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -570,6 +576,9 @@
     <ClInclude Include="..\public\DustWindCurvedMove.h">
       <Filter>01.GameObject\03.Monster\99.MonsterWeapon\06.DustWind</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\ChainExplosion.h">
+      <Filter>01.GameObject\03.Monster\99.MonsterWeapon\01.Grunt\01.ChainExplosion</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -838,6 +847,9 @@
     </ClCompile>
     <ClCompile Include="..\private\DustWindCurvedMove.cpp">
       <Filter>01.GameObject\03.Monster\99.MonsterWeapon\06.DustWind</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\ChainExplosion.cpp">
+      <Filter>01.GameObject\03.Monster\99.MonsterWeapon\01.Grunt\01.ChainExplosion</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

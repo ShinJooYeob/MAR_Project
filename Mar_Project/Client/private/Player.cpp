@@ -8,6 +8,8 @@
 
 
 
+
+
 _uint CALLBACK Add_Force_Thread(void* _Prameter)
 {
 	THREADARG tThreadArg{};
@@ -72,7 +74,6 @@ _int CPlayer::Update(_double fDeltaTime)
 
 	if (g_pGameInstance->Get_DIKeyState(DIK_2)&DIS_Down)
 		Add_Dmg_to_Player(1);
-
 
 
 

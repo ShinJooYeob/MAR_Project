@@ -16,7 +16,7 @@ public:
 	virtual HRESULT Initialize_Clone(void * pArg);
 
 	_bool	Get_IsOwnerDead() { return m_bIsOwnerDead; };
-	void	Set_IsOwnerDead() { m_bIsOwnerDead = true; };
+	void	Set_IsOwnerDead(_bool	bBool = true) { m_bIsOwnerDead = bBool; };
 protected:
 	ID3D11Device*			m_pDevice = nullptr;
 	ID3D11DeviceContext*	m_pDeviceContext = nullptr;

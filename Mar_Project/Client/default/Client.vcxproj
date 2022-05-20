@@ -178,6 +178,7 @@
     <ClInclude Include="..\bin\ShaderFiles\Shader_Define.hpp" />
     <ClInclude Include="..\public\BreakableObj.h" />
     <ClInclude Include="..\public\DustWindCurvedMove.h" />
+    <ClInclude Include="..\public\ChainExplosion.h" />
     <ClInclude Include="..\public\ExecutorThron.h" />
     <ClInclude Include="..\public\BreakedGazebo.h" />
     <ClInclude Include="..\public\CardPeice.h" />
@@ -268,6 +269,7 @@
   <ItemGroup>
     <ClCompile Include="..\private\BreakableObj.cpp" />
     <ClCompile Include="..\private\DustWindCurvedMove.cpp" />
+    <ClCompile Include="..\private\ChainExplosion.cpp" />
     <ClCompile Include="..\private\ExecutorThron.cpp" />
     <ClCompile Include="..\private\BreakedGazebo.cpp" />
     <ClCompile Include="..\private\CardPeice.cpp" />

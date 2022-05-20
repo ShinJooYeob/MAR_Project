@@ -57,7 +57,7 @@ HRESULT CScene_Stage1::Initialize()
 
 	//FAILED_CHECK(Ready_Layer_DollMaker(TAG_LAY(Layer_Monster)));
 	
-	//FAILED_CHECK(Ready_Layer_Grunt(TAG_LAY(Layer_Monster)));
+	FAILED_CHECK(Ready_Layer_Grunt(TAG_LAY(Layer_Monster)));
 	//FAILED_CHECK(Ready_Layer_Eyepot(TAG_LAY(Layer_Monster)));
 	//FAILED_CHECK(Ready_Layer_WaspInk(TAG_LAY(Layer_Monster)));
 	//FAILED_CHECK(Ready_Layer_WaspArrow(TAG_LAY(Layer_Monster)));
@@ -472,13 +472,13 @@ HRESULT CScene_Stage1::Ready_Layer_Eyepot(const _tchar * pLayerTag)
 
 HRESULT CScene_Stage1::Ready_Layer_Grunt(const _tchar * pLayerTag)
 {
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_Grunt), &_float3(160.f, 2.8701f, 147.668f)));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_Grunt), &_float3(13.6105f, 20.f, 7.6433f)));
 
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_Grunt), &_float3(158.576019f, 2.8701f, 156.82135f)));
+	//FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_Grunt), &_float3(158.576019f, 2.8701f, 156.82135f)));
 
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_Grunt), &_float3(152.774f, 2.8701f, 145.700989f)));
+	//FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_Grunt), &_float3(152.774f, 2.8701f, 145.700989f)));
 
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_Grunt), &_float3(168.802f, 2.8701f, 142.16185f)));
+	//FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_Grunt), &_float3(168.802f, 2.8701f, 142.16185f)));
 
 	return S_OK;
 }
