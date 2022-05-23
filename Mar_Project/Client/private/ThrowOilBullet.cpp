@@ -1,27 +1,28 @@
 #include "stdafx.h"
-#include "..\public\CardPeice.h"
+#include "..\public\ThrowOilBullet.h"
 #include "Terrain.h"
 #include "Player.h"
+#include "Monster.h"
 
 
 
-CCardPiece::CCardPiece(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
+CThrowOilBullet::CThrowOilBullet(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
 	:CMonsterWeapon(pDevice,pDeviceContext)
 {
 }
 
-CCardPiece::CCardPiece(const CCardPiece & rhs)
+CThrowOilBullet::CThrowOilBullet(const CThrowOilBullet & rhs)
 	: CMonsterWeapon(rhs)
 {
 }
 
-HRESULT CCardPiece::Initialize_Prototype(void * pArg)
+HRESULT CThrowOilBullet::Initialize_Prototype(void * pArg)
 {
 	FAILED_CHECK(__super::Initialize_Prototype(pArg));
 	return S_OK;
 }
 
-HRESULT CCardPiece::Initialize_Clone(void * pArg)
+HRESULT CThrowOilBullet::Initialize_Clone(void * pArg)
 {
 	//FAILED_CHECK(__super::Initialize_Clone(pArg));
 
@@ -33,7 +34,7 @@ HRESULT CCardPiece::Initialize_Clone(void * pArg)
 		NULL_CHECK_RETURN(m_pPlayer, E_FAIL);
 
 
-		memcpy(&m_tDesc, pArg, sizeof(CARDPIECEDESC));
+		memcpy(&m_tDesc, pArg, sizeof(BREAKEDGAZBODESC));
 
 	}
 
@@ -47,71 +48,39 @@ HRESULT CCardPiece::Initialize_Clone(void * pArg)
 	m_fStartTimer = 0;
 
 	CUtilityMgr* pUtilMgr = GetSingle(CUtilityMgr);
-	m_vSpoutDir = (pUtilMgr->RandomFloat3(-10000.f, 10000.f)).Get_Nomalize();
-	m_fRandPower = (pUtilMgr->RandomFloat(10, 20.f));
 
-	Add_JumpPower(pUtilMgr->RandomFloat(10, 15.f));
-	m_fTurningTime = 0;
-	//m_vRotAxis = m_vSpoutDir;
+	m_bIsHavetoMoving = true;
+
+	m_pTransformCom->Scaled_All(_float3(2));
+
+
+	FAILED_CHECK(SetUp_ParticleDesc());
+
+	GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_tParticleDesc);
+
 	return S_OK;
 }
 
-_int CCardPiece::Update(_double fDeltaTime)
+_int CThrowOilBullet::Update(_double fDeltaTime)
 {
 	if (__super::Update(fDeltaTime) < 0)
 		return -1;
 
+	if (!m_bIsHavetoMoving)return false;
+
 	m_pColliderCom->Update_ConflictPassedTime(fDeltaTime);
 
-	m_pTransformCom->MovetoDir_bySpeed(m_tDesc.MoveDir.XMVector(), 15 , fDeltaTime);
+	m_fStartTimer += (_float)fDeltaTime;
 
-	m_fTurningTime += fDeltaTime;
-
-	if (m_fTurningTime > 0.00)
+	if (m_fStartTimer > 3)
 	{
-
-		m_fStartTimer += _float(fDeltaTime);
-
-		if (!m_bIsSpout)
-		{
-			_float fGravity = 0;
-			if (m_fJumpPower > 0)
-			{
-				m_fJumpPower = _float(m_fMaxJumpPower * (m_fStartTimer - 1.f)* (m_fStartTimer - 1.f));
-				fGravity = m_fJumpPower;
-
-				if (m_fJumpPower <= 2.0f)
-				{
-					m_fJumpPower = 0;
-					m_fStartTimer = _float(fDeltaTime);
-				}
-			}
-			else
-			{
-				fGravity = _float((m_fStartTimer) * (m_fStartTimer) * -49.0f);
-			}
-
-			m_pTransformCom->MovetoDir_bySpeed(XMVectorSet(0, 1.f, 0, 0), fGravity, fDeltaTime);
-			m_pTransformCom->MovetoDir_bySpeed(m_vSpoutDir.XMVector(), m_fRandPower, fDeltaTime);
-
-			CGameInstance* pInstance = GetSingle(CGameInstance);
-
-			CTerrain* pTerrain = (CTerrain*)(pInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Terrain)));
-
-			_bool bIsOn = false;
-			_uint eTileKinds = Tile_End;
-			pTerrain->PutOnTerrain(&bIsOn, m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), m_vOldPos.XMVector(),nullptr, &eTileKinds);
-
-				m_pTransformCom->Turn_CW(m_vSpoutDir.XMVector(), fDeltaTime * 7);
-
-			if (bIsOn)
-			{
-				m_bIsSpout = true;
-				Set_IsDead();
-			}
-
-		}
+		m_pTransformCom->Set_IsOwnerDead(true);
+		Set_IsDead();
 	}
+
+	m_pTransformCom->MovetoDir_bySpeed(m_tDesc.MoveDir.XMVector(), 25 , fDeltaTime);
+
+	
 
 
 	m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
@@ -121,7 +90,15 @@ _int CCardPiece::Update(_double fDeltaTime)
 		for (_uint i = 0; i < m_pColliderCom->Get_NumColliderBuffer(); i++)
 			m_pColliderCom->Update_Transform(i, m_pTransformCom->Get_WorldMatrix());
 
-		g_pGameInstance->Add_CollisionGroup(CollisionType_MonsterWeapon, this, m_pColliderCom);
+
+		if (!m_tDesc.MeshKinds)
+		{
+			g_pGameInstance->Add_CollisionGroup(CollisionType_MonsterWeapon, this, m_pColliderCom);
+		}
+		else
+		{
+			g_pGameInstance->Add_CollisionGroup(CollisionType_PlayerWeapon, this, m_pColliderCom);
+		}
 
 	}
 
@@ -129,7 +106,7 @@ _int CCardPiece::Update(_double fDeltaTime)
 	return _int();
 }
 
-_int CCardPiece::LateUpdate(_double fDeltaTime)
+_int CThrowOilBullet::LateUpdate(_double fDeltaTime)
 {
 	if (__super::LateUpdate(fDeltaTime) < 0)
 		return -1;
@@ -145,7 +122,7 @@ _int CCardPiece::LateUpdate(_double fDeltaTime)
 	return _int();
 }
 
-_int CCardPiece::Render()
+_int CThrowOilBullet::Render()
 {
 	if (__super::Render() < 0)
 		return -1;
@@ -194,7 +171,7 @@ _int CCardPiece::Render()
 	return _int();
 }
 
-_int CCardPiece::LateRender()
+_int CThrowOilBullet::LateRender()
 {
 	if (__super::LateRender() < 0)
 		return -1;
@@ -202,7 +179,19 @@ _int CCardPiece::LateRender()
 	return _int();
 }
 
-void CCardPiece::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedObj, CCollider * pConflictedCollider, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType)
+void CThrowOilBullet::Set_Position(_float3 vPosition)
+{
+}
+
+void CThrowOilBullet::Set_MovingStart(_float3 vDir)
+{
+	m_tDesc.MoveDir =vDir.Get_Nomalize();
+	m_tDesc.MeshKinds = 1;
+	m_fStartTimer = 0;
+
+}
+
+void CThrowOilBullet::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedObj, CCollider * pConflictedCollider, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType)
 {
 	switch (eConflictedObjCollisionType)
 	{
@@ -215,6 +204,26 @@ void CCardPiece::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflict
 			((CPlayer*)(pConflictedObj))->Add_Dmg_to_Player(rand() % 2 + 3);
 
 		}
+		else
+		{
+			_float Radian =  XMVectorGetX(XMVector3Dot(XMVector3Normalize(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_LOOK)),
+				XMVector3Normalize(m_tDesc.MoveDir.XMVector())));
+
+			if (Radian < 0)
+			{
+				m_pPlayer->Set_UmbrellaReflected(true);
+				GetSingle(CUtilityMgr)->SlowMotionStart();
+				Set_MovingStart(XMVectorSetY(m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0) - XMVectorSetY(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS), 0));
+			}
+		}
+	}
+	break;
+	case Engine::CollisionType_Monster:
+	{
+		pConflictedCollider->Set_Conflicted();
+		GetSingle(CUtilityMgr)->SlowMotionStart();
+		((CMonster*)(pConflictedObj))->Add_Dmg_to_Monster(5);
+		
 	}
 	break;
 	case Engine::CollisionType_Terrain:
@@ -225,14 +234,14 @@ void CCardPiece::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflict
 	}
 }
 
-HRESULT CCardPiece::SetUp_Components()
+HRESULT CThrowOilBullet::SetUp_Components()
 {
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Renderer), TAG_COM(Com_Renderer), (CComponent**)&m_pRendererCom));
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Shader_VNAM), TAG_COM(Com_Shader), (CComponent**)&m_pShaderCom));
 
 
-	FAILED_CHECK(Add_Component(m_eNowSceneNum, TAG_CP(COMPONENTPROTOTYPEID(m_tDesc.MeshKinds)), TAG_COM(Com_Model), (CComponent**)&m_pModel));
+	FAILED_CHECK(Add_Component(m_eNowSceneNum, L"Grunt_StaticSwpanMesh", TAG_COM(Com_Model), (CComponent**)&m_pModel));
 	
 
 	CTransform::TRANSFORMDESC tDesc = {};
@@ -256,51 +265,99 @@ HRESULT CCardPiece::SetUp_Components()
 
 	//Pivot  : 0.030000f , -10.630148f , -10.410143f , 1
 	//size  : 6.080047f , 3.000000f , 3.000000f  
-	ColliderDesc.vScale = _float3(4, 1, 1);
+	ColliderDesc.vScale = _float3(1.5f, 1, 1);
 	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
 	ColliderDesc.vPosition = _float4(0, 0, 0, 1);
 	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
 
 
 
-
+	m_pPlayerTransfrom = (CTransform*)(m_pPlayer->Get_Component(TAG_COM(Com_Transform)));
+	NULL_CHECK_RETURN(m_pPlayerTransfrom, E_FAIL);
 
 
 	return S_OK;
 }
 
-void CCardPiece::Add_JumpPower(_float power)
+HRESULT CThrowOilBullet::SetUp_ParticleDesc()
 {
 
-	m_fJumpPower = m_fMaxJumpPower = power;
+	m_tParticleDesc = PARTICLEDESC();
 
+	m_tParticleDesc.eParticleTypeID = Particle_Straight;
+
+	m_tParticleDesc.FollowingTarget = m_pTransformCom;
+
+	m_tParticleDesc.szTextureProtoTypeTag = TAG_CP(Prototype_Texture_PlayerEffect);
+	m_tParticleDesc.szTextureLayerTag = L"Explosion";
+	m_tParticleDesc.iSimilarLayerNum = 2;
+
+	m_tParticleDesc.TextureChageFrequency = 1;
+	m_tParticleDesc.vTextureXYNum = _float2(5, 4);
+
+	m_tParticleDesc.TotalParticleTime = 7.f;
+	m_tParticleDesc.EachParticleLifeTime = 0.34f;
+
+	m_tParticleDesc.MaxParticleCount = 10;
+
+	m_tParticleDesc.SizeChageFrequency = 2;
+	m_tParticleDesc.ParticleSize = _float3(3);
+	m_tParticleDesc.ParticleSize2 = _float3(0.2f);
+
+	m_tParticleDesc.ColorChageFrequency = 0;
+	m_tParticleDesc.TargetColor = _float4(1.f, 1.f, 1.f, 0.7f);
+	m_tParticleDesc.TargetColor2 = _float4(1.f, 1.f, 1.f, 1.f);
+
+
+	m_tParticleDesc.Particle_Power = 3;
+	m_tParticleDesc.PowerRandomRange = _float2(0.8f, 1.0f);
+
+	m_tParticleDesc.vUp = _float3(0, 1, 0);
+
+	m_tParticleDesc.MaxBoundaryRadius = 3;
+
+	m_tParticleDesc.m_bIsUI = false;
+	m_tParticleDesc.m_bUIDepth = 0;
+
+	m_tParticleDesc.ParticleStartRandomPosMin = _float3(-0.05f, 0.00f, -0.05f);
+	m_tParticleDesc.ParticleStartRandomPosMax = _float3(0.05f, 0.01f, 0.05f);
+
+	m_tParticleDesc.DepthTestON = true;
+	m_tParticleDesc.AlphaBlendON = true;
+
+	m_tParticleDesc.m_fAlphaTestValue = 0.1f;
+	m_tParticleDesc.m_iPassIndex = 3;
+
+	return S_OK;
 }
 
-CCardPiece * CCardPiece::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, void * pArg)
+
+
+CThrowOilBullet * CThrowOilBullet::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, void * pArg)
 {
-	CCardPiece*	pInstance = new CCardPiece(pDevice, pDeviceContext);
+	CThrowOilBullet*	pInstance = new CThrowOilBullet(pDevice, pDeviceContext);
 
 	if (FAILED(pInstance->Initialize_Prototype(pArg)))
 	{
-		MSGBOX("Failed to Created CCardPiece");
+		MSGBOX("Failed to Created CThrowOilBullet");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-CGameObject * CCardPiece::Clone(void * pArg)
+CGameObject * CThrowOilBullet::Clone(void * pArg)
 {
-	CCardPiece*	pInstance = new CCardPiece(*this);
+	CThrowOilBullet*	pInstance = new CThrowOilBullet(*this);
 
 	if (FAILED(pInstance->Initialize_Clone(pArg)))
 	{
-		MSGBOX("Failed to Created CCardPiece");
+		MSGBOX("Failed to Created CThrowOilBullet");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-void CCardPiece::Free()
+void CThrowOilBullet::Free()
 {
 	__super::Free();
 	Safe_Release(m_pTransformCom);

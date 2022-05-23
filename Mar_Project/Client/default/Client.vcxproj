@@ -177,6 +177,9 @@
     <ClInclude Include="..\..\Reference\Inc\imstb_truetype.h" />
     <ClInclude Include="..\bin\ShaderFiles\Shader_Define.hpp" />
     <ClInclude Include="..\public\BreakableObj.h" />
+    <ClInclude Include="..\public\Instance_Particle.h" />
+    <ClInclude Include="..\public\Stage2_SpwanEyePot.h" />
+    <ClInclude Include="..\public\ThrowOilBullet.h" />
     <ClInclude Include="..\public\DustWindCurvedMove.h" />
     <ClInclude Include="..\public\ChainExplosion.h" />
     <ClInclude Include="..\public\ExecutorThron.h" />
@@ -268,6 +271,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\BreakableObj.cpp" />
+    <ClCompile Include="..\private\Instance_Particle.cpp" />
+    <ClCompile Include="..\private\Stage2_SpwanEyePot.cpp" />
+    <ClCompile Include="..\private\ThrowOilBullet.cpp" />
     <ClCompile Include="..\private\DustWindCurvedMove.cpp" />
     <ClCompile Include="..\private\ChainExplosion.cpp" />
     <ClCompile Include="..\private\ExecutorThron.cpp" />
@@ -378,6 +384,7 @@
     <FxCompile Include="..\bin\ShaderFiles\Shader_NonAnimModel.hlsl" />
     <FxCompile Include="..\bin\ShaderFiles\Shader_VtxCubeTex.hlsl" />
     <FxCompile Include="..\bin\ShaderFiles\Shader_VtxNorTex.hlsl" />
+    <FxCompile Include="..\bin\ShaderFiles\Shader_VtxPointInstance.hlsl" />
     <FxCompile Include="..\bin\ShaderFiles\Shader_VtxTex.hlsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

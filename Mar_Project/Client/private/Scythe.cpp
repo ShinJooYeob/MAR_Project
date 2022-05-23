@@ -130,9 +130,12 @@ void CScythe::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedO
 
 	case Engine::CollisionType_Player:
 	{
+		if (!lstrcmp(pConflictedObj->Get_NameTag(), L"Alice"))
+		{
 		pConflictedCollider->Set_Conflicted();
 		((CPlayer*)(pConflictedObj))->Add_Dmg_to_Player(rand()%2 + 3);
 		
+		}
 	}
 		break;
 	case Engine::CollisionType_Terrain:

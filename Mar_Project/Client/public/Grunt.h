@@ -47,6 +47,7 @@ private:
 	_float				m_SpwanMeshScale = 2;
 	_double				m_SpwanedPassedTime = 0;
 	ATTACHBONEMATRIX_PTR m_tCollisionAttachPtr;
+	_bool				m_PatternChecker = false;
 
 
 	PARTICLEDESC		m_tParticleDesc;
@@ -60,7 +61,7 @@ private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ParticleDesc();
 
-	HRESULT DashPatternWander(_double fDeltaTime);
+	HRESULT DashPatternWander(_double fDeltaTime,_float Speed = 1.f);
 
 
 	HRESULT Adjust_AnimMovedTransform(_double fDeltatime);

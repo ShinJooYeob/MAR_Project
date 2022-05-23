@@ -54,7 +54,10 @@ _int CRendererEditSceneUI::Render()
 
 	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ViewMatrix", &XMMatrixIdentity(), sizeof(_float4x4)));
 	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ProjMatrix", &m_ProjMatrix, sizeof(_float4x4)));
+	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vColor", &_float4(1,1,1,1), sizeof(_float4)));
 
+
+	
 	CGameInstance* pInstance = GetSingle(CGameInstance);
 
 	for (auto& EditUIDesc : *m_pVecEditUI)
@@ -83,7 +86,7 @@ _int CRendererEditSceneUI::Render()
 		//m_pShaderCom->Set_Texture("g_DiffuseTexture", EditUIDesc.SRV);
 		FAILED_CHECK(m_pShaderCom->Set_Texture("g_DiffuseTexture", EditUIDesc.SRV));
 
-		FAILED_CHECK(m_pVIBufferCom->Render(m_pShaderCom, 0));
+		FAILED_CHECK(m_pVIBufferCom->Render(m_pShaderCom, 1));
 	}
 
 

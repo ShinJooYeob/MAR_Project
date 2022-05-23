@@ -23,6 +23,8 @@ public:
 	HRESULT Add_Dmg_to_Player(_uint iNowHP,_int iDmg);
 
 	void Set_DrawClockBombUI();
+
+	void Set_DrawFightUI(_bool bBool);
 protected:
 	CRenderer*			m_pRendererCom = nullptr;
 	class CPlayer*			m_pPlayer = nullptr;
@@ -33,12 +35,16 @@ protected:
 	_bool				m_bDrawClockBomb = false;
 	_double				m_PassedClockBombTime = 0;
 
+	_bool				m_bFightUIDraw = false;
+	_double				m_PassedFightUITime = 100;
+
 protected:
 	HRESULT Change_WeaponUI();
 	HRESULT Update_CrossHead();
 	HRESULT Update_GrinderHUD();
 	HRESULT Update_TeapotHUD(_double fDeltaTime);
 	HRESULT Update_ClockBombHUD(_double fDeltaTime);
+	HRESULT Update_FightHUD(_double fDeltaTime);
 
 protected:
 	HRESULT SetUp_Components();
@@ -53,6 +59,7 @@ protected:
 	HRESULT Ready_WeaponGrinderHUD(CGameInstance* pInstance);
 	HRESULT Ready_WeaponTeapotHUD(CGameInstance* pInstance);
 	HRESULT Ready_WeaponClockBombHUD(CGameInstance* pInstance);
+	HRESULT Ready_FightHUD(CGameInstance* pInstance);
 
 	HRESULT Ready_CrossHead(CGameInstance* pInstance);
 

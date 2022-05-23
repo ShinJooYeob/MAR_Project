@@ -206,8 +206,10 @@ HRESULT CScene_Stage3::Ready_Layer_Player(const _tchar * pLayerTag)
 	NULL_CHECK_RETURN(pPlayer, E_FAIL);
 
 	pPlayer->Set_NowSceneNum(SCENE_STAGE3);
-	pPlayer->Renew_Player(_float3(128, 23.134f, 174.085f), _float3(128, 23.134f, 200.085f));
-	//pPlayer->Renew_Player(_float3(128, 20.f, 88) , _float3(128, 20.f, 108));
+	/*executor 앞*/
+	//pPlayer->Renew_Player(_float3(128, 23.134f, 174.085f), _float3(128, 23.134f, 200.085f));
+	/*원래 위치*/
+	pPlayer->Renew_Player(_float3(128, 20.f, 88) , _float3(128, 20.f, 108));
 	
 
 	return S_OK;

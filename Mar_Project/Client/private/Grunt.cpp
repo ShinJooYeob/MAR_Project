@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "..\public\Grunt.h"
 #include "ChainExplosion.h"
+#include "ThrowOilBullet.h"
 
 
 
@@ -43,12 +44,13 @@ HRESULT CGrunt::Initialize_Clone(void * pArg)
 	RandDir.y = 0;
 	m_pTransformCom->LookDir(RandDir.Get_Nomalize());
 
-	m_ePattern = _uint(GetSingle(CUtilityMgr)->RandomFloat(0, 2));
+	m_ePattern = rand()%5;
 
 	__super::SetUp_WanderLook(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK));
 
 	m_iSpwanMeshRend = 0;
-	m_PatternDelayTime = 0;
+	m_PatternDelayTime = GetSingle(CUtilityMgr)->RandomFloat(2, 3);
+	m_bIsPatternFinished = true;
 
 	FAILED_CHECK(SetUp_ParticleDesc());
 
@@ -84,8 +86,8 @@ _int CGrunt::Update(_double fDeltaTime)
 	if (g_pGameInstance->Get_DIKeyState(DIK_O)&DIS_Down)
 		Add_Dmg_to_Monster(1000);
 	
-	m_bSpwanedAnimFinished = true;
-	m_iSpwanMeshRend = 2;
+	//m_bSpwanedAnimFinished = true;
+	//m_iSpwanMeshRend = 2;
 	/*
 	static float testFloat = 1.;
 	if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
@@ -162,13 +164,13 @@ _int CGrunt::Update(_double fDeltaTime)
 		if (!(AnimIndex >= 23 && AnimIndex <= 25 || AnimIndex == 1))
 		{
 
-			if ((!m_bIsPatternFinished || Distance_BetweenPlayer(m_pTransformCom) < 8) && m_PatternDelayTime > 4)
+			if ((!m_bIsPatternFinished || Distance_BetweenPlayer(m_pTransformCom) < 15) && m_PatternDelayTime < 0)
 			{
 				Update_Pattern(fDeltaTime);
 			}
 			else
 			{
-				m_PatternDelayTime += fDeltaTime;
+				m_PatternDelayTime -= fDeltaTime;
 				if (!m_pModel->Get_IsUntillPlay())
 				{
 					m_pModel->Change_AnimIndex(2);
@@ -186,8 +188,6 @@ _int CGrunt::Update(_double fDeltaTime)
 		if (m_iSpwanMeshRend < 2)
 		{
 			FAILED_CHECK(m_pSubModel->Update_AnimationClip(fDeltaTime, m_bIsOnScreen));
-
-			m_SpwanMeshScale = 2;
 
 			if (PlayRate > 0.64285714 && !m_iSpwanMeshRend)
 			{
@@ -215,9 +215,15 @@ _int CGrunt::Update(_double fDeltaTime)
 	Update_DmgCalculate(fDeltaTime);
 
 	m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
-
-
-	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime, m_bIsOnScreen));
+	_uint iAnimIndex = m_pModel->Get_NowAnimIndex();
+	if ((m_ePattern == 2 || m_ePattern == 3) && (iAnimIndex == 2))
+	{
+		FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime * 1.5f, m_bIsOnScreen));
+	}
+	else
+	{
+		FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime, m_bIsOnScreen));
+	}
 	FAILED_CHECK(Adjust_AnimMovedTransform(fDeltaTime));
 	
 	if (m_bIsOnScreen)
@@ -323,8 +329,11 @@ void CGrunt::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedOb
 	{
 		if (iMyColliderIndex == 2)
 		{
-			pConflictedCollider->Set_Conflicted();
-			((CPlayer*)(pConflictedObj))->Add_Dmg_to_Player(rand() % 2 + 3);
+			if (!lstrcmp(pConflictedObj->Get_NameTag(), L"Alice"))
+			{
+				pConflictedCollider->Set_Conflicted();
+				((CPlayer*)(pConflictedObj))->Add_Dmg_to_Player(rand() % 2 + 3);
+			}
 		}
 	}
 	break;
@@ -397,11 +406,14 @@ _int CGrunt::Update_Pattern(_double fDeltaTime)
 	m_PatternPassedTime += fDeltaTime;
 	if (m_bIsPatternFinished)
 	{
-		m_ePattern += 1;
 
+		m_ePattern += 1;
 		if (m_ePattern > 4) m_ePattern = 0;
+
+
 		m_bIsPatternFinished = false;
 		m_PatternPassedTime = 0;
+		m_PatternChecker = false;
 		//m_pModel->Change_AnimIndex(2);
 	}
 
@@ -417,7 +429,7 @@ _int CGrunt::Update_Pattern(_double fDeltaTime)
 			if (!m_pModel->Get_IsUntillPlay())
 			{
 				m_bIsPatternFinished = true;
-				m_PatternDelayTime = 0;
+				m_PatternDelayTime = GetSingle(CUtilityMgr)->RandomFloat(3,6);
 				m_PatternPassedTime = 0;
 			}
 		}
@@ -460,7 +472,7 @@ _int CGrunt::Update_Pattern(_double fDeltaTime)
 			{
 				m_bIsPatternFinished = true;
 				m_PatternPassedTime = 0; 
-				m_PatternDelayTime = 0;
+				m_PatternDelayTime = GetSingle(CUtilityMgr)->RandomFloat(3, 6);
 
 			}
 		}
@@ -468,33 +480,68 @@ _int CGrunt::Update_Pattern(_double fDeltaTime)
 
 		break;
 	case 2:
-		if (!m_PatternPassedTime)
+
+		if (!m_PatternChecker && m_PatternPassedTime < 5 && Distance_BetweenPlayer(m_pTransformCom) > 3)
 		{
-			m_pModel->Change_AnimIndex_UntilNReturn(9, 11, 0,0.15, true);
+			FAILED_CHECK(DashPatternWander(fDeltaTime, 2.f));
+
+			m_vLookDir = XMVector3Normalize(XMVectorSetY(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS) - m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0));
+			m_pTransformCom->LookDir(m_vLookDir.XMVector() * 0.05f + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * 0.95f);
 		}
 		else
 		{
-			if (!m_pModel->Get_IsUntillPlay())
+			if (!m_PatternChecker)
 			{
-				m_bIsPatternFinished = true;
-				m_PatternPassedTime = 0; m_PatternDelayTime = 0;
+				m_PatternChecker = true;
+				m_pModel->Change_AnimIndex_UntilNReturn(9, 11, 0, 0.15, true);
 			}
+			else
+			{
+				if (!m_pModel->Get_IsUntillPlay())
+				{
+					m_bIsPatternFinished = true;
+					m_PatternPassedTime = 0;
+					m_PatternDelayTime = GetSingle(CUtilityMgr)->RandomFloat(3, 6);
+				}
+			}
+
+
 		}
+
+
+
 
 		break;
 	case 3:
-		if (!m_PatternPassedTime)
+
+		if (!m_PatternChecker && m_PatternPassedTime < 5 && Distance_BetweenPlayer(m_pTransformCom) > 3)
 		{
-			m_pModel->Change_AnimIndex_UntilNReturn(12, 13, 0,0.15, true);
+			FAILED_CHECK(DashPatternWander(fDeltaTime,2.f));
+
+			m_vLookDir = XMVector3Normalize(XMVectorSetY(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS) - m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0));
+			m_pTransformCom->LookDir(m_vLookDir.XMVector() * 0.05f + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * 0.95f);
 		}
 		else
 		{
-			if (!m_pModel->Get_IsUntillPlay())
+			if (!m_PatternChecker)
 			{
-				m_bIsPatternFinished = true;
-				m_PatternPassedTime = 0; m_PatternDelayTime = 0;
+				m_PatternChecker = true;			
+				m_pModel->Change_AnimIndex_UntilNReturn(12, 13, 0, 0.15, true);
+
 			}
+			else
+			{
+				if (!m_pModel->Get_IsUntillPlay())
+				{
+					m_bIsPatternFinished = true;
+					m_PatternPassedTime = 0;
+					m_PatternDelayTime = GetSingle(CUtilityMgr)->RandomFloat(3, 6);
+				}
+			}
+
+
 		}
+
 
 		break;
 
@@ -524,6 +571,199 @@ _int CGrunt::Update_Pattern(_double fDeltaTime)
 
 
 	return _int();
+}
+
+
+HRESULT CGrunt::Adjust_AnimMovedTransform(_double fDeltatime)
+{
+	if (!m_bSpwanedAnimFinished) return S_FALSE;
+
+	_uint iNowAnimIndex = m_pModel->Get_NowAnimIndex();
+	_double PlayRate = m_pModel->Get_PlayRate();
+
+	if (iNowAnimIndex != m_iOldAnimIndex || PlayRate > 0.95)
+		m_iAdjMovedIndex = 0;
+
+
+	if (PlayRate <= 0.95)
+	{
+		switch (iNowAnimIndex)
+		{
+		case 4:
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.01)
+			{
+
+				m_pParticleTargetTransformCom->Set_IsOwnerDead(true);
+
+				CChainExplosion::THRONDESC tDesc;
+
+				tDesc.MeshKinds = 0;
+				tDesc.MoveDir = m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK);
+				tDesc.vPosition = m_pParticleTargetTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), L"Prototype_ChainExplosion", &tDesc);
+
+				m_iAdjMovedIndex++;
+			}
+
+			break;
+
+		case 5:
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.01)
+			{
+
+				m_pParticleTargetTransformCom->Set_IsOwnerDead(false);
+				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_tParticleDesc);
+				m_iAdjMovedIndex++;
+
+			}
+			if (PlayRate > 0.5)
+			{
+				m_vLookDir = XMVector3Normalize(XMVectorSetY(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS) - m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0));
+				m_pTransformCom->LookDir(m_vLookDir.XMVector() * 0.05f + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * 0.95f);
+
+			}
+
+			break;
+
+		case 8:
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.01)
+			{
+
+				m_pParticleTargetTransformCom->Set_IsOwnerDead(true);
+
+				CChainExplosion::THRONDESC tDesc;
+
+				tDesc.MeshKinds = 0;
+				tDesc.MoveDir = m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK);
+				tDesc.vPosition = m_pParticleTargetTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), L"Prototype_ChainExplosion", &tDesc);
+
+				m_iAdjMovedIndex++;
+			}
+
+
+			break;
+
+		case 11:
+		case 13:
+
+		{
+			m_pParticleTargetTransformCom->Scaled_All(_float3(_float(3 -((fabs(0.5f - PlayRate) * 4)))));
+		}
+		break;
+
+		case 12:
+
+		{
+			if (PlayRate > 0.5)
+			{
+				m_pParticleTargetTransformCom->Scaled_All(_float3(1));
+			}
+			else
+			{
+				m_pParticleTargetTransformCom->Scaled_All(_float3(_float(3 - ((fabs(0.25f - PlayRate) * 8)))));
+			}
+		}
+		break;
+
+
+		case 15:
+
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.01)
+			{
+				m_pParticleTargetTransformCom->Set_IsOwnerDead(false);
+				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_tParticleDesc);
+				m_iAdjMovedIndex++;
+			}
+
+
+			break;
+		case 21:
+
+			if (PlayRate > 0.3030 && PlayRate < 0.80)
+			{
+				m_vLookDir = XMVector3Normalize(XMVectorSetY(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS) - m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0));
+				m_pTransformCom->LookDir(m_vLookDir.XMVector() * 0.05f + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * 0.95f);
+			}
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.80)
+			{
+				CThrowOilBullet::BREAKEDGAZBODESC tDesc;
+
+				tDesc.vPosition = m_pParticleTargetTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+				tDesc.MoveDir = m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * 0.8f + m_pTransformCom->Get_MatrixState(CTransform::STATE_RIGHT) * 0.2f;
+				tDesc.MeshKinds = 0;
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), L"Prototype_ThrowOilBullet", &tDesc);
+
+				m_iAdjMovedIndex++;
+			}
+
+			if (m_iAdjMovedIndex == 1 && PlayRate > 0.878787)
+			{
+				CThrowOilBullet::BREAKEDGAZBODESC tDesc;
+
+				tDesc.vPosition = m_pParticleTargetTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+				tDesc.MoveDir = m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK);
+				tDesc.MeshKinds = 0;
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), L"Prototype_ThrowOilBullet",&tDesc);
+
+				m_iAdjMovedIndex++;
+			}
+			if (m_iAdjMovedIndex == 2 && PlayRate > 0.92)
+			{
+				CThrowOilBullet::BREAKEDGAZBODESC tDesc;
+
+				tDesc.vPosition = m_pParticleTargetTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+				tDesc.MoveDir = m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * 0.8f + m_pTransformCom->Get_MatrixState(CTransform::STATE_RIGHT) * -0.2f;
+				tDesc.MeshKinds = 0;
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), L"Prototype_ThrowOilBullet", &tDesc);
+
+				m_pParticleTargetTransformCom->Set_IsOwnerDead(true);
+				m_iAdjMovedIndex++;
+			}
+
+
+			break;
+
+
+
+		}
+	}
+	else
+	{
+		switch (iNowAnimIndex)
+		{
+		case 15:
+		{
+			m_pModel->Change_AnimIndex_UntilTo(21, 22, 0.15, true);
+
+		}
+		break;
+
+		case 11:
+		case 12:
+		case 13:
+
+			m_pParticleTargetTransformCom->Scaled_All(_float3(1));
+
+			break;
+
+
+		case 22:
+		{
+			m_bIsPatternFinished = true;
+			m_PatternPassedTime = 0;
+			m_PatternDelayTime = GetSingle(CUtilityMgr)->RandomFloat(3, 6);
+
+			m_pModel->Change_AnimIndex(2, 0.15, true);
+
+		}
+		break;
+		}
+	}
+
+	m_iOldAnimIndex = iNowAnimIndex;
+	return S_OK;
 }
 
 void CGrunt::Add_Dmg_to_Monster(_float iDmgAmount)
@@ -639,8 +879,6 @@ HRESULT CGrunt::SetUp_ParticleDesc()
 	m_tParticleDesc.m_bIsUI = false;
 	m_tParticleDesc.m_bUIDepth = 0;
 
-	//m_tParticleDesc.ParticleStartRandomPosMin = _float3(-0.05f, 0.7f, -0.05f);
-	//m_tParticleDesc.ParticleStartRandomPosMax = _float3(0.05f, 0.75f, 0.05f);
 	m_tParticleDesc.ParticleStartRandomPosMin = _float3(-0.05f, 0.00f, -0.05f);
 	m_tParticleDesc.ParticleStartRandomPosMax = _float3(0.05f, 0.01f, 0.05f);
 
@@ -653,7 +891,7 @@ HRESULT CGrunt::SetUp_ParticleDesc()
 	return S_OK;
 }
 
-HRESULT CGrunt::DashPatternWander(_double fDeltaTime)
+HRESULT CGrunt::DashPatternWander(_double fDeltaTime , _float Speed)
 {
 	if (!(Check_Movable_Terrain(m_pTransformCom, m_vLookDir.XMVector(), 0.1f)))
 	{
@@ -662,132 +900,12 @@ HRESULT CGrunt::DashPatternWander(_double fDeltaTime)
 	else
 	{
 		m_pTransformCom->LookDir(m_vLookDir.XMVector() * 0.15f + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * 0.85f);
-		m_pTransformCom->MovetoDir((m_vLookDir.XMVector()), fDeltaTime);
+		m_pTransformCom->MovetoDir((m_vLookDir.XMVector()), fDeltaTime * Speed);
 
 	}
-	return S_OK;
-
 	return S_OK;
 }
 
-HRESULT CGrunt::Adjust_AnimMovedTransform(_double fDeltatime)
-{
-	if (!m_bSpwanedAnimFinished) return S_FALSE;
-
-	_uint iNowAnimIndex = m_pModel->Get_NowAnimIndex();
-	_double PlayRate = m_pModel->Get_PlayRate();
-
-	if (iNowAnimIndex != m_iOldAnimIndex || PlayRate > 0.95)
-		m_iAdjMovedIndex = 0;
-
-
-	if (PlayRate <= 0.95)
-	{
-		switch (iNowAnimIndex)
-		{
-		case 4:
-			if (m_iAdjMovedIndex == 0 && PlayRate > 0.01)
-			{
-
-				m_pParticleTargetTransformCom->Set_IsOwnerDead(true);
-
-				CChainExplosion::THRONDESC tDesc;
-
-				tDesc.MeshKinds = 0;
-				tDesc.MoveDir = m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK);
-				tDesc.vPosition = m_pParticleTargetTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
-
-				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), L"Prototype_ChainExplosion", &tDesc);
-
-				m_iAdjMovedIndex++;
-			}
-
-			break;
-
-		case 5:
-			if (m_iAdjMovedIndex == 0 && PlayRate > 0.01)
-			{
-
-				m_pParticleTargetTransformCom->Set_IsOwnerDead(false);
-				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_tParticleDesc);
-				m_iAdjMovedIndex++;
-
-			}
-			break;
-
-		case 8:
-			if (m_iAdjMovedIndex == 0 && PlayRate > 0.01)
-			{
-
-				m_pParticleTargetTransformCom->Set_IsOwnerDead(true);
-
-				CChainExplosion::THRONDESC tDesc;
-
-				tDesc.MeshKinds = 0;
-				tDesc.MoveDir = m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK);
-				tDesc.vPosition = m_pParticleTargetTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
-
-				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), L"Prototype_ChainExplosion", &tDesc);
-
-				m_iAdjMovedIndex++;
-			}
-
-
-			break;
-
-		case 15:
-
-			if (m_iAdjMovedIndex == 0 && PlayRate > 0.01)
-			{
-				m_pParticleTargetTransformCom->Set_IsOwnerDead(false);
-				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_tParticleDesc);
-				m_iAdjMovedIndex++;
-			}
-
-
-			break;
-		case 21:
-
-			if (m_iAdjMovedIndex == 0 && PlayRate > 0.878787)
-			{
-				m_pParticleTargetTransformCom->Set_IsOwnerDead(true);
-				m_iAdjMovedIndex++;
-			}
-
-
-			break;
-
-
-			
-		}
-	}
-	else
-	{
-		switch (iNowAnimIndex)
-		{
-		case 15:
-			{
-				m_pModel->Change_AnimIndex_UntilTo(21, 22, 0.15, true);
-
-			}
-			break;
-
-		case 22:
-		{
-			m_bIsPatternFinished = true;
-			m_PatternPassedTime = 0;
-			m_PatternDelayTime = 0;
-
-			m_pModel->Change_AnimIndex(2, 0.15, true);
-
-		}
-		break;
-		}
-	}
-
-	m_iOldAnimIndex = iNowAnimIndex;
-	return S_OK;
-}
 
 CGrunt * CGrunt::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, void * pArg)
 {

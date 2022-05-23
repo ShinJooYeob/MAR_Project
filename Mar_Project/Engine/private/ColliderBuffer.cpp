@@ -271,6 +271,8 @@ void CColliderBuffer::Add_ChildBufferIndex(_uint iIndex)
 #ifdef _DEBUG
 _int CColliderBuffer::Render()
 {
+	m_pDeviceContext->GSSetShader(nullptr, nullptr, 0);
+
 	m_pDeviceContext->IASetInputLayout(m_pInputLayout);
 
 	m_pBasicEffect->SetWorld(XMMatrixIdentity());

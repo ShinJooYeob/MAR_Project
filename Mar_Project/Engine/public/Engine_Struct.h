@@ -3,6 +3,31 @@
 namespace Engine
 {
 
+	typedef struct tagVertex_Point
+	{
+		XMFLOAT3			vPosition;
+		float				fPSize;
+	}VTXPOINT;
+
+	typedef struct ENGINE_DLL tagVertex_Point_Instance_Matrix_Declaration
+	{
+		static const unsigned int iNumElements = 8;
+		static const D3D11_INPUT_ELEMENT_DESC	Elements[iNumElements];
+	}VTXPOINT_INSTMAT_DECLARATION;
+
+	typedef struct tagVertex_Instance_Matrix
+	{
+		XMFLOAT4			vRight;
+		XMFLOAT4			vUp;
+		XMFLOAT4			vLook;
+		XMFLOAT4			vTranslation;
+
+		XMFLOAT4			vUV_WHSize;
+		XMFLOAT4			vColor;
+	}VTXINSTMAT;
+
+
+
 	typedef struct tagAttachBoneMatrixPtr
 	{
 		_float4x4*			pUpdatedNodeMat;

@@ -16,7 +16,7 @@ public:
 	enum eWeaponState
 	{
 		Weapon_None = 0, Weapon_Knife = 47, Weapon_Grinder = 73, Weapon_Horse = 89, Weapon_Teapot = 113, Weapon_Umbrella = 134, Weapon_Giant= 140, Weapon_End
-		//Weapon_None = 0, Weapon_Knife =88888888, Weapon_Grinder = 45651, Weapon_Horse = 387137, Weapon_Teapot = 123123, Weapon_Umbrella = 51613, Weapon_Giant= 47, Weapon_End
+		//Weapon_None = 0, Weapon_Knife =88888888, Weapon_Grinder = 45651, Weapon_Horse = 387137, Weapon_Teapot = 123123, Weapon_Umbrella = 47, Weapon_Giant= 41616516, Weapon_End
 	};
 
 
@@ -74,6 +74,8 @@ public:
 
 	void Set_IsVenting(_bool bBool,_float3 vTargetLook);
 	void Set_PlayerDeadAnimStart();
+
+	void Set_UmbrellaReflected(_bool	bBool);
 private:
 	CShader*			m_pShaderCom = nullptr;
 	CRenderer*			m_pRendererCom = nullptr;
@@ -100,6 +102,10 @@ private:
 	_float3				m_vDashDir;
 	_float				m_fDashPower= 0;
 	_float				m_fDashPassedTime = 0;
+
+	/*For Umbrella*/
+	_bool				m_bUmbrellaReflected = false;
+	_double				m_ReflectPassedTime = 0;
 
 	/*For Bomb*/
 	_double				m_BombCoolTime = 0;

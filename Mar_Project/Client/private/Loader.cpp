@@ -15,6 +15,8 @@
 #include "Umbrella.h"
 #include "ClockBomb.h"
 
+#include "Instance_Particle.h"
+
 //Editor
 #include "ESCursor.h"
 #include "Camera_Editor.h"
@@ -44,6 +46,7 @@
 #include "SceneChageTriger.h"
 #include "Stage1_SpwanGrunt.h"
 #include "Stage1_SpwanWasp.h"
+#include "Stage2_SpwanEyePot.h"
 #include "Stage3_SpwanExecutor.h"
 
 #include "StaticMapObject.h"
@@ -60,6 +63,7 @@
 
 #include "Grunt.h"
 #include "ChainExplosion.h"
+#include "ThrowOilBullet.h"
 
 
 #include "WaspArrow.h"
@@ -650,6 +654,10 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 		CGrunt::Create(m_pDevice, m_pDeviceContext)));
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(L"Prototype_ChainExplosion",
 		CChainExplosion::Create(m_pDevice, m_pDeviceContext)));
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(L"Prototype_ThrowOilBullet",
+		CThrowOilBullet::Create(m_pDevice, m_pDeviceContext)));
+
+	
 
 	
 
@@ -673,6 +681,9 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(L"Stage1_SpwanWasp",
 		CStage1_SpwanWasp::Create(m_pDevice, m_pDeviceContext)));
 
+
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(L"Test",
+		CInstance_Particle::Create(m_pDevice, m_pDeviceContext)));
 	
 #pragma endregion
 	RELEASE_INSTANCE(CGameInstance);
@@ -884,6 +895,10 @@ HRESULT CLoader::Load_Scene_Stage2(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_Presser),
 		CPresserObj::Create(m_pDevice, m_pDeviceContext)));
 
+
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(L"Stage2_SpwanEyePot",
+		CStage2_SpwanEyePot::Create(m_pDevice, m_pDeviceContext)));
+	
 
 #pragma endregion
 

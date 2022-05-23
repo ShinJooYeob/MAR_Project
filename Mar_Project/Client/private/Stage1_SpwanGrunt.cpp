@@ -5,6 +5,7 @@
 #include "Camera_Main.h"
 #include "Grunt.h"
 #include "JumpPad.h"
+#include "GamePlayUI.h"
 
 
 
@@ -175,6 +176,7 @@ _int CStage1_SpwanGrunt::Update(_double fDeltaTime)
 				if (!m_JumpPadSpwanCount)
 				{
 
+					((CGamePlayUI*)(g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_UI_GamePlay))))->Set_DrawFightUI(false);
 
 					CCamera_Main* pCamera = (CCamera_Main*)g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Camera_Main));
 					NULL_CHECK_BREAK(pCamera);
@@ -343,6 +345,7 @@ void CStage1_SpwanGrunt::CollisionTriger(_uint iMyColliderIndex, CGameObject * p
 		m_pPlayer->Set_ReturnPos(_float3(144.58f, 10.f, 129.779f), _float3(160.f, 2.8701f, 147.668f));
 		m_SpwanPassedTime = 0;
 
+		((CGamePlayUI*)(g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_UI_GamePlay))))->Set_DrawFightUI(true);
 
 		CCamera_Main* pCamera = (CCamera_Main*)g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Camera_Main));
 		NULL_CHECK_BREAK(pCamera);

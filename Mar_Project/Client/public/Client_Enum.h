@@ -608,6 +608,7 @@ enum COMPONENTPROTOTYPEID
 	Prototype_Shader_VNCT,
 	Prototype_Shader_VAM,
 	Prototype_Shader_VNAM,
+	Prototype_Shader_VTXPOINTINST,
 	//////////////////////////////////////////////////////////////////////////
 	Prototype_VIBuffer_Rect,
 	Prototype_VIBuffer_Cube,
@@ -615,6 +616,8 @@ enum COMPONENTPROTOTYPEID
 	Prototype_VIBuffer_Terrain_2,
 	Prototype_VIBuffer_Terrain_3,
 	Prototype_VIBuffer_Terrain_Edit,
+	Prototype_VIBuffer_Point_Instance,
+
 	//////////////////////////////////////////////////////////////////////////
 
 	Prototype_Mesh_None,
@@ -855,7 +858,8 @@ enum COMPONENTPROTOTYPEID
 	Prototype_Texture_EditScene,
 	Prototype_Texture_Terrain,
 	Prototype_Texture_Edit_Terrain,
-	Prototype_Texture_DefaultUI,
+			Prototype_Texture_DefaultUI,
+			Prototype_Texture_InstanceParticleTex,
 	Prototype_Texture_ScreenEffectUI,
 	Prototype_Texture_PlayerEffect,
 	Prototype_Texture_GamePlayScene,
@@ -901,7 +905,9 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 	case Prototype_Shader_VNAM:
 		return TEXT("Prototype_Component_Shader_VTXNONANIMMODEL");
 		break;
-
+	case Prototype_Shader_VTXPOINTINST:
+		return TEXT("Prototype_Component_Shader_VTXPOINTINST");
+		break;
 
 
 	case Prototype_VIBuffer_Rect:
@@ -912,6 +918,10 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 		return TEXT("Prototype_Component_VIBuffer_Cube");
 		break;
 
+	case Prototype_VIBuffer_Point_Instance:
+		return TEXT("Prototype_VIBuffer_Point_Instance");
+		break;
+		
 
 		//메쉬////////////////////////////////////////////////////////////////////////
 
@@ -1600,7 +1610,10 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 		case Prototype_Texture_MskTex:
 			return TEXT("Prototype_Texture_MskTex");
 			break;
-				
+		case Prototype_Texture_InstanceParticleTex:
+			return TEXT("Prototype_Texture_InstanceParticleTex");
+			break;
+			
 				//메쉬////////////////////////////////////////////////////////////////////////
 
 

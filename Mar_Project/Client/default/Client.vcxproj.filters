@@ -256,9 +256,6 @@
     <Filter Include="01.GameObject\09.TriggerCollider\02.Stage1_SpwanWasp">
       <UniqueIdentifier>{93d8e8af-1b29-4cc7-a339-f4164628037f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.GameObject\09.TriggerCollider\03.Stage3_SpwanExecutor">
-      <UniqueIdentifier>{a59ec47e-1508-4978-a0fe-04924e8ce9a6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.GameObject\03.Monster\99.MonsterWeapon\05.Executor">
       <UniqueIdentifier>{62070e70-1213-4bfc-8a63-e5cb404c6594}</UniqueIdentifier>
     </Filter>
@@ -282,6 +279,18 @@
     </Filter>
     <Filter Include="01.GameObject\03.Monster\99.MonsterWeapon\01.Grunt\01.ChainExplosion">
       <UniqueIdentifier>{7f563d40-a625-4ce8-9f26-d28da6b335e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\03.Monster\99.MonsterWeapon\01.Grunt\00.ThrowOilBullet">
+      <UniqueIdentifier>{8ad9a18f-40eb-48a0-84a3-8d9c7df7697c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\09.TriggerCollider\04.Stage3_SpwanExecutor">
+      <UniqueIdentifier>{a59ec47e-1508-4978-a0fe-04924e8ce9a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\09.TriggerCollider\03.Stage2_SpwanEyePot">
+      <UniqueIdentifier>{2fc6aac2-244f-44c4-a1b1-1e4e186bc5fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\98.Particle\99.Instance_Particle">
+      <UniqueIdentifier>{7fe48969-1984-4132-9366-eee67ed4c2ec}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -556,7 +565,7 @@
       <Filter>01.GameObject\09.TriggerCollider\02.Stage1_SpwanWasp</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Stage3_SpwanExecutor.h">
-      <Filter>01.GameObject\09.TriggerCollider\03.Stage3_SpwanExecutor</Filter>
+      <Filter>01.GameObject\09.TriggerCollider\04.Stage3_SpwanExecutor</Filter>
     </ClInclude>
     <ClInclude Include="..\public\CardPeice.h">
       <Filter>01.GameObject\03.Monster\99.MonsterWeapon\05.Executor\01.CardPiece</Filter>
@@ -578,6 +587,15 @@
     </ClInclude>
     <ClInclude Include="..\public\ChainExplosion.h">
       <Filter>01.GameObject\03.Monster\99.MonsterWeapon\01.Grunt\01.ChainExplosion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\ThrowOilBullet.h">
+      <Filter>01.GameObject\03.Monster\99.MonsterWeapon\01.Grunt\00.ThrowOilBullet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Stage2_SpwanEyePot.h">
+      <Filter>01.GameObject\09.TriggerCollider\03.Stage2_SpwanEyePot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Instance_Particle.h">
+      <Filter>01.GameObject\98.Particle\99.Instance_Particle</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -828,7 +846,7 @@
       <Filter>01.GameObject\09.TriggerCollider\02.Stage1_SpwanWasp</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Stage3_SpwanExecutor.cpp">
-      <Filter>01.GameObject\09.TriggerCollider\03.Stage3_SpwanExecutor</Filter>
+      <Filter>01.GameObject\09.TriggerCollider\04.Stage3_SpwanExecutor</Filter>
     </ClCompile>
     <ClCompile Include="..\private\CardPeice.cpp">
       <Filter>01.GameObject\03.Monster\99.MonsterWeapon\05.Executor\01.CardPiece</Filter>
@@ -850,6 +868,15 @@
     </ClCompile>
     <ClCompile Include="..\private\ChainExplosion.cpp">
       <Filter>01.GameObject\03.Monster\99.MonsterWeapon\01.Grunt\01.ChainExplosion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\ThrowOilBullet.cpp">
+      <Filter>01.GameObject\03.Monster\99.MonsterWeapon\01.Grunt\00.ThrowOilBullet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Stage2_SpwanEyePot.cpp">
+      <Filter>01.GameObject\09.TriggerCollider\03.Stage2_SpwanEyePot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Instance_Particle.cpp">
+      <Filter>01.GameObject\98.Particle\99.Instance_Particle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -889,6 +916,9 @@
       <Filter>04.Shader</Filter>
     </FxCompile>
     <FxCompile Include="..\bin\ShaderFiles\Shader_AnimModel.hlsl">
+      <Filter>04.Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\bin\ShaderFiles\Shader_VtxPointInstance.hlsl">
       <Filter>04.Shader</Filter>
     </FxCompile>
   </ItemGroup>

@@ -185,8 +185,11 @@ void CExecutorThron::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConf
 
 	case Engine::CollisionType_Player:
 	{
-		pConflictedCollider->Set_Conflicted();
-		((CPlayer*)(pConflictedObj))->Add_Dmg_to_Player(rand() % 2 + 3);
+		if (!lstrcmp(pConflictedObj->Get_NameTag(), L"Alice"))
+		{
+			pConflictedCollider->Set_Conflicted();
+			((CPlayer*)(pConflictedObj))->Add_Dmg_to_Player(rand() % 2 + 3);
+		}
 
 	}
 	break;

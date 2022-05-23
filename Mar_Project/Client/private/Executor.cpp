@@ -66,8 +66,11 @@ _int CExecutor::Update(_double fDeltaTime)
 	//walk 2.8 / 0.05f
 
 	//run 5.5 / 0.1
-
-	if (m_bSpwanAnimFinished)
+	if (m_bDeathAnimStart)
+	{
+		Set_IsDead();
+	}
+	else if (m_bSpwanAnimFinished)
 	{
 
 

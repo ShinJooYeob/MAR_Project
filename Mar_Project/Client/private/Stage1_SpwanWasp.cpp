@@ -5,6 +5,7 @@
 #include "Camera_Main.h"
 #include "WaspInk.h"
 #include "JumpPad.h"
+#include "GamePlayUI.h"
 
 
 
@@ -79,6 +80,8 @@ _int CStage1_SpwanWasp::Update(_double fDeltaTime)
 
 			if (MonsterLayer->size() == 0)
 			{
+				((CGamePlayUI*)(g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_UI_GamePlay))))->Set_DrawFightUI(false);
+
 				CCamera_Main* pCamera = (CCamera_Main*)g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Camera_Main));
 				NULL_CHECK_BREAK(pCamera);
 
@@ -197,6 +200,7 @@ void CStage1_SpwanWasp::CollisionTriger(_uint iMyColliderIndex, CGameObject * pC
 		m_SpwanPassedTime = 0;
 
 
+		((CGamePlayUI*)(g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_UI_GamePlay))))->Set_DrawFightUI(true);
 		CCamera_Main* pCamera = (CCamera_Main*)g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Camera_Main));
 		NULL_CHECK_BREAK(pCamera);
 

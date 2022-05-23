@@ -191,7 +191,19 @@ PS_OUT PS_FADE(PS_IN In)
 
 	return Out;
 }
+PS_OUT PS_MAIN_ALLMOSTDISCARD(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
 
+	Out.vColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);//vector(1.f, 0.f, 0.f, 1.f);rgba
+
+	if (Out.vColor.a < 0.5f)
+		discard;
+
+
+
+	return Out;
+}
 
 
 
@@ -279,5 +291,15 @@ technique11		DefaultTechnique
 		PixelShader = compile ps_5_0 PS_FADE();
 	}
 
-	
+	pass UIALMOSTDISCARD			//8
+	{
+		SetBlendState(AlphaBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(NonZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_ccw);
+
+		VertexShader = compile vs_5_0 VS_MAIN_RECT();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_ALLMOSTDISCARD();
+	}
+
 }

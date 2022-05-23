@@ -1,32 +1,32 @@
 #include "stdafx.h"
-#include "..\public\Stage3_SpwanExecutor.h"
+#include "..\public\Stage2_SpwanEyePot.h"
 #include "Player.h"
 #include "Terrain.h"
 #include "Camera_Main.h"
-#include "Executor.h"
+#include "Eyepot.h"
+#include "ButtonPad.h"
 #include "GamePlayUI.h"
 
 
-
-CStage3_SpwanExecutor::CStage3_SpwanExecutor(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
+CStage2_SpwanEyePot::CStage2_SpwanEyePot(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
 	:CMapObject(pDevice,pDeviceContext)
 {
 }
 
-CStage3_SpwanExecutor::CStage3_SpwanExecutor(const CStage3_SpwanExecutor & rhs)
+CStage2_SpwanEyePot::CStage2_SpwanEyePot(const CStage2_SpwanEyePot & rhs)
 	: CMapObject(rhs)
 {
 }
 
 
 
-HRESULT CStage3_SpwanExecutor::Initialize_Prototype(void * pArg)
+HRESULT CStage2_SpwanEyePot::Initialize_Prototype(void * pArg)
 {
 	FAILED_CHECK(__super::Initialize_Prototype(pArg));
 	return S_OK;
 }
 
-HRESULT CStage3_SpwanExecutor::Initialize_Clone(void * pArg)
+HRESULT CStage2_SpwanEyePot::Initialize_Clone(void * pArg)
 {
 	FAILED_CHECK(__super::Initialize_Clone(pArg));
 
@@ -37,8 +37,8 @@ HRESULT CStage3_SpwanExecutor::Initialize_Clone(void * pArg)
 
 	FAILED_CHECK(SetUp_Components());
 
-	FAILED_CHECK(Load_ActionCam(L"Stage3_CameAction_5"));
-	FAILED_CHECK(Load_ActionCam2(L"Stage1_CameAction_3"));
+	FAILED_CHECK(Load_ActionCam(L"Stage2_CameAction_0"));
+	FAILED_CHECK(Load_ActionCam2(L"Stage2_CameAction_1"));
 
 	
 	return S_OK;
@@ -46,7 +46,7 @@ HRESULT CStage3_SpwanExecutor::Initialize_Clone(void * pArg)
 
 
 
-_int CStage3_SpwanExecutor::Update(_double fDeltaTime)
+_int CStage2_SpwanEyePot::Update(_double fDeltaTime)
 {
 	if (__super::Update(fDeltaTime) < 0)
 		return -1;
@@ -55,84 +55,87 @@ _int CStage3_SpwanExecutor::Update(_double fDeltaTime)
 
 	if (m_bSpwanStart)
 	{
-		static _uint iChecker = 0;
-		if (m_SpwanPassedTime < 30)
+		if (m_SpwanPassedTime < 10)
 		{
+			static _uint iChecker = 0;
 			m_SpwanPassedTime += fDeltaTime;
 
-			if (iChecker ==0 && m_SpwanPassedTime > 2.5)
+			if (iChecker ==0 && m_SpwanPassedTime > 2.)
 			{
-				iChecker++;
-				FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE3, TAG_LAY(Layer_Monster), TAG_OP(Prototype_Executor), &_float3(128, 13.28f, 256)));
-			
-			/*	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE3, TAG_LAY(Layer_Monster), TAG_OP(Prototype_Executor), &_float3(128, 27.39f, 226.782f)));
-				Set_IsDead();
-				*/
-
-			}
-			else if (iChecker == 1 && m_SpwanPassedTime > 15.4)
-			{
-
-				GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeOutIn, 1, { 0,0,0,1 });
-
+				GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 1.2f, _float4(0.1f));
 				iChecker++;
 
 			}
-			else if (iChecker == 2 && m_SpwanPassedTime > 17.4)
+			else if (iChecker == 1 && m_SpwanPassedTime > 2.8)
 			{
-				GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeOutIn, 1, { 0,0,0,1 });
-				iChecker++;
+				list<CGameObject*>* MonsterLayer = g_pGameInstance->Get_ObjectList_from_Layer(SCENE_STAGE2, TAG_LAY(Layer_Monster));
 
-			}
-			else if (iChecker == 3 && m_SpwanPassedTime > 19.4)
-			{
-				GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeOutIn, 1, { 0,0,0,1 });
-				iChecker++;
+				NULL_CHECK_RETURN(MonsterLayer, E_FAIL);
 
-			}
-			else if (iChecker == 4 && m_SpwanPassedTime > 22.4)
-			{
-				GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeOutIn, 1, { 0,0,0,1 });
+				((CEyepot*)(MonsterLayer->back()))->Set_StartSprout();
 				iChecker++;
-
 			}
+	
 
 
 
 		}
 		else
 		{
-
-			list<CGameObject*>* MonsterLayer = g_pGameInstance->Get_ObjectList_from_Layer(SCENE_STAGE3, TAG_LAY(Layer_Monster));
-
-			NULL_CHECK_RETURN(MonsterLayer, E_FAIL);
-
-			if (MonsterLayer->size() == 0)
+			static _uint iChecker = 0;
+			if (iChecker == 0)
 			{
-
 				((CGamePlayUI*)(g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_UI_GamePlay))))->Set_DrawFightUI(false);
 
-				//CCamera_Main* pCamera = (CCamera_Main*)g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Camera_Main));
-				//NULL_CHECK_BREAK(pCamera);
-				//
-				//CAMERAACTION tDesc;
-				//
-				//tDesc.vecCamPos = m_vecEndCamPositions;
-				//tDesc.vecLookAt = m_vecEndLookPostions;
-				//
-				//
-				//CAMACTDESC Return;
-				//Return.fDuration = 0.5f;
-				//Return.vPosition = pCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_POS);
-				//tDesc.vecCamPos.push_back(Return);
-				//
-				//Return.fDuration = 0.5f;
-				//Return.vPosition = Return.vPosition.XMVector() + (pCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_LOOK));
-				//tDesc.vecLookAt.push_back(Return);
-				//
-				//pCamera->CamActionStart(tDesc);
+				list<CGameObject*>* MonsterLayer = g_pGameInstance->Get_ObjectList_from_Layer(SCENE_STAGE2, TAG_LAY(Layer_Monster));
+				NULL_CHECK_RETURN(MonsterLayer, E_FAIL);
 
-				Set_IsDead();
+				if (MonsterLayer->size() == 0)
+				{
+					CCamera_Main* pCamera = (CCamera_Main*)g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Camera_Main));
+					NULL_CHECK_BREAK(pCamera);
+
+					CAMERAACTION tDesc;
+
+					tDesc.vecCamPos = m_vecEndCamPositions;
+					tDesc.vecLookAt = m_vecEndLookPostions;
+
+
+					CAMACTDESC Return;
+					Return.fDuration = 0.5f;
+					Return.vPosition = pCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_POS);
+					tDesc.vecCamPos.push_back(Return);
+
+					Return.fDuration = 0.5f;
+					Return.vPosition = Return.vPosition.XMVector() + (pCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_LOOK));
+					tDesc.vecLookAt.push_back(Return);
+
+					pCamera->CamActionStart(tDesc);
+
+					iChecker++;
+				}
+			}
+			else if (iChecker == 1 )
+			{
+				m_SpwanPassedTime += fDeltaTime;
+
+				if (m_SpwanPassedTime > 12.)
+				{
+
+					list<CGameObject*>* ButtonLayer = g_pGameInstance->Get_ObjectList_from_Layer(SCENE_STAGE2, TAG_LAY(Layer_ButtonPad));
+					NULL_CHECK_RETURN(ButtonLayer, E_FAIL);
+
+					auto& iter = ButtonLayer->begin();
+
+					for (_uint i = 0 ; i < 2; i++)
+					{
+						((CButtonPad*)(*iter))->Set_Visuable();
+						iter++;
+					}
+
+					iChecker++;
+					Set_IsDead();
+				}
 			}
 		}
 
@@ -151,22 +154,22 @@ _int CStage3_SpwanExecutor::Update(_double fDeltaTime)
 	return _int();
 }
 
-_int CStage3_SpwanExecutor::LateUpdate(_double fDeltaTime)
+_int CStage2_SpwanEyePot::LateUpdate(_double fDeltaTime)
 {
 	if (__super::LateUpdate(fDeltaTime) < 0)
 		return -1;
 
-		FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this));
 
 #ifdef _DEBUG
 
+		FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this));
 #endif // _DEBUG
 	m_vOldPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
 
 	return _int();
 }
 
-_int CStage3_SpwanExecutor::Render()
+_int CStage2_SpwanEyePot::Render()
 {
 	if (__super::Render() < 0)
 		return -1;
@@ -177,37 +180,13 @@ _int CStage3_SpwanExecutor::Render()
 		m_pColliderCom->Render();
 #endif // _DEBUG
 
-	if (m_bOilDropRender)
-	{
 
-		NULL_CHECK_RETURN(m_pModel, E_FAIL);
-
-
-		FAILED_CHECK(m_pTransformCom->Bind_OnShader(m_pShaderCom, "g_WorldMatrix"));
-
-
-		FAILED_CHECK(__super::SetUp_ConstTable(m_pShaderCom));
-
-
-		_uint NumMaterial = m_pModel->Get_NumMaterial();
-
-		for (_uint i = 0; i < NumMaterial; i++)
-		{
-
-			for (_uint j = 0; j < AI_TEXTURE_TYPE_MAX; j++)
-				FAILED_CHECK(m_pModel->Bind_OnShader(m_pShaderCom, i, j, MODLETEXTYPE(j)));
-
-			FAILED_CHECK(m_pModel->Render(m_pShaderCom, 0, i));
-		}
-
-
-	}
 
 
 	return _int();
 }
 
-_int CStage3_SpwanExecutor::LateRender()
+_int CStage2_SpwanEyePot::LateRender()
 {
 	if (__super::LateRender() < 0)
 		return -1;
@@ -218,7 +197,7 @@ _int CStage3_SpwanExecutor::LateRender()
 
 
 
-void CStage3_SpwanExecutor::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedObj, CCollider * pConflictedCollider, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType)
+void CStage2_SpwanEyePot::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedObj, CCollider * pConflictedCollider, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType)
 {
 	switch (eConflictedObjCollisionType)
 	{
@@ -226,7 +205,7 @@ void CStage3_SpwanExecutor::CollisionTriger(_uint iMyColliderIndex, CGameObject 
 	case Engine::CollisionType_Player:
 	{
 		m_bSpwanStart = true;
-		m_pPlayer->Set_ReturnPos(_float3(128.3894f,27.39f,194.531f), _float3(128.3894f, 27.39f, 204.531f));
+		m_pPlayer->Set_ReturnPos(_float3(75.830f, 23.670f, 77.509f), _float3(84.321f, 23.670f, 95.669f));
 		m_SpwanPassedTime = 0;
 
 		((CGamePlayUI*)(g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_UI_GamePlay))))->Set_DrawFightUI(true);
@@ -262,7 +241,7 @@ void CStage3_SpwanExecutor::CollisionTriger(_uint iMyColliderIndex, CGameObject 
 }
 
 
-HRESULT CStage3_SpwanExecutor::Load_ActionCam(const _tchar * szPath)
+HRESULT CStage2_SpwanEyePot::Load_ActionCam(const _tchar * szPath)
 {
 	{
 		{
@@ -328,7 +307,7 @@ HRESULT CStage3_SpwanExecutor::Load_ActionCam(const _tchar * szPath)
 	return S_OK;
 }
 
-HRESULT CStage3_SpwanExecutor::Load_ActionCam2(const _tchar * szPath)
+HRESULT CStage2_SpwanEyePot::Load_ActionCam2(const _tchar * szPath)
 {
 
 
@@ -398,11 +377,13 @@ HRESULT CStage3_SpwanExecutor::Load_ActionCam2(const _tchar * szPath)
 }
 
 
-HRESULT CStage3_SpwanExecutor::SetUp_Components()
+HRESULT CStage2_SpwanEyePot::SetUp_Components()
 {
+#ifdef _DEBUG
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Renderer), TAG_COM(Com_Renderer), (CComponent**)&m_pRendererCom));
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Shader_VNAM), TAG_COM(Com_Shader), (CComponent**)&m_pShaderCom));
+#endif // _DEBUG
 
 	//FAILED_CHECK(Add_Component(m_eNowSceneNum, L"Grunt_StaticSwpanMesh", TAG_COM(Com_Model), (CComponent**)&m_pModel));
 
@@ -419,17 +400,11 @@ HRESULT CStage3_SpwanExecutor::SetUp_Components()
 	/* For.Com_AABB */
 	ZeroMemory(&ColliderDesc, sizeof(COLLIDERDESC));
 
-	ColliderDesc.vScale = _float3(30);
+	ColliderDesc.vScale = _float3(20);
 	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
 	ColliderDesc.vPosition = _float4(0, 0.f, 0, 1);
 	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
 
-
-	ColliderDesc.vScale = _float3(25.7f, 20, 1);
-	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
-	ColliderDesc.vPosition = _float4(0, 0, 0, 1);
-	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_OBB, &ColliderDesc));
-	m_pColliderCom->Set_ParantBuffer();
 
 	m_pPlayer = (CPlayer*)(g_pGameInstance->Get_GameObject_By_LayerIndex(SCENE_STATIC, TAG_LAY(Layer_Player)));
 
@@ -445,31 +420,31 @@ HRESULT CStage3_SpwanExecutor::SetUp_Components()
 	return S_OK;
 }
 
-CStage3_SpwanExecutor * CStage3_SpwanExecutor::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, void * pArg)
+CStage2_SpwanEyePot * CStage2_SpwanEyePot::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, void * pArg)
 {
-	CStage3_SpwanExecutor*	pInstance = new CStage3_SpwanExecutor(pDevice, pDeviceContext);
+	CStage2_SpwanEyePot*	pInstance = new CStage2_SpwanEyePot(pDevice, pDeviceContext);
 
 	if (FAILED(pInstance->Initialize_Prototype(pArg)))
 	{
-		MSGBOX("Failed to Created CStage3_SpwanExecutor");
+		MSGBOX("Failed to Created CStage2_SpwanEyePot");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-CGameObject * CStage3_SpwanExecutor::Clone(void * pArg)
+CGameObject * CStage2_SpwanEyePot::Clone(void * pArg)
 {
-	CStage3_SpwanExecutor*	pInstance = new CStage3_SpwanExecutor(*this);
+	CStage2_SpwanEyePot*	pInstance = new CStage2_SpwanEyePot(*this);
 
 	if (FAILED(pInstance->Initialize_Clone(pArg)))
 	{
-		MSGBOX("Failed to Created CStage3_SpwanExecutor");
+		MSGBOX("Failed to Created CStage2_SpwanEyePot");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-void CStage3_SpwanExecutor::Free()
+void CStage2_SpwanEyePot::Free()
 {
 	__super::Free();
 
@@ -478,10 +453,11 @@ void CStage3_SpwanExecutor::Free()
 	
 	Safe_Release(m_pTransformCom);
 	Safe_Release(m_pColliderCom);
+#ifdef _DEBUG
 
 	Safe_Release(m_pRendererCom);
-	Safe_Release(m_pModel);
 	Safe_Release(m_pShaderCom);
+#endif // _DEBUG
 
 		
 

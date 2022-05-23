@@ -47,7 +47,14 @@ _float CUtilityMgr::RandomFloat(_float Min, _float Max)
 
 
 	_uint RandNum = rand();
-	_uint Power = _uint(pow(10, CountDigit(RandNum)));
+	_uint iDigit = CountDigit(RandNum);
+	while (!iDigit)
+	{
+		RandNum = rand();
+		iDigit = CountDigit(RandNum);
+	}
+	_uint Power = _uint(pow(10, iDigit - 1));
+	//_float f = (RandNum) / _float(Power);
 	_float f = (RandNum % Power) / _float(Power);
 	return (f * (Max - Min)) + Min;
 }

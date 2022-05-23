@@ -1,25 +1,24 @@
 #pragma once
-#include "MapObject.h"
+#include "MonsterWeapon.h"
 
 BEGIN(Client)
 
-class CButtonPad final :public CMapObject
+class CThrowOilBullet final :public CMonsterWeapon
 {
 public:
-	typedef struct tagButtonDesc
+	typedef struct tagBreakedGazboDesc
 	{
 		_float3 vPosition;
-		_float3 vAngle;
+		_uint MeshKinds;
+		_float3 MoveDir;
 
-		CGameObject* pTargetObject = nullptr;
-		_uint	eKindsOfObject = INT_MAX;
-	}BUTTONDESC;
+	}BREAKEDGAZBODESC;
 
 
 private:
-	CButtonPad(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
-	CButtonPad(const CButtonPad& rhs);
-	virtual ~CButtonPad() = default;
+	CThrowOilBullet(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
+	CThrowOilBullet(const CThrowOilBullet& rhs);
+	virtual ~CThrowOilBullet() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype(void* pArg)override;
@@ -31,44 +30,35 @@ public:
 	virtual _int Render()override;
 	virtual _int LateRender()override;
 
-	void Set_Visuable() { m_bVisuable = true; };
 
-public:
+	void Set_Position(_float3 vPosition);
+	void Set_MovingStart(_float3 vDir);
+
 	virtual void CollisionTriger(_uint iMyColliderIndex, CGameObject* pConflictedObj, CCollider* pConflictedCollider, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType) override;
 
-	void	LetWorkButton(_bool bBool);
 
 private:
+
 	CShader*			m_pShaderCom = nullptr;
 	CRenderer*			m_pRendererCom = nullptr;
 	CTransform*			m_pTransformCom = nullptr;
 	CModel*				m_pModel = nullptr;
-	CModel*				m_pSubModel = nullptr;
 	CCollider*			m_pColliderCom = nullptr;
+	PARTICLEDESC		m_tParticleDesc;
 
-
-	
 private:
-	class CPlayer*		m_pPlayer= nullptr;
-	CTransform*			m_pPlayerTransform = nullptr;
-	_bool				m_bIsPlayerCloser = false;
-	BUTTONDESC			m_tDesc;
+	CTransform*			m_pPlayerTransfrom = nullptr;
+	_float				m_fStartTimer = 0;
+	_bool				m_bIsHavetoMoving = false;
 
-	_bool				m_bIsUp = true;
-	_float				m_ButtonHight = 0;
-	_double				m_PassedTime = 0;
-
-	_bool				m_bChecker = false;
-
-	_bool				m_bVisuable = false;
-
-
+	BREAKEDGAZBODESC		m_tDesc;
 private:
 	HRESULT SetUp_Components();
-	HRESULT Update_ButtonAnim(_double fDeltaTime);
+	HRESULT SetUp_ParticleDesc();
+
 
 public:
-	static CButtonPad* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, void* pArg = nullptr);
+	static CThrowOilBullet* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, void* pArg = nullptr);
 	virtual CGameObject* Clone(void* pArg);
 	virtual void Free() override;
 };

@@ -91,8 +91,15 @@ _int CEyepot::Update(_double fDeltaTime)
 
 	_uint AnimIndex = m_pModel->Get_NowAnimIndex();
 
-
-	if (!m_bIsDmgAnimUpdated[2])
+	if (m_bDeathAnimStart)
+	{
+		if (m_pModel->Get_PlayRate() > 0.95)
+		{
+			Set_IsDead();
+			return 0;
+		}
+	}
+	else if (!m_bIsDmgAnimUpdated[2])
 	{
 		if (m_bStartPos)
 		{
@@ -113,34 +120,35 @@ _int CEyepot::Update(_double fDeltaTime)
 		}
 		else//스타트 패턴
 		{
-			if (!m_bIsPatternFinished)
+			if (m_bStartSprout)
 			{
-				if (Distance_BetweenPlayer(m_pTransformCom) < 15)
+				if (!m_bIsPatternFinished)
 				{
-					m_pModel->Change_AnimIndex_ReturnTo_Must(24, 0, 0.15, true);
-					m_bIsPatternFinished = true;
-					m_PatternPassedTime = 0;
-					m_PatternDelayTime = 0;
+						m_pModel->Change_AnimIndex_ReturnTo_Must(24, 0, 0.15, true);
+						m_bIsPatternFinished = true;
+						m_PatternPassedTime = 0;
+						m_PatternDelayTime = 0;
+				
 				}
-			}
-			else 
-			{
-				m_PatternPassedTime += fDeltaTime;
-
-				if (m_PatternPassedTime > 2.5)
+				else
 				{
-					m_PatternPassedTime = 0;
-					m_bStartPos = true;
+					m_PatternPassedTime += fDeltaTime;
+
+					if (m_PatternPassedTime > 5.)
+					{
+						m_PatternPassedTime = 0;
+						m_bStartPos = true;
+					}
+
 				}
 
 			}
-
 		}
 
 	}
 
-
-	Update_DmgCalculate(fDeltaTime);
+	if (m_bStartPos)
+		Update_DmgCalculate(fDeltaTime);
 
 	m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
 	_uint NowAnimIndex = m_pModel->Get_NowAnimIndex();
@@ -231,6 +239,22 @@ _int CEyepot::LateRender()
 
 _int CEyepot::Update_DmgCalculate(_double fDeltaTime)
 {
+	if (m_fHP <= 0)
+	{
+		if (!m_bDeathAnimStart)
+		{
+
+			ZeroMemory(m_bIsDmgAnimUpdated, sizeof(_bool) * 3);
+			m_fDmgAmount = 0;
+			m_DmgPassedTime = 0;
+
+			m_bDeathAnimStart = true;
+			m_pModel->Change_AnimIndex(23, 0.15, true);
+		}
+
+		return 0;
+	}
+
 	if (m_DmgPassedTime <= 0)
 	{
 		if (m_fDmgAmount > 0)
@@ -244,13 +268,12 @@ _int CEyepot::Update_DmgCalculate(_double fDeltaTime)
 			m_fDmgAmount = 0;
 			m_DmgPassedTime = 0;
 
-
-
-
 		}
 		return 0;
 	}
 	m_DmgPassedTime -= fDeltaTime;
+
+
 
 
 
@@ -297,8 +320,11 @@ void CEyepot::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedO
 	{
 		if (!m_bIsPatternFinished && (m_ePattern == 0 || m_ePattern == 2))
 		{
-			pConflictedCollider->Set_Conflicted();
-			((CPlayer*)(pConflictedObj))->Add_Dmg_to_Player(rand() % 2 + 3);
+			if (!lstrcmp(pConflictedObj->Get_NameTag(), L"Alice"))
+			{
+				pConflictedCollider->Set_Conflicted();
+				((CPlayer*)(pConflictedObj))->Add_Dmg_to_Player(rand() % 2 + 3);
+			}
 		}
 	}
 	break;

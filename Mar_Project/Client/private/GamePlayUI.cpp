@@ -44,6 +44,8 @@ _int CGamePlayUI::Update(_double fDeltaTime)
 	FAILED_CHECK(Update_GrinderHUD());
 	FAILED_CHECK(Update_TeapotHUD(fDeltaTime));
 	FAILED_CHECK(Update_ClockBombHUD(fDeltaTime));
+	FAILED_CHECK(Update_FightHUD(fDeltaTime));
+
 
 
 	for (auto& pUI : m_vecUIContainer)
@@ -155,6 +157,27 @@ void CGamePlayUI::Set_DrawClockBombUI()
 	m_vecUIContainer[21]->Set_IsDraw(true);
 }
 
+void CGamePlayUI::Set_DrawFightUI(_bool bBool)
+{
+	m_bFightUIDraw = bBool;
+	if (m_bFightUIDraw)
+	{
+		m_PassedFightUITime = 0;
+		m_vecUIContainer[22]->Set_IsDraw(true);
+		m_vecUIContainer[23]->Set_IsDraw(true);
+	}
+	else
+	{
+
+		m_vecUIContainer[22]->Set_IsDraw(true);
+		m_vecUIContainer[23]->Set_IsDraw(true);
+		m_PassedFightUITime = 0;
+
+	}
+
+
+}
+
 HRESULT CGamePlayUI::Change_WeaponUI()
 {
 	CGameInstance* pInstance = g_pGameInstance;
@@ -257,7 +280,7 @@ HRESULT CGamePlayUI::Update_GrinderHUD()
 		for (_uint i = 0; i < 2; i++)
 			m_vecUIContainer[13 + i]->Set_IsDraw(true);
 		
-		_float CutY = _float(121 - (m_pPlayer->Get_GrinderCoolGauge() / PlayerGrinderCoolTime) * 70);
+		_float CutY = _float(138 - (m_pPlayer->Get_GrinderCoolGauge() / PlayerGrinderCoolTime) * 70);
 		m_vecUIContainer[13]->Set_UICutY(CutY);
 
 
@@ -301,7 +324,7 @@ HRESULT CGamePlayUI::Update_TeapotHUD(_double fDeltaTime)
 			m_vecUIContainer[16 + i]->Set_IsDraw(true);
 
 		_float Gauge = m_pPlayer->Get_CharedGauge();
-		_float CutY = _float(116.f - Gauge * 53.f);
+		_float CutY = _float(133.5f - Gauge * 53.f);
 		m_vecUIContainer[17]->Set_UICutY(CutY);
 
 
@@ -376,6 +399,56 @@ HRESULT CGamePlayUI::Update_ClockBombHUD(_double fDeltaTime)
 	return S_OK;
 }
 
+HRESULT CGamePlayUI::Update_FightHUD(_double fDeltaTime)
+{
+	if (m_PassedFightUITime > 2) return S_FALSE;
+
+	m_PassedFightUITime += fDeltaTime;
+
+	_float EasedHeight = 0;
+
+	if (m_bFightUIDraw)
+		EasedHeight = g_pGameInstance->Easing(TYPE_Linear, 0, 128, _float(m_PassedFightUITime), 2);
+	else
+		EasedHeight = g_pGameInstance->Easing(TYPE_Linear, 128, 0, _float(m_PassedFightUITime), 2);
+
+
+
+	if (m_PassedFightUITime > 2)
+	{
+		EasedHeight = 128;
+
+		if (!m_bFightUIDraw)
+		{
+			m_vecUIContainer[22]->Set_IsDraw(false);
+			m_vecUIContainer[23]->Set_IsDraw(false);
+		}
+	}
+
+	UIDESC tUIDesc;
+
+	tUIDesc.fX = 640;
+	tUIDesc.fY = -64 + EasedHeight;
+	tUIDesc.fCX = 1280;
+	tUIDesc.fCY = 128;
+
+	m_vecUIContainer[22]->Apply_UI_To_MemberValue(tUIDesc);
+	FAILED_CHECK(m_vecUIContainer[22]->Apply_UIDesc_To_Transform());
+
+
+	tUIDesc.fX = 640;
+	tUIDesc.fY = 784 - EasedHeight;
+	tUIDesc.fCX = 1280;
+	tUIDesc.fCY = 128;
+
+	m_vecUIContainer[23]->Apply_UI_To_MemberValue(tUIDesc);
+	FAILED_CHECK(m_vecUIContainer[23]->Apply_UIDesc_To_Transform());
+
+
+
+	return S_OK;
+}
+
 
 
 
@@ -398,6 +471,9 @@ HRESULT CGamePlayUI::SetUp_Components()
 	FAILED_CHECK(Ready_WeaponGrinderHUD(pInstance));//13 - 15
 	FAILED_CHECK(Ready_WeaponTeapotHUD(pInstance));//16 - 19
 	FAILED_CHECK(Ready_WeaponClockBombHUD(pInstance));//20 - 21
+	FAILED_CHECK(Ready_FightHUD(pInstance));//22 - 23
+
+
 	
 	
 		
@@ -431,10 +507,10 @@ HRESULT CGamePlayUI::Ready_HpBarBackGround(CGameInstance* pInstance)
 
 	UIDESC tUIDesc;
 
-	tUIDesc.fX	=178		;
-	tUIDesc.fY	=66		;
-	tUIDesc.fCX	=	320	;
-	tUIDesc.fCY	=		92;
+	tUIDesc.fX	=215;
+	tUIDesc.fY	=92	;
+	tUIDesc.fCX	=256;
+	tUIDesc.fCY	=64;
 
 	pUI->Apply_UI_To_MemberValue(tUIDesc);
 	FAILED_CHECK(pUI->Apply_UIDesc_To_Transform());
@@ -464,47 +540,51 @@ HRESULT CGamePlayUI::Ready_HpFlowerPetal(CGameInstance * pInstance)
 
 		UIDESC tUIDesc;
 
-		tUIDesc.fCX = 34;
-		tUIDesc.fCY = 33;
+		tUIDesc.fCX = 32;
+		tUIDesc.fCY = 32;
 
 		switch (i)
 		{
 		case 0:
 
-			tUIDesc.fX = 319;
-			tUIDesc.fY = 47;
-			pUI->Set_Angle(180);
+			tUIDesc.fX = 327;
+			tUIDesc.fY = 74;
+			pUI->Set_Angle(231);
 			break;
 		case 1:
-			tUIDesc.fX = 298;
-			tUIDesc.fY = 94;
+			tUIDesc.fX = 313;
+			tUIDesc.fY = 119;
+			pUI->Set_Angle(339);
 			break;
 		case 2:
-			tUIDesc.fX = 277;
-			tUIDesc.fY = 45;
-			pUI->Set_Angle(180);
+			tUIDesc.fX = 294;
+			tUIDesc.fY = 73;
+			pUI->Set_Angle(220);
 			break;
 		case 3:
-			tUIDesc.fX = 251;
-			tUIDesc.fY = 98;
+			tUIDesc.fX = 277;
+			tUIDesc.fY = 118;
+			pUI->Set_Angle(351);
 			break;
 		case 4:
-			tUIDesc.fX = 235;
-			tUIDesc.fY = 48;
-			pUI->Set_Angle(180);
+			tUIDesc.fX = 260;
+			tUIDesc.fY = 75;
+			pUI->Set_Angle(230);
 			break;
 		case 5:
-			tUIDesc.fX = 212;
-			tUIDesc.fY = 96;
+			tUIDesc.fX = 244;
+			tUIDesc.fY = 118;
+			pUI->Set_Angle(358);
 			break;
 		case 6:
-			tUIDesc.fX = 194;
-			tUIDesc.fY = 41;
-			pUI->Set_Angle(180);
+			tUIDesc.fX = 227;
+			tUIDesc.fY = 72;
+			pUI->Set_Angle(216);
 			break;
 		case 7:
-			tUIDesc.fX = 171;
-			tUIDesc.fY = 98;
+			tUIDesc.fX = 208;
+			tUIDesc.fY = 117;
+			pUI->Set_Angle(354);
 			break;
 		default:
 			break;
@@ -603,8 +683,8 @@ HRESULT CGamePlayUI::Ready_WeaponGrinderHUD(CGameInstance * pInstance)
 		pUI->Set_IsDraw(false);
 		UIDESC tUIDesc;
 
-		tUIDesc.fX = 1213;
-		tUIDesc.fY = 86;
+		tUIDesc.fX = 1175;
+		tUIDesc.fY = 103;
 		tUIDesc.fCX = 70;
 		tUIDesc.fCY = 100;
 
@@ -639,8 +719,8 @@ HRESULT CGamePlayUI::Ready_WeaponTeapotHUD(CGameInstance * pInstance)
 		pUI->Set_IsDraw(false);
 		UIDESC tUIDesc;
 
-		tUIDesc.fX = 1218;
-		tUIDesc.fY = 86;
+		tUIDesc.fX = 1180;
+		tUIDesc.fY = 103;
 		tUIDesc.fCX = 120;
 		tUIDesc.fCY = 130;
 
@@ -668,8 +748,8 @@ HRESULT CGamePlayUI::Ready_WeaponTeapotHUD(CGameInstance * pInstance)
 		pUI->Set_PassIndex(6);
 		UIDESC tUIDesc;
 
-		tUIDesc.fX = 1217;
-		tUIDesc.fY = 90;
+		tUIDesc.fX = 1179;
+		tUIDesc.fY = 107;
 		tUIDesc.fCX = 25;
 		tUIDesc.fCY = 53;
 
@@ -698,8 +778,8 @@ HRESULT CGamePlayUI::Ready_WeaponTeapotHUD(CGameInstance * pInstance)
 		pUI->Set_IsDraw(false);
 		UIDESC tUIDesc;
 
-		tUIDesc.fX = 1213;
-		tUIDesc.fY = 86;
+		tUIDesc.fX = 1175;
+		tUIDesc.fY = 103;
 		tUIDesc.fCX = 70;
 		tUIDesc.fCY = 100;
 
@@ -734,8 +814,8 @@ HRESULT CGamePlayUI::Ready_WeaponClockBombHUD(CGameInstance * pInstance)
 
 		UIDESC tUIDesc;
 
-		tUIDesc.fX = 1115;
-		tUIDesc.fY = 78;
+		tUIDesc.fX = 1100;
+		tUIDesc.fY = 102;
 		tUIDesc.fCX = 68;
 		tUIDesc.fCY = 130;
 
@@ -762,8 +842,8 @@ HRESULT CGamePlayUI::Ready_WeaponClockBombHUD(CGameInstance * pInstance)
 		pUI->Set_PassIndex(6);
 		UIDESC tUIDesc;
 
-		tUIDesc.fX = 1115;
-		tUIDesc.fY = 107;
+		tUIDesc.fX = 1100;
+		tUIDesc.fY = 131;
 		tUIDesc.fCX = 100;
 		tUIDesc.fCY = 45;
 
@@ -772,6 +852,70 @@ HRESULT CGamePlayUI::Ready_WeaponClockBombHUD(CGameInstance * pInstance)
 		FAILED_CHECK(pUI->Apply_UIDesc_To_Transform());
 
 		pUI->Set_UIDepth(_float(-21));
+
+		m_vecUIContainer.push_back(pUI);
+	}
+
+
+	return S_OK;
+}
+
+HRESULT CGamePlayUI::Ready_FightHUD(CGameInstance * pInstance)
+{
+	{
+
+		CUI* pUI = nullptr;
+		FAILED_CHECK(pInstance->Add_GameObject_Out_of_Manager((CGameObject**)(&pUI), m_eNowSceneNum, TAG_OP(Prototype_UIImage)));
+
+		NULL_CHECK_RETURN(pUI, E_FAIL);
+
+		FAILED_CHECK(pUI->Change_Component_by_NewAssign(m_eNowSceneNum, TAG_CP(Prototype_Texture_GamePlayScene), TAG_COM(Com_Texture)));
+
+		FAILED_CHECK(pUI->Change_TextureLayer(L"FightUI"));
+		pUI->Set_TextureLayerIndex(0);
+		pUI->Set_PassIndex(8);
+		pUI->Set_IsDraw(false);
+
+		UIDESC tUIDesc;
+
+		tUIDesc.fX = 640;
+		tUIDesc.fY = 64;
+		tUIDesc.fCX = 1280;
+		tUIDesc.fCY = 128;
+
+		pUI->Apply_UI_To_MemberValue(tUIDesc);
+		pUI->Set_DrawingValueIsUIDesc(false);
+		FAILED_CHECK(pUI->Apply_UIDesc_To_Transform());
+
+		pUI->Set_UIDepth(_float(-9999999));
+
+		m_vecUIContainer.push_back(pUI);
+	}
+	{
+
+		CUI* pUI = nullptr;
+		FAILED_CHECK(pInstance->Add_GameObject_Out_of_Manager((CGameObject**)(&pUI), m_eNowSceneNum, TAG_OP(Prototype_UIImage)));
+
+		NULL_CHECK_RETURN(pUI, E_FAIL);
+
+		FAILED_CHECK(pUI->Change_Component_by_NewAssign(m_eNowSceneNum, TAG_CP(Prototype_Texture_GamePlayScene), TAG_COM(Com_Texture)));
+
+		FAILED_CHECK(pUI->Change_TextureLayer(L"FightUI"));
+		pUI->Set_TextureLayerIndex(1);
+		pUI->Set_IsDraw(false);
+		pUI->Set_PassIndex(8);
+		UIDESC tUIDesc;
+
+		tUIDesc.fX = 640;
+		tUIDesc.fY = 656;
+		tUIDesc.fCX = 1280;
+		tUIDesc.fCY = 128;
+
+		pUI->Apply_UI_To_MemberValue(tUIDesc);
+		pUI->Set_DrawingValueIsUIDesc(false);
+		FAILED_CHECK(pUI->Apply_UIDesc_To_Transform());
+
+		pUI->Set_UIDepth(_float(-9999999));
 
 		m_vecUIContainer.push_back(pUI);
 	}
@@ -825,7 +969,7 @@ HRESULT CGamePlayUI::Ready_TeethUI(CGameInstance * pInstance)
 
 	UIDESC tUIDesc;
 
-	tUIDesc.fX = 74;
+	tUIDesc.fX = 134;
 	tUIDesc.fY = 166;
 	tUIDesc.fCX = 36;
 	tUIDesc.fCY = 53;

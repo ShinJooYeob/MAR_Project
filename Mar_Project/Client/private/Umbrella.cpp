@@ -28,6 +28,7 @@ HRESULT CUmbrella::Initialize_Clone(void * pArg)
 
 	FAILED_CHECK(SetUp_Components());
 
+	m_szNameTag = L"Umbrella";
 	
 	return S_OK;
 }
@@ -280,7 +281,8 @@ _int CUmbrella::Update(_double fDeltaTime)
 	for (_uint i = 0; i < m_pColliderCom->Get_NumColliderBuffer(); i++)
 		m_pColliderCom->Update_Transform(i, TransformMatrix);
 
-	g_pGameInstance->Add_CollisionGroup(CollisionType_Player, this, m_pColliderCom);
+	if (m_bIsAttackAble)
+		g_pGameInstance->Add_CollisionGroup(CollisionType_Player, this, m_pColliderCom);
 
 	return _int();
 }
@@ -305,7 +307,9 @@ _int CUmbrella::Render()
 	NULL_CHECK_RETURN(m_pModel, E_FAIL);
 
 #ifdef _DEBUG
-	m_pColliderCom->Render();
+
+	if (m_bIsAttackAble)
+		m_pColliderCom->Render();
 #endif // _DEBUG
 
 

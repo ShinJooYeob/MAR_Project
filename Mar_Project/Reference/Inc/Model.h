@@ -35,6 +35,7 @@ public:
 	void	Set_BlockAnim(_bool IsBlock) { m_bIsBlockAnim = IsBlock; };
 	void    Set_NextAnim_Must(_uint iAnim) { m_iNextAnimIndex = iAnim; };
 	HRESULT	Remove_CertainKeyFrameIndex(_uint iAnimIndex);
+	void	Add_Time_To_NowAnimPlayAcc(_double Time) { m_NowPlayTimeAcc += Time; }
 
 	HRESULT Bind_OnShader(class CShader* pShader, _uint iMaterialIndex , _uint eTextureType, const char* pHlslConstValueName);
 	HRESULT Update_AnimationClip(_double fDeltaTime, _bool IsUpdateAll = true);	

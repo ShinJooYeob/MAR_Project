@@ -52,6 +52,8 @@ HRESULT CPlayer::Initialize_Clone(void * pArg)
 		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, *((_float3*)pArg));
 
 
+	m_szNameTag = L"Alice";
+
 	return S_OK;
 }
 
@@ -69,11 +71,16 @@ _int CPlayer::Update(_double fDeltaTime)
 	FAILED_CHECK(Input_Keyboard(fDeltaTime));
 
 
+
 	if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
 		Set_GettingBigger(!m_bIsGiant);
 
 	if (g_pGameInstance->Get_DIKeyState(DIK_2)&DIS_Down)
 		Add_Dmg_to_Player(1);
+
+	if (g_pGameInstance->Get_DIKeyState(DIK_3)&DIS_Down) {
+		g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), L"Test", &m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
+	}
 
 
 
@@ -509,7 +516,9 @@ void CPlayer::Change_Weapon(_uint WeaponIndex)
 		m_bIsCharged = false;
 		m_fCharedGauge = 0;
 		m_bIsCoolTime = false;
+		m_bUmbrellaReflected = false;
 		m_fUmbrellaIntro = 0;
+		m_vecWeapon[m_iWeaponModelIndex]->Set_AttackAble(true);
 		m_pModel->Change_AnimIndex_UntilTo(Weapon_Umbrella, Weapon_Umbrella + 1);
 		m_pModel->Set_BlockAnim(true);
 		break;
@@ -683,7 +692,9 @@ void CPlayer::Set_PlayerDeadAnimStart()
 
 	m_iHP = 0;
 	((CGamePlayUI*)(g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_UI_GamePlay))))->Add_Dmg_to_Player(m_iHP, 0);
-	GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_HitEffect, 0.2, { 1,0,0,0.4f });
+	GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_HitEffect, 0.2, { 1,0,0,0.4f }
+
+	);
 
 	m_pModel->Change_AnimIndex_ReturnTo_Must(37, 37, 0.15f, true);
 	m_bAliceDeathAnimStart = true;
@@ -691,7 +702,15 @@ void CPlayer::Set_PlayerDeadAnimStart()
 }
 
 
+void CPlayer::Set_UmbrellaReflected(_bool bBool)
+{
+	m_bUmbrellaReflected = bBool;
+	m_ReflectPassedTime = 0;
 
+	m_vecWeapon[m_iWeaponModelIndex]->Set_AttackAble(false);
+	m_pModel->Change_AnimIndex_ReturnTo_Must(Weapon_Umbrella + 4, Weapon_Umbrella + 1, 0, true);
+	m_pModel->Add_Time_To_NowAnimPlayAcc(0.15);
+}
 
 
 HRESULT CPlayer::SetUp_Components()
@@ -2867,9 +2886,8 @@ HRESULT CPlayer::Move_Update_Umbrella(_double fDeltaTime, CGameInstance * pInsta
 
 	if (!m_pModel->Get_IsHavetoBlockAnimChange())
 	{
-
-		if (!m_LevitationTime)
-			m_pModel->Change_AnimIndex_UntilTo(Weapon_Umbrella + 1, Weapon_Umbrella + 2);
+		if (!m_LevitationTime && !m_bUmbrellaReflected)
+			m_pModel->Change_AnimIndex_UntilTo(Weapon_Umbrella + 1, Weapon_Umbrella + 1);
 
 	}
 	return S_OK;
@@ -2936,8 +2954,18 @@ HRESULT CPlayer::Attack_Update_Umbrella(_double fDeltaTime, CGameInstance * pIns
 
 	if (m_fUmbrellaIntro >= 1)
 	{
-		if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_LBUTTON) & DIS_Down)
-			m_pModel->Change_AnimIndex_ReturnTo_Must(Weapon_Umbrella + 4, Weapon_Umbrella + 1, 0.15, true);
+		if (m_bUmbrellaReflected)
+		{
+			m_ReflectPassedTime += fDeltaTime;
+
+
+			if (m_ReflectPassedTime > 2)
+			{
+				m_vecWeapon[m_iWeaponModelIndex]->Set_AttackAble(true);
+			}
+
+		}
+
 	}
 
 

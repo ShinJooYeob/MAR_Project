@@ -30,6 +30,8 @@ public:
 
 	virtual void CollisionTriger(_uint iMyColliderIndex, CGameObject* pConflictedObj, CCollider* pConflictedCollider, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType) override;
 
+	void Set_StartSprout() { m_bStartSprout = true; };
+
 private:
 	CShader*			m_pShaderCom = nullptr;
 	CRenderer*			m_pRendererCom = nullptr;
@@ -45,6 +47,10 @@ private:
 	_uint				m_iPatternCount = 0;
 	_bool				m_bIsJumping = false;
 	_bool				m_bIsFarPattern = false;
+
+	_bool				m_bDeathAnimStart = false;
+	_bool				m_bStartSprout = false;
+
 private:
 	HRESULT SetUp_Components();
 	HRESULT FarPatternWander(_double fDeltaTime);

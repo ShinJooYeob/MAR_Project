@@ -35,7 +35,6 @@ HRESULT CButtonPad::Initialize_Clone(void * pArg)
 	FAILED_CHECK(SetUp_Components());
 
 
-	//FAILED_CHECK(Set_TerrainTileKinds());
 
 	return S_OK;
 }
@@ -44,6 +43,8 @@ _int CButtonPad::Update(_double fDeltaTime)
 {
 	if (__super::Update(fDeltaTime) < 0)
 		return -1;
+
+	if (!m_bVisuable) return 0;
 
 	FAILED_CHECK(Update_ButtonAnim(fDeltaTime));
 
@@ -79,6 +80,9 @@ _int CButtonPad::LateUpdate(_double fDeltaTime)
 {
 	if (__super::LateUpdate(fDeltaTime) < 0)
 		return -1;
+
+	if (!m_bVisuable) return 0;
+
 
 	LetWorkButton(!m_bChecker);
 
@@ -258,15 +262,6 @@ HRESULT CButtonPad::SetUp_Components()
 	FAILED_CHECK(Add_Component(m_eNowSceneNum, TAG_CP(Prototype_Mesh_Button), TAG_COM(Com_Model), (CComponent**)&m_pModel));
 	FAILED_CHECK(Add_Component(m_eNowSceneNum, TAG_CP(Prototype_Mesh_Button_Frame), TAG_COM(Com_SubModel), (CComponent**)&m_pSubModel));
 
-
-	ZeroMemory(m_NevRectPoint, sizeof(_float4) * 4);
-
-
-
-	m_NevRectPoint[0] = _float4(0.8f, 0.6f, 0.8f, 1);
-	m_NevRectPoint[1] = _float4(0.8f, 0.6f, -0.8f, 1);
-	m_NevRectPoint[2] = _float4(-0.8f, 0.6f, -0.8f, 1);
-	m_NevRectPoint[3] = _float4(-0.8f, 0.6f, 0.8f, 1);
 
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Collider), TAG_COM(Com_Collider), (CComponent**)&m_pColliderCom));
