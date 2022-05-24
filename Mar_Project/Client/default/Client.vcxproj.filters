@@ -292,6 +292,12 @@
     <Filter Include="01.GameObject\98.Particle\99.Instance_Particle">
       <UniqueIdentifier>{7fe48969-1984-4132-9366-eee67ed4c2ec}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.GameObject\08.Weapon\98.Etc">
+      <UniqueIdentifier>{1d04f928-9de4-4e8e-af24-aff32e9ea5f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\09.TriggerCollider\05.Stage3_GientTrigger">
+      <UniqueIdentifier>{fdea0471-87b0-49da-8fcd-b6c0b6f14a6d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -597,6 +603,12 @@
     <ClInclude Include="..\public\Instance_Particle.h">
       <Filter>01.GameObject\98.Particle\99.Instance_Particle</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Protein.h">
+      <Filter>01.GameObject\08.Weapon\98.Etc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Stage3_GientTrigger.h">
+      <Filter>01.GameObject\09.TriggerCollider\05.Stage3_GientTrigger</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -877,6 +889,12 @@
     </ClCompile>
     <ClCompile Include="..\private\Instance_Particle.cpp">
       <Filter>01.GameObject\98.Particle\99.Instance_Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Protein.cpp">
+      <Filter>01.GameObject\08.Weapon\98.Etc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Stage3_GientTrigger.cpp">
+      <Filter>01.GameObject\09.TriggerCollider\05.Stage3_GientTrigger</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

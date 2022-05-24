@@ -35,6 +35,8 @@ public:
 	void Set_GettingBigger(_bool bBool);
 	_bool Get_IsGiant() { return m_bIsGiant; };
 
+	void Eat_Protain();
+
 public:
 	virtual _int Update(_double fDeltaTime)override;
 	virtual _int LateUpdate(_double fDeltaTime)override;
@@ -75,7 +77,9 @@ public:
 	void Set_IsVenting(_bool bBool,_float3 vTargetLook);
 	void Set_PlayerDeadAnimStart();
 
-	void Set_UmbrellaReflected(_bool	bBool);
+	void Set_UmbrellaReflected(_bool bBool);
+
+	HRESULT Update_EattingProtein(_double fDeltatime);
 private:
 	CShader*			m_pShaderCom = nullptr;
 	CRenderer*			m_pRendererCom = nullptr;
@@ -184,6 +188,11 @@ private:
 	_double			m_DeathAnimPassedTime = 0;
 	_bool			m_bPlayerNotRender = false;
 
+
+	_bool			m_bEattingProteinStart = false;
+	_double			m_ProteinPassedTime = 0;
+	_uint			m_iProteinChecker = 0;
+	
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ConstTable();

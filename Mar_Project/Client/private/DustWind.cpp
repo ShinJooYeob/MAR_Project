@@ -66,19 +66,21 @@ _int CDustWind::Update(_double fDeltaTime)
 	//
 	//if (m_PassedTime > m_TargetTime)Set_IsDead();
 
-	_float DistBtwPlayer = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS).Get_Distance(m_pPlayerTransform->Get_MatrixState(CTransform::STATE_POS));
-	_float Scale = XMVectorGetX(m_pTransformCom->Get_MatrixScale(CTransform::STATE_RIGHT));
-
-	if (DistBtwPlayer >= 2 * Scale && DistBtwPlayer <= 3 * Scale)
+	if (fabs((m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS).y - m_pPlayerTransform->Get_MatrixState_Float3(CTransform::STATE_POS).y)) < 3)
 	{
-		CCollider* pPlayerCollider =((CCollider*)(m_pPlayer->Get_Component(TAG_COM(Com_Collider))));
-		if (pPlayerCollider != nullptr && !pPlayerCollider->Get_Conflicted())
+		_float DistBtwPlayer = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS).Get_Distance(m_pPlayerTransform->Get_MatrixState(CTransform::STATE_POS));
+		_float Scale = XMVectorGetX(m_pTransformCom->Get_MatrixScale(CTransform::STATE_RIGHT));
+
+ 		if (DistBtwPlayer >= 2 * Scale && DistBtwPlayer <= 3 * Scale)
 		{
-			pPlayerCollider->Set_Conflicted();
-			m_pPlayer->Add_Dmg_to_Player(1);
+			CCollider* pPlayerCollider = ((CCollider*)(m_pPlayer->Get_Component(TAG_COM(Com_Collider))));
+			if (pPlayerCollider != nullptr && !pPlayerCollider->Get_Conflicted())
+			{
+				pPlayerCollider->Set_Conflicted();
+				m_pPlayer->Add_Dmg_to_Player(1);
+			}
 		}
 	}
-
 
 	return _int();
 }

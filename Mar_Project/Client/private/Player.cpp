@@ -54,6 +54,8 @@ HRESULT CPlayer::Initialize_Clone(void * pArg)
 
 	m_szNameTag = L"Alice";
 
+
+
 	return S_OK;
 }
 
@@ -66,9 +68,16 @@ _int CPlayer::Update(_double fDeltaTime)
 	m_pColliderCom->Update_ConflictPassedTime(fDeltaTime);
 
 
-	FAILED_CHECK(Update_SpwanNDeathAnim(fDeltaTime));
-	FAILED_CHECK(Manage_CoolTime(fDeltaTime));
-	FAILED_CHECK(Input_Keyboard(fDeltaTime));
+	if (m_bEattingProteinStart)
+	{
+		FAILED_CHECK(Update_EattingProtein(fDeltaTime));
+	}
+	else
+	{
+		FAILED_CHECK(Update_SpwanNDeathAnim(fDeltaTime));
+		FAILED_CHECK(Manage_CoolTime(fDeltaTime));
+		FAILED_CHECK(Input_Keyboard(fDeltaTime));
+	}
 
 
 
@@ -78,14 +87,11 @@ _int CPlayer::Update(_double fDeltaTime)
 	if (g_pGameInstance->Get_DIKeyState(DIK_2)&DIS_Down)
 		Add_Dmg_to_Player(1);
 
-	//if (g_pGameInstance->Get_DIKeyState(DIK_3)&DIS_Down)
-	//{
-	//	//FAILED_CHECK(GetSingle(CUtilityMgr)->Start_InstanceParticle(m_eNowSceneNum, m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS), 0));
+	if (g_pGameInstance->Get_DIKeyState(DIK_3)&DIS_Down)
+	{
 
-	//	m_vecParticleDesc[5].vUp = GetSingle(CUtilityMgr)->RandomFloat3(-1, 1).Get_Nomalize();
-	//
-	//	GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[5]);
-	//}
+		Eat_Protain();
+	}
 
 
 
@@ -720,6 +726,116 @@ void CPlayer::Set_UmbrellaReflected(_bool bBool)
 	m_pModel->Add_Time_To_NowAnimPlayAcc(0.15);
 }
 
+HRESULT CPlayer::Update_EattingProtein(_double fDeltatime)
+{
+
+	if (!m_bEattingProteinStart) return S_FALSE;
+
+	m_ProteinPassedTime += fDeltatime;
+
+	if (!m_iProteinChecker)
+	{
+		GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeOutIn, 1, _float4(0, 0, 0, 1));
+		m_iProteinChecker++;
+	}
+	else if(m_iProteinChecker == 1 && m_ProteinPassedTime > 0.4f)
+	{
+		//vector<CAMACTDESC>		 vecCamPositions;
+		//vector<CAMACTDESC>		 vecLookPostions;
+		//= vecLookPostions;
+		//= vecCamPositions;
+
+		//////////////////////////////////////////////////////////////////////////
+
+		CAMERAACTION tDesc;
+		CAMACTDESC Before;
+
+		tDesc.vecCamPos;
+		Before.fDuration = 0.1f;
+		Before.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS)
+			+ (XMVector3Normalize(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK)) * 3.f) + XMVectorSet(0, 2, 0, 0);;
+		tDesc.vecCamPos.push_back(Before);
+		Before.fDuration = 6.5f;
+		Before.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS)
+			+ (XMVector3Normalize(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK)) * 3.f) + XMVectorSet(0, 2, 0, 0);;
+		tDesc.vecCamPos.push_back(Before);
+
+
+
+		Before.fDuration = 0.1f;
+		Before.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS) + XMVectorSet(0, 1.5f, 0, 0);
+		tDesc.vecLookAt.push_back(Before);
+
+		Before.fDuration = 6.5f;
+		Before.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS) + XMVectorSet(0, 1.5f, 0, 0);
+		tDesc.vecLookAt.push_back(Before);
+
+
+
+
+
+		CAMACTDESC Return;
+
+		Return.fDuration = 0.1f;
+		Return.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS)
+			+ (XMVector3Normalize(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK)) * 10.f);
+		tDesc.vecCamPos.push_back(Return);
+
+		Return.fDuration = 1.4f;
+		Return.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS)
+			+ (XMVector3Normalize(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK))* 20.f)
+			+ XMVectorSet(0, 15, 0, 0);
+		tDesc.vecCamPos.push_back(Return);
+
+
+
+
+		Return.fDuration = 0.1f;
+		Return.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS) + XMVectorSet(0, 2, 0, 0);
+		tDesc.vecLookAt.push_back(Return);
+
+		Return.fDuration = 2.5f;
+		Return.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS) + XMVectorSet(0, 30, 0, 0);
+		tDesc.vecLookAt.push_back(Return);
+
+
+		m_pMainCamera->CamActionStart(tDesc);
+
+		m_iProteinChecker++;
+	}
+	else if (m_iProteinChecker == 2 &&  m_ProteinPassedTime > 1.2f)
+	{
+		CWeapon::WEAPONDESC tWeaponDesc;
+		tWeaponDesc.pModel = m_pModel;
+		tWeaponDesc.pParantTransform = m_pTransformCom;
+		tWeaponDesc.szHirarchyNodeName = "Bip01-R-Finger0";
+
+		CWeapon* pWeapon = nullptr;
+		g_pGameInstance->Add_GameObject_To_Layer(SCENE_STATIC, TAG_LAY(Layer_StaticMapObj), TAG_OP(Prototype_EatableProtein), &tWeaponDesc);
+		m_iProteinChecker++;
+	}
+	else if (m_iProteinChecker == 3 && m_ProteinPassedTime > 6.5f)
+	{
+		GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeOutIn, 1, _float4(0, 0, 0, 1));
+		m_iProteinChecker++;
+
+	}
+	else if (m_iProteinChecker == 4 && m_ProteinPassedTime > 7.f)
+	{
+
+		Set_GettingBigger(true);
+
+		m_pModel->Set_BlockAnim(false);
+		m_bEattingProteinStart = false;
+		m_iProteinChecker++;
+	}
+
+
+
+
+	return S_OK;
+}
+
 
 HRESULT CPlayer::SetUp_Components()
 {
@@ -870,6 +986,8 @@ HRESULT CPlayer::SetUp_Weapon()
 	NULL_CHECK_RETURN(pWeapon, E_FAIL);
 	m_vecWeapon.push_back(pWeapon);
 	
+
+
 
 	return S_OK;
 }
@@ -1033,53 +1151,50 @@ HRESULT CPlayer::Renew_Player(_float3 Position , _float3 ReturnLookAt)
 void CPlayer::Set_GettingBigger(_bool bBool)
 {
 	if (m_GiantingPassedTime < 3) return;
-
 	if (bBool)
 	{
 		m_pModel->Change_AnimIndex(Weapon_Giant + 4, 0.0f, true);
 		
+
 		GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 2., _float4(0.5));
-
-
-
 		//////////////////////////////////////////////////////////////////////////
 
 
-		vector<CAMACTDESC>		 vecCamPositions;
-		vector<CAMACTDESC>		 vecLookPostions;
+		//vector<CAMACTDESC>		 vecCamPositions;
+		//vector<CAMACTDESC>		 vecLookPostions;
 
-		CAMERAACTION tDesc;
+		//CAMERAACTION tDesc;
 
-		tDesc.vecCamPos = vecCamPositions;
-		tDesc.vecLookAt = vecLookPostions;
-
-
-		CAMACTDESC Return;
-
-		Return.fDuration = 0.1f;
-		Return.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS)
-			+ (XMVector3Normalize(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK)) * 10.f);
-		tDesc.vecCamPos.push_back(Return);
-
-		Return.fDuration = 1.4f;
-		Return.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS)
-			+ (XMVector3Normalize(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) )* 20.f)
-			+ XMVectorSet(0, 15, 0, 0);
-		tDesc.vecCamPos.push_back(Return);
+		//tDesc.vecCamPos = vecCamPositions;
+		//tDesc.vecLookAt = vecLookPostions;
 
 
+		//CAMACTDESC Return;
+
+		//Return.fDuration = 0.1f;
+		//Return.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS)
+		//	+ (XMVector3Normalize(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK)) * 10.f);
+		//tDesc.vecCamPos.push_back(Return);
+
+		//Return.fDuration = 1.4f;
+		//Return.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS)
+		//	+ (XMVector3Normalize(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) )* 20.f)
+		//	+ XMVectorSet(0, 15, 0, 0);
+		//tDesc.vecCamPos.push_back(Return);
 
 
-		Return.fDuration = 0.1f;
-		Return.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS) + XMVectorSet(0, 2, 0, 0);
-		tDesc.vecLookAt.push_back(Return);
-
-		Return.fDuration = 2.5f;
-		Return.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS)+ XMVectorSet(0, 30, 0, 0);
-		tDesc.vecLookAt.push_back(Return);
 
 
-		m_pMainCamera->CamActionStart(tDesc);
+		//Return.fDuration = 0.1f;
+		//Return.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS) + XMVectorSet(0, 2, 0, 0);
+		//tDesc.vecLookAt.push_back(Return);
+
+		//Return.fDuration = 2.5f;
+		//Return.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS)+ XMVectorSet(0, 30, 0, 0);
+		//tDesc.vecLookAt.push_back(Return);
+
+
+		//m_pMainCamera->CamActionStart(tDesc);
 
 		//////////////////////////////////////////////////////////////////////////
 
@@ -1139,6 +1254,17 @@ void CPlayer::Set_GettingBigger(_bool bBool)
 		m_bGettingBigger = false;
 		m_GiantingPassedTime = 0;
 	}
+
+}
+
+void CPlayer::Eat_Protain()
+{
+
+
+	m_iProteinChecker = 0;
+	m_bEattingProteinStart = true;
+	m_ProteinPassedTime = 0;
+	m_pModel->Change_AnimIndex(5, 0, true);
 
 }
 
@@ -3021,7 +3147,6 @@ HRESULT CPlayer::Giantting_Update(_double fDeltaTime, CGameInstance * pInstance)
 		if (m_GiantingPassedTime > 3.f)
 		{
 			m_pModel->Change_AnimIndex(0, 0.35f);
-
 
 			m_fSmallScale = 1.f;
 			m_bIsGiant = false;

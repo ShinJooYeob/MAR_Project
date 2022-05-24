@@ -426,7 +426,7 @@ _int CExecutor::Update_Pattern(_double fDeltaTime)
 					m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.15f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.85f));
 					Add_Force(m_pTransformCom, m_vLookDir.XMVector() * 0.25f + XMVectorSet(0, 1, 0, 0) * 0.5f, 200);
 					//Add_Force(m_pTransformCom, m_vLookDir.XMVector() * 0.75f + XMVectorSet(0, 1, 0, 0) * 0.25f, 100);
-					m_LevitationTime = 0.5f;
+					m_LevitationTime = 0.7f;
 				}
 			}
 
@@ -688,7 +688,7 @@ _int CExecutor::Update_Pattern(_double fDeltaTime)
 					m_vLookDir = XMVector3Normalize(XMVectorSetY(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS) - m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0));
 					m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.15f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.85f));
 					Add_Force(m_pTransformCom, m_vLookDir.XMVector() * 0.25f + XMVectorSet(0, 1, 0, 0) * 0.5f, 200);
-					m_LevitationTime = 0.5f;
+					m_LevitationTime = 0.7f;
 					//Add_Force(m_pTransformCom, m_vLookDir.XMVector() * 0.75f + XMVectorSet(0, 1, 0, 0) * 0.25f, 100);
 				}
 			}
@@ -968,6 +968,16 @@ HRESULT CExecutor::Set_Monster_On_Terrain(CTransform * pTransform, _double fDelt
 		if (m_bIsJumping && m_pModel->Get_NowAnimIndex() != 4 && m_pModel->Get_NowAnimIndex() != 5)
 		{
 			GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.2f, _float4(0.3f));
+
+			CDustWind::DUSTWINDDESC tDesc;
+
+			tDesc.vPosition = (m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
+			tDesc.ToTalLifeTime = 1.f;
+			tDesc.StartScale = _float3(2, 5.f, 2);
+			tDesc.TargetScale = _float3(7, 0.5f, 7);
+			tDesc.eEasingType = TYPE_ExpoOut;
+			
+			g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_DustWind), &(tDesc));
 
 			m_bIsJumping = false;
 			m_PatternDelayTime = 3;

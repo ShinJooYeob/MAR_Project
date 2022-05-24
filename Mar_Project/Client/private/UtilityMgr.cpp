@@ -124,6 +124,10 @@ HRESULT CUtilityMgr::Create_ParticleObject(_uint eSceneID, PARTICLEDESC tParticl
 		FAILED_CHECK(GetSingle(CGameInstance)->Add_GameObject_To_Layer(eSceneID, TAG_LAY(Layer_Particle), TEXT("ProtoType_GameObject_Object_particle_Suck"), &tParticleDesc));
 		break;
 
+	case Client::Particle_Cone:
+		FAILED_CHECK(GetSingle(CGameInstance)->Add_GameObject_To_Layer(eSceneID, TAG_LAY(Layer_Particle), TEXT("ProtoType_GameObject_Object_particle_Cone"), &tParticleDesc));
+		break;
+
 	case Client::Particle_Fixed_LookFree:
 		FAILED_CHECK(GetSingle(CGameInstance)->Add_GameObject_To_Layer(eSceneID, TAG_LAY(Layer_Particle), TEXT("ProtoType_GameObject_Object_particle_Fixed_LookFree"), &tParticleDesc));
 		break;
@@ -267,7 +271,7 @@ HRESULT CUtilityMgr::Ready_InstanceParticleDesc()
 
 	
 	tDesc.ColorChangeFrequency = 4;
-	tDesc.vStartColor = _float4(0, 0.066666f, 0.72156862, 1);
+	tDesc.vStartColor = _float4(0, 0.066666f, 0.72156862f, 1);
 	//tDesc.vTargetColor = _float4(0.7333333f, 0.31372549f, 0.f, 0.2f);
 	tDesc.vTargetColor = _float4(1, 1, 1, 0.2f);
 

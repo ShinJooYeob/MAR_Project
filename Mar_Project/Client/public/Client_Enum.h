@@ -36,6 +36,9 @@ enum OBJECTPROTOTYPEID
 	Prototype_UISetting,
 
 
+	Prototype_EatableProtein,
+
+
 	Prototype_SkyBox,
 	Prototype_PlayerLoby,
 	Prototype_Player,
@@ -119,6 +122,9 @@ static const _tchar* Tag_Object_Prototype(OBJECTPROTOTYPEID eTag)
 	{
 		
 		
+	case Prototype_EatableProtein:
+		return TEXT("Prototype_EatableProtein");
+		break;
 	case Prototype_Instance_Particle_Ball:
 		return TEXT("Prototype_Instance_Particle_Ball");
 		break;
@@ -783,6 +789,9 @@ enum COMPONENTPROTOTYPEID
 		
 		
 
+		Prototype_Mesh_Protein,
+		Prototype_Mesh_ProteinTable,
+		Prototype_Mesh_ProteinTableCover,
 		
 		
 		
@@ -1377,6 +1386,18 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 		break;
 
 
+	case Prototype_Mesh_Protein:
+		return TEXT("Prototype_Mesh_Protein");
+		break;
+
+	case Prototype_Mesh_ProteinTable:
+		return TEXT("Prototype_Mesh_ProteinTable");
+		break;
+
+
+	case Prototype_Mesh_ProteinTableCover:
+		return TEXT("Prototype_Mesh_ProteinTableCover");
+		break;
 
 		
 
