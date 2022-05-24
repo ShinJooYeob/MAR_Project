@@ -30,6 +30,48 @@ HRESULT CHorse::Initialize_Clone(void * pArg)
 
 	FAILED_CHECK(SetUp_Components());
 
+	m_tParticleDesc.eParticleTypeID = Particle_Fixed_LookFree;
+
+	m_tParticleDesc.FollowingTarget = nullptr;
+
+	m_tParticleDesc.szTextureProtoTypeTag = TAG_CP(Prototype_Texture_PlayerEffect);
+	m_tParticleDesc.szTextureLayerTag = L"HorseHit";
+	m_tParticleDesc.iSimilarLayerNum = 2;
+
+	m_tParticleDesc.TextureChageFrequency = 1;
+	m_tParticleDesc.vTextureXYNum = _float2(3, 3);
+
+	m_tParticleDesc.TotalParticleTime = 0.01f;
+	m_tParticleDesc.EachParticleLifeTime = 0.34f;
+	m_tParticleDesc.MaxParticleCount = 1;
+
+	m_tParticleDesc.SizeChageFrequency = 2;
+	m_tParticleDesc.ParticleSize = _float3(2.f);
+	m_tParticleDesc.ParticleSize2 = _float3(5.5f);
+
+	m_tParticleDesc.ColorChageFrequency = 1;
+	m_tParticleDesc.TargetColor = _float4(0.8f, 0.8f, 0.5f, 0.3f);
+	m_tParticleDesc.TargetColor2 = _float4(1.f, 1.f, 1.f, 0.8f);
+
+
+	m_tParticleDesc.Particle_Power = 0;
+	m_tParticleDesc.PowerRandomRange = _float2(0.5f, 1.5f);
+
+	m_tParticleDesc.vUp = _float3(0, 1, 0);
+
+	m_tParticleDesc.MaxBoundaryRadius = 20;
+
+	m_tParticleDesc.m_bIsUI = false;
+	m_tParticleDesc.m_bUIDepth = 0;
+
+	m_tParticleDesc.ParticleStartRandomPosMin = _float3(-0, 0, -0);
+	m_tParticleDesc.ParticleStartRandomPosMax = _float3(0, 0, 0);
+
+	m_tParticleDesc.DepthTestON = true;
+	m_tParticleDesc.AlphaBlendON = false;
+
+	m_tParticleDesc.m_fAlphaTestValue = 0.1f;
+	m_tParticleDesc.m_iPassIndex = 9;
 	
 	return S_OK;
 }
@@ -134,17 +176,41 @@ void CHorse::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedOb
 
 		if (lstrcmp(pConflictedObj->Get_NameTag(), TAG_LAY(Layer_Breakable)))
 		{
+			CUtilityMgr* pUtil = GetSingle(CUtilityMgr);
 
 			pConflictedCollider->Set_Conflicted();
-			GetSingle(CUtilityMgr)->SlowMotionStart();
+			pUtil->SlowMotionStart();
 			((CMonster*)(pConflictedObj))->Add_Dmg_to_Monster(5);
 
+			_Vector vMyColliderPos = m_pColliderCom->Get_ColliderPosition(iMyColliderIndex).XMVector();
+			_Vector vEnemyColliderPos = pConflictedCollider->Get_ColliderPosition(iConflictedObjColliderIndex).XMVector();
+
+			pUtil->Start_InstanceParticle(m_eNowSceneNum, vMyColliderPos, 0);
+
+			m_tParticleDesc.FixedTarget = (vMyColliderPos + vEnemyColliderPos)*0.5f;
+			m_tParticleDesc.vUp = XMVector3Normalize(XMVector3Cross(vMyColliderPos - vEnemyColliderPos, g_pGameInstance->Get_TargetPostion_Vector(PLV_CAMERA) - vEnemyColliderPos));
+			pUtil->Create_ParticleObject(m_eNowSceneNum, m_tParticleDesc);
 		}
 		else
 		{
+			CUtilityMgr* pUtil = GetSingle(CUtilityMgr);
+
 			pConflictedCollider->Set_Conflicted();
-			GetSingle(CUtilityMgr)->SlowMotionStart();
+			pUtil->SlowMotionStart();
 			((CBreakableObj*)(pConflictedObj))->Add_Dmg_To_BreakableObj(5);
+
+			pUtil->Start_InstanceParticle(m_eNowSceneNum, m_pColliderCom->Get_ColliderPosition(iMyColliderIndex), 0);
+
+
+			_Vector vMyColliderPos = m_pColliderCom->Get_ColliderPosition(iMyColliderIndex).XMVector();
+			_Vector vEnemyColliderPos = pConflictedCollider->Get_ColliderPosition(iConflictedObjColliderIndex).XMVector();
+
+			pUtil->Start_InstanceParticle(m_eNowSceneNum, vMyColliderPos, 0);
+
+			m_tParticleDesc.FixedTarget = (vMyColliderPos + vEnemyColliderPos)*0.5f;
+			m_tParticleDesc.vUp = XMVector3Normalize(XMVector3Cross(vMyColliderPos - vEnemyColliderPos, g_pGameInstance->Get_TargetPostion_Vector(PLV_CAMERA) - vEnemyColliderPos));
+			pUtil->Create_ParticleObject(m_eNowSceneNum, m_tParticleDesc);
+
 		}
 
 	}

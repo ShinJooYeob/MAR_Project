@@ -25,14 +25,16 @@ HRESULT CInstance_Particle::Initialize_Clone(void * pArg)
 	if (FAILED(__super::Initialize_Clone(pArg)))
 		return E_FAIL;
 
+	if (pArg != nullptr)
+	{
+		memcpy(&m_tDesc, pArg, sizeof(INSTPARTICLEDESC));
+	}
+
+
 	FAILED_CHECK(SetUp_Components());
 	FAILED_CHECK(SetUp_ParticleAttribute());
 
-	if (pArg != nullptr)
-	{
-		_float3 vPos = *((_float3*)pArg);
-		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, vPos);
-	}
+	m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, m_tDesc.vWorldPosition);
 
 	return S_OK;
 }
@@ -42,38 +44,16 @@ _int CInstance_Particle::Update(_double TimeDelta)
 	if (0 > __super::Update(TimeDelta))
 		return -1;
 
-	m_PassedTime += TimeDelta;
+	//m_PassedTime += TimeDelta;
 
-	if (m_PassedTime > 15)
-	{
-		Set_IsDead();
-		return 0 ;
-	}
-
-
-	FAILED_CHECK(Update_ParticleAttribute(TimeDelta));
-
-
-	D3D11_MAPPED_SUBRESOURCE SubResource;
-	CUtilityMgr* pUtil = GetSingle(CUtilityMgr);
-
-	FAILED_CHECK(m_pVIBufferCom->Lock(&SubResource));
+	//if (m_PassedTime > 15)
+	//{
+	//	Set_IsDead();
+	//	return 0 ;
+	//}
 
 
 
-	for (_uint i = 0; i < m_iNumInstance; ++i)
-	{
-		//
-		XMStoreFloat4(&(((VTXINSTMAT*)SubResource.pData)[i].vRight), ((_float3*)(&m_vecParticleAttribute[i]._LocalMatirx.m[0]))->XMVector() * m_vecParticleAttribute[i]._size.x);
-		XMStoreFloat4(&(((VTXINSTMAT*)SubResource.pData)[i].vUp), ((_float3*)(&m_vecParticleAttribute[i]._LocalMatirx.m[1]))->XMVector()* m_vecParticleAttribute[i]._size.y);
-		XMStoreFloat4(&(((VTXINSTMAT*)SubResource.pData)[i].vLook), ((_float3*)(&m_vecParticleAttribute[i]._LocalMatirx.m[2]))->XMVector()* m_vecParticleAttribute[i]._size.z);
-		XMStoreFloat4(&(((VTXINSTMAT*)SubResource.pData)[i].vTranslation), ((_float3*)(&m_vecParticleAttribute[i]._LocalMatirx.m[3]))->XMVector());
-		((VTXINSTMAT*)SubResource.pData)[i].vTranslation.w = 1;
-	}
-
-
-
-	m_pVIBufferCom->UnLock();
 	return _int();
 }
 
@@ -91,8 +71,30 @@ _int CInstance_Particle::LateUpdate(_double TimeDelta)
 
 _int CInstance_Particle::Render()
 {
-
 	NULL_CHECK_RETURN(m_pVIBufferCom, E_FAIL);
+	
+	FAILED_CHECK(Update_ParticleAttribute(g_fDeltaTime));
+	D3D11_MAPPED_SUBRESOURCE SubResource;
+	CUtilityMgr* pUtil = GetSingle(CUtilityMgr);
+
+	FAILED_CHECK(m_pVIBufferCom->Lock(&SubResource));
+
+	for (_uint i = 0; i < m_iNumInstance; ++i)
+	{
+		//
+		XMStoreFloat4(&(((VTXINSTMAT*)SubResource.pData)[i].vRight), ((_float3*)(&m_vecParticleAttribute[i]._LocalMatirx.m[0]))->XMVector() * m_vecParticleAttribute[i]._size.x);
+		XMStoreFloat4(&(((VTXINSTMAT*)SubResource.pData)[i].vUp), ((_float3*)(&m_vecParticleAttribute[i]._LocalMatirx.m[1]))->XMVector()* m_vecParticleAttribute[i]._size.y);
+		XMStoreFloat4(&(((VTXINSTMAT*)SubResource.pData)[i].vLook), ((_float3*)(&m_vecParticleAttribute[i]._LocalMatirx.m[2]))->XMVector()* m_vecParticleAttribute[i]._size.z);
+		XMStoreFloat4(&(((VTXINSTMAT*)SubResource.pData)[i].vTranslation), ((_float3*)(&m_vecParticleAttribute[i]._LocalMatirx.m[3]))->XMVector());
+		((VTXINSTMAT*)SubResource.pData)[i].vTranslation.w = 1;
+
+
+		((VTXINSTMAT*)SubResource.pData)[i].vColor = m_vecParticleAttribute[i]._color;
+		((VTXINSTMAT*)SubResource.pData)[i].vColor.w = 1;
+	}
+
+	m_pVIBufferCom->UnLock();
+
 
 	FAILED_CHECK(SetUp_ConstantTable());
 
@@ -140,7 +142,7 @@ HRESULT CInstance_Particle::SetUp_ParticleAttribute()
 		vUp = pUtil->RandomFloat3(-999, 999).Get_Nomalize();
 		vRight = XMVector3Normalize(XMVector3Cross(XMVectorSet(0, 1, 0, 0), vUp));
 		vLook = XMVector3Normalize(XMVector3Cross(vRight, vUp));
-		vTrans = XMVectorSetY(pUtil->RandomFloat3(-0.3f, 0.3f).XMVector(),1.0f);
+		vTrans = XMVectorSetY(pUtil->RandomFloat3(-0.3f, 0.3f).XMVector(),0.f);
 
 
 		tDesc._LocalMatirx = XMMatrixIdentity();
@@ -158,7 +160,39 @@ HRESULT CInstance_Particle::SetUp_ParticleAttribute()
 
 		tDesc._lifeTime = pUtil->RandomFloat(1, 2.5f);
 		tDesc._size = _float3(0.5f, 2.f, 1);
-		
+
+
+//#define ColorRange 0.3f, 0.8f
+
+		//switch (rand() % 7)
+		//{
+		//case 0:
+		//	tDesc._targetcolor = _float4(pUtil->RandomFloat(ColorRange), 0, 0, 1.f);
+		//	break;
+		//case 1:
+		//	tDesc._targetcolor = _float4(0, pUtil->RandomFloat(ColorRange), 0, 1.f);
+		//	break;
+		//case 2:
+		//	tDesc._targetcolor = _float4(0, 0, pUtil->RandomFloat(ColorRange), 1.f);
+		//	break;
+		//case 3:
+		//	tDesc._targetcolor = _float4(0, pUtil->RandomFloat(ColorRange), pUtil->RandomFloat(ColorRange), 1.f);
+		//	break;
+		//case 4:
+		//	tDesc._targetcolor = _float4(pUtil->RandomFloat(ColorRange), 0, pUtil->RandomFloat(ColorRange), 1.f);
+		//	break;
+		//case 5:
+		//	tDesc._targetcolor = _float4(pUtil->RandomFloat(ColorRange), pUtil->RandomFloat(ColorRange), 0, 1.f);
+		//	break;
+		//case 6:
+		//	tDesc._targetcolor = _float4(pUtil->RandomFloat3(ColorRange), 1.f);
+		//	break;
+
+		//default:
+		//	__debugbreak();
+		//	break;
+		//}
+
 
 		m_vecParticleAttribute.push_back(tDesc);
 	}
@@ -203,8 +237,16 @@ HRESULT CInstance_Particle::Update_ParticleAttribute(_double fDeltaTime)
 
 		if (m_vecParticleAttribute[i]._age < m_vecParticleAttribute[i]._lifeTime)
 		{
-			m_vecParticleAttribute[i]._NowForce = pInstance->Easing(TYPE_Linear, m_vecParticleAttribute[i]._Defaultforce, 0, (_float)m_vecParticleAttribute[i]._age, (_float)m_vecParticleAttribute[i]._lifeTime);
-			m_vecParticleAttribute[i]._size = pInstance->Easing_Vector(TYPE_ExpoOut, _float3(0.05f, 0.2f, 1), _float3(0.01f), (_float)m_vecParticleAttribute[i]._age, (_float)m_vecParticleAttribute[i]._lifeTime);
+			m_vecParticleAttribute[i]._NowForce = pInstance->Easing(TYPE_SinIn, m_vecParticleAttribute[i]._Defaultforce, 0, (_float)m_vecParticleAttribute[i]._age, (_float)m_vecParticleAttribute[i]._lifeTime);
+			
+			if (m_vecParticleAttribute[i]._age < m_vecParticleAttribute[i]._lifeTime * m_tDesc.SizeChangingEndRate)
+			{
+				m_vecParticleAttribute[i]._size = pInstance->Easing_Vector(TYPE_ExpoOut, m_tDesc.vStartSize, m_tDesc.vTargetSize,
+					(_float)m_vecParticleAttribute[i]._age, (_float)m_vecParticleAttribute[i]._lifeTime * 0.7f);
+
+			}
+
+			FAILED_CHECK(Update_ColorChange(&(m_vecParticleAttribute[i]),fDeltaTime));
 
 			_float3 NewPos = *((_float3*)(&m_vecParticleAttribute[i]._LocalMatirx.m[3]));
 			/*if (NewPos.Get_Lenth() < 7)
@@ -222,7 +264,7 @@ HRESULT CInstance_Particle::Update_ParticleAttribute(_double fDeltaTime)
 		}
 	}
 
-	if (iDeadCount == m_iNumInstance - 1)
+	if (iDeadCount >= m_iNumInstance - 2)
 	{
 		Set_IsDead();
 	}
@@ -230,6 +272,35 @@ HRESULT CInstance_Particle::Update_ParticleAttribute(_double fDeltaTime)
 
 	return S_OK;
 }
+
+HRESULT CInstance_Particle::Update_ColorChange(INSTPARTICLEATT * tParticleAtt, _double fDeltaTime)
+{
+	CGameInstance* pInstance = GetSingle(CGameInstance);
+
+
+	_double TimeInterver = tParticleAtt->_lifeTime / m_tDesc.ColorChangeFrequency; //=> 15.초 파티클의 2번 진동수면 7.5가 나오는 것
+	_uint iFrequencyIndex = _uint(tParticleAtt->_age / TimeInterver); //=> 7.5초 주기에 3.4초를 지나고있으면 0번째 10초를 지나고있으면 1번째를 의미함
+	_double FrequencyAge = tParticleAtt->_age - (TimeInterver * iFrequencyIndex); // =>7.5초 주기에 3.4초를 지나고있으면 3.4 10초를 지나고있으면 2.5
+
+	if (iFrequencyIndex % 2)
+	{
+		//_float3(1, 0.64313725f, 0.141176470f);
+		tParticleAtt->_color = pInstance->Easing_Vector(TYPE_Linear, m_tDesc.vTargetColor, m_tDesc.vStartColor, _float(FrequencyAge), _float(TimeInterver));
+	}
+	else
+	{
+		tParticleAtt->_color = pInstance->Easing_Vector(TYPE_Linear, m_tDesc.vStartColor, m_tDesc.vTargetColor,  _float(FrequencyAge), _float(TimeInterver));
+
+	}
+
+	tParticleAtt->_color.x = min(max(tParticleAtt->_color.x, 0), 1);
+	tParticleAtt->_color.y = min(max(tParticleAtt->_color.y, 0), 1);
+	tParticleAtt->_color.z = min(max(tParticleAtt->_color.z, 0), 1);
+
+
+	return S_OK;
+}
+
 
 CInstance_Particle * CInstance_Particle::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
 {
@@ -264,5 +335,7 @@ void CInstance_Particle::Free()
 	Safe_Release(m_pVIBufferCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pTransformCom);
+
+	m_vecParticleAttribute.clear();
 	
 }

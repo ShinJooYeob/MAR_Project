@@ -78,9 +78,17 @@ _int CPlayer::Update(_double fDeltaTime)
 	if (g_pGameInstance->Get_DIKeyState(DIK_2)&DIS_Down)
 		Add_Dmg_to_Player(1);
 
-	if (g_pGameInstance->Get_DIKeyState(DIK_3)&DIS_Down) {
-		g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), L"Test", &m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
-	}
+	//if (g_pGameInstance->Get_DIKeyState(DIK_3)&DIS_Down)
+	//{
+	//	//FAILED_CHECK(GetSingle(CUtilityMgr)->Start_InstanceParticle(m_eNowSceneNum, m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS), 0));
+
+	//	m_vecParticleDesc[5].vUp = GetSingle(CUtilityMgr)->RandomFloat3(-1, 1).Get_Nomalize();
+	//
+	//	GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[5]);
+	//}
+
+
+
 
 
 
@@ -1390,6 +1398,20 @@ HRESULT CPlayer::Ready_ParticleDesc()
 
 
 	m_vecParticleDesc.push_back(tDesc);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	return S_OK;
 }

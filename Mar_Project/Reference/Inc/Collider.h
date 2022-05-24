@@ -28,6 +28,8 @@ public:
 	void Set_Conflicted(_double TotalTime = 0.5);
 	_bool Get_Conflicted() {return m_bIsConflicted;}
 
+	_float3 Get_ColliderPosition(_uint iIndex = 0);
+
 #ifdef _DEBUG
 public:
 	virtual _int Render();

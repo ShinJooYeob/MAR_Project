@@ -5,6 +5,21 @@
 
 BEGIN(Client)
 
+typedef struct tagInstanceParticleDesc
+{
+	_float3 vWorldPosition = _float3(0);
+
+	_float	ColorChangeFrequency = 0;
+	_float4 vStartColor = _float4(1);
+	_float4 vTargetColor = _float4(1);
+
+	_float	SizeChangingEndRate = 0.7f;
+	_float3 vStartSize = _float3(1);
+	_float3 vTargetSize = _float3(1);
+
+}INSTPARTICLEDESC;
+
+
 typedef struct tagObjectElement
 {
 	_tchar			ObjectID[128] = L"";
@@ -42,6 +57,7 @@ enum ParticleID
 	Particle_Suck,
 	Particle_Straight,
 	Particle_Cone,
+	Particle_Fixed_LookFree,
 	//Particle_Fountain,
 	//Particle_Spread,
 

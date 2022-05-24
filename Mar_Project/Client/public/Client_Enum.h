@@ -25,6 +25,9 @@ enum OBJECTPROTOTYPEID
 	Prototype_ScreenEffectUI,
 	Prototype_TriggerCollider_SceneChager,
 
+
+	Prototype_Instance_Particle_Ball,
+
 	Prototype_UIImage,
 
 	Prototype_UIGamePlay,
@@ -115,7 +118,10 @@ static const _tchar* Tag_Object_Prototype(OBJECTPROTOTYPEID eTag)
 	switch (eTag)
 	{
 		
-
+		
+	case Prototype_Instance_Particle_Ball:
+		return TEXT("Prototype_Instance_Particle_Ball");
+		break;
 	case Prototype_DustWind:
 		return TEXT("Prototype_DustWind");
 		break;

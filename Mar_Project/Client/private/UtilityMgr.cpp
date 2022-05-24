@@ -33,6 +33,8 @@ HRESULT CUtilityMgr::Initialize_UtilityMgr(ID3D11Device * pDevice, ID3D11DeviceC
 
 	NULL_CHECK_RETURN(m_pFadeEffect, E_FAIL);
 
+	FAILED_CHECK(Ready_InstanceParticleDesc());
+
 	return S_OK;
 }
 
@@ -122,8 +124,8 @@ HRESULT CUtilityMgr::Create_ParticleObject(_uint eSceneID, PARTICLEDESC tParticl
 		FAILED_CHECK(GetSingle(CGameInstance)->Add_GameObject_To_Layer(eSceneID, TAG_LAY(Layer_Particle), TEXT("ProtoType_GameObject_Object_particle_Suck"), &tParticleDesc));
 		break;
 
-		case Client::Particle_Cone:
-		FAILED_CHECK(GetSingle(CGameInstance)->Add_GameObject_To_Layer(eSceneID, TAG_LAY(Layer_Particle), TEXT("ProtoType_GameObject_Object_particle_Cone"), &tParticleDesc));
+	case Client::Particle_Fixed_LookFree:
+		FAILED_CHECK(GetSingle(CGameInstance)->Add_GameObject_To_Layer(eSceneID, TAG_LAY(Layer_Particle), TEXT("ProtoType_GameObject_Object_particle_Fixed_LookFree"), &tParticleDesc));
 		break;
 		/*
 		case Client::Particle_Fountain:
@@ -212,6 +214,15 @@ HRESULT CUtilityMgr::Start_ScreenEffect(ScreenEffectID eEffectType, _double Effe
 	return S_OK;
 }
 
+HRESULT CUtilityMgr::Start_InstanceParticle(_uint eNowSceneNum, _float3 vPosition, _uint iParticleDescIndex)
+{
+	if (iParticleDescIndex >= m_vecInstanceParticleDesc.size())return E_FAIL;
+
+	m_vecInstanceParticleDesc[iParticleDescIndex].vWorldPosition = vPosition;
+
+	return g_pGameInstance->Add_GameObject_To_Layer(eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_Instance_Particle_Ball),&m_vecInstanceParticleDesc[iParticleDescIndex]);;
+}
+
 
 
 HRESULT CUtilityMgr::Clear_RenderGroup_forSceneChange()
@@ -234,6 +245,38 @@ _uint CUtilityMgr::CountDigit(_uint iNum)
 	string tmp;
 	tmp = to_string(iNum);
 	return _uint(tmp.size());
+}
+
+HRESULT CUtilityMgr::Ready_InstanceParticleDesc()
+{
+	m_vecInstanceParticleDesc.reserve(1);
+
+	INSTPARTICLEDESC tDesc;
+
+	tDesc.ColorChangeFrequency = 1;
+	tDesc.vStartColor = _float4(1, 0.64313725f, 0.141176470f, 1);
+	//tDesc.vTargetColor = _float4(0.7333333f, 0.31372549f, 0.f, 0.2f);
+	tDesc.vTargetColor = _float4(1,1,1, 0.2f);
+
+	tDesc.SizeChangingEndRate = 0.7f;
+	tDesc.vStartSize = _float3(0.01f, 0.2f, 1);
+	tDesc.vTargetSize = _float3(0.01f);
+	m_vecInstanceParticleDesc.push_back(tDesc);
+
+
+
+	
+	tDesc.ColorChangeFrequency = 4;
+	tDesc.vStartColor = _float4(0, 0.066666f, 0.72156862, 1);
+	//tDesc.vTargetColor = _float4(0.7333333f, 0.31372549f, 0.f, 0.2f);
+	tDesc.vTargetColor = _float4(1, 1, 1, 0.2f);
+
+	tDesc.SizeChangingEndRate = 0.7f;
+	tDesc.vStartSize = _float3(0.01f, 0.2f, 1);
+	tDesc.vTargetSize = _float3(0.01f);
+	m_vecInstanceParticleDesc.push_back(tDesc);
+
+	return S_OK;
 }
 
 void CUtilityMgr::Free()

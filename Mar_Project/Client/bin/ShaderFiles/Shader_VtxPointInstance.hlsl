@@ -75,6 +75,7 @@ struct GS_OUT
 {
 	float4		vPosition : SV_POSITION;
 	float2		vTexUV : TEXCOORD0;
+	float4		vColor : TEXCOORD1;
 };
 
 [maxvertexcount(6)]
@@ -103,18 +104,22 @@ void GS_MAIN_INST(in point GS_IN In[1], inout TriangleStream<GS_OUT> Trianglestr
 	vPosition = In[0].vPosition.xyz + vRight *RightLength + vUp *UpLength;
 	Out[0].vPosition = mul(vector(vPosition, 1.f), matVP);
 	Out[0].vTexUV = float2(0.f, 0.f);
+	Out[0].vColor = In[0].vColor;
 
 	vPosition = In[0].vPosition.xyz - vRight *RightLength + vUp * UpLength;
 	Out[1].vPosition = mul(vector(vPosition, 1.f), matVP);
 	Out[1].vTexUV = float2(1.f, 0.f);
+	Out[1].vColor = In[0].vColor;
 
 	vPosition = In[0].vPosition.xyz - vRight *RightLength - vUp *UpLength;
 	Out[2].vPosition = mul(vector(vPosition, 1.f), matVP);
 	Out[2].vTexUV = float2(1.f, 1.f);
+	Out[2].vColor = In[0].vColor;
 
 	vPosition = In[0].vPosition.xyz + vRight * RightLength - vUp * UpLength;
 	Out[3].vPosition = mul(vector(vPosition, 1.f), matVP);
 	Out[3].vTexUV = float2(0.f, 1.f);
+	Out[3].vColor = In[0].vColor;
 
 
 	Trianglestream.Append(Out[0]);
@@ -128,57 +133,13 @@ void GS_MAIN_INST(in point GS_IN In[1], inout TriangleStream<GS_OUT> Trianglestr
 	Trianglestream.RestartStrip();
 
 
-
-	//GS_OUT			Out[4];
-
-	//float3		vLook = (g_vCamPosition - In[0].vPosition).xyz;
-	//float3		vAxisY = float3(0.f, 1.f, 0.f);
-	//float3		vRight = cross(vAxisY, vLook);
-	//float3		vUp = cross(vLook, vRight);
-
-	//vLook = normalize(vLook);
-	//vRight = normalize(vRight);
-	//vUp = normalize(vUp);
-	//float	fHalfSize = 1;
-
-	//matrix		matVP;
-	//matVP = mul(g_ViewMatrix, g_ProjMatrix);
-
-	//float3		vPosition;
-
-	//vPosition = In[0].vPosition.xyz + vRight * fHalfSize + vUp * fHalfSize;
-	//Out[0].vPosition = mul(vector(vPosition, 1.f), matVP);
-	//Out[0].vTexUV = float2(0.f, 0.f);
-
-	//vPosition = In[0].vPosition.xyz - vRight * fHalfSize + vUp * fHalfSize;
-	//Out[1].vPosition = mul(vector(vPosition, 1.f), matVP);
-	//Out[1].vTexUV = float2(1.f, 0.f);
-
-	//vPosition = In[0].vPosition.xyz - vRight * fHalfSize - vUp * fHalfSize;
-	//Out[2].vPosition = mul(vector(vPosition, 1.f), matVP);
-	//Out[2].vTexUV = float2(1.f, 1.f);
-
-	//vPosition = In[0].vPosition.xyz + vRight * fHalfSize - vUp * fHalfSize;
-	//Out[3].vPosition = mul(vector(vPosition, 1.f), matVP);
-	//Out[3].vTexUV = float2(0.f, 1.f);
-
-	//Trianglestream.Append(Out[0]);
-	//Trianglestream.Append(Out[1]);
-	//Trianglestream.Append(Out[2]);
-	//Trianglestream.RestartStrip();
-
-	//Trianglestream.Append(Out[0]);
-	//Trianglestream.Append(Out[2]);
-	//Trianglestream.Append(Out[3]);
-	//Trianglestream.RestartStrip();
-
-
 }
 
 struct PS_IN
 {
 	float4		vPosition : SV_POSITION;
 	float2		vTexUV : TEXCOORD0;
+	float4		vColor : TEXCOORD1;
 };
 
 struct PS_OUT
@@ -193,10 +154,10 @@ PS_OUT PS_MAIN_INST(PS_IN In)
 	Out.vColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
 	//Out.vColor.gb = 0.f;
 
-	//if (Out.vColor.a < 0.9f)
-	//	discard;
+	if (Out.vColor.a < 0.9f)
+		discard;
 
-	//Out.vColor.r = 1.f;
+	Out.vColor *= In.vColor;
 
 	return Out;
 }
@@ -205,7 +166,7 @@ technique11		DefaultTechnique
 {
 	pass Point
 	{
-		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetBlendState(AlphaBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 		SetDepthStencilState(ZTestAndWriteState, 0);
 		SetRasterizerState(CullMode_None);
 

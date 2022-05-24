@@ -374,12 +374,13 @@ HRESULT CParticleObject::SetUp_ParticleDesc(void * pArg)
 
 	if (m_vUp.y != 1 && m_vUp.y != -1)
 	{
-		m_vRight = XMVector3Normalize(m_vUp.Get_Cross(XMVectorSet(0,1,0,0)));
+		m_vRight = XMVector3Normalize(_float3(0,1,0).Get_Cross(m_vUp.XMVector()));
+		//m_vRight = XMVector3Normalize(m_vUp.Get_Cross(XMVectorSet(0,1,0,0)));
 		m_vLook = XMVector3Normalize(m_vRight.Get_Cross(m_vUp.XMVector()));
 	}
 	else
 	{
-		m_vRight = XMVector3Normalize(m_vUp.Get_Cross(XMVectorSet(0.000001f, 1, 0, 0)));
+		m_vRight = XMVector3Normalize(_float3(0.000001f, 1, 0).Get_Cross(m_vUp.XMVector()));
 		m_vLook = XMVector3Normalize(m_vRight.Get_Cross(m_vUp.XMVector()));
 	}
 
@@ -587,7 +588,7 @@ CParticleeObj_Cone::CParticleeObj_Cone(ID3D11Device * pDevice, ID3D11DeviceConte
 {
 }
 
-CParticleeObj_Cone::CParticleeObj_Cone(const CParticleeObj_Ball & rhs)
+CParticleeObj_Cone::CParticleeObj_Cone(const CParticleeObj_Cone & rhs)
 	: CParticleObject(rhs)
 {
 }
@@ -674,7 +675,7 @@ CParticleeObj_Fixed::CParticleeObj_Fixed(ID3D11Device * pDevice, ID3D11DeviceCon
 {
 }
 
-CParticleeObj_Fixed::CParticleeObj_Fixed(const CParticleeObj_Ball & rhs)
+CParticleeObj_Fixed::CParticleeObj_Fixed(const CParticleeObj_Fixed & rhs)
 	: CParticleObject(rhs)
 {
 }
@@ -752,6 +753,174 @@ CGameObject * CParticleeObj_Fixed::Clone(void * pArg)
 	if (FAILED(pInstance->Initialize_Clone(pArg)))
 	{
 		MSGBOX("Fail to Create CParticleeObj_Fixed");
+		Safe_Release(pInstance);
+	}
+
+	return pInstance;
+}
+
+
+
+
+CParticleeObj_Fixed_LookFree::CParticleeObj_Fixed_LookFree(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
+	: CParticleObject(pDevice, pDeviceContext)
+{
+}
+
+CParticleeObj_Fixed_LookFree::CParticleeObj_Fixed_LookFree(const CParticleeObj_Fixed_LookFree & rhs)
+	: CParticleObject(rhs)
+{
+}
+
+void CParticleeObj_Fixed_LookFree::Reset_Velocity(_float3 & fAttVlocity)
+{
+}
+
+void CParticleeObj_Fixed_LookFree::Update_Position_by_Velocity(PARTICLEATT * tParticleAtt, _double fTimeDelta)
+{
+	if (m_ParticleDesc.FollowingTarget != nullptr)
+		tParticleAtt->_position = m_ParticleDesc.FollowingTarget->Get_MatrixState(CTransform::STATE_POS) + m_vPivot.XMVector();
+	else
+		tParticleAtt->_position = m_ParticleDesc.FixedTarget.XMVector() + m_vPivot.XMVector();
+
+}
+
+HRESULT CParticleeObj_Fixed_LookFree::Initialize_Child_Clone()
+{
+	m_ParticleList.clear();
+
+	PARTICLEATT part;
+
+
+	m_ParticleDesc.Particle_Power = 0.;
+	m_ParticleDesc.PowerRandomRange = _float2(0.0f, 0.1f);
+	m_ParticleDesc.SubPowerRandomRange = _float2(0, 0);
+	m_ParticleDesc.vUp = _float3(0, 1, 0);
+	m_ParticleDesc.MaxBoundaryRadius = 1.f;
+	m_vPivot = m_ParticleDesc.ParticleStartRandomPosMin;
+	m_ParticleDesc.ParticleStartRandomPosMin = _float3(-0, 0, -0);
+	m_ParticleDesc.ParticleStartRandomPosMax = _float3(0, 0, 0);
+	if (m_ParticleDesc.MaxParticleCount > 5)m_ParticleDesc.MaxParticleCount = 5;
+
+
+	for (_uint i = 0; i < m_ParticleDesc.MaxParticleCount; i++)
+	{
+		ResetParticle(&part);
+		part._lifeTime = m_ParticleDesc.EachParticleLifeTime;
+		m_ParticleList.push_front(part);
+	}
+	return S_OK;
+}
+
+_int CParticleeObj_Fixed_LookFree::Update(_double fTimeDelta)
+{
+	if (0 > __super::Update(fTimeDelta)) return -1;
+	return _int();
+}
+
+_int CParticleeObj_Fixed_LookFree::LateUpdate(_double fTimeDelta)
+{
+	if (0 > __super::LateUpdate(fTimeDelta)) return -1;
+	return _int();
+}
+
+_int CParticleeObj_Fixed_LookFree::Render()
+{
+
+	CGameInstance* pInstance = GetSingle(CGameInstance);
+
+
+	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ViewMatrix", &pInstance->Get_Transform_Float4x4_TP(PLM_VIEW), sizeof(_float4x4)));
+	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ProjMatrix", &pInstance->Get_Transform_Float4x4_TP(PLM_PROJ), sizeof(_float4x4)));
+	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ProjMatrix", &pInstance->Get_Transform_Float4x4_TP(PLM_PROJ), sizeof(_float4x4)));
+
+	_float2 UVSize = _float2(1 / m_ParticleDesc.vTextureXYNum.x, 1 / m_ParticleDesc.vTextureXYNum.y);
+
+	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vUVSize", &UVSize, sizeof(_float2)));
+
+	if (m_ParticleDesc.m_fAlphaTestValue != 0.1f)
+		FAILED_CHECK(m_pShaderCom->Set_RawValue("g_fAlphaTestValue", &m_ParticleDesc.m_fAlphaTestValue, sizeof(_float)));
+
+
+
+	_Matrix vViewMat = pInstance->Get_Transform_Matrix(PLM_VIEW);
+
+	if (!m_ParticleList.empty())
+	{
+		if (m_ParticleDesc.AlphaBlendON)
+		{
+			m_ParticleList.sort([](PARTICLEATT tSrc, PARTICLEATT tDest) ->_bool
+			{
+				return tSrc._CamDist > tDest._CamDist;
+			});
+		}
+
+
+
+
+		for (auto iter : m_ParticleList)
+		{
+			if (iter._isAlive)
+			{
+				//if (m_ParticleDesc.ColorChageFrequency)
+				//	m_pGraphicDevice->SetRenderState(D3DRS_TEXTUREFACTOR, D3DCOLOR_XRGB(_uint(iter._color.x), _uint(iter._color.y), _uint(iter._color.z)));
+
+
+
+				if (m_ParticleDesc.m_bIsUI && m_ParticleDesc.FollowingTarget == nullptr)
+				{
+					//_float3 UIPos = { 0,0,0 };
+					//UIPos.x = iter._position.x - g_iWinCX *0.5f;
+					//UIPos.y = -iter._position.y + g_iWinCY *0.5f;
+					//m_pParticleTransformCom->Set_MatrixState(CTransform::STATE_POS, UIPos);
+				}
+				else {
+					m_pParticleTransformCom->Set_Matrix(XMMatrixIdentity());
+
+
+					m_pParticleTransformCom->Set_MatrixState(CTransform::STATE_RIGHT, m_vRight);
+					m_pParticleTransformCom->Set_MatrixState(CTransform::STATE_UP, m_vUp);
+					m_pParticleTransformCom->Set_MatrixState(CTransform::STATE_LOOK, m_vLook);
+
+					m_pParticleTransformCom->Scaled_All(iter._size);
+
+					m_pParticleTransformCom->Set_MatrixState(CTransform::STATE_POS, iter._position);
+				}
+
+				FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vUVPos", &iter._TextureUV, sizeof(_float2)));
+				FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vColor", &iter._color, sizeof(_float4)));
+				FAILED_CHECK(m_pTextureCom->Bind_OnShader(m_pShaderCom, "g_DiffuseTexture", iter._TextureIndex));
+				FAILED_CHECK(m_pParticleTransformCom->Bind_OnShader(m_pShaderCom, "g_WorldMatrix"));
+				FAILED_CHECK(m_pVIBufferCom->Render(m_pShaderCom, m_ParticleDesc.m_iPassIndex));
+			}
+
+		}
+	}
+
+	return _int();
+}
+
+CParticleeObj_Fixed_LookFree * CParticleeObj_Fixed_LookFree::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, void * pArg)
+{
+	CParticleeObj_Fixed_LookFree* pInstance = new CParticleeObj_Fixed_LookFree(pDevice, pDeviceContext);
+
+	if (FAILED(pInstance->Initialize_Prototype(pArg)))
+	{
+		MSGBOX("Fail to Create CParticleeObj_Fixed_LookFree");
+		Safe_Release(pInstance);
+
+	}
+
+	return pInstance;
+}
+
+CGameObject * CParticleeObj_Fixed_LookFree::Clone(void * pArg)
+{
+	CParticleeObj_Fixed_LookFree* pInstance = new CParticleeObj_Fixed_LookFree(*this);
+
+	if (FAILED(pInstance->Initialize_Clone(pArg)))
+	{
+		MSGBOX("Fail to Create CParticleeObj_Fixed_LookFree");
 		Safe_Release(pInstance);
 	}
 

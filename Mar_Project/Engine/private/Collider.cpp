@@ -118,6 +118,13 @@ void CCollider::Set_Conflicted(_double TotalTime)
 	}
 }
 
+_float3 CCollider::Get_ColliderPosition(_uint iIndex)
+{
+	if (iIndex >= m_vecColliderBuffer.size()) return _float3(0);
+
+	return m_vecColliderBuffer[iIndex]->Get_ColliderPosition();
+}
+
 #ifdef _DEBUG
 
 _int CCollider::Render()

@@ -178,6 +178,22 @@ PS_OUT PS_MAIN_PARTICLEREMOVEALPHA2(PS_IN In)
 	Out.vColor.a = Alpha * 0.5f;
 	return Out;
 }
+PS_OUT PS_MAIN_PARTICLEREMOVEALPHA3(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	Out.vColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);//vector(1.f, 0.f, 0.f, 1.f);rgba
+	float Alpha = max(max(Out.vColor.r, Out.vColor.g), Out.vColor.b);
+
+	if (Alpha < g_fAlphaTestValue)
+		discard;
+
+	Out.vColor = (Out.vColor * 0.8 + g_vColor*0.2);
+	//Out.vColor = (Out.vColor * 0.8 + g_vColor*0.2);
+	//Out.vColor *= g_vColor;
+	Out.vColor.a = min(Alpha, g_vColor.a);
+	return Out;
+}
 PS_OUT PS_FADE(PS_IN In)
 {
 	PS_OUT		Out = (PS_OUT)0;
@@ -301,5 +317,14 @@ technique11		DefaultTechnique
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN_ALLMOSTDISCARD();
 	}
+	pass ParticleRectRemoveAlphaCullModeNone		//9
+	{
+		SetBlendState(ParticleBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(ZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_None);
 
+		VertexShader = compile vs_5_0 VS_MAIN_PARTICLE();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_PARTICLEREMOVEALPHA3();
+	}
 }

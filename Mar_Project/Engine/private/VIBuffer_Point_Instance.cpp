@@ -157,7 +157,7 @@ HRESULT CVIBuffer_Point_Instance::Lock(D3D11_MAPPED_SUBRESOURCE * pSubResourceDa
 {
 	NULL_CHECK_BREAK(m_pDeviceContext);
 
-	return m_pDeviceContext->Map(m_pVBInstance, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, pSubResourceData);
+	return m_pDeviceContext->Map(m_pVBInstance, 0, D3D11_MAP_WRITE_DISCARD, 0, pSubResourceData);
 }
 
 void CVIBuffer_Point_Instance::UnLock()

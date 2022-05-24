@@ -29,8 +29,10 @@ private:
 	CModel*				m_pModel = nullptr;
 	CCollider*			m_pColliderCom = nullptr;
 
+	PARTICLEDESC		m_tParticleDesc;
 private:
 	HRESULT SetUp_Components();
+
 
 
 public:

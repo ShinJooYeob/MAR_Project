@@ -268,7 +268,28 @@ void CColliderBuffer::Add_ChildBufferIndex(_uint iIndex)
 	m_ChildNodeIndexList.push_back(iIndex);
 }
 
+_float3 CColliderBuffer::Get_ColliderPosition()
+{
+
+	switch (m_eColliderType)
+	{
+	case Engine::COLLIDER_AABB:
+		return m_pAABB[BOUNDING_TRANSFORM]->Center;
+	case Engine::COLLIDER_OBB:
+		return m_pOBB[BOUNDING_TRANSFORM]->Center;
+	case Engine::COLLIDER_SPHERE:
+		return m_pSphere[BOUNDING_TRANSFORM]->Center;
+	default:
+		break;
+	}
+
+
+
+	return _float3();
+}
+
 #ifdef _DEBUG
+
 _int CColliderBuffer::Render()
 {
 	m_pDeviceContext->GSSetShader(nullptr, nullptr, 0);

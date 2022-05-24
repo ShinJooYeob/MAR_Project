@@ -49,9 +49,14 @@ public:
 	HRESULT Start_ScreenEffect(ScreenEffectID eEffectType, _double EffectDuration, _float4 AdditionalParameter = _float4(1, 1, 1, 1));
 
 
+	HRESULT Start_InstanceParticle(_uint eNowSceneNum, _float3 vPosition, _uint iParticleDescIndex = 0);
+
 public:
 	HRESULT Clear_RenderGroup_forSceneChange();
 	void Set_Renderer(CRenderer* pRenderer);
+
+
+
 
 private:
 	ID3D11Device*			m_pDevice = nullptr;
@@ -61,7 +66,10 @@ private:
 
 	class CFadeEffect*		m_pFadeEffect = nullptr;
 
+	vector<INSTPARTICLEDESC> m_vecInstanceParticleDesc;
+private:
 	_uint CountDigit(_uint iNum);
+	HRESULT Ready_InstanceParticleDesc();
 public:
 	virtual void Free()override;
 

@@ -32,6 +32,8 @@ public:
 	_uint Get_NumChildBuffer() { return _uint(m_ChildNodeIndexList.size()); };
 	void Set_IsConflicted(_bool bBool) { m_bIsConflicted = bBool; };
 
+	_float3 Get_ColliderPosition();
+
 #ifdef _DEBUG
 public:
 	virtual _int Render();

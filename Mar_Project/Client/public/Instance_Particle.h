@@ -7,6 +7,7 @@ BEGIN(Client)
 
 class CInstance_Particle final : public CGameObject
 {
+
 public:
 	typedef struct tagInstanceParticleAttribute
 	{
@@ -61,7 +62,9 @@ private:
 	_uint						m_iNumInstance = 0;
 	_double						m_TotalLifeTime = 0;
 	_double						m_PassedTime = 0;
+	INSTPARTICLEDESC			m_tDesc;
 	vector<INSTPARTICLEATT>		m_vecParticleAttribute;
+
 
 private:
 	HRESULT SetUp_Components();
@@ -69,6 +72,7 @@ private:
 	HRESULT SetUp_ConstantTable();
 
 	HRESULT Update_ParticleAttribute(_double fDeltaTime);
+	HRESULT Update_ColorChange(INSTPARTICLEATT* tParticleAtt, _double fDeltaTime);
 
 public:
 	static CInstance_Particle* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
