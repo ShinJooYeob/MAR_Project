@@ -2818,6 +2818,98 @@ HRESULT CScene_Edit::Update_ParticleTab(_double fDeltatime)
 	return S_OK;
 }
 
+#define DefaultParticleNameTag "Dust3"
+
+HRESULT CScene_Edit::Ready_ParticleDesc()
+{
+	m_tParticleDesc.eParticleTypeID = Particle_Spread;
+
+	m_tParticleDesc.FollowingTarget = nullptr;
+
+	m_tParticleDesc.szTextureProtoTypeTag = TAG_CP(Prototype_Texture_PlayerEffect);
+	m_tParticleDesc.szTextureLayerTag = TEXT( DefaultParticleNameTag);
+	m_tParticleDesc.iSimilarLayerNum = 1;
+
+	m_tParticleDesc.TextureChageFrequency = 6;
+	m_tParticleDesc.vTextureXYNum = _float2(4, 4);
+
+	m_tParticleDesc.TotalParticleTime = 0.1f;
+	m_tParticleDesc.EachParticleLifeTime = 2.f;
+	m_tParticleDesc.MaxParticleCount = 15;
+
+	m_tParticleDesc.SizeChageFrequency = 0;
+	m_tParticleDesc.ParticleSize = _float3(1.f);
+	m_tParticleDesc.ParticleSize2 = _float3(1.f);
+
+	m_tParticleDesc.ColorChageFrequency = 0;
+	m_tParticleDesc.TargetColor = _float4(1.f, 0.643f, 0.141f, 1.f);
+	m_tParticleDesc.TargetColor2 = _float4(1.f, 1.f, 1.f, 1.f);
+
+
+	m_tParticleDesc.Particle_Power = 3;
+	m_tParticleDesc.PowerRandomRange = _float2(0.5f, 1.5f);
+
+	m_tParticleDesc.vUp = _float3(0, 1, 0);
+
+	m_tParticleDesc.MaxBoundaryRadius = 5;
+
+	m_tParticleDesc.m_bIsUI = false;
+	m_tParticleDesc.m_bUIDepth = 0;
+
+	m_tParticleDesc.ParticleStartRandomPosMin = _float3(-1.0f, 0.0f, -1.0f);
+	m_tParticleDesc.ParticleStartRandomPosMax = _float3(1.f, 0.f, 1.f);
+
+	m_tParticleDesc.DepthTestON = true;
+	m_tParticleDesc.AlphaBlendON = true;
+
+	m_tParticleDesc.m_fAlphaTestValue = 0.1f;
+	m_tParticleDesc.m_iPassIndex = 10;
+
+	/*m_tParticleDesc.eParticleTypeID = Particle_Fixed;
+
+	m_tParticleDesc.FollowingTarget = nullptr;
+
+	m_tParticleDesc.szTextureProtoTypeTag = TAG_CP(Prototype_Texture_PlayerEffect);
+	m_tParticleDesc.szTextureLayerTag = L"Dust2";
+	m_tParticleDesc.iSimilarLayerNum = 1;
+
+	m_tParticleDesc.TextureChageFrequency = 2;
+	m_tParticleDesc.vTextureXYNum = _float2(2, 2);
+
+	m_tParticleDesc.TotalParticleTime = 1.f;
+	m_tParticleDesc.EachParticleLifeTime = 0.34f;
+	m_tParticleDesc.MaxParticleCount = 30;
+
+	m_tParticleDesc.SizeChageFrequency = 0;
+	m_tParticleDesc.ParticleSize = _float3(0.5, 0.5, 0.5);
+	m_tParticleDesc.ParticleSize2 = _float3(0.5, 0.5, 0.5);
+
+	m_tParticleDesc.ColorChageFrequency = 0;
+	m_tParticleDesc.TargetColor = _float4(1.f, 1.f, 1.f, 1.f);
+	m_tParticleDesc.TargetColor2 = _float4(1.f, 1.f, 1.f, 1.f);
+
+
+	m_tParticleDesc.Particle_Power = 1;
+	m_tParticleDesc.PowerRandomRange = _float2(0.5f, 1.5f);
+
+	m_tParticleDesc.vUp = _float3(0, 1, 0);
+
+	m_tParticleDesc.MaxBoundaryRadius = 5;
+
+	m_tParticleDesc.m_bIsUI = false;
+	m_tParticleDesc.m_bUIDepth = 0;
+
+	m_tParticleDesc.ParticleStartRandomPosMin = _float3(-1.0f, 0.0f, -1.0f);
+	m_tParticleDesc.ParticleStartRandomPosMax = _float3(1.f, 1.5f, 1.f);
+
+	m_tParticleDesc.DepthTestON = true;
+	m_tParticleDesc.AlphaBlendON = true;
+
+	m_tParticleDesc.m_fAlphaTestValue = 0.18f;
+	m_tParticleDesc.m_iPassIndex = 4;*/
+	return S_OK;
+}
+
 HRESULT CScene_Edit::Widget_SettingParticleDesc(_double fDeltatime)
 {
 	//m_tParticleDesc.eParticleTypeID = Particle_Ball;
@@ -2848,7 +2940,7 @@ HRESULT CScene_Edit::Widget_SettingParticleDesc(_double fDeltatime)
 	wtemp.assign(Temp.begin(), Temp.end());
 	m_tParticleDesc.szTextureProtoTypeTag = wtemp.c_str();
 
-	static ImGuiTextFilter filter2 = "ButterFly";
+	static ImGuiTextFilter filter2 = DefaultParticleNameTag;
 	filter2.Draw("Input TextureLayer");
 
 	string Temp2 = string(filter2.InputBuf);
@@ -4619,96 +4711,6 @@ HRESULT CScene_Edit::Ready_Layer_Player(const _tchar * pLayerTag)
 #ifdef USE_IMGUI
 
 
-
-HRESULT CScene_Edit::Ready_ParticleDesc()
-{
-	m_tParticleDesc.eParticleTypeID = Particle_Ball;
-
-	m_tParticleDesc.FollowingTarget = nullptr;
-
-	m_tParticleDesc.szTextureProtoTypeTag = TAG_CP(Prototype_Texture_PlayerEffect);
-	m_tParticleDesc.szTextureLayerTag = L"ButterFly";
-	m_tParticleDesc.iSimilarLayerNum = 12;
-
-	m_tParticleDesc.TextureChageFrequency = 1;
-	m_tParticleDesc.vTextureXYNum = _float2(8, 2);
-
-	m_tParticleDesc.TotalParticleTime = 2;
-	m_tParticleDesc.EachParticleLifeTime = 0.34f;
-	m_tParticleDesc.MaxParticleCount = 15;
-
-	m_tParticleDesc.SizeChageFrequency = 0;
-	m_tParticleDesc.ParticleSize = _float3(0.5, 0.5, 0.5);
-	m_tParticleDesc.ParticleSize2 = _float3(0.5, 0.5, 0.5);
-
-	m_tParticleDesc.ColorChageFrequency = 0;
-	m_tParticleDesc.TargetColor = _float4(1.f, 1.f, 1.f, 1.f);
-	m_tParticleDesc.TargetColor2 = _float4(1.f, 1.f, 1.f, 1.f);
-
-
-	m_tParticleDesc.Particle_Power = 1;
-	m_tParticleDesc.PowerRandomRange = _float2(0.5f, 1.5f);
-
-	m_tParticleDesc.vUp = _float3(0, 1, 0);
-
-	m_tParticleDesc.MaxBoundaryRadius = 5;
-
-	m_tParticleDesc.m_bIsUI = false;
-	m_tParticleDesc.m_bUIDepth = 0;
-
-	m_tParticleDesc.ParticleStartRandomPosMin = _float3(-1.0f, 0.0f, -1.0f);
-	m_tParticleDesc.ParticleStartRandomPosMax = _float3(1.f, 1.5f, 1.f);
-
-	m_tParticleDesc.DepthTestON = true;
-	m_tParticleDesc.AlphaBlendON = false;
-
-	m_tParticleDesc.m_fAlphaTestValue = 0.1f;
-	m_tParticleDesc.m_iPassIndex = 3;
-
-	/*m_tParticleDesc.eParticleTypeID = Particle_Fixed;
-
-	m_tParticleDesc.FollowingTarget = nullptr;
-
-	m_tParticleDesc.szTextureProtoTypeTag = TAG_CP(Prototype_Texture_PlayerEffect);
-	m_tParticleDesc.szTextureLayerTag = L"Dust2";
-	m_tParticleDesc.iSimilarLayerNum = 1;
-
-	m_tParticleDesc.TextureChageFrequency = 2;
-	m_tParticleDesc.vTextureXYNum = _float2(2, 2);
-
-	m_tParticleDesc.TotalParticleTime = 1.f;
-	m_tParticleDesc.EachParticleLifeTime = 0.34f;
-	m_tParticleDesc.MaxParticleCount = 30;
-
-	m_tParticleDesc.SizeChageFrequency = 0;
-	m_tParticleDesc.ParticleSize = _float3(0.5, 0.5, 0.5);
-	m_tParticleDesc.ParticleSize2 = _float3(0.5, 0.5, 0.5);
-
-	m_tParticleDesc.ColorChageFrequency = 0;
-	m_tParticleDesc.TargetColor = _float4(1.f, 1.f, 1.f, 1.f);
-	m_tParticleDesc.TargetColor2 = _float4(1.f, 1.f, 1.f, 1.f);
-
-
-	m_tParticleDesc.Particle_Power = 1;
-	m_tParticleDesc.PowerRandomRange = _float2(0.5f, 1.5f);
-
-	m_tParticleDesc.vUp = _float3(0, 1, 0);
-
-	m_tParticleDesc.MaxBoundaryRadius = 5;
-
-	m_tParticleDesc.m_bIsUI = false;
-	m_tParticleDesc.m_bUIDepth = 0;
-
-	m_tParticleDesc.ParticleStartRandomPosMin = _float3(-1.0f, 0.0f, -1.0f);
-	m_tParticleDesc.ParticleStartRandomPosMax = _float3(1.f, 1.5f, 1.f);
-
-	m_tParticleDesc.DepthTestON = true;
-	m_tParticleDesc.AlphaBlendON = true;
-
-	m_tParticleDesc.m_fAlphaTestValue = 0.18f;
-	m_tParticleDesc.m_iPassIndex = 4;*/
-	return S_OK;
-}
 
 HRESULT CScene_Edit::Ready_CamActionCursor(const _tchar * pLayerTag)
 {

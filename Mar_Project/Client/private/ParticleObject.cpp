@@ -243,7 +243,7 @@ void CParticleObject::ResetParticle(PARTICLEATT * attribute)
 	attribute->_age = 0;
 
 	attribute->_color = m_ParticleDesc.TargetColor;
-	attribute->_force = m_ParticleDesc.Particle_Power * pUtil->RandomFloat(m_ParticleDesc.PowerRandomRange.x, m_ParticleDesc.PowerRandomRange.y);
+	attribute->_Targetforce = attribute->_force = m_ParticleDesc.Particle_Power * pUtil->RandomFloat(m_ParticleDesc.PowerRandomRange.x, m_ParticleDesc.PowerRandomRange.y);
 	attribute->_color = m_ParticleDesc.TargetColor;
 	attribute->_size = m_ParticleDesc.ParticleSize;
 	attribute->_TextureIndex = rand() % (m_ParticleDesc.iSimilarLayerNum);
@@ -926,3 +926,93 @@ CGameObject * CParticleeObj_Fixed_LookFree::Clone(void * pArg)
 
 	return pInstance;
 }
+
+CParticleeObj_Spread::CParticleeObj_Spread(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
+	: CParticleObject(pDevice, pDeviceContext)
+{
+}
+
+CParticleeObj_Spread::CParticleeObj_Spread(const CParticleeObj_Spread & rhs)
+	: CParticleObject(rhs)
+{
+}
+
+void CParticleeObj_Spread::Reset_Velocity(_float3 & fAttVlocity)
+{
+	_float RightRate = GetSingle(CUtilityMgr)->RandomFloat(-1, 1);
+	_float LookRate = GetSingle(CUtilityMgr)->RandomFloat(-1, 1);
+
+	_float3 ResetedVelocity = m_vRight.XMVector() * RightRate + m_vLook.XMVector() * LookRate;
+
+	//if (m_ParticleDesc.m_bIsUI)	RandomVelocity.z = 0;
+
+	fAttVlocity = ResetedVelocity.Get_Nomalize();
+}
+
+void CParticleeObj_Spread::Update_Position_by_Velocity(PARTICLEATT * tParticleAtt, _double fTimeDelta)
+{
+	tParticleAtt->_force = g_pGameInstance->Easing(TYPE_QuadIn, tParticleAtt->_Targetforce, 0, (_float)tParticleAtt->_age, (_float)tParticleAtt->_lifeTime);
+
+	tParticleAtt->_position = tParticleAtt->_position.XMVector() + (tParticleAtt->_velocity.XMVector() * tParticleAtt->_force * _float(fTimeDelta));
+}
+
+HRESULT CParticleeObj_Spread::Initialize_Child_Clone()
+{
+	m_ParticleList.clear();
+
+	PARTICLEATT part;
+
+
+	for (_uint i = 0; i < m_ParticleDesc.MaxParticleCount; i++)
+	{
+		ResetParticle(&part);
+		m_ParticleList.push_front(part);
+	}
+
+
+	return S_OK;
+}
+
+_int CParticleeObj_Spread::Update(_double fTimeDelta)
+{
+	if (0 > __super::Update(fTimeDelta)) return -1;
+	return _int();
+}
+
+_int CParticleeObj_Spread::LateUpdate(_double fTimeDelta)
+{
+	if (0 > __super::LateUpdate(fTimeDelta)) return -1;
+	return _int();
+}
+
+CParticleeObj_Spread * CParticleeObj_Spread::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, void * pArg)
+{
+	CParticleeObj_Spread* pInstance = new CParticleeObj_Spread(pDevice, pDeviceContext);
+
+	if (FAILED(pInstance->Initialize_Prototype(pArg)))
+	{
+		MSGBOX("Fail to Create CParticleeObj_Spread");
+		Safe_Release(pInstance);
+
+	}
+
+
+	return pInstance;
+}
+
+CGameObject * CParticleeObj_Spread::Clone(void * pArg)
+{
+	CParticleeObj_Spread* pInstance = new CParticleeObj_Spread(*this);
+
+	if (FAILED(pInstance->Initialize_Clone(pArg)))
+	{
+		MSGBOX("Fail to Create CParticleeObj_Spread");
+		Safe_Release(pInstance);
+	}
+
+	return pInstance;
+}
+
+
+
+

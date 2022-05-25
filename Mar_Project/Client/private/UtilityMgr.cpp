@@ -131,6 +131,12 @@ HRESULT CUtilityMgr::Create_ParticleObject(_uint eSceneID, PARTICLEDESC tParticl
 	case Client::Particle_Fixed_LookFree:
 		FAILED_CHECK(GetSingle(CGameInstance)->Add_GameObject_To_Layer(eSceneID, TAG_LAY(Layer_Particle), TEXT("ProtoType_GameObject_Object_particle_Fixed_LookFree"), &tParticleDesc));
 		break;
+	case Client::Particle_Spread:
+		FAILED_CHECK(GetSingle(CGameInstance)->Add_GameObject_To_Layer(eSceneID, TAG_LAY(Layer_Particle), TEXT("ProtoType_GameObject_Object_particle_Spread"), &tParticleDesc));
+		break;
+
+
+		
 		/*
 		case Client::Particle_Fountain:
 		FAILED_CHECK(GetSingle(CGameInstance)->Add_GameObject_To_Layer(eSceneID, TEXT("Layer_Particle"), TEXT("ProtoType_GameObject_Object_particle_Fountain"), &tParticleDesc));
@@ -253,7 +259,7 @@ _uint CUtilityMgr::CountDigit(_uint iNum)
 
 HRESULT CUtilityMgr::Ready_InstanceParticleDesc()
 {
-	m_vecInstanceParticleDesc.reserve(1);
+	m_vecInstanceParticleDesc.reserve(4);
 
 	INSTPARTICLEDESC tDesc;
 
@@ -279,6 +285,24 @@ HRESULT CUtilityMgr::Ready_InstanceParticleDesc()
 	tDesc.vStartSize = _float3(0.01f, 0.2f, 1);
 	tDesc.vTargetSize = _float3(0.01f);
 	m_vecInstanceParticleDesc.push_back(tDesc);
+
+
+
+	tDesc.ColorChangeFrequency = 1;
+	tDesc.vStartColor = _float4(1, 0.64313725f, 0.141176470f, 1);
+	tDesc.vTargetColor = _float4(1, 1, 1, 0.2f);
+
+	tDesc.SizeChangingEndRate = 0.7f;
+	tDesc.vStartSize = _float3(0.015f, 2.f, 1);
+	tDesc.vTargetSize = _float3(0.015f);
+	m_vecInstanceParticleDesc.push_back(tDesc);
+
+	tDesc.ColorChangeFrequency = 4;
+	tDesc.vStartColor = _float4(0.72156862f, 0.066666f,0 , 1);
+	tDesc.vTargetColor = _float4(1, 1, 1, 0.2f);
+	m_vecInstanceParticleDesc.push_back(tDesc);
+
+
 
 	return S_OK;
 }

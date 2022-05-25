@@ -50,8 +50,8 @@ HRESULT CKnife::Initialize_Clone(void * pArg)
 	m_tParticleDesc.MaxParticleCount = 1;
 
 	m_tParticleDesc.SizeChageFrequency = 1;
-	m_tParticleDesc.ParticleSize = _float3(2.f, 2.f, 2.f);
-	m_tParticleDesc.ParticleSize2 = _float3(1.f, 6.f, 1.f);
+	m_tParticleDesc.ParticleSize = _float3(2.f, 4.f, 2.f);
+	m_tParticleDesc.ParticleSize2 = _float3(1.f, 12.f, 1.f);
 
 	m_tParticleDesc.ColorChageFrequency = 1;
 	m_tParticleDesc.TargetColor = _float4(1.f, 1.f, 1.f, 1.f);

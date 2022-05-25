@@ -59,7 +59,7 @@ enum ParticleID
 	Particle_Cone,
 	Particle_Fixed_LookFree,
 	//Particle_Fountain,
-	//Particle_Spread,
+	Particle_Spread,
 
 	Particle_End
 };

@@ -19,6 +19,7 @@ typedef struct tag_ParticleAttribute
 	_float3 _position;
 	_float3 _velocity;
 	_float	_force;
+	_float _Targetforce;
 
 	// 시간 크기 색
 	_double       _lifeTime;								
@@ -296,6 +297,44 @@ private:
 public:
 
 	static CParticleeObj_Fixed_LookFree* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, void* pArg = nullptr);
+	virtual CGameObject * Clone(void * pArg) override;
+};
+END
+
+#pragma endregion
+
+
+
+#pragma region SpreadParticle
+
+BEGIN(Client)
+
+///////////퍼지는 형태 파티클///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class CParticleeObj_Spread final : public CParticleObject
+{
+private:
+	explicit CParticleeObj_Spread(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
+	explicit CParticleeObj_Spread(const CParticleeObj_Spread& rhs);
+	virtual ~CParticleeObj_Spread() = default;
+
+private:
+
+	virtual void Reset_Velocity(_float3& fAttVlocity)override;
+	virtual void Update_Position_by_Velocity(PARTICLEATT* tParticleAtt, _double fTimeDelta)override;
+
+
+	virtual HRESULT Initialize_Child_Clone() override;
+	//	virtual void ResetParticle(PARTICLEATT* attribute);
+
+	virtual _int Update(_double fTimeDelta)override;
+	virtual _int LateUpdate(_double fTimeDelta)override;
+	// 랜더는 부모 것 사용
+
+
+public:
+
+	static CParticleeObj_Spread* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, void* pArg = nullptr);
 	virtual CGameObject * Clone(void * pArg) override;
 };
 END

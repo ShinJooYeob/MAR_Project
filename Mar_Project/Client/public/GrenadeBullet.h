@@ -23,6 +23,19 @@ public:
 
 	virtual void CollisionTriger(_uint iMyColliderIndex, CGameObject* pConflictedObj, CCollider* pConflictedCollider, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType) override;
 
+private:
+	class CTerrain*		m_pTerrain = nullptr;
+
+	_bool				m_bIsHit = false;
+	_bool				m_bDeadAnimStart = false;
+	_double				m_DeadAnimPassedTime = 0;
+
+	_uint				m_iChecker = 0;
+
+	vector<PARTICLEDESC>		m_vecParticleDesc;
+private:
+	HRESULT Set_Player_On_Terrain();
+	HRESULT Ready_ParticleDesc();
 
 public:
 	static CGrenadeBullet* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
