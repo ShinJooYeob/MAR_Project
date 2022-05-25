@@ -18,6 +18,8 @@ public:
 		_double	ToTalLifeTime = 1;
 		_float4 vColor = _float4(0.56470588f, 0.3058823f, 0.0470588f, 1);
 
+		_bool	bNotAttackPlayer = false;
+
 	}DUSTWINDDESC;
 
 

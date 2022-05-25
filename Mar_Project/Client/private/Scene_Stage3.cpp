@@ -43,7 +43,10 @@ HRESULT CScene_Stage3::Initialize()
 	FAILED_CHECK(Ready_VentObject(TAG_LAY(Layer_Vent)));
 	FAILED_CHECK(Ready_MovableColum(TAG_LAY(Layer_MazeDoor)));
 	FAILED_CHECK(Ready_MovableColumBtn(TAG_LAY(Layer_ButtonPad)));
+	FAILED_CHECK(Ready_BreakableWall(TAG_LAY(Layer_Breakable)));
 	
+	
+
 	FAILED_CHECK(Ready_Layer_TriggerCollider(TAG_LAY(Layer_TriggerCollider)));
 	
 	//FAILED_CHECK(Ready_Layer_Executor(TAG_LAY(Layer_Monster)));
@@ -437,6 +440,12 @@ HRESULT CScene_Stage3::Ready_MovableColumBtn(const _tchar * pLayerTag)
 	tDesc.eKindsOfObject = 2;
 	FAILED_CHECK(pInstance->Add_GameObject_To_Layer(SCENE_STAGE3, pLayerTag, TAG_OP(Prototype_MazeDoorBtn), &tDesc));
 
+	return S_OK;
+}
+
+HRESULT CScene_Stage3::Ready_BreakableWall(const _tchar * pLayerTag)
+{
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE3, pLayerTag, TAG_OP(Prototype_BreakableWall)));
 	return S_OK;
 }
 

@@ -998,28 +998,28 @@ HRESULT CExecutor::Adjust_AnimMovedTransform(_double fDeltatime)
 	if (iNowAnimIndex != m_iOldAnimIndex || PlayRate > 0.95)
 		m_iAdjMovedIndex = 0;
 
-	static float Power = 7.2f;
-	if (g_pGameInstance->Get_DIKeyState(DIK_UP)& DIS_Down)
-	{
-		Power += 0.2f;
-		string ttszLog = "//Power  : " + to_string(Power) + "\n";
+	//static float Power = 7.2f;
+	//if (g_pGameInstance->Get_DIKeyState(DIK_UP)& DIS_Down)
+	//{
+	//	Power += 0.2f;
+	//	string ttszLog = "//Power  : " + to_string(Power) + "\n";
 
-		wstring ttDebugLog;
-		ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+	//	wstring ttDebugLog;
+	//	ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
 
-		OutputDebugStringW(ttDebugLog.c_str());
+	//	OutputDebugStringW(ttDebugLog.c_str());
 
-	}
-	else if (g_pGameInstance->Get_DIKeyState(DIK_DOWN)& DIS_Down)
-	{
-		Power -= 0.2f;
-		string ttszLog = "//Power  : " + to_string(Power) + "\n";
+	//}
+	//else if (g_pGameInstance->Get_DIKeyState(DIK_DOWN)& DIS_Down)
+	//{
+	//	Power -= 0.2f;
+	//	string ttszLog = "//Power  : " + to_string(Power) + "\n";
 
-		wstring ttDebugLog;
-		ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
+	//	wstring ttDebugLog;
+	//	ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
 
-		OutputDebugStringW(ttDebugLog.c_str());
-	}
+	//	OutputDebugStringW(ttDebugLog.c_str());
+	//}
 
 
 	if (PlayRate <= 0.95)

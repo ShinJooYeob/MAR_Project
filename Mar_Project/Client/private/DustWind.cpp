@@ -66,7 +66,7 @@ _int CDustWind::Update(_double fDeltaTime)
 	//
 	//if (m_PassedTime > m_TargetTime)Set_IsDead();
 
-	if (fabs((m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS).y - m_pPlayerTransform->Get_MatrixState_Float3(CTransform::STATE_POS).y)) < 3)
+	if (!m_tDesc.bNotAttackPlayer && fabs((m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS).y - m_pPlayerTransform->Get_MatrixState_Float3(CTransform::STATE_POS).y)) < 3)
 	{
 		_float DistBtwPlayer = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS).Get_Distance(m_pPlayerTransform->Get_MatrixState(CTransform::STATE_POS));
 		_float Scale = XMVectorGetX(m_pTransformCom->Get_MatrixScale(CTransform::STATE_RIGHT));

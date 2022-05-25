@@ -2,6 +2,7 @@
 #include "..\public\Stage3_GientTrigger.h"
 #include "Player.h"
 #include "Terrain.h"
+#include "BreakableWall.h"
 #include "Camera_Main.h"
 
 
@@ -138,16 +139,23 @@ void CStage3_GientTrigger::CollisionTriger(_uint iMyColliderIndex, CGameObject *
 
 
 
-			_Matrix WorldMatrix = XMMatrixScaling(1, 10.f, 20.f)*
+			_Matrix WorldMatrix = XMMatrixScaling(6, 10.f, 20.f)*
 				XMMatrixRotationY(XMConvertToRadians(180)) *
 				XMMatrixTranslation(123.544f, 24.0f, 161.657f);
 			m_pTransformCom->Set_Matrix(WorldMatrix);
 		}
 		else if(m_iSpwanPoint == 1)
 		{
-			m_pPlayer->Set_GettingBigger(false);
-			m_iSpwanPoint = 2;
-			Set_IsDead();
+
+			CBreakableWall* pWall =  (CBreakableWall*)g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Breakable));
+
+			if (pWall != nullptr && pWall->Get_NowPieceNum() == 2)
+			{
+				m_pPlayer->Set_PlayerPosition(_float3(124.889424f, 19.990f, 158.176773f));
+				m_pPlayer->Set_GettingBigger(false);
+				m_iSpwanPoint = 2;
+				Set_IsDead();
+			}
 		}
 
 
@@ -194,7 +202,7 @@ HRESULT CStage3_GientTrigger::SetUp_Components()
 
 	_Matrix WorldMatrix = XMMatrixScaling(1, 10.f, 7.f)*
 		XMMatrixRotationY(XMConvertToRadians(-60)) *
-		XMMatrixTranslation(143.686f, 20.f, 120.693f);
+		XMMatrixTranslation(143.686f, 22.f, 120.693f);
 
 	m_pTransformCom->Set_Matrix(WorldMatrix);
 
@@ -205,7 +213,7 @@ HRESULT CStage3_GientTrigger::SetUp_Components()
 	/* For.Com_AABB */
 	ZeroMemory(&ColliderDesc, sizeof(COLLIDERDESC));
 
-	ColliderDesc.vScale = _float3(30);
+	ColliderDesc.vScale = _float3(2);
 	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
 	ColliderDesc.vPosition = _float4(0, 0.f, 0, 1);
 	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));

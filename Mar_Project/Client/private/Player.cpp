@@ -6,6 +6,8 @@
 #include "GamePlayUI.h"
 #include "ClockBomb.h"
 
+#include "DustWind.h"
+
 
 
 
@@ -81,17 +83,17 @@ _int CPlayer::Update(_double fDeltaTime)
 
 
 
-	if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
-		Set_GettingBigger(!m_bIsGiant);
+	//if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
+	//	Set_GettingBigger(!m_bIsGiant);
 
-	if (g_pGameInstance->Get_DIKeyState(DIK_2)&DIS_Down)
-		Add_Dmg_to_Player(1);
+	//if (g_pGameInstance->Get_DIKeyState(DIK_2)&DIS_Down)
+	//	Add_Dmg_to_Player(1);
 
-	if (g_pGameInstance->Get_DIKeyState(DIK_3)&DIS_Down)
-	{
+	//if (g_pGameInstance->Get_DIKeyState(DIK_3)&DIS_Down)
+	//{
 
-		Eat_Protain();
-	}
+	//	Eat_Protain();
+	//}
 
 
 
@@ -834,6 +836,33 @@ HRESULT CPlayer::Update_EattingProtein(_double fDeltatime)
 
 
 	return S_OK;
+}
+
+_bool CPlayer::Get_IsGiantAtteck()
+{
+
+	_uint iAnimIndex = m_pModel->Get_NowAnimIndex();
+	if (iAnimIndex == Weapon_Giant + 2 )
+	{
+		_double PlayRate = m_pModel->Get_PlayRate();
+
+		if (PlayRate > 0.28888888f &&PlayRate < 0.5555555)	return true;
+		else return false;
+		//0.28888888 0.5555555
+
+
+	}
+	else if (iAnimIndex == Weapon_Giant + 3)
+	{
+		_double PlayRate = m_pModel->Get_PlayRate();
+
+		if (PlayRate > 0.3363636f &&PlayRate < 0.454545454)	return true;
+		else return false;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 
@@ -3122,11 +3151,18 @@ HRESULT CPlayer::Attack_Update_Umbrella(_double fDeltaTime, CGameInstance * pIns
 
 HRESULT CPlayer::Giantting_Update(_double fDeltaTime, CGameInstance * pInstance)
 {
+	static bool IsFadeOuted = false;
 
 	if (m_bGettingBigger)
 	{
 		m_GiantingPassedTime += _float(fDeltaTime);
 		m_fSmallScale = pInstance->Easing(TYPE_QuarticOut, 1.f, PlayerGiantSize, (_float)m_GiantingPassedTime, 3.0f);
+
+		if (!IsFadeOuted && m_GiantingPassedTime > 2.f)
+		{
+			IsFadeOuted = true;
+			GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeOutIn, 1, _float4(0, 0, 0, 1));
+		}
 
 		if (m_GiantingPassedTime > 3.f)
 		{
@@ -3143,6 +3179,12 @@ HRESULT CPlayer::Giantting_Update(_double fDeltaTime, CGameInstance * pInstance)
 	{
 		m_GiantingPassedTime += _float(fDeltaTime);
 		m_fSmallScale = pInstance->Easing(TYPE_QuarticOut, PlayerGiantSize, 1.f, (_float)m_GiantingPassedTime, 3.0f);
+
+		if (IsFadeOuted && m_GiantingPassedTime > 2.f)
+		{
+			IsFadeOuted = false;
+			GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeOutIn, 1, _float4(0, 0, 0, 1));
+		}
 
 		if (m_GiantingPassedTime > 3.f)
 		{
@@ -3229,6 +3271,119 @@ HRESULT CPlayer::Move_Update_Giant(_double fDeltaTime, CGameInstance * pInstance
 
 		}
 	}
+
+	static _uint m_iOldAnimIndex = 0;
+	static _uint m_iAdjMovedIndex = 0;
+
+	_uint iNowAnimIndex = m_pModel->Get_NowAnimIndex();
+	_double PlayRate = m_pModel->Get_PlayRate();
+
+	if (iNowAnimIndex != m_iOldAnimIndex || PlayRate > 0.95)
+		m_iAdjMovedIndex = 0;
+
+
+
+	if (PlayRate <= 0.95)
+	{
+		switch (iNowAnimIndex)
+		{
+		case Weapon_Giant + 1:
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.29333)
+			{
+				GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.2f, _float4(3.0f));
+
+
+				CDustWind::DUSTWINDDESC tDesc;
+
+				tDesc.vPosition = (m_pTransformCom->Get_MatrixState(CTransform::STATE_POS) 
+					+ XMVector3Normalize(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK)) * 7 + XMVector3Normalize(m_pTransformCom->Get_MatrixState(CTransform::STATE_RIGHT)) * -5);
+				tDesc.ToTalLifeTime = 0.4f;
+				tDesc.StartScale = _float3(3, 10, 3);
+				tDesc.TargetScale = _float3(7, 0.5f, 7);
+				tDesc.eEasingType = TYPE_Linear;
+				tDesc.bNotAttackPlayer = true;
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_DustWind), &(tDesc));
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_DustWind), &(tDesc));
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_DustWind), &(tDesc));
+
+				m_iAdjMovedIndex++;
+			}
+			if (m_iAdjMovedIndex == 1 && PlayRate > 0.8)
+			{
+				GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.2f, _float4(3.0f));
+
+				CDustWind::DUSTWINDDESC tDesc;
+
+				tDesc.vPosition = (m_pTransformCom->Get_MatrixState(CTransform::STATE_POS)
+					+ XMVector3Normalize(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK)) * 7 + XMVector3Normalize(m_pTransformCom->Get_MatrixState(CTransform::STATE_RIGHT)) * 5);
+				tDesc.ToTalLifeTime = 0.4f;
+				tDesc.StartScale = _float3(3, 10, 3);
+				tDesc.TargetScale = _float3(7, 0.5f, 7);
+				tDesc.eEasingType = TYPE_Linear;
+				tDesc.bNotAttackPlayer = true;
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_DustWind), &(tDesc));
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_DustWind), &(tDesc));
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_DustWind), &(tDesc));
+
+				m_iAdjMovedIndex++;
+			}
+
+			break;
+
+		case Weapon_Giant + 3:
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.37272727)
+			{
+				GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.4f, _float4(6.f));
+
+
+				CDustWind::DUSTWINDDESC tDesc;
+
+				tDesc.vPosition = (m_pTransformCom->Get_MatrixState(CTransform::STATE_POS)
+					+ XMVector3Normalize(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK)) * 7 + XMVector3Normalize(m_pTransformCom->Get_MatrixState(CTransform::STATE_RIGHT)) * -5);
+				tDesc.ToTalLifeTime = 1.5f;
+				tDesc.StartScale = _float3(5, 10, 5);
+				tDesc.TargetScale = _float3(7, 0.5f, 7);
+				tDesc.eEasingType = TYPE_ElasticIn;
+				tDesc.bNotAttackPlayer = true;
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_DustWind), &(tDesc));
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_DustWind), &(tDesc));
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_DustWind), &(tDesc));
+
+				CGameInstance* pInstance = g_pGameInstance;
+				CUtilityMgr* pUtil = GetSingle(CUtilityMgr);
+				_Vector vTranslation = XMVectorSetW(m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0);
+
+				for (_uint i = 0; i < 30; i++)
+				{
+					if (rand() % 2)
+					{
+						_float4 TargetPos = tDesc.vPosition.XMVector() + XMVectorSet(pUtil->RandomFloat(-3, 3), pUtil->RandomFloat(1, 6), pUtil->RandomFloat(-3, 3), _float(Prototype_Mesh_Gazebo_Piece01 + (rand() % 4)));
+						pInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_BreakablePiece), TAG_OP(Prototype_BreakablePiece), &TargetPos);
+
+					}
+					else
+					{
+						_float4 TargetPos = tDesc.vPosition.XMVector() + XMVectorSet(pUtil->RandomFloat(-3, 3), pUtil->RandomFloat(1, 6), pUtil->RandomFloat(-3, 3), _float(Prototype_QBattleTowerParticleA + (rand() % 2)));
+						pInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_BreakablePiece), TAG_OP(Prototype_BreakablePiece), &TargetPos);
+
+					}
+				}
+
+				m_iAdjMovedIndex++;
+			}
+		
+
+			break;
+
+			
+		default:
+			break;
+		}
+	}
+
+	m_iOldAnimIndex = iNowAnimIndex;
+
+
 	return S_OK;
 }
 
@@ -3265,28 +3420,14 @@ HRESULT CPlayer::Jump_Update_Giant(_double fDeltaTime, CGameInstance * pInstance
 }
 HRESULT CPlayer::Attack_Update_Giant(_double fDeltaTime, CGameInstance * pInstance)
 {
-	static int GiantAttackAnim= 0;
+	static _uint GiantAttack = 0;
+
+
 
 	if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_LBUTTON) & DIS_Down)
 	{
-
-		GiantAttackAnim++;
-		if (GiantAttackAnim > 1)GiantAttackAnim = 0;
-
-
-		if (GiantAttackAnim)
-		{
-			m_pModel->Change_AnimIndex_ReturnTo_Must(Weapon_Giant + 2, 0, 0.35, true);
-		}
-		else
-		{
-			m_pModel->Change_AnimIndex_ReturnTo_Must(Weapon_Giant + 3, 0, 0.35, true);
-
-		}
-
-
-
-
+		
+		m_pModel->Change_AnimIndex_ReturnTo_Must(Weapon_Giant + 3, 0, 0.35, true);
 	}
 
 

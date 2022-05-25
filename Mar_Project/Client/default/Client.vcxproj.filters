@@ -298,6 +298,9 @@
     <Filter Include="01.GameObject\09.TriggerCollider\05.Stage3_GientTrigger">
       <UniqueIdentifier>{fdea0471-87b0-49da-8fcd-b6c0b6f14a6d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.GameObject\07.MapObject\01.DynamicObj\16.BreakalbeWall">
+      <UniqueIdentifier>{5b98aede-182c-476c-96b3-0cf38bbfd438}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -609,6 +612,9 @@
     <ClInclude Include="..\public\Stage3_GientTrigger.h">
       <Filter>01.GameObject\09.TriggerCollider\05.Stage3_GientTrigger</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\BreakableWall.h">
+      <Filter>01.GameObject\07.MapObject\01.DynamicObj\16.BreakalbeWall</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -895,6 +901,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Stage3_GientTrigger.cpp">
       <Filter>01.GameObject\09.TriggerCollider\05.Stage3_GientTrigger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\BreakableWall.cpp">
+      <Filter>01.GameObject\07.MapObject\01.DynamicObj\16.BreakalbeWall</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

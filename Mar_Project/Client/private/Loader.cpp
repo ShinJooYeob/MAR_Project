@@ -43,6 +43,7 @@
 #include "VentObj.h"
 #include "MovableColum.h"
 #include "MovableColumBtn.h"
+#include "BreakableWall.h"
 
 #include "SceneChageTriger.h"
 #include "Stage1_SpwanGrunt.h"
@@ -223,7 +224,7 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 
 
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Player),
-		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Alice", "Alice.FBX", TransformMatrix, 2)));
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Alice", "Alice.FBX", TransformMatrix, 3)));
 
 	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Tornado1),
@@ -1042,8 +1043,13 @@ HRESULT CLoader::Load_Scene_Stage3(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "Protein", "Table.FBX", TransformMatrix)));
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_ProteinTableCover),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "Protein", "Cover.FBX", TransformMatrix)));
-	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
 
+	TransformMatrix = XMMatrixScaling(0.2f, 0.2f, 0.2f);
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE3, TAG_CP(Prototype_QGiantBreakableGate_Broken),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "QGiantBreakable", "QGiantBreakableGate_Broken.FBX", TransformMatrix)));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE3, TAG_CP(Prototype_QGiantBreakableGate_Flesh),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "QGiantBreakable", "QGiantBreakableGate_Flesh.FBX", TransformMatrix)));
+	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
 
 	//////////Terrain
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE3, TAG_CP(Prototype_VIBuffer_Terrain),
@@ -1062,14 +1068,13 @@ HRESULT CLoader::Load_Scene_Stage3(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_Vent),
 		CVentObj::Create(m_pDevice, m_pDeviceContext)));
-
-
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_MazeDoor),
 		CMovableColum::Create(m_pDevice, m_pDeviceContext)));
-
-
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_MazeDoorBtn),
 		CMovableColumBtn::Create(m_pDevice, m_pDeviceContext)));
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_BreakableWall),
+		CBreakableWall::Create(m_pDevice, m_pDeviceContext)));
+
 
 
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_CardPiece),

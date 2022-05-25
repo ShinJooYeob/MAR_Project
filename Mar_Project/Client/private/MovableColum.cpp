@@ -45,12 +45,12 @@ _int CMovableColum::Update(_double fDeltaTime)
 
 	static _uint i = 0;
 
-	if (g_pGameInstance->Get_DIKeyState(DIK_2)&DIS_Down)
-	{
-		Start_Turning_Colum(i);		
-		i++;
-		if (i > 2) i = 0;
-	}
+	//if (g_pGameInstance->Get_DIKeyState(DIK_2)&DIS_Down)
+	//{
+	//	Start_Turning_Colum(i);		
+	//	i++;
+	//	if (i > 2) i = 0;
+	//}
 
 
 
