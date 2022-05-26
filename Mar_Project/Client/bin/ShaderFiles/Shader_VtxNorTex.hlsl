@@ -1,13 +1,23 @@
 
 #include "Shader_Define.hpp" 
 
-cbuffer LightDesc
-{
-	float4		g_vLightVector;
-	float4		g_vLightDiffuse;
-	float4		g_vLightAmbient;
-	float4		g_vLightSpecular;
-};
+//cbuffer LightDesc
+//{
+//	float4		g_vLightVector;
+//	float4		g_vLightDiffuse;
+//	float4		g_vLightAmbient;
+//	float4		g_vLightSpecular;
+//};
+//cbuffer CameraDesc
+//{
+//	float4			g_CamPosition;
+//	float4			g_CamLookDir;
+//};
+//cbuffer MtrlDesc
+//{
+//	float4		g_vMtrlAmbient = float4(0.2f, 0.2f, 0.2f, 1.f);
+//	float4		g_vMtrlSpecular = float4(1.f, 1.f, 1.f, 1.f);
+//};
 
 texture2D		g_DiffuseTexture;
 
@@ -28,18 +38,8 @@ cbuffer BrushDesc
 	float4		g_vBrushPos = float4(10.0f, 0.0f, 10.f, 1.f);
 	float		g_fRadius = 3.f;
 };
-
-
-cbuffer CameraDesc
-{
-	float4			g_CamPosition;
-	float4			g_CamLookDir;
-};
-
 cbuffer MtrlDesc
 {
-	float4		g_vMtrlAmbient = float4(0.2f, 0.2f, 0.2f, 1.f);
-	float4		g_vMtrlSpecular = float4(1.f, 1.f, 1.f, 1.f);
 	float		g_fMimMapSize = 20;
 };
 
@@ -58,7 +58,8 @@ struct VS_OUT
 	float2		vTexUV : TEXCOORD0;
 
 	float4		vWorldPos : TEXCOORD1;
-	float		bIsNotDraw : TEXCOORD2;
+	float4		vProjPos : TEXCOORD2;
+	float		bIsNotDraw : TEXCOORD3;
 };
 
 
@@ -82,6 +83,7 @@ VS_OUT VS_MAIN_TERRAIN(VS_IN In)
 		Out.vWorldNormal = mul(vector(In.vNormal, 0.f), g_WorldMatrix);
 		Out.vTexUV = In.vTexUV;
 		Out.vWorldPos = mul(vector(In.vPosition, 1.f), g_WorldMatrix);
+		Out.vProjPos = Out.vPosition;
 	}
 	return Out;
 }
@@ -94,13 +96,16 @@ struct PS_IN
 	float2		vTexUV : TEXCOORD0;
 
 	float4		vWorldPos : TEXCOORD1;
-	float		bIsNotDraw : TEXCOORD2;
+	float4		vProjPos : TEXCOORD2;
+	float		bIsNotDraw : TEXCOORD3;
 };
 
 
 struct PS_OUT
 {
-	vector		vColor : SV_TARGET0;
+	vector		vDiffuse : SV_TARGET0;
+	vector		vNormal : SV_TARGET1;
+	vector		vDepth : SV_TARGET2;
 };
 
 
@@ -130,21 +135,26 @@ PS_OUT PS_MAIN_TERRAIN_DIRECTIONAL(PS_IN In)
 
 
 
-		float	fShade = max(dot(normalize(g_vLightVector) * -1.f, In.vWorldNormal), 0.f);
+		//float	fShade = max(dot(normalize(g_vLightVector) * -1.f, In.vWorldNormal), 0.f);
 
-		vector	vReflect = reflect(normalize(g_vLightVector), In.vWorldNormal);
-		vector	vLook = normalize(In.vWorldPos - g_CamPosition);
+		//vector	vReflect = reflect(normalize(g_vLightVector), In.vWorldNormal);
+		//vector	vLook = normalize(In.vWorldPos - g_CamPosition);
 
-		float	fSpecular = pow(max(dot(normalize(vReflect) * -1.f, vLook), 0.f), 30.f);
+		//float	fSpecular = pow(max(dot(normalize(vReflect) * -1.f, vLook), 0.f), 30.f);
 
 
-		Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient))
-			+ (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
+		//Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient))
+		//	+ (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
 
 
 		float  FogShaderRate = 1 - saturate(  max((3.f - In.vWorldPos.y), 0) / 3.f);
+		Out.vDiffuse = vMtrlDiffuse;
+		Out.vDiffuse.a *= FogShaderRate;
+
+		Out.vNormal = vector(In.vWorldNormal.xyz * 0.5f + 0.5f, 0.f);
+		Out.vDepth = vector(In.vProjPos.w / 300.0f, In.vProjPos.z / In.vProjPos.w, 0.f, 0.f);
+
 		
-		Out.vColor.a *= FogShaderRate;
 	}
 
 	return Out;
@@ -163,24 +173,27 @@ PS_OUT PS_MAIN_TERRAIN_POINT(PS_IN In)
 	}
 	else {
 
-		vector	vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV * 30.f);
+		vector	vSourMtrlDiffuse = g_SourDiffuseTexture.Sample(DefaultSampler, In.vTexUV * g_fMimMapSize);
+		vector	vDestMtrlDiffuse1 = g_DestDiffuseTexture1.Sample(DefaultSampler, In.vTexUV * g_fMimMapSize);
+		vector	vDestMtrlDiffuse2 = g_DestDiffuseTexture2.Sample(DefaultSampler, In.vTexUV * g_fMimMapSize);
+		vector	vDestMtrlDiffuse3 = g_DestDiffuseTexture3.Sample(DefaultSampler, In.vTexUV * g_fMimMapSize);
+		vector	vDestMtrlDiffuse4 = g_DestDiffuseTexture4.Sample(DefaultSampler, In.vTexUV * g_fMimMapSize);
 
 
-		vector	vLightDir = In.vWorldPos - g_vLightVector;
-		float  fLength = length(vLightDir);
+		vector	vFilterColor = g_FilterTexture.Sample(DefaultSampler, In.vTexUV);
 
-		float	fShade = max(dot(normalize(vLightDir) * -1.f, In.vWorldNormal), 0.f);
 
-		vector	vReflect = reflect(normalize(vLightDir), In.vWorldNormal);
-		vector	vLook = normalize(In.vWorldPos - g_CamPosition);
+		vector	vMtrlDiffuse = vSourMtrlDiffuse * (1.f - vFilterColor.a) + vDestMtrlDiffuse1 * (vFilterColor.a);
+		vMtrlDiffuse = vMtrlDiffuse * (1.f - vFilterColor.r) + vDestMtrlDiffuse2 * (vFilterColor.r);
+		vMtrlDiffuse = vMtrlDiffuse * (1.f - vFilterColor.g) + vDestMtrlDiffuse3 * (vFilterColor.g);
+		vMtrlDiffuse = vMtrlDiffuse * (1.f - vFilterColor.b) + vDestMtrlDiffuse4 * (vFilterColor.b);
 
-		float	fSpecular = pow(max(dot(normalize(vReflect) * -1.f, vLook), 0.f), 30.f);
+		float  FogShaderRate = 1 - saturate(max((3.f - In.vWorldPos.y), 0) / 3.f);
+		Out.vDiffuse = vMtrlDiffuse;
+		Out.vDiffuse.a *= FogShaderRate;
 
-		Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient))
-			+ (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
-
-		Out.vColor *= saturate((10.f - fLength) / 10.f);
-		
+		Out.vNormal = vector(In.vWorldNormal.xyz * 0.5f + 0.5f, 0.f);
+		Out.vDepth = vector(In.vProjPos.w / 300.0f, In.vProjPos.z / In.vProjPos.w, 0.f, 0.f);
 	}
 
 	return Out;
@@ -214,20 +227,27 @@ PS_OUT PS_MAIN_TERRAIN_WIRE(PS_IN In)
 
 		//vector	vTileKinds = g_HeightMapTexture.Sample(DefaultSampler, HeightUV);
 
-		Out.vColor = vTileKinds;
+		Out.vDiffuse = vTileKinds;
 
 		if (vTileKinds.r <= 0.f)// 1 못가는곳
 		{
-			Out.vColor = vector(1, 0, 0, 1) + vBrushColor;
+			Out.vDiffuse = vector(1, 0, 0, 1) + vBrushColor;
 		}
 		else if (vTileKinds.r <= 0.00785f) // 2 이하 특수타일
 		{
-			Out.vColor = vector(0, 0, 1, 1) + vBrushColor;
+			Out.vDiffuse = vector(0, 0, 1, 1) + vBrushColor;
 		}
 		else if(vTileKinds.r <= 0.01177f) // 움직일수 있는곳
 		{
-			Out.vColor = vector(0, 0.5f, 0, 1) + vBrushColor;
+			Out.vDiffuse = vector(0, 0.5f, 0, 1) + vBrushColor;
 		}
+
+
+
+		/* -1 -> 0*/
+		/* 1 - > 1*/
+		Out.vNormal = vector(In.vWorldNormal.xyz * 0.5f + 0.5f, 0.f);
+		Out.vDepth = vector(In.vProjPos.w / 300.0f, In.vProjPos.z / In.vProjPos.w, 0.f, 0.f);
 
 	}
 
@@ -284,7 +304,10 @@ PS_OUT PS_MAIN_TERRAIN_EDIT(PS_IN In)
 		Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient))
 			+ (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;*/
 
-		Out.vColor = vMtrlDiffuse;
+		Out.vDiffuse = vMtrlDiffuse;
+
+		Out.vNormal = vector(In.vWorldNormal.xyz * 0.5f + 0.5f, 0.f);
+		Out.vDepth = vector(In.vProjPos.w / 300.0f, In.vProjPos.z / In.vProjPos.w, 0.f, 0.f);
 	}
 	return Out;
 }

@@ -219,6 +219,9 @@ _int CWaspInk::Update(_double fDeltaTime)
 		g_pGameInstance->Add_CollisionGroup(CollisionType_Monster, this, m_pColliderCom);
 	else
 		g_pGameInstance->Add_CollisionGroup(CollisionType_MonsterWeapon, this, m_pColliderCom);
+#ifdef _DEBUG
+	FAILED_CHECK(m_pRendererCom->Add_DebugGroup(m_pColliderCom));
+#endif // _DEBUG
 
 
 	return _int();
@@ -245,9 +248,6 @@ _int CWaspInk::Render()
 
 
 	NULL_CHECK_RETURN(m_pModel, E_FAIL);
-#ifdef _DEBUG
-	m_pColliderCom->Render();
-#endif // _DEBUG
 
 
 	FAILED_CHECK(m_pTransformCom->Bind_OnShader(m_pShaderCom, "g_WorldMatrix"));

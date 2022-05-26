@@ -100,6 +100,12 @@
     <PreBuildEvent>
       <Command>call BeforBuildBat.bat</Command>
     </PreBuildEvent>
+    <FxCompile>
+      <ShaderType>Effect</ShaderType>
+    </FxCompile>
+    <FxCompile>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -171,8 +177,10 @@
     <ClInclude Include="..\public\ObjectLayer.h" />
     <ClInclude Include="..\public\ObjectMgr.h" />
     <ClInclude Include="..\public\Renderer.h" />
+    <ClInclude Include="..\public\RenderTargetLayer.h" />
     <ClInclude Include="..\public\Scene.h" />
     <ClInclude Include="..\public\SceneMgr.h" />
+    <ClInclude Include="..\public\RenderTargetMgr.h" />
     <ClInclude Include="..\public\TextureLayer.h" />
     <ClInclude Include="..\public\Texture.h" />
     <ClInclude Include="..\public\Shader.h" />
@@ -215,8 +223,10 @@
     <ClCompile Include="..\private\ObjectLayer.cpp" />
     <ClCompile Include="..\private\ObjectMgr.cpp" />
     <ClCompile Include="..\private\Renderer.cpp" />
+    <ClCompile Include="..\private\RenderTargetLayer.cpp" />
     <ClCompile Include="..\private\Scene.cpp" />
     <ClCompile Include="..\private\SceneMgr.cpp" />
+    <ClCompile Include="..\private\RenderTargetMgr.cpp" />
     <ClCompile Include="..\private\TextureLayer.cpp" />
     <ClCompile Include="..\private\Texture.cpp" />
     <ClCompile Include="..\private\Shader.cpp" />
@@ -231,6 +241,9 @@
     <ClCompile Include="..\private\VIBuffer_Point_Instance.cpp" />
     <ClCompile Include="..\private\VIBuffer_Terrain.cpp" />
     <ClCompile Include="..\private\VIBuffer_Rect.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\bin\ShaderFiles\Shader_Deferred.hlsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -24,24 +24,24 @@ cbuffer AttechMatrix
 	matrix g_AttechMatrix;
 };
 
-cbuffer LightDesc
-{
-	float4		g_vLightVector;
-	float4		g_vLightDiffuse;
-	float4		g_vLightAmbient;
-	float4		g_vLightSpecular;
-};
-cbuffer CameraDesc
-{
-	float4			g_CamPosition;
-	float4			g_CamLookDir;
-};
+//cbuffer LightDesc
+//{
+//	float4		g_vLightVector;
+//	float4		g_vLightDiffuse;
+//	float4		g_vLightAmbient;
+//	float4		g_vLightSpecular;
+//};
+//cbuffer CameraDesc
+//{
+//	float4			g_CamPosition;
+//	float4			g_CamLookDir;
+//};
 
-cbuffer MtrlDesc
-{
-	float4		g_vMtrlAmbient = float4(0.2f, 0.2f, 0.2f, 1.f);
-	float4		g_vMtrlSpecular = float4(1.f, 1.f, 1.f, 1.f);
-};
+//cbuffer MtrlDesc
+//{
+//	float4		g_vMtrlAmbient = float4(0.2f, 0.2f, 0.2f, 1.f);
+//	float4		g_vMtrlSpecular = float4(1.f, 1.f, 1.f, 1.f);
+//};
 
 cbuffer HiddenPad
 {
@@ -67,7 +67,10 @@ struct VS_OUT
 	float4		vNormal : NORMAL;
 	float2		vTexUV : TEXCOORD0;
 	float4		vWorldPos : TEXCOORD1;
+	float4		vProjPos : TEXCOORD2;
+
 };
+
 
 VS_OUT VS_MAIN_DEFAULT(VS_IN In)
 {
@@ -82,6 +85,7 @@ VS_OUT VS_MAIN_DEFAULT(VS_IN In)
 	Out.vNormal = normalize(mul(vector(In.vNormal, 0.f), g_WorldMatrix));
 	Out.vTexUV = In.vTexUV;
 	Out.vWorldPos = mul(vector(In.vPosition, 1.f), g_WorldMatrix);
+	Out.vProjPos = Out.vPosition;
 
 
 
@@ -108,6 +112,7 @@ VS_OUT VS_MAIN_ATTACHBONE(VS_IN In)
 	Out.vTexUV = In.vTexUV;
 	Out.vWorldPos = mul(vector(In.vPosition, 1.f), WorldMatrix);
 	Out.vTexUV = In.vTexUV;
+	Out.vProjPos = Out.vPosition;
 
 	return Out;
 }
@@ -121,11 +126,19 @@ struct PS_IN
 	float4		vNormal : NORMAL;
 	float2		vTexUV : TEXCOORD0;
 	float4		vWorldPos : TEXCOORD1;
+	float4		vProjPos : TEXCOORD2;
 };
 
 struct PS_OUT
 {
-	vector		vColor : SV_TARGET0;
+	vector		vDiffuse : SV_TARGET0;
+	vector		vNormal : SV_TARGET1;
+	vector		vDepth : SV_TARGET2;
+};
+
+struct PS_OUT_NODEFERRED
+{
+	vector		vDiffuse : SV_TARGET0;
 };
 
 PS_OUT PS_MAIN_DEFAULT(PS_IN In)
@@ -133,17 +146,20 @@ PS_OUT PS_MAIN_DEFAULT(PS_IN In)
 	PS_OUT		Out = (PS_OUT)0;
 
 	vector		vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
-	float		fShade = saturate(dot(normalize(g_vLightVector) * -1.f, In.vNormal));
+	//float		fShade = saturate(dot(normalize(g_vLightVector) * -1.f, In.vNormal));
 
-	float4		vReflect = reflect(normalize(g_vLightVector), In.vNormal);
-	float4		vLook = normalize(In.vWorldPos - g_CamPosition);
+	//float4		vReflect = reflect(normalize(g_vLightVector), In.vNormal);
+	//float4		vLook = normalize(In.vWorldPos - g_CamPosition);
 
-	float		fSpecular = pow(saturate(dot(normalize(vReflect) * -1.f, vLook)), 30.f);
+	//float		fSpecular = pow(saturate(dot(normalize(vReflect) * -1.f, vLook)), 30.f);
 
-	Out.vColor = (g_vLightDiffuse * vDiffuse) * (fShade + (g_vLightAmbient * g_vMtrlAmbient)) +
-		(g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
+	//Out.vColor = (g_vLightDiffuse * vDiffuse) * (fShade + (g_vLightAmbient * g_vMtrlAmbient)) +
+	//	(g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
 
 
+	Out.vDiffuse = vDiffuse;
+	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+	Out.vDepth = vector(In.vProjPos.w / 300.0f, In.vProjPos.z / In.vProjPos.w, 0.f, 0.f);
 
 	return Out;
 }
@@ -156,16 +172,9 @@ PS_OUT PS_MAIN_ZTESTALLMOST(PS_IN In)
 	if (vDiffuse.a < 1)
 		discard;
 
-	float		fShade = saturate(dot(normalize(g_vLightVector) * -1.f, In.vNormal));
-
-	float4		vReflect = reflect(normalize(g_vLightVector), In.vNormal);
-	float4		vLook = normalize(In.vWorldPos - g_CamPosition);
-
-	float		fSpecular = pow(saturate(dot(normalize(vReflect) * -1.f, vLook)), 30.f);
-
-	Out.vColor = (g_vLightDiffuse * vDiffuse) * (fShade + (g_vLightAmbient * g_vMtrlAmbient)) +
-		(g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
-
+	Out.vDiffuse = vDiffuse;
+	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+	Out.vDepth = vector(In.vProjPos.w / 300.0f, In.vProjPos.z / In.vProjPos.w, 0.f, 0.f);
 
 
 	return Out;
@@ -180,23 +189,15 @@ PS_OUT PS_MAIN_HIDDENPAD(PS_IN In)
 	if ((vDiffuse.r + vDiffuse.g + vDiffuse.b) / 3 > g_fVisualValue)
 		discard;
 
-	float		fShade = saturate(dot(normalize(g_vLightVector) * -1.f, In.vNormal));
-
-	float4		vReflect = reflect(normalize(g_vLightVector), In.vNormal);
-	float4		vLook = normalize(In.vWorldPos - g_CamPosition);
-
-	float		fSpecular = pow(saturate(dot(normalize(vReflect) * -1.f, vLook)), 30.f);
-
-	Out.vColor = (g_vLightDiffuse * vDiffuse) * (fShade + (g_vLightAmbient * g_vMtrlAmbient)) +
-		(g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
-
-
+	Out.vDiffuse = vDiffuse;
+	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+	Out.vDepth = vector(In.vProjPos.w / 300.0f, In.vProjPos.z / In.vProjPos.w, 0.f, 0.f);
 
 	return Out;
 }
-PS_OUT PS_MAIN_PARTICLEREMOVEALPHA(PS_IN In)
+PS_OUT_NODEFERRED PS_MAIN_PARTICLEREMOVEALPHA(PS_IN In)
 {
-	PS_OUT		Out = (PS_OUT)0;
+	PS_OUT_NODEFERRED		Out = (PS_OUT_NODEFERRED)0;
 
 	vector		vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
 	float Alpha = (vDiffuse.r);
@@ -207,24 +208,16 @@ PS_OUT PS_MAIN_PARTICLEREMOVEALPHA(PS_IN In)
 	vDiffuse = vDiffuse*0.3 +  g_vMixColor*0.7;
 	vDiffuse.a = Alpha*0.5;
 
-	float		fShade = saturate(dot(normalize(g_vLightVector) * -1.f, In.vNormal));
-
-	//float4		vReflect = reflect(normalize(g_vLightVector), In.vNormal);
-	//float4		vLook = normalize(In.vWorldPos - g_CamPosition);
-
-	//float		fSpecular = pow(saturate(dot(normalize(vReflect) * -1.f, vLook)), 30.f);
-
-	Out.vColor = (g_vLightDiffuse * vDiffuse) * (fShade + (g_vLightAmbient * g_vMtrlAmbient));
-	//+(g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
+	Out.vDiffuse = vDiffuse;
 
 
 	return Out;
 }
-PS_OUT PS_MAIN_SKYBOX(PS_IN In)
+PS_OUT_NODEFERRED PS_MAIN_SKYBOX(PS_IN In)
 {
-	PS_OUT		Out = (PS_OUT)0;
+	PS_OUT_NODEFERRED		Out = (PS_OUT_NODEFERRED)0;
 
-	Out.vColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
+	Out.vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
 
 
 	return Out;
@@ -285,7 +278,7 @@ technique11		DefaultTechnique
 		PixelShader = compile ps_5_0 PS_MAIN_HIDDENPAD();
 	}
 
-	pass ParticleRemoveAlpha		//5
+	pass MeshParticleRemoveAlpha	//5
 	{
 		SetBlendState(ParticleBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 		SetDepthStencilState(ZTestAndWriteState, 0);

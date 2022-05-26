@@ -135,7 +135,12 @@ _int CPlayer::Update(_double fDeltaTime)
 	}
 
 	if (!m_bIsAttached && !m_bAliceSpwanAnimStart && !m_bAliceDeathAnimStart)
+	{
 		g_pGameInstance->Add_CollisionGroup(CollisionType_Player, this, m_pColliderCom);
+#ifdef _DEBUG
+		FAILED_CHECK(m_pRendererCom->Add_DebugGroup(m_pColliderCom));
+#endif // _DEBUG
+	}
 
 	return _int();
 }
@@ -180,6 +185,7 @@ _int CPlayer::LateUpdate(_double fDeltaTime)
 	if (!m_fDashPassedTime && !m_bTrappedbyFlower && !m_bPlayerNotRender)
 	{
 		FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this));
+
 		if (m_iWeaponModelIndex != 10 && !m_LevitationTime)
 		{
 			m_vecWeapon[m_iWeaponModelIndex]->LateUpdate(fDeltaTime);
@@ -238,9 +244,6 @@ _int CPlayer::Render()
 	}
 
 
-#ifdef _DEBUG
-	m_pColliderCom->Render();
-#endif // _DEBUG
 
 	
 	return _int();
@@ -952,17 +955,17 @@ HRESULT CPlayer::SetUp_ConstTable()
 	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ProjMatrix", &pInstance->Get_Transform_Float4x4_TP(PLM_PROJ), sizeof(_float4x4)));
 
 
-	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_CamPosition", &pInstance->Get_TargetPostion_float4(PLV_CAMERA), sizeof(_float4)));
-	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_CamLookDir", &pInstance->Get_TargetPostion_float4(PLV_CAMLOOK), sizeof(_float4)));
+	//FAILED_CHECK(m_pShaderCom->Set_RawValue("g_CamPosition", &pInstance->Get_TargetPostion_float4(PLV_CAMERA), sizeof(_float4)));
+	//FAILED_CHECK(m_pShaderCom->Set_RawValue("g_CamLookDir", &pInstance->Get_TargetPostion_float4(PLV_CAMLOOK), sizeof(_float4)));
 
 
-	const LIGHTDESC* pLightDesc = pInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0);
-	NULL_CHECK_RETURN(pLightDesc, -1);
+	//const LIGHTDESC* pLightDesc = pInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0);
+	//NULL_CHECK_RETURN(pLightDesc, -1);
 
-	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vLightVector", &(pLightDesc->vVector), sizeof(_float4)));
-	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4)));
-	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4)));
-	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4)));
+	//FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vLightVector", &(pLightDesc->vVector), sizeof(_float4)));
+	//FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4)));
+	//FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4)));
+	//FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4)));
 
 
 	return S_OK;

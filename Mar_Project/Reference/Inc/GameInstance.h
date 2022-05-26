@@ -19,7 +19,7 @@ class CSoundMgr;
 class CPipeLineMgr;
 class CLightMgr;
 class CCollisionMgr;
-
+class CRenderTargetMgr;
 
 class ENGINE_DLL CGameInstance final :public CBase
 {
@@ -138,6 +138,9 @@ public: //CollisionMgr
 	HRESULT Add_CollisionGroup(CollisionTypeID eType, class CGameObject* pCollisionObject, class CCollider* pCollider);
 	void	Clear_CollisionGroup();
 
+
+
+
 private:
 	CGraphic_Device*	m_pGraphicDevice = nullptr;
 	CTimeMgr*			m_pTimerMgr = nullptr;
@@ -152,6 +155,7 @@ private:
 	CPipeLineMgr*		m_pPipeLineMgr = nullptr;
 	CLightMgr*			m_pLightMgr = nullptr;
 	CCollisionMgr*		m_pCollisionMgr = nullptr;
+	CRenderTargetMgr*	m_pRenderTargetMgr = nullptr;
 
 public:
 	static void Release_Engine();

@@ -17,6 +17,14 @@ public:
 
 	_bool	Get_IsOwnerDead() { return m_bIsOwnerDead; };
 	void	Set_IsOwnerDead(_bool	bBool = true) { m_bIsOwnerDead = bBool; };
+
+
+
+#ifdef _DEBUG
+public:
+	virtual HRESULT Render() { return S_OK; }
+#endif // _DEBUG
+
 protected:
 	ID3D11Device*			m_pDevice = nullptr;
 	ID3D11DeviceContext*	m_pDeviceContext = nullptr;

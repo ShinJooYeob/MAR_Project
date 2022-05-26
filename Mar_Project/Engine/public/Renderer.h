@@ -12,7 +12,7 @@ class ENGINE_DLL CRenderer final :public CComponent
 public:
 	enum RENDERGROUP 
 	{
-		RENDER_PRIORITY, RENDER_NONBLEND,RENDER_PRIORITYBLEND, RENDER_BLEND, RENDER_AFTEROBJ, RENDER_UI, RENDER_END
+		RENDER_PRIORITY, RENDER_NONBLEND, RENDER_PRIORITYBLEND, RENDER_NONBLEND_NOLIGHT, RENDER_BLEND, RENDER_AFTEROBJ, RENDER_UI, RENDER_END
 	};
 
 private:
@@ -26,25 +26,48 @@ private:
 
 public:
 	HRESULT Add_RenderGroup(RENDERGROUP eRenderID ,CGameObject* pGameObject);
+	HRESULT Add_DebugGroup(class CComponent* pComponent);
 	HRESULT Render_RenderGroup();
 	HRESULT Clear_RenderGroup_forSceneChaging();
 
 
 
 private:
-	list<CGameObject*>			m_RenderObjectList[RENDER_END];
+	list<CGameObject*>				m_RenderObjectList[RENDER_END];
 	typedef list<CGameObject*>		RENDEROBJECTS;
-private:
 
-	_float4x4						m_ProjMatrix;
+private:
+	list<class CComponent*>					m_DebugObjectList;
+	typedef list<class CComponent*>			DEBUGOBJECT;
+
+private:
+	class CRenderTargetMgr*					m_pRenderTargetMgr = nullptr;
+	class CLightMgr*					m_pLightMgr			 = nullptr;
+
+	class CVIBuffer_Rect*					m_pVIBuffer = nullptr;
+	class CShader*							m_pShader = nullptr;
+
+
+private:
+	MATRIXWVP					m_WVPmat;
 
 private:
 	HRESULT Render_Priority();
+
 	HRESULT Render_NonAlpha();
 	HRESULT Render_PriorityAlpha();
+
+	HRESULT Render_Lights();
+	HRESULT Render_DeferredTexture();
+
 	HRESULT Render_Alpha();
 	HRESULT Render_AfterObj();
 	HRESULT Render_UI();
+
+#ifdef _DEBUG
+	HRESULT Render_Debug();
+#endif // _DEBUG
+
 
 public:
 	static CRenderer* Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, void* pArg = nullptr);

@@ -127,7 +127,7 @@ _float3 CCollider::Get_ColliderPosition(_uint iIndex)
 
 #ifdef _DEBUG
 
-_int CCollider::Render()
+HRESULT CCollider::Render()
 {
 	for (auto& pColliderBuffer : m_vecColliderBuffer)
 	{

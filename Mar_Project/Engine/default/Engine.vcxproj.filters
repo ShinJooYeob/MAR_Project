@@ -142,6 +142,18 @@
     <Filter Include="01.Utility\01.ComponentMgr\01.Component\03.Model\02.VIBuffer\Point_Instance">
       <UniqueIdentifier>{58a03c32-5b71-4c23-bf4b-7c774ab47f96}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\11.FontMgr">
+      <UniqueIdentifier>{62f12fe5-c672-4809-9559-b480c2a5a139}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\12.RenderTargetMgr">
+      <UniqueIdentifier>{13395230-b226-4ed4-926c-a8145922339c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\12.RenderTargetMgr\00.Manager">
+      <UniqueIdentifier>{df8dfa0c-ae41-40c7-84c6-cbac60ae38eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="98.ShaderFiles">
+      <UniqueIdentifier>{d555d002-8d68-4644-bee2-f2c0c47f4128}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Base.h">
@@ -288,6 +300,12 @@
     <ClInclude Include="..\public\VIBuffer_Point_Instance.h">
       <Filter>01.Utility\01.ComponentMgr\01.Component\03.Model\02.VIBuffer\Point_Instance</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\RenderTargetMgr.h">
+      <Filter>01.Utility\12.RenderTargetMgr\00.Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\RenderTargetLayer.h">
+      <Filter>01.Utility\12.RenderTargetMgr</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">
@@ -416,5 +434,16 @@
     <ClCompile Include="..\private\VIBuffer_Point_Instance.cpp">
       <Filter>01.Utility\01.ComponentMgr\01.Component\03.Model\02.VIBuffer\Point_Instance</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\RenderTargetMgr.cpp">
+      <Filter>01.Utility\12.RenderTargetMgr\00.Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\RenderTargetLayer.cpp">
+      <Filter>01.Utility\12.RenderTargetMgr</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\bin\ShaderFiles\Shader_Deferred.hlsl">
+      <Filter>98.ShaderFiles</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

@@ -282,7 +282,13 @@ _int CUmbrella::Update(_double fDeltaTime)
 		m_pColliderCom->Update_Transform(i, TransformMatrix);
 
 	if (m_bIsAttackAble)
+	{
 		g_pGameInstance->Add_CollisionGroup(CollisionType_Player, this, m_pColliderCom);
+#ifdef _DEBUG
+		FAILED_CHECK(m_pRendererCom->Add_DebugGroup(m_pColliderCom));
+#endif // _DEBUG
+
+	}
 
 	return _int();
 }
@@ -305,12 +311,6 @@ _int CUmbrella::Render()
 {
 
 	NULL_CHECK_RETURN(m_pModel, E_FAIL);
-
-#ifdef _DEBUG
-
-	if (m_bIsAttackAble)
-		m_pColliderCom->Render();
-#endif // _DEBUG
 
 
 

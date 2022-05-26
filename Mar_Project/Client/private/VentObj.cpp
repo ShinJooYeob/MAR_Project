@@ -88,7 +88,13 @@ _int CVentObj::Update(_double fDeltaTime)
 			m_pColliderCom->Update_Transform(i, m_pTransformCom->Get_WorldMatrix());
 
 		if (!m_bVentingStart)
+		{
 			pInstance->Add_CollisionGroup(CollisionType_DynaicObject, this, m_pColliderCom);
+
+#ifdef _DEBUG
+			FAILED_CHECK(m_pRendererCom->Add_DebugGroup(m_pColliderCom));
+#endif // _DEBUG
+		}
 	}
 
 
@@ -117,10 +123,6 @@ _int CVentObj::Render()
 	if (__super::Render() < 0)
 		return -1;
 
-#ifdef _DEBUG
-	if (!m_bVentingStart)
-		m_pColliderCom->Render();
-#endif // _DEBUG
 
 
 	return _int();

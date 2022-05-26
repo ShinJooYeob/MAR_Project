@@ -134,8 +134,8 @@ HRESULT CScene_Loby::Ready_Light()
 
 
 	LightDesc.eLightType = tagLightDesc::TYPE_DIRECTIONAL;
-	LightDesc.vDiffuse = _float4(1.f, 1.f,1.f,1.f);
-	LightDesc.vAmbient = _float4(1);
+	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
+	LightDesc.vAmbient = _float4(0.2f);
 	LightDesc.vSpecular = _float4(1);
 	LightDesc.vVector = _float4(1, -1, 1, 0);
 
@@ -143,13 +143,13 @@ HRESULT CScene_Loby::Ready_Light()
 
 
 
-	LightDesc.eLightType = tagLightDesc::TYPE_POINT;
-	LightDesc.vDiffuse = _float4(1);
-	LightDesc.vAmbient = _float4(1);
-	LightDesc.vSpecular = _float4(1);
-	LightDesc.vVector = _float4(5, 5, 5, 1);
-
-	g_pGameInstance->Add_Light(LightDesc);
+	//LightDesc.eLightType = tagLightDesc::TYPE_POINT;
+	//LightDesc.vDiffuse = _float4(1);
+	//LightDesc.vAmbient = _float4(1);
+	//LightDesc.vSpecular = _float4(1);
+	//LightDesc.vVector = _float4(5, 5, 5, 1);
+	//LightDesc.fRange = 10;
+	//g_pGameInstance->Add_Light(LightDesc);
 
 	return S_OK;
 }

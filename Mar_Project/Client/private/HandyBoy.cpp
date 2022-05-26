@@ -151,10 +151,22 @@ _int CHandyBoy::Update(_double fDeltaTime)
 
 
 		if (NowIndex != 25)
+		{
 			g_pGameInstance->Add_CollisionGroup(CollisionType_Monster, this, m_pColliderCom);
 
-		if(!m_bIsPatternFinished && !m_bIsDealTime)
+#ifdef _DEBUG
+			FAILED_CHECK(m_pRendererCom->Add_DebugGroup(m_pColliderCom));
+#endif // _DEBUG
+		}
+
+		if (!m_bIsPatternFinished && !m_bIsDealTime)
+		{
 			g_pGameInstance->Add_CollisionGroup(CollisionType_MonsterWeapon, this, m_pColliderCom);
+
+#ifdef _DEBUG
+			FAILED_CHECK(m_pRendererCom->Add_DebugGroup(m_pColliderCom));
+#endif // _DEBUG
+		}
 
 	}
 
@@ -191,9 +203,6 @@ _int CHandyBoy::Render()
 
 	NULL_CHECK_RETURN(m_pModel, E_FAIL);
 
-#ifdef _DEBUG
-	m_pColliderCom->Render();
-#endif // _DEBUG
 
 
 	FAILED_CHECK(m_pTransformCom->Bind_OnShader(m_pShaderCom, "g_WorldMatrix"));

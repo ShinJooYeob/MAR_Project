@@ -68,6 +68,7 @@ namespace Engine
 		_float4		vSpecular;
 		//Directional : 방향 / Point : 위치
 		_float4		vVector;
+		_float		fRange;
 	}LIGHTDESC;
 
 	typedef struct tagVertex_Model
@@ -181,6 +182,15 @@ namespace Engine
 	{
 		unsigned short	_0, _1, _2;
 	}FACEINDICES16;
+
+
+
+	typedef struct tagWorldViewProjMatirx
+	{
+		_float4x4		WorldMatrix;
+		_float4x4		ViewMatrix;
+		_float4x4		ProjMatrix;
+	}MATRIXWVP;
 
 
 

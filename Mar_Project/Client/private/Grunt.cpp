@@ -238,10 +238,15 @@ _int CGrunt::Update(_double fDeltaTime)
 		}
 
 		if (!m_bDeathAnimStart)
+		{
 			g_pGameInstance->Add_CollisionGroup(CollisionType_Monster, this, m_pColliderCom);
+		}
 
 		//if(!m_bIsPatternFinished)
-			g_pGameInstance->Add_CollisionGroup(CollisionType_MonsterWeapon, this, m_pColliderCom);
+		g_pGameInstance->Add_CollisionGroup(CollisionType_MonsterWeapon, this, m_pColliderCom);
+#ifdef _DEBUG
+		FAILED_CHECK(m_pRendererCom->Add_DebugGroup(m_pColliderCom));
+#endif // _DEBUG
 
 	}
 
@@ -268,10 +273,6 @@ _int CGrunt::Render()
 
 
 	NULL_CHECK_RETURN(m_pModel, E_FAIL);
-
-#ifdef _DEBUG
-	m_pColliderCom->Render();
-#endif // _DEBUG
 
 
 

@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Base.h"
+#include "Shader.h"
+#include "VIBuffer_Rect.h"
 
 BEGIN(Engine)
 
@@ -13,9 +14,13 @@ private:
 public:
 	LIGHTDESC* Get_LightDesc() {return &m_LightDesc;}
 
-
 public:
 	HRESULT Initilize_Protoype(const LIGHTDESC& LightDesc);
+
+
+public:
+	HRESULT Render(CShader* pShader, CVIBuffer_Rect* pVIBuffer);
+
 
 private:
 	ID3D11Device*				m_pDevice = nullptr;

@@ -63,6 +63,9 @@ _int CEscalatorPad::Update(_double fDeltaTime)
 
 		g_pGameInstance->Add_CollisionGroup(CollisionType_MonsterWeapon, this, m_pColliderCom);
 
+#ifdef _DEBUG
+		FAILED_CHECK(m_pRendererCom->Add_DebugGroup(m_pColliderCom));
+#endif // _DEBUG
 	}
 	return _int();
 }
@@ -86,9 +89,6 @@ _int CEscalatorPad::Render()
 	if (__super::Render() < 0)
 		return -1;
 
-#ifdef _DEBUG
-	m_pColliderCom->Render();
-#endif // _DEBUG
 
 
 

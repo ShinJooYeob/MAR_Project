@@ -10,6 +10,7 @@
 #include "PipeLineMgr.h"
 #include "LightMgr.h"
 #include "CollisionMgr.h"
+#include "RenderTargetMgr.h"
 
 IMPLEMENT_SINGLETON(CGameInstance);
 
@@ -27,7 +28,8 @@ CGameInstance::CGameInstance()
 	m_pSoundMgr(GetSingle(CSoundMgr)),
 	m_pPipeLineMgr(GetSingle(CPipeLineMgr)),
 	m_pLightMgr(GetSingle(CLightMgr)),
-	m_pCollisionMgr(GetSingle(CCollisionMgr))
+	m_pCollisionMgr(GetSingle(CCollisionMgr)),
+	m_pRenderTargetMgr(GetSingle(CRenderTargetMgr))
 
 {
 
@@ -44,6 +46,7 @@ CGameInstance::CGameInstance()
 	Safe_AddRef(m_pPipeLineMgr);
 	Safe_AddRef(m_pLightMgr);
 	Safe_AddRef(m_pCollisionMgr);
+	Safe_AddRef(m_pRenderTargetMgr);
 	
 }
 
@@ -81,6 +84,7 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInst, const CGraphic_Device:
 
 	FAILED_CHECK(m_pSoundMgr->Initialize_FMOD());
 
+	FAILED_CHECK(m_pRenderTargetMgr->Initialize_RenderTargetMgr(*ppDeviceOut, *ppDeviceContextOut));
 
 
 
@@ -617,6 +621,7 @@ HRESULT CGameInstance::Add_CollisionGroup(CollisionTypeID eType, CGameObject * p
 {
 	NULL_CHECK_RETURN(m_pCollisionMgr,E_FAIL);
 
+
 	return m_pCollisionMgr->Add_CollisionGroup(eType,pCollisionObject,pCollider);
 }
 
@@ -672,6 +677,9 @@ void CGameInstance::Release_Engine()
 	if (0 != GetSingle(CCollisionMgr)->DestroyInstance())
 		MSGBOX("Failed to Release CCollisionMgr ");
 
+	if (0 != GetSingle(CRenderTargetMgr)->DestroyInstance())
+		MSGBOX("Failed to Release Com CRenderTargetMgr ");
+
 	if (0 != GetSingle(CGraphic_Device)->DestroyInstance())
 		MSGBOX("Failed to Release Com Graphic_Device ");
 
@@ -692,6 +700,7 @@ void CGameInstance::Free()
 	Safe_Release(m_pPipeLineMgr);
 	Safe_Release(m_pLightMgr);
 	Safe_Release(m_pCollisionMgr);
+	Safe_Release(m_pRenderTargetMgr);
 	
 	
 }

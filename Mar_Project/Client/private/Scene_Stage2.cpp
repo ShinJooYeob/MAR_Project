@@ -122,27 +122,27 @@ _int CScene_Stage2::Change_to_NextScene()
 
 HRESULT CScene_Stage2::Ready_Light()
 {
-	LIGHTDESC LightDesc;
+	//LIGHTDESC LightDesc;
 
 
 
-	LightDesc.eLightType = tagLightDesc::TYPE_DIRECTIONAL;
-	LightDesc.vDiffuse = _float4(1.f, 1.f,1.f,1.f);
-	LightDesc.vAmbient = _float4(1);
-	LightDesc.vSpecular = _float4(1);
-	LightDesc.vVector = _float4(1, -1, 1, 0);
+	//LightDesc.eLightType = tagLightDesc::TYPE_DIRECTIONAL;
+	//LightDesc.vDiffuse = _float4(1.f, 1.f,1.f,1.f);
+	//LightDesc.vAmbient = _float4(1);
+	//LightDesc.vSpecular = _float4(1);
+	//LightDesc.vVector = _float4(1, -1, 1, 0);
 
-	g_pGameInstance->Add_Light(LightDesc);
+	//g_pGameInstance->Add_Light(LightDesc);
 
 
 
-	LightDesc.eLightType = tagLightDesc::TYPE_POINT;
-	LightDesc.vDiffuse = _float4(1);
-	LightDesc.vAmbient = _float4(1);
-	LightDesc.vSpecular = _float4(1);
-	LightDesc.vVector = _float4(5, 5, 5, 1);
+	//LightDesc.eLightType = tagLightDesc::TYPE_POINT;
+	//LightDesc.vDiffuse = _float4(1);
+	//LightDesc.vAmbient = _float4(1);
+	//LightDesc.vSpecular = _float4(1);
+	//LightDesc.vVector = _float4(5, 5, 5, 1);
 
-	g_pGameInstance->Add_Light(LightDesc);
+	//g_pGameInstance->Add_Light(LightDesc);
 
 	return S_OK;
 }

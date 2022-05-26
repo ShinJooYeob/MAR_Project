@@ -144,7 +144,13 @@ _int CStage3_SpwanExecutor::Update(_double fDeltaTime)
 		m_pColliderCom->Update_Transform(i, m_pTransformCom->Get_WorldMatrix());
 
 	if (!m_bSpwanStart)
+	{
 		pInstance->Add_CollisionGroup(CollisionType_DynaicObject, this, m_pColliderCom);
+
+#ifdef _DEBUG
+		FAILED_CHECK(m_pRendererCom->Add_DebugGroup(m_pColliderCom));
+#endif // _DEBUG
+	}
 
 
 
@@ -172,10 +178,6 @@ _int CStage3_SpwanExecutor::Render()
 		return -1;
 
 
-#ifdef _DEBUG
-	if (!m_bSpwanStart)
-		m_pColliderCom->Render();
-#endif // _DEBUG
 
 	if (m_bOilDropRender)
 	{

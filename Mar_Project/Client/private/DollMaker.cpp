@@ -117,8 +117,14 @@ _int CDollMaker::Update(_double fDeltaTime)
 
 	_uint NowIndex = m_pModel->Get_NowAnimIndex();
 
-	if((NowIndex >= 1 && NowIndex <= 3) || (NowIndex >= 5 && NowIndex <= 6))
+	if ((NowIndex >= 1 && NowIndex <= 3) || (NowIndex >= 5 && NowIndex <= 6))
+	{
 		g_pGameInstance->Add_CollisionGroup(CollisionType_Monster, this, m_pColliderCom);
+
+#ifdef _DEBUG
+		FAILED_CHECK(m_pRendererCom->Add_DebugGroup(m_pColliderCom));
+#endif // _DEBUG
+	}
 
 
 	for (_uint i = 0; i < m_pHanddyIndex; i++)
@@ -153,9 +159,6 @@ _int CDollMaker::Render()
 
 	NULL_CHECK_RETURN(m_pModel, E_FAIL);
 
-#ifdef _DEBUG
-	m_pColliderCom->Render();
-#endif // _DEBUG
 
 	FAILED_CHECK(m_pTransformCom->Bind_OnShader(m_pShaderCom, "g_WorldMatrix"));
 

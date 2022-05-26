@@ -81,7 +81,10 @@ _int CBreakableObj::Update(_double fDeltaTime)
 			m_pColliderCom->Update_Transform(i, m_pTransformCom->Get_WorldMatrix());
 
 
-			g_pGameInstance->Add_CollisionGroup(CollisionType_Monster, this, m_pColliderCom);
+		g_pGameInstance->Add_CollisionGroup(CollisionType_Monster, this, m_pColliderCom);
+#ifdef _DEBUG
+		FAILED_CHECK(m_pRendererCom->Add_DebugGroup(m_pColliderCom));
+#endif // _DEBUG
 	}
 
 
@@ -157,9 +160,6 @@ _int CBreakableObj::Render()
 	if (__super::Render() < 0)
 		return -1;
 
-#ifdef _DEBUG
-	m_pColliderCom->Render();
-#endif // _DEBUG
 
 	NULL_CHECK_RETURN(m_pModel, E_FAIL);
 

@@ -17,9 +17,13 @@ public:
 	HRESULT Initialize_LightMgr(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 
 public:
+	HRESULT Render(class CShader* pShader, class CVIBuffer_Rect* pViBuffer, MATRIXWVP* pWVPMat);
+public:
 	const LIGHTDESC* Get_LightDesc(LIGHTDESC::TYPE eLightType, _uint iIndex) const;
 	HRESULT EasingDiffuseLightDesc(LIGHTDESC::TYPE eLightType, _uint iIndex, _fVector vTargetDiffuse, _float MixRate = 1.f);
 	HRESULT Add_Light(const LIGHTDESC& LightDesc);
+
+
 
 private:
 	list<class CLight*>			m_ArrLightList[LIGHTDESC::TYPE_END];
