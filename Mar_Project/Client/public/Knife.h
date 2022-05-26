@@ -28,6 +28,7 @@ private:
 	CTransform*			m_pTransformCom = nullptr;
 	CModel*				m_pModel = nullptr;
 	CCollider*			m_pColliderCom = nullptr;
+	CSwordTrail*		m_pSwordTrailCom = nullptr;
 
 	PARTICLEDESC		m_tParticleDesc;
 private:

@@ -154,6 +154,9 @@
     <Filter Include="98.ShaderFiles">
       <UniqueIdentifier>{d555d002-8d68-4644-bee2-f2c0c47f4128}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\01.ComponentMgr\01.Component\07.SwordTrail">
+      <UniqueIdentifier>{2fab23fb-50d8-4ad5-9683-bde9fb0bf535}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Base.h">
@@ -306,6 +309,9 @@
     <ClInclude Include="..\public\RenderTargetLayer.h">
       <Filter>01.Utility\12.RenderTargetMgr</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\SwordTrail.h">
+      <Filter>01.Utility\01.ComponentMgr\01.Component\07.SwordTrail</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">
@@ -440,9 +446,15 @@
     <ClCompile Include="..\private\RenderTargetLayer.cpp">
       <Filter>01.Utility\12.RenderTargetMgr</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\SwordTrail.cpp">
+      <Filter>01.Utility\01.ComponentMgr\01.Component\07.SwordTrail</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\bin\ShaderFiles\Shader_Deferred.hlsl">
+      <Filter>98.ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\bin\ShaderFiles\Shader_VtxTrailInstance.hlsl">
       <Filter>98.ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

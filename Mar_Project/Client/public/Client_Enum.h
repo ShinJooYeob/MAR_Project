@@ -1690,7 +1690,7 @@ enum COMPONENTID
 	Com_Model,
 	Com_SubModel,
 	Com_Collider,
-
+	Com_SwordTrail
 };
 static const _tchar* Tag_Component(COMPONENTID eTag)
 {
@@ -1730,6 +1730,10 @@ static const _tchar* Tag_Component(COMPONENTID eTag)
 
 	case Com_Collider:
 		return TEXT("Com_Collider");
+		break;
+
+	case Com_SwordTrail:
+		return TEXT("Com_SwordTrail");
 		break;
 
 		

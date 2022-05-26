@@ -12,6 +12,8 @@
 #include "Texture.h"
 #include "Shader.h"
 #include "Collider.h"
+
+#include "SwordTrail.h"
 //#include "Collision.h"
 
 BEGIN(Engine)

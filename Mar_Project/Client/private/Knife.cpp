@@ -32,8 +32,6 @@ HRESULT CKnife::Initialize_Clone(void * pArg)
 
 
 
-
-
 	m_tParticleDesc.eParticleTypeID = Particle_Fixed_LookFree;
 
 	m_tParticleDesc.FollowingTarget = nullptr;
@@ -78,7 +76,8 @@ HRESULT CKnife::Initialize_Clone(void * pArg)
 	m_tParticleDesc.m_iPassIndex = 9;
 
 
-	
+	m_pSwordTrailCom->Set_TrailTurnOn(true, m_pColliderCom->Get_ColliderPosition(1) , m_pColliderCom->Get_ColliderPosition(3));
+	m_pSwordTrailCom->Set_Color(_float4(0, 0, 1, 0.5f));
 	return S_OK;
 }
 
@@ -89,6 +88,9 @@ _int CKnife::Update(_double fDeltaTime)
 	if (m_bIsDead) return 0;
 	
 	m_pColliderCom->Update_ConflictPassedTime(fDeltaTime);
+
+	m_pSwordTrailCom->Update_SwordTrail(m_pColliderCom->Get_ColliderPosition(1), m_pColliderCom->Get_ColliderPosition(3));
+
 
 	
 	_Matrix			TransformMatrix = XMLoadFloat4x4(m_tATBMat.pUpdatedNodeMat) * XMLoadFloat4x4(m_tATBMat.pDefaultPivotMat);
@@ -137,7 +139,7 @@ _int CKnife::Render()
 
 	NULL_CHECK_RETURN(m_pModel, E_FAIL);
 
-
+	m_pSwordTrailCom->Render();
 
 	_float4x4 ShaderMat = m_BoneMatrix.TransposeXMatrix();
 	m_pShaderCom->Set_RawValue("g_AttechMatrix", &ShaderMat, sizeof(_float4x4));
@@ -271,8 +273,9 @@ HRESULT CKnife::SetUp_Components()
 
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Transform), TAG_COM(Com_Transform), (CComponent**)&m_pTransformCom));
+	FAILED_CHECK(Add_Component(SCENE_STATIC, L"Trail", TAG_COM(Com_SwordTrail), (CComponent**)&m_pSwordTrailCom));
 
-
+	
 	return S_OK;
 }
 
@@ -309,5 +312,6 @@ void CKnife::Free()
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModel);
 	Safe_Release(m_pColliderCom);
+	Safe_Release(m_pSwordTrailCom);
 	
 }
