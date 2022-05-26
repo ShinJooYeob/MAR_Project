@@ -12,7 +12,7 @@ public:
 	typedef struct tagSwordTrailDesc
 	{
 		_float4 vColor = _float4(1);
-		_uint	iTextureIndex = 0;
+		_uint	iTextureIndex = 1;
 		_uint	iPassIndex = 0;
 	}TRAILDESC;
 
@@ -34,7 +34,7 @@ private:
 
 
 public:
-	_uint Update_SwordTrail(_float3 tSourPoint, _float3 tDestPoint);
+	_uint Update_SwordTrail(_float3 tSourPoint, _float3 tDestPoint, _double fDeltaTime);
 	virtual HRESULT Render() override;
 
 
@@ -56,6 +56,7 @@ private:
 
 	_bool							m_bDrawTrail = false;
 
+	_float							m_PassedTime = 0;
 	TRAILDESC						m_tDesc;
 
 public:

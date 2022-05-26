@@ -7,6 +7,8 @@
 #include "ClockBomb.h"
 
 #include "DustWind.h"
+#include "Knife.h"
+#include "Horse.h"
 
 
 
@@ -2628,9 +2630,17 @@ HRESULT CPlayer::Attack_Update_Horse(_double fDeltaTime, CGameInstance * pInstan
 		break;
 	}
 
+	if (iNowAnimIndex >= Weapon_Horse + 8 && iNowAnimIndex <= Weapon_Horse + 14)
+	{
+		((CHorse*)(m_vecWeapon[2]))->Set_TrailOn(true);
+	}
+	else
+	{
+		((CHorse*)(m_vecWeapon[2]))->Set_TrailOn(false);
+	}
 
-	if (g_pGameInstance->Get_DIKeyState(DIK_Z) &DIS_Down)
-		m_vecWeapon[m_iWeaponModelIndex]->Get_WeaponModel()->Change_AnimIndex_ReturnTo_Must(1, 0, 0, true);
+	//if (g_pGameInstance->Get_DIKeyState(DIK_Z) &DIS_Down)
+	//	m_vecWeapon[m_iWeaponModelIndex]->Get_WeaponModel()->Change_AnimIndex_ReturnTo_Must(1, 0, 0, true);
 
 	return S_OK;
 }
@@ -3801,7 +3811,15 @@ HRESULT CPlayer::Attack_Update_Knife(_double fDeltaTime, CGameInstance * pInstan
 		break;
 	}
 
+	if (iNowAnimIndex >= Weapon_Knife + 8 && iNowAnimIndex <= Weapon_Knife + 16)
+	{
+		((CKnife*)(m_vecWeapon[0]))->Set_TrailOn(true);
+	}
+	else
+	{
 
+		((CKnife*)(m_vecWeapon[0]))->Set_TrailOn(false);
+	}
 
 
 	return S_OK;

@@ -23,6 +23,7 @@ public:
 
 	virtual void CollisionTriger(_uint iMyColliderIndex, CGameObject* pConflictedObj, CCollider* pConflictedCollider, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType) override;
 	CModel*	Get_WeaponModel() override { return m_pModel; };
+	void Set_TrailOn(_bool bBool);
 
 private:
 	CShader*			m_pShaderCom = nullptr;
@@ -30,7 +31,14 @@ private:
 	CTransform*			m_pTransformCom = nullptr;
 	CModel*				m_pModel = nullptr;
 	CCollider*			m_pColliderCom = nullptr;
+	CSwordTrail*		m_pSwordTrailCom = nullptr;
 
+	class CTransform*			m_pPlayerTransform = nullptr;
+
+
+	_float3				m_TargetColor;
+	_float3				m_SourColor;
+	_double				m_TrailColorChageTime = 0;
 	PARTICLEDESC		m_tParticleDesc;
 private:
 	HRESULT SetUp_Components();

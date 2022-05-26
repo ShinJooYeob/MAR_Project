@@ -73,6 +73,13 @@ HRESULT CHorse::Initialize_Clone(void * pArg)
 	m_tParticleDesc.m_fAlphaTestValue = 0.1f;
 	m_tParticleDesc.m_iPassIndex = 9;
 	
+
+	m_pSwordTrailCom->Set_Color(_float4(0, 0.84705882f, 1, 1.f));
+
+	GetSingle(CUtilityMgr)->RandomFloat3(0, 1);
+	m_pSwordTrailCom->Set_PassIndex(2);
+	m_pSwordTrailCom->Set_TextureIndex(2);
+	//m_pSwordTrailCom->Set_TrailTurnOn(true, m_pColliderCom->Get_ColliderPosition(1), m_pColliderCom->Get_ColliderPosition(3));
 	return S_OK;
 }
 
@@ -84,6 +91,10 @@ _int CHorse::Update(_double fDeltaTime)
 	
 	m_pColliderCom->Update_ConflictPassedTime(fDeltaTime);
 
+	_Vector ColDir = XMVector3Normalize(m_pColliderCom->Get_ColliderPosition(3).XMVector() - m_pColliderCom->Get_ColliderPosition(1).XMVector());
+
+	m_pSwordTrailCom->Update_SwordTrail(m_pColliderCom->Get_ColliderPosition(1).XMVector() - ColDir,
+		m_pColliderCom->Get_ColliderPosition(3).XMVector() + ColDir, fDeltaTime);
 
 
 	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime * 2));
@@ -123,6 +134,7 @@ _int CHorse::LateUpdate(_double fDeltaTime)
 
 	
 	FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this));
+	FAILED_CHECK(m_pRendererCom->Add_TrailGroup(m_pSwordTrailCom));
 	m_vOldPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
 	return _int();
 }
@@ -227,6 +239,11 @@ void CHorse::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedOb
 
 }
 
+void CHorse::Set_TrailOn(_bool bBool)
+{
+	m_pSwordTrailCom->Set_TrailTurnOn(bBool, m_pColliderCom->Get_ColliderPosition(1), m_pColliderCom->Get_ColliderPosition(3));
+}
+
 HRESULT CHorse::SetUp_Components()
 {
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Renderer), TAG_COM(Com_Renderer), (CComponent**)&m_pRendererCom));
@@ -273,6 +290,10 @@ HRESULT CHorse::SetUp_Components()
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Transform), TAG_COM(Com_Transform), (CComponent**)&m_pTransformCom));
 
+	FAILED_CHECK(Add_Component(SCENE_STATIC, L"Trail", TAG_COM(Com_SwordTrail), (CComponent**)&m_pSwordTrailCom));
+
+	m_pPlayerTransform = (CTransform*)m_pPlayer->Get_Component(TAG_COM(Com_Transform));
+	NULL_CHECK_RETURN(m_pPlayerTransform, E_FAIL);
 
 	return S_OK;
 }
@@ -310,5 +331,6 @@ void CHorse::Free()
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModel);
 	Safe_Release(m_pColliderCom);
-	
+
+	Safe_Release(m_pSwordTrailCom);
 }

@@ -76,8 +76,13 @@ HRESULT CKnife::Initialize_Clone(void * pArg)
 	m_tParticleDesc.m_iPassIndex = 9;
 
 
-	m_pSwordTrailCom->Set_TrailTurnOn(true, m_pColliderCom->Get_ColliderPosition(1) , m_pColliderCom->Get_ColliderPosition(3));
-	m_pSwordTrailCom->Set_Color(_float4(0, 0, 1, 0.5f));
+	//m_pSwordTrailCom->Set_TrailTurnOn(true, m_pColliderCom->Get_ColliderPosition(1) , m_pColliderCom->Get_ColliderPosition(3));
+	//m_pSwordTrailCom->Set_Color(_float4(0.4392156862f, 0.75686274f, 1, 1.f));
+	m_pSwordTrailCom->Set_Color(_float4(0, 0.84705882f, 1, 1.f));
+
+	GetSingle(CUtilityMgr)->RandomFloat3(0, 1);
+	m_pSwordTrailCom->Set_PassIndex(0);
+	m_pSwordTrailCom->Set_TextureIndex(1);
 	return S_OK;
 }
 
@@ -89,7 +94,23 @@ _int CKnife::Update(_double fDeltaTime)
 	
 	m_pColliderCom->Update_ConflictPassedTime(fDeltaTime);
 
-	m_pSwordTrailCom->Update_SwordTrail(m_pColliderCom->Get_ColliderPosition(1), m_pColliderCom->Get_ColliderPosition(3));
+	m_pSwordTrailCom->Update_SwordTrail(m_pColliderCom->Get_ColliderPosition(1), m_pColliderCom->Get_ColliderPosition(3),fDeltaTime);
+
+	{
+
+		m_TrailColorChageTime += fDeltaTime;
+
+
+		if (m_TrailColorChageTime > 1)
+		{
+			m_TrailColorChageTime = 0;
+			m_SourColor = m_TargetColor;
+			m_TargetColor = GetSingle(CUtilityMgr)->RandomFloat3(0, 1);
+		}
+		m_pSwordTrailCom->Set_Color(_float4(g_pGameInstance->Easing_Vector(TYPE_Linear, m_SourColor, m_TargetColor,(_float) m_TrailColorChageTime, 1), 1));
+
+
+	}
 
 
 	
@@ -130,7 +151,10 @@ _int CKnife::LateUpdate(_double fDeltaTime)
 
 	//if (m_bIsOnScreen)	
 	FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this));
+	FAILED_CHECK(m_pRendererCom->Add_TrailGroup(m_pSwordTrailCom));
+	
 	m_vOldPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+
 	return _int();
 }
 
@@ -138,8 +162,6 @@ _int CKnife::Render()
 {
 
 	NULL_CHECK_RETURN(m_pModel, E_FAIL);
-
-	m_pSwordTrailCom->Render();
 
 	_float4x4 ShaderMat = m_BoneMatrix.TransposeXMatrix();
 	m_pShaderCom->Set_RawValue("g_AttechMatrix", &ShaderMat, sizeof(_float4x4));
@@ -231,6 +253,11 @@ void CKnife::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedOb
 		break;
 	}
 
+}
+
+void CKnife::Set_TrailOn(_bool bBool)
+{
+	m_pSwordTrailCom->Set_TrailTurnOn(bBool, m_pColliderCom->Get_ColliderPosition(1), m_pColliderCom->Get_ColliderPosition(3));
 }
 
 HRESULT CKnife::SetUp_Components()

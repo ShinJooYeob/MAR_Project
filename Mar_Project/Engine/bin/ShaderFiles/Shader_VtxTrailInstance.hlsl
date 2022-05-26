@@ -20,8 +20,6 @@ BlendState	Blending_One
 	BlendOp = Add;
 	SrcBlend = one;
 	DestBlend = one;
-
-
 };
 cbuffer	RenderingPipeLine
 {
@@ -45,6 +43,9 @@ RasterizerState CullMode_None
 
 
 texture2D			g_DiffuseTexture;
+texture2D			g_BackBufferTexture;
+texture2D			g_NoiseTexture;
+float				g_fTime;
 
 struct VS_IN
 {
@@ -56,7 +57,7 @@ struct VS_IN
 	float4		vNextSour	: TEXCOORD3;
 	float4		vNextDest : TEXCOORD4;
 
-	float4		vUV_Rect: TEXCOORD5;
+	float4		vUV_N_Time: TEXCOORD5;
 	float4		vColor : TEXCOORD6;
 
 };
@@ -71,7 +72,7 @@ struct VS_OUT
 	float4		vNextSour	: TEXCOORD3;
 	float4		vNextDest	: TEXCOORD4;
 
-	float4		vUV_Rect	: TEXCOORD5;
+	float4		vUV_N_Time	: TEXCOORD5;
 	float4		vColor		: TEXCOORD6;
 };	
 
@@ -93,7 +94,7 @@ VS_OUT VS_MAIN_INST(VS_IN In)
 	Out.vNextSour = In.vNextSour;
 	Out.vNextDest = In.vNextDest;
 
-	Out.vUV_Rect = In.vUV_Rect;
+	Out.vUV_N_Time = In.vUV_N_Time;
 	Out.vColor = In.vColor;
 
 
@@ -110,7 +111,7 @@ struct GS_IN
 	float4		vNextSour	: TEXCOORD3;
 	float4		vNextDest	: TEXCOORD4;
 
-	float4		vUV_Rect	: TEXCOORD5;
+	float4		vUV_N_Time	: TEXCOORD5;
 	float4		vColor		: TEXCOORD6;
 };
 
@@ -136,22 +137,22 @@ void GS_MAIN_INST(in point GS_IN In[1], inout TriangleStream<GS_OUT> Trianglestr
 
 	vPosition = vector(In[0].vNowDest.xyz,1);
 	Out[0].vPosition = mul(vPosition, matVP);
-	Out[0].vTexUV = float2(In[0].vUV_Rect.x, In[0].vUV_Rect.y);
+	Out[0].vTexUV = float2(In[0].vUV_N_Time.x, In[0].vUV_N_Time.y);
 	Out[0].vColor = In[0].vColor;
 
 	vPosition = vector(In[0].vNextDest.xyz, 1);
 	Out[1].vPosition = mul(vPosition, matVP);
-	Out[1].vTexUV = float2(In[0].vUV_Rect.z, In[0].vUV_Rect.y);
+	Out[1].vTexUV = float2(In[0].vUV_N_Time.z, In[0].vUV_N_Time.y);
 	Out[1].vColor = In[0].vColor;
 
 	vPosition = vector(In[0].vNextSour.xyz, 1);
 	Out[2].vPosition = mul(vPosition, matVP);
-	Out[2].vTexUV = float2(In[0].vUV_Rect.z, In[0].vUV_Rect.w);
+	Out[2].vTexUV = float2(In[0].vUV_N_Time.z, In[0].vUV_N_Time.w);
 	Out[2].vColor = In[0].vColor;
 
 	vPosition = vector(In[0].vNowSour.xyz, 1);
 	Out[3].vPosition = mul(vPosition, matVP);
-	Out[3].vTexUV = float2(In[0].vUV_Rect.x, In[0].vUV_Rect.w);
+	Out[3].vTexUV = float2(In[0].vUV_N_Time.x, In[0].vUV_N_Time.w);
 	Out[3].vColor = In[0].vColor;
 
 
@@ -180,12 +181,7 @@ struct PS_OUT
 	vector		vDiffuse : SV_TARGET0;
 };
 
-struct PS_OUT_DEFERRED
-{
-	vector		vDiffuse : SV_TARGET0;
-	vector		vNormal : SV_TARGET1;
-	vector		vDepth : SV_TARGET2;
-};
+
 
 PS_OUT PS_MAIN_INST(PS_IN In)
 {
@@ -198,10 +194,10 @@ PS_OUT PS_MAIN_INST(PS_IN In)
 
 	if (Alpha < 0.1)
 		discard;
-	Out.vDiffuse *= In.vColor;
+	Out.vDiffuse = (Out.vDiffuse) * In.vColor;
 	
 
-	Out.vDiffuse.a = min(Alpha, In.vColor.a);
+	Out.vDiffuse.a = min(Alpha * 2.f, In.vColor.a);
 
 
 	return Out;
@@ -220,26 +216,38 @@ PS_OUT PS_MAIN_INSTINVERSE(PS_IN In)
 
 	Out.vDiffuse = (1 - Out.vDiffuse) * In.vColor;
 
-	Out.vDiffuse.a = min(Alpha, In.vColor.a);
+	Out.vDiffuse.a = min(Alpha * 2.f, In.vColor.a);
 
 
 	return Out;
 }
-PS_OUT_DEFERRED PS_MAIN_INST_ToDeferred(PS_IN In)
+PS_OUT PS_MAIN_INST_DISORT(PS_IN In)
 {
-	PS_OUT_DEFERRED		Out = (PS_OUT_DEFERRED)0;
+	PS_OUT		Out = (PS_OUT)0;
+
 
 	Out.vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
 
 
 	float Alpha = max(max(Out.vDiffuse.r, Out.vDiffuse.g), Out.vDiffuse.b);
 
-	if (Alpha < 0.1)
+	if (Alpha < 0.5)
 		discard;
 
-	Out.vDiffuse *= In.vColor;
 
-	Out.vDiffuse.a = min(Alpha, In.vColor.a);
+	float2 PosToUv = float2(In.vPosition.x/1280, In.vPosition.y / 780);
+
+	vector Noise = g_NoiseTexture.Sample(DefaultSampler, In.vTexUV + g_fTime);
+
+	float2 TargetUV = float2(PosToUv.x + (0.5f - (Noise.x))*0.15625f, PosToUv.y + (0.5f - (Noise.y))*0.25f);
+	//float2 TargetUV = In.vTexUV + float2(PosToUv.x + (0.5f - (Noise.x))*0.0015625f, PosToUv.y + (0.5f - (Noise.y))*0.0025f);
+
+	vector BackBuffer = g_BackBufferTexture.Sample(DefaultSampler, TargetUV);
+
+	Out.vDiffuse = BackBuffer;
+
+	Out.vDiffuse.a = 1;
+	//Out.vDiffuse.a = min(Alpha, In.vColor.a);
 
 
 	return Out;
@@ -267,7 +275,7 @@ technique11		DefaultTechnique
 		GeometryShader = compile gs_5_0 GS_MAIN_INST();
 		PixelShader = compile ps_5_0 PS_MAIN_INSTINVERSE();
 	}
-	pass ToDeferred
+	pass Distortion
 	{
 		SetBlendState(AlphaBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 		SetDepthStencilState(ZTestAndWriteState, 0);
@@ -275,7 +283,7 @@ technique11		DefaultTechnique
 
 		VertexShader = compile vs_5_0 VS_MAIN_INST();
 		GeometryShader = compile gs_5_0 GS_MAIN_INST();
-		PixelShader = compile ps_5_0 PS_MAIN_INST();
+		PixelShader = compile ps_5_0 PS_MAIN_INST_DISORT();
 	}
 
 }

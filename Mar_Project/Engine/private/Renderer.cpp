@@ -6,7 +6,9 @@
 #include "LightMgr.h"
 #include "VIBuffer_Rect.h"
 #include "Shader.h"
+#include "SwordTrail.h"
 
+#include "GameInstance.h"
 
 CRenderer::CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CComponent(pDevice, pDeviceContext)
@@ -118,6 +120,14 @@ HRESULT CRenderer::Add_RenderGroup(RENDERGROUP eRenderID, CGameObject * pGameObj
 	return S_OK;
 }
 
+HRESULT CRenderer::Add_TrailGroup(CSwordTrail * pComponent)
+{
+	m_TrailObjectList.push_back(pComponent);
+	Safe_AddRef(pComponent);
+
+	return S_OK;
+}
+
 HRESULT CRenderer::Add_DebugGroup(CComponent * pComponent)
 {
 	m_DebugObjectList.push_back(pComponent);
@@ -141,6 +151,8 @@ HRESULT CRenderer::Render_RenderGroup()
 	FAILED_CHECK(Render_Lights());
 	FAILED_CHECK(Render_DeferredTexture());
 
+	FAILED_CHECK(Render_NonAlpha_NoDeferrd());
+
 	FAILED_CHECK(Render_Alpha());
 	FAILED_CHECK(Render_AfterObj());
 
@@ -149,9 +161,18 @@ HRESULT CRenderer::Render_RenderGroup()
 
 
 #ifdef _DEBUG
-	FAILED_CHECK(Render_Debug());
-	FAILED_CHECK(m_pRenderTargetMgr->Render_DebugBuffer(TEXT("MRT_Deferred")));
-	FAILED_CHECK(m_pRenderTargetMgr->Render_DebugBuffer(TEXT("MRT_LightAcc")));
+	static bool tt = false;
+	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_M) &DIS_Down)
+	{
+		tt = !tt;
+	}
+	if (tt)
+	{
+		FAILED_CHECK(Render_Debug());
+		FAILED_CHECK(m_pRenderTargetMgr->Render_DebugBuffer(TEXT("MRT_Deferred")));
+		FAILED_CHECK(m_pRenderTargetMgr->Render_DebugBuffer(TEXT("MRT_LightAcc")));
+	}
+
 #endif
 
 	return S_OK;
@@ -174,6 +195,13 @@ HRESULT CRenderer::Clear_RenderGroup_forSceneChaging()
 		Safe_Release(DebugObject);
 	}
 	m_DebugObjectList.clear();
+
+	for (auto& TrailObject : m_TrailObjectList)
+	{
+		Safe_Release(TrailObject);
+	}
+	m_TrailObjectList.clear();
+
 
 	return S_OK;
 }
@@ -256,6 +284,34 @@ HRESULT CRenderer::Render_DeferredTexture()
 	m_pVIBuffer->Render(m_pShader, 3);
 
 	return S_OK;
+}
+
+HRESULT CRenderer::Render_NonAlpha_NoDeferrd()
+{
+	for (auto& RenderObject : m_RenderObjectList[RENDER_NONBLEND_NOLIGHT])
+	{
+		if (RenderObject != nullptr)
+		{
+			FAILED_CHECK(RenderObject->Render());
+		}
+		Safe_Release(RenderObject);
+	}
+
+	m_RenderObjectList[RENDER_NONBLEND_NOLIGHT].clear();
+
+
+	for (auto& pComponent : m_TrailObjectList)
+	{
+		if (nullptr != pComponent)
+			pComponent->Render();
+
+		Safe_Release(pComponent);
+	}
+
+	m_TrailObjectList.clear();
+
+	return S_OK;
+
 }
 
 HRESULT CRenderer::Render_Alpha()
@@ -382,5 +438,10 @@ void CRenderer::Free()
 	}
 	m_DebugObjectList.clear();
 
-	
+	for (auto& TrailObject : m_TrailObjectList)
+	{
+		Safe_Release(TrailObject);
+	}
+	m_TrailObjectList.clear();
+
 }

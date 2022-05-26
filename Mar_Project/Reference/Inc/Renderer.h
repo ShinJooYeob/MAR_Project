@@ -26,6 +26,7 @@ private:
 
 public:
 	HRESULT Add_RenderGroup(RENDERGROUP eRenderID ,CGameObject* pGameObject);
+	HRESULT Add_TrailGroup(class CSwordTrail* pComponent);
 	HRESULT Add_DebugGroup(class CComponent* pComponent);
 	HRESULT Render_RenderGroup();
 	HRESULT Clear_RenderGroup_forSceneChaging();
@@ -35,6 +36,9 @@ public:
 private:
 	list<CGameObject*>				m_RenderObjectList[RENDER_END];
 	typedef list<CGameObject*>		RENDEROBJECTS;
+
+	list<class CSwordTrail*>					m_TrailObjectList;
+	typedef list<class CSwordTrail*>			TRAILOBJECT;
 
 private:
 	list<class CComponent*>					m_DebugObjectList;
@@ -59,6 +63,10 @@ private:
 
 	HRESULT Render_Lights();
 	HRESULT Render_DeferredTexture();
+
+
+	HRESULT Render_NonAlpha_NoDeferrd();
+	
 
 	HRESULT Render_Alpha();
 	HRESULT Render_AfterObj();

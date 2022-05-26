@@ -4,6 +4,7 @@
 #include "Texture.h"
 #include "PipeLineMgr.h"
 #include "GameInstance.h"
+#include "RenderTargetMgr.h"
 
 
 
@@ -59,7 +60,7 @@ HRESULT CSwordTrail::Initialize_Clone(void * pArg)
 
 void CSwordTrail::Set_TrailTurnOn(_bool bBool, _float3 tSourPoint, _float3 tDestPoint)
 {
-	//if (m_bDrawTrail != bBool) return;
+	if (m_bDrawTrail == bBool) return;
 	
 	m_bDrawTrail = bBool;
 
@@ -82,9 +83,12 @@ void CSwordTrail::Set_TrailTurnOn(_bool bBool, _float3 tSourPoint, _float3 tDest
 
 }
 
-_uint CSwordTrail::Update_SwordTrail(_float3 tSourPoint, _float3 tDestPoint)
+_uint CSwordTrail::Update_SwordTrail(_float3 tSourPoint, _float3 tDestPoint,_double fDeltaTime)
 {
 	if (!m_bDrawTrail)return 0;
+
+	m_PassedTime += (_float)fDeltaTime;
+	if (m_PassedTime > 1) m_PassedTime = 0;
 
 	TRAILPOINT tPoints;
 	tPoints.vSourPoint = tSourPoint;
@@ -125,6 +129,8 @@ _uint CSwordTrail::Update_SwordTrail(_float3 tSourPoint, _float3 tDestPoint)
 
 HRESULT CSwordTrail::Render()
 {
+	if (!m_bDrawTrail)return S_FALSE;
+
 	NULL_CHECK_RETURN(m_pVIBuffer, E_FAIL);
 
 	//FAILED_CHECK(Update_ParticleAttribute(g_fDeltaTime));
@@ -146,9 +152,9 @@ HRESULT CSwordTrail::Render()
 		XMStoreFloat4(&(((VTXINSTMAT*)SubResource.pData)[i].vRight), iter->vSourPoint.XMVector());
 		XMStoreFloat4(&(((VTXINSTMAT*)SubResource.pData)[i].vUp), iter->vDestPoint.XMVector());
 		XMStoreFloat4(&(((VTXINSTMAT*)SubResource.pData)[i].vLook), (iterNext)->vSourPoint.XMVector());
-		XMStoreFloat4(&(((VTXINSTMAT*)SubResource.pData)[i].vTranslation), (iterNext)->vDestPoint.XMVector());
+		XMStoreFloat4(&(((VTXINSTMAT*)SubResource.pData)[i].vTranslation), (iterNext)->vDestPoint.XMVector()); 
 
-		((VTXINSTMAT*)SubResource.pData)[i].vUV_WHSize = _float4(i * UVWidth, 0 ,(i + 1) * UVWidth, 1);
+		((VTXINSTMAT*)SubResource.pData)[i].vUV_WHSize = _float4(i * UVWidth, 0 , (i + 1) * UVWidth, 1);
 		((VTXINSTMAT*)SubResource.pData)[i].vColor = m_tDesc.vColor;
 
 		iter++;
@@ -162,6 +168,16 @@ HRESULT CSwordTrail::Render()
 	FAILED_CHECK(m_pShader->Set_RawValue("g_ProjMatrix", &pInstance->Get_Transform_Float4x4_TP(PLM_PROJ), sizeof(_float4x4)));
 
 	FAILED_CHECK(m_pTexture->Bind_OnShader(m_pShader, "g_DiffuseTexture", m_tDesc.iTextureIndex));
+
+	if (m_tDesc.iPassIndex == 2)
+	{
+		FAILED_CHECK(m_pTexture->Bind_OnShader(m_pShader, "g_NoiseTexture", 0));
+		FAILED_CHECK(m_pShader->Set_Texture("g_BackBufferTexture", GetSingle(CRenderTargetMgr)->Get_SRV(L"Target_Diffuse")));
+		FAILED_CHECK(m_pShader->Set_RawValue("g_ProjMatrix", &pInstance->Get_Transform_Float4x4_TP(PLM_PROJ), sizeof(_float4x4)));
+		FAILED_CHECK(m_pShader->Set_RawValue("g_fTime", &m_PassedTime, sizeof(_float)));
+
+		
+	}
 
 	FAILED_CHECK(m_pVIBuffer->Render(m_pShader, m_tDesc.iPassIndex));
 
