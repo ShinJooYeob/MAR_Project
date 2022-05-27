@@ -47,7 +47,7 @@ public:
 	virtual _int Update(_double TimeDelta)override;
 	virtual _int LateUpdate(_double TimeDelta)override;
 	virtual _int Render() override;
-	virtual _int LateRender() override;
+	virtual _int LightRender() override;
 
 
 

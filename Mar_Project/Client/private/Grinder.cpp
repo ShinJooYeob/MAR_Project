@@ -329,7 +329,7 @@ _int CGrinder::Render()
 	return _int();
 }
 
-_int CGrinder::LateRender()
+_int CGrinder::LightRender()
 {
 
 	return _int();

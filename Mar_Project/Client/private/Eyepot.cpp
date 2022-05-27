@@ -232,7 +232,7 @@ _int CEyepot::Render()
 	return _int();
 }
 
-_int CEyepot::LateRender()
+_int CEyepot::LightRender()
 {
 	return _int();
 }

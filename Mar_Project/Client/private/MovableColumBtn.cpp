@@ -143,9 +143,9 @@ _int CMovableColumBtn::Render()
 	return _int();
 }
 
-_int CMovableColumBtn::LateRender()
+_int CMovableColumBtn::LightRender()
 {
-	if (__super::LateRender() < 0)
+	if (__super::LightRender() < 0)
 		return -1;
 
 	return _int();

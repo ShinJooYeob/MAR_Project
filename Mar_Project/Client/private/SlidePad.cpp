@@ -113,9 +113,9 @@ _int CSlidePad::Render()
 	return _int();
 }
 
-_int CSlidePad::LateRender()
+_int CSlidePad::LightRender()
 {
-	if (__super::LateRender() < 0)
+	if (__super::LightRender() < 0)
 		return -1;
 
 	return _int();

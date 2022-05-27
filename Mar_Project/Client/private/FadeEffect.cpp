@@ -157,7 +157,7 @@ _int CFadeEffect::Render()
 	return _int();
 }
 
-_int CFadeEffect::LateRender()
+_int CFadeEffect::LightRender()
 {
 
 

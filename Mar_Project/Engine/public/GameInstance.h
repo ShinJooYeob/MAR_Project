@@ -139,7 +139,8 @@ public: //CollisionMgr
 	void	Clear_CollisionGroup();
 
 
-
+public:
+	ID3D11ShaderResourceView* Get_SRV(const _tchar* pTargetTag) const;
 
 private:
 	CGraphic_Device*	m_pGraphicDevice = nullptr;

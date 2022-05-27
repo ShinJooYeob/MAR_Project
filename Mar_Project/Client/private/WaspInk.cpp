@@ -279,7 +279,7 @@ _int CWaspInk::Render()
 	return _int();
 }
 
-_int CWaspInk::LateRender()
+_int CWaspInk::LightRender()
 {
 	return _int();
 }

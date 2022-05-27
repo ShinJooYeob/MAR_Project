@@ -316,7 +316,7 @@ _int CGrunt::Render()
 	return _int();
 }
 
-_int CGrunt::LateRender()
+_int CGrunt::LightRender()
 {
 	return _int();
 }

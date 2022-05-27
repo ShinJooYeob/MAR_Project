@@ -88,6 +88,8 @@ _int CLobyAlice::Render()
 		for (_uint j = 0; j < AI_TEXTURE_TYPE_MAX; j++)
 			FAILED_CHECK(m_pModel->Bind_OnShader(m_pShaderCom, i, j, MODLETEXTYPE(j)));
 
+		
+
 		if (i <= 1)
 		{
 			FAILED_CHECK(m_pModel->Render(m_pShaderCom, 5, i, "g_BoneMatrices"));
@@ -104,7 +106,7 @@ _int CLobyAlice::Render()
 	return _int();
 }
 
-_int CLobyAlice::LateRender()
+_int CLobyAlice::LightRender()
 {
 	return _int();
 }

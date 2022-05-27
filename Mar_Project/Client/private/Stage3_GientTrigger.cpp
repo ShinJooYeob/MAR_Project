@@ -116,9 +116,9 @@ _int CStage3_GientTrigger::Render()
 	return _int();
 }
 
-_int CStage3_GientTrigger::LateRender()
+_int CStage3_GientTrigger::LightRender()
 {
-	if (__super::LateRender() < 0)
+	if (__super::LightRender() < 0)
 		return -1;
 
 	return _int();

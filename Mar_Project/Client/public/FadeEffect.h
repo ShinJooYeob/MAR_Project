@@ -29,7 +29,7 @@ public:
 	virtual _int Update(_double fDeltaTime)override;
 	virtual _int LateUpdate(_double fDeltaTime)override;
 	virtual _int Render()override;
-	virtual _int LateRender()override;
+	virtual _int LightRender()override;
 
 	
 	_bool	Start_FadeEffect(FadeID eFadeType,_double Duration, _float4 TargetColor = _float4(0, 0, 0, 1));

@@ -400,7 +400,7 @@ _int CGameInstance::Render_Scene()
 		return -1;
 	}
 
-	if (m_pSceneMgr->LateRender() < 0)
+	if (m_pSceneMgr->LightRender() < 0)
 	{
 		__debugbreak();
 		return -1;
@@ -629,6 +629,13 @@ void CGameInstance::Clear_CollisionGroup()
 {
 	NULL_CHECK_BREAK(m_pCollisionMgr);
 	m_pCollisionMgr->Clear_CollisionGroup();
+}
+
+ID3D11ShaderResourceView * CGameInstance::Get_SRV(const _tchar * pTargetTag) const
+{
+	NULL_CHECK_BREAK(m_pRenderTargetMgr);
+
+	return m_pRenderTargetMgr->Get_SRV(pTargetTag);
 }
 
 

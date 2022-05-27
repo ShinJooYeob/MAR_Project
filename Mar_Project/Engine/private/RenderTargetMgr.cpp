@@ -104,6 +104,31 @@ HRESULT CRenderTargetMgr::Begin(const _tchar * pMRTTag)
 	return S_OK;
 }
 
+HRESULT CRenderTargetMgr::Begin(const _tchar * pMRTTag, ID3D11DepthStencilView * DepthStencil)
+{
+	list<CRenderTargetLayer*>*	pMRTList = Find_MRT(pMRTTag);
+	NULL_CHECK_RETURN(pMRTList, E_FAIL);
+
+	m_pDeviceContext->OMGetRenderTargets(1, &m_pOldRTV, &m_pOriginalDSV);
+
+	_uint iNumViews = 0;
+
+	ID3D11RenderTargetView*		pRenderTargets[8] = { nullptr };
+
+	for (auto& pRenderTarget : *pMRTList)
+	{
+		pRenderTarget->Clear();
+		pRenderTargets[iNumViews++] = pRenderTarget->Get_RTV();
+	}
+
+	m_pDeviceContext->OMSetRenderTargets(iNumViews, pRenderTargets, DepthStencil);
+
+
+	ID3D11ShaderResourceView* pSRV[8] = { nullptr };
+	m_pDeviceContext->PSSetShaderResources(0, iNumViews, pSRV);
+	return S_OK;
+}
+
 HRESULT CRenderTargetMgr::End(const _tchar * pMRTTag)
 {
 	_uint		iNumViews = 1;

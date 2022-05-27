@@ -251,12 +251,22 @@ _int CPlayer::Render()
 	return _int();
 }
 
-_int CPlayer::LateRender()
+_int CPlayer::LightRender()
 {
-	if (__super::LateRender() < 0)
+	if (__super::LightRender() < 0)
 		return -1;
 
+	NULL_CHECK_RETURN(m_pModel, E_FAIL);
 
+	FAILED_CHECK(m_pTransformCom->Bind_OnShader(m_pShaderCom, "g_WorldMatrix"));
+
+	_uint NumMaterial = m_pModel->Get_NumMaterial();
+
+	for (_uint i = 0; i < NumMaterial; i++)
+	{
+		FAILED_CHECK(m_pModel->Render(m_pShaderCom, 9, i, "g_BoneMatrices"));
+
+	}
 
 
 	return _int();

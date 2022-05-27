@@ -76,7 +76,7 @@ _int CCamera_Editor::Render()
 	return _int();
 }
 
-_int CCamera_Editor::LateRender()
+_int CCamera_Editor::LightRender()
 {
 
 

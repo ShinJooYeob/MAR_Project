@@ -31,7 +31,7 @@ _int CScene::Render()
 	return _int();
 }
 
-_int CScene::LateRender()
+_int CScene::LightRender()
 {
 	return _int();
 }

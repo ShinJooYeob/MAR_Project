@@ -20,7 +20,7 @@ public:
 	virtual _int Update(_double fDeltaTime)override;
 	virtual _int LateUpdate(_double fDeltaTime)override;
 	virtual _int Render()override;
-	virtual _int LateRender()override;
+	virtual _int LightRender()override;
 
 
 	virtual HRESULT Set_Monster_On_Terrain(CTransform* pTransform, _double fDeltaTime)override;

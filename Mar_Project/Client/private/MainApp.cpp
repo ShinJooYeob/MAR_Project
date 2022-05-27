@@ -319,8 +319,8 @@ HRESULT CMainApp::Ready_Static_Component_Prototype()
 	FAILED_CHECK(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Collider),
 		CCollider::Create(m_pDevice, m_pDeviceContext)));
 
-
-	FAILED_CHECK(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, L"Trail",
+	
+	FAILED_CHECK(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Trail),
 		CSwordTrail::Create(m_pDevice, m_pDeviceContext,L"SwordTrail.txt", 20)));
 
 	return S_OK;

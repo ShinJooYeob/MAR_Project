@@ -38,7 +38,7 @@ _int CNpc::Render()
 	return _int();
 }
 
-_int CNpc::LateRender()
+_int CNpc::LightRender()
 {
 	return _int();
 }

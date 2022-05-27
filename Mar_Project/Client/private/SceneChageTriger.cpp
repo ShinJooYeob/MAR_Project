@@ -121,9 +121,9 @@ _int CSceneChageTriger::Render()
 	return _int();
 }
 
-_int CSceneChageTriger::LateRender()
+_int CSceneChageTriger::LightRender()
 {
-	if (__super::LateRender() < 0)
+	if (__super::LightRender() < 0)
 		return -1;
 
 	return _int();

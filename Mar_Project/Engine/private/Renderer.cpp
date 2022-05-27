@@ -9,6 +9,7 @@
 #include "SwordTrail.h"
 
 #include "GameInstance.h"
+#include "PipeLineMgr.h"
 
 CRenderer::CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CComponent(pDevice, pDeviceContext)
@@ -19,6 +20,7 @@ CRenderer::CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	Safe_AddRef(m_pLightMgr);
 
 }
+#define ShadowMapQuality 8
 
 HRESULT CRenderer::Initialize_Prototype(void * pArg)
 {
@@ -31,6 +33,7 @@ HRESULT CRenderer::Initialize_Prototype(void * pArg)
 	D3D11_VIEWPORT		Viewport;
 
 	m_pDeviceContext->RSGetViewports(&iNumViewports, &Viewport);
+
 
 	/* For.Target_Diffuse */
 	FAILED_CHECK(m_pRenderTargetMgr->Add_RenderTarget( TEXT("Target_Diffuse"), (_uint)Viewport.Width, (_uint)Viewport.Height, DXGI_FORMAT_B8G8R8A8_UNORM, _float4(0.f, 0.f, 0.f, 0.f)));
@@ -47,6 +50,10 @@ HRESULT CRenderer::Initialize_Prototype(void * pArg)
 	/* For.Target_Specular */
 	FAILED_CHECK(m_pRenderTargetMgr->Add_RenderTarget(TEXT("Target_Specular"), (_uint)Viewport.Width, (_uint)Viewport.Height, DXGI_FORMAT_B8G8R8A8_UNORM, _float4(0.f, 0.f, 0.f, 0.f)));
 
+	/* For.Target_Shadow*/
+	FAILED_CHECK(m_pRenderTargetMgr->Add_RenderTarget(TEXT("Target_Shadow"), (_uint)Viewport.Width * ShadowMapQuality, (_uint)Viewport.Height * ShadowMapQuality, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f)));
+
+
 	/* For.MRT_Deferred : 객체들을 그릴때 바인드. */
 	FAILED_CHECK(m_pRenderTargetMgr->Add_MRT(TEXT("MRT_Deferred"), TEXT("Target_Diffuse")));
 	FAILED_CHECK(m_pRenderTargetMgr->Add_MRT(TEXT("MRT_Deferred"), TEXT("Target_Normal")));
@@ -57,6 +64,8 @@ HRESULT CRenderer::Initialize_Prototype(void * pArg)
 	FAILED_CHECK(m_pRenderTargetMgr->Add_MRT(TEXT("MRT_LightAcc"), TEXT("Target_Shade")));
 	FAILED_CHECK(m_pRenderTargetMgr->Add_MRT(TEXT("MRT_LightAcc"), TEXT("Target_Specular")));
 
+	/* For.MRT_LightAcc : 그림자 그릴때 바인드 */
+	FAILED_CHECK(m_pRenderTargetMgr->Add_MRT(TEXT("MRT_Shadow"), TEXT("Target_Shadow")));
 
 	m_pVIBuffer = CVIBuffer_Rect::Create(m_pDevice, m_pDeviceContext);
 	NULL_CHECK_RETURN(m_pVIBuffer, E_FAIL);
@@ -68,12 +77,14 @@ HRESULT CRenderer::Initialize_Prototype(void * pArg)
 
 #ifdef _DEBUG
 
-	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_Diffuse"), 100.f, 100.f, 200.f, 200.f));
-	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_Normal"), 100.f, 300.f, 200.f, 200.f));
-	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_Depth"), 100.f, 500.f, 200.f, 200.f));
-		
-	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_Shade"), 300.f, 100.f, 200.f, 200.f));
-	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_Specular"), 300.f, 300.0f, 200.f, 200.f));
+	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_Diffuse"), 75.f, 75.f, 150.f, 150.f));
+	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_Normal"), 75.f, 225.f, 150.f, 150.f));
+	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_Depth"), 75.f, 375.f, 150.f, 150.f));
+
+	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_Shade"), 225.f, 75.f, 150.f, 150.f));
+	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_Specular"), 225.f, 225.f, 150.f, 150.f));
+
+	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_Shadow"), 75.f, 625.f, 150.f, 150.f));
 #endif
 
 
@@ -87,6 +98,36 @@ HRESULT CRenderer::Initialize_Prototype(void * pArg)
 	XMStoreFloat4x4(&m_WVPmat.WorldMatrix, XMMatrixTranspose(XMLoadFloat4x4(&m_WVPmat.WorldMatrix)));
 	XMStoreFloat4x4(&m_WVPmat.ViewMatrix, XMMatrixIdentity());
 	XMStoreFloat4x4(&m_WVPmat.ProjMatrix, XMMatrixTranspose(XMMatrixOrthographicLH(Viewport.Width, Viewport.Height, 0.f, 1.f)));
+
+	//////////////////////////////////////////////////////////////////////////
+
+
+	m_LightWVPmat.ViewMatrix = XMMatrixTranspose(XMMatrixLookAtLH(XMVectorSet(0,128,-128,1), XMVectorSet(128,0,128,1), XMVectorSet(0, 1, 0, 0)));
+	m_LightWVPmat.ProjMatrix = XMMatrixTranspose(XMMatrixPerspectiveFovLH(XMConvertToRadians(60.f), 1, 0.2f, 3000));
+
+
+	ID3D11Texture2D*		pDepthStencilTexture = nullptr;
+
+	D3D11_TEXTURE2D_DESC	TextureDesc;
+	ZeroMemory(&TextureDesc, sizeof(D3D11_TEXTURE2D_DESC));
+
+	TextureDesc.Width = (_uint)Viewport.Width * ShadowMapQuality;
+	TextureDesc.Height = (_uint)Viewport.Height * ShadowMapQuality;
+	TextureDesc.MipLevels = 1;
+	TextureDesc.ArraySize = 1;
+	TextureDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+
+	TextureDesc.SampleDesc.Quality = 0;
+	TextureDesc.SampleDesc.Count = 1;
+
+	TextureDesc.Usage = D3D11_USAGE_DEFAULT;
+	TextureDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	TextureDesc.CPUAccessFlags = 0;
+	TextureDesc.MiscFlags = 0;
+
+	FAILED_CHECK(m_pDevice->CreateTexture2D(&TextureDesc, nullptr, &pDepthStencilTexture));
+	FAILED_CHECK(m_pDevice->CreateDepthStencilView(pDepthStencilTexture, nullptr, &m_LightDepthStencil));
+	Safe_Release(pDepthStencilTexture);
 
 	return S_OK;
 }
@@ -142,6 +183,7 @@ HRESULT CRenderer::Render_RenderGroup()
 
 	FAILED_CHECK(Render_Priority());
 
+	FAILED_CHECK(Render_ShadowMap());
 
 	FAILED_CHECK(m_pRenderTargetMgr->Begin(TEXT("MRT_Deferred")));
 	FAILED_CHECK(Render_NonAlpha());
@@ -171,6 +213,8 @@ HRESULT CRenderer::Render_RenderGroup()
 		FAILED_CHECK(Render_Debug());
 		FAILED_CHECK(m_pRenderTargetMgr->Render_DebugBuffer(TEXT("MRT_Deferred")));
 		FAILED_CHECK(m_pRenderTargetMgr->Render_DebugBuffer(TEXT("MRT_LightAcc")));
+		FAILED_CHECK(m_pRenderTargetMgr->Render_DebugBuffer(TEXT("MRT_Shadow")));
+
 	}
 
 #endif
@@ -224,6 +268,72 @@ HRESULT CRenderer::Render_Priority()
 	return S_OK;
 }
 
+HRESULT CRenderer::Render_ShadowMap()
+{
+
+	m_pDeviceContext->ClearDepthStencilView(m_LightDepthStencil, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
+
+
+
+
+	FAILED_CHECK(m_pRenderTargetMgr->Begin(TEXT("MRT_Shadow"), m_LightDepthStencil));
+
+
+	_uint		iNumViewports = 1;
+	D3D11_VIEWPORT		OldViewPortDesc;
+	m_pDeviceContext->RSGetViewports(&iNumViewports, &OldViewPortDesc);
+
+	D3D11_VIEWPORT			ViewPortDesc;
+	ZeroMemory(&ViewPortDesc, sizeof(D3D11_VIEWPORT));
+	ViewPortDesc.TopLeftX = 0;
+	ViewPortDesc.TopLeftY = 0;
+	ViewPortDesc.Width = (_float)OldViewPortDesc.Width * ShadowMapQuality;
+	ViewPortDesc.Height = (_float)OldViewPortDesc.Height * ShadowMapQuality;
+	ViewPortDesc.MinDepth = 0.f;
+	ViewPortDesc.MaxDepth = 1.f;
+
+	m_pDeviceContext->RSSetViewports(iNumViewports, &ViewPortDesc);
+
+	CShader* ObjShader = nullptr;
+	
+
+	for (auto& RenderObject : m_RenderObjectList[RENDER_NONBLEND])
+	{
+		if (RenderObject != nullptr)
+		{
+			ObjShader = (CShader*)RenderObject->Get_Component(L"Com_Shader");
+			ObjShader->Set_RawValue("g_LightViewMatrix", &m_LightWVPmat.ViewMatrix, sizeof(_float4x4));
+			ObjShader->Set_RawValue("g_LightProjMatrix", &m_LightWVPmat.ProjMatrix, sizeof(_float4x4));
+
+			RenderObject->LightRender();
+		}
+
+	}
+
+	for (auto& RenderObject : m_RenderObjectList[RENDER_PRIORITYBLEND])
+	{
+		if (RenderObject != nullptr)
+		{
+			ObjShader = (CShader*)RenderObject->Get_Component(L"Com_Shader");
+			ObjShader->Set_RawValue("g_LightViewMatrix", &m_LightWVPmat.ViewMatrix, sizeof(_float4x4));
+			ObjShader->Set_RawValue("g_LightProjMatrix", &m_LightWVPmat.ProjMatrix, sizeof(_float4x4));
+
+			RenderObject->LightRender();
+		}
+
+	}
+
+	m_pDeviceContext->RSSetViewports(iNumViewports, &OldViewPortDesc);
+
+	FAILED_CHECK(m_pRenderTargetMgr->End(TEXT("MRT_Shadow")));
+
+
+
+	return S_OK;
+}
+
+
+
 HRESULT CRenderer::Render_NonAlpha()
 {
 
@@ -261,7 +371,7 @@ HRESULT CRenderer::Render_Lights()
 {
 	FAILED_CHECK(m_pRenderTargetMgr->Begin(TEXT("MRT_LightAcc")));
 
-	m_pLightMgr->Render(m_pShader, m_pVIBuffer, &m_WVPmat);
+	FAILED_CHECK(m_pLightMgr->Render(m_pShader, m_pVIBuffer, &m_WVPmat));
 
 	FAILED_CHECK(m_pRenderTargetMgr->End(TEXT("MRT_LightAcc")));
 
@@ -270,18 +380,33 @@ HRESULT CRenderer::Render_Lights()
 
 HRESULT CRenderer::Render_DeferredTexture()
 {
+	CPipeLineMgr*		pPipeLineMgr = GetSingle(CPipeLineMgr);
+
+	_float4x4		ViewMatrixInv, ProjMatrixInv;
+
+	XMStoreFloat4x4(&ViewMatrixInv, XMMatrixTranspose(XMMatrixInverse(nullptr, pPipeLineMgr->Get_Transform_Matrix(PLM_VIEW))));
+	XMStoreFloat4x4(&ProjMatrixInv, XMMatrixTranspose(XMMatrixInverse(nullptr, pPipeLineMgr->Get_Transform_Matrix(PLM_PROJ))));
+
+
+	FAILED_CHECK(m_pShader->Set_RawValue("g_ViewMatrixInv", &ViewMatrixInv, sizeof(_float4x4)));
+	FAILED_CHECK(m_pShader->Set_RawValue("g_ProjMatrixInv", &ProjMatrixInv, sizeof(_float4x4)));
 
 	FAILED_CHECK(m_pShader->Set_Texture("g_DiffuseTexture", m_pRenderTargetMgr->Get_SRV(TEXT("Target_Diffuse"))));
 	FAILED_CHECK(m_pShader->Set_Texture("g_ShadeTexture", m_pRenderTargetMgr->Get_SRV(TEXT("Target_Shade"))));
 	FAILED_CHECK(m_pShader->Set_Texture("g_SpecularTexture", m_pRenderTargetMgr->Get_SRV(TEXT("Target_Specular"))));
+	FAILED_CHECK(m_pShader->Set_Texture("g_SpecularTexture", m_pRenderTargetMgr->Get_SRV(TEXT("Target_Specular"))));
 
+	FAILED_CHECK(m_pShader->Set_Texture("g_ShadowMapTexture", m_pRenderTargetMgr->Get_SRV(TEXT("Target_Shadow"))));
 
+	
 	FAILED_CHECK(m_pShader->Set_RawValue("g_WorldMatrix", &m_WVPmat.WorldMatrix, sizeof(_float4x4)));
 	FAILED_CHECK(m_pShader->Set_RawValue("g_ViewMatrix", &m_WVPmat.ViewMatrix, sizeof(_float4x4)));
 	FAILED_CHECK(m_pShader->Set_RawValue("g_ProjMatrix", &m_WVPmat.ProjMatrix, sizeof(_float4x4)));
 
+	FAILED_CHECK(m_pShader->Set_RawValue("g_LightViewMatrix", &m_LightWVPmat.ViewMatrix, sizeof(_float4x4)));
+	FAILED_CHECK(m_pShader->Set_RawValue("g_LightProjMatrix", &m_LightWVPmat.ProjMatrix, sizeof(_float4x4)));
 
-	m_pVIBuffer->Render(m_pShader, 3);
+	FAILED_CHECK(m_pVIBuffer->Render(m_pShader, 3));
 
 	return S_OK;
 }
@@ -415,6 +540,7 @@ void CRenderer::Free()
 {
 	__super::Free();
 
+	Safe_Release(m_LightDepthStencil);
 
 	Safe_Release(m_pVIBuffer);
 	Safe_Release(m_pShader);

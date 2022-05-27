@@ -298,9 +298,9 @@ _int CScene_Edit::Render()
 	return 0;
 }
 
-_int CScene_Edit::LateRender()
+_int CScene_Edit::LightRender()
 {
-	if (__super::LateRender() < 0)
+	if (__super::LightRender() < 0)
 		return -1;
 
 #ifdef USE_IMGUI

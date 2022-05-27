@@ -205,7 +205,7 @@ _int CLobyUI::Render()
 	return _int();
 }
 
-_int CLobyUI::LateRender()
+_int CLobyUI::LightRender()
 {
 	return _int();
 }

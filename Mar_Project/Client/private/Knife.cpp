@@ -188,7 +188,7 @@ _int CKnife::Render()
 	return _int();
 }
 
-_int CKnife::LateRender()
+_int CKnife::LightRender()
 {
 
 	return _int();
@@ -300,7 +300,7 @@ HRESULT CKnife::SetUp_Components()
 
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Transform), TAG_COM(Com_Transform), (CComponent**)&m_pTransformCom));
-	FAILED_CHECK(Add_Component(SCENE_STATIC, L"Trail", TAG_COM(Com_SwordTrail), (CComponent**)&m_pSwordTrailCom));
+	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Trail), TAG_COM(Com_SwordTrail), (CComponent**)&m_pSwordTrailCom));
 
 	
 	return S_OK;

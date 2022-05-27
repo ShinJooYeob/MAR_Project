@@ -87,7 +87,7 @@ _uint CSwordTrail::Update_SwordTrail(_float3 tSourPoint, _float3 tDestPoint,_dou
 {
 	if (!m_bDrawTrail)return 0;
 
-	m_PassedTime += (_float)fDeltaTime;
+	m_PassedTime += (_float)fDeltaTime * m_tDesc.NoiseSpeed;
 	if (m_PassedTime > 1) m_PassedTime = 0;
 
 	TRAILPOINT tPoints;
@@ -176,10 +176,13 @@ HRESULT CSwordTrail::Render()
 		FAILED_CHECK(m_pShader->Set_RawValue("g_ProjMatrix", &pInstance->Get_Transform_Float4x4_TP(PLM_PROJ), sizeof(_float4x4)));
 		FAILED_CHECK(m_pShader->Set_RawValue("g_fTime", &m_PassedTime, sizeof(_float)));
 
-		
-	}
+		FAILED_CHECK(m_pVIBuffer->Render(m_pShader, m_tDesc.iPassIndex));
 
-	FAILED_CHECK(m_pVIBuffer->Render(m_pShader, m_tDesc.iPassIndex));
+	}
+	else
+	{
+		FAILED_CHECK(m_pVIBuffer->Render(m_pShader, m_tDesc.iPassIndex));
+	}
 
 
 

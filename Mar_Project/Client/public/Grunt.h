@@ -20,7 +20,7 @@ public:
 	virtual _int Update(_double fDeltaTime)override;
 	virtual _int LateUpdate(_double fDeltaTime)override;
 	virtual _int Render()override;
-	virtual _int LateRender()override;
+	virtual _int LightRender()override;
 
 	virtual void CollisionTriger(_uint iMyColliderIndex, CGameObject* pConflictedObj, CCollider* pConflictedCollider, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType) override;
 public:

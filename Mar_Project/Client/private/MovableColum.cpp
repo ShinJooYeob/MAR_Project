@@ -105,9 +105,9 @@ _int CMovableColum::Render()
 	return _int();
 }
 
-_int CMovableColum::LateRender()
+_int CMovableColum::LightRender()
 {
-	if (__super::LateRender() < 0)
+	if (__super::LightRender() < 0)
 		return -1;
 
 	return _int();

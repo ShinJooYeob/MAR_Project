@@ -89,7 +89,7 @@ _int CLoadingUI::Render()
 	return _int();
 }
 
-_int CLoadingUI::LateRender()
+_int CLoadingUI::LightRender()
 {
 	return _int();
 }

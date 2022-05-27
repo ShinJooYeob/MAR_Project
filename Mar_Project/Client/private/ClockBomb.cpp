@@ -254,7 +254,7 @@ _int CClockBomb::Render()
 	return _int();
 }
 
-_int CClockBomb::LateRender()
+_int CClockBomb::LightRender()
 {
 
 	return _int();

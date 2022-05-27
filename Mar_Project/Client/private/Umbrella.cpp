@@ -340,7 +340,7 @@ _int CUmbrella::Render()
 	return _int();
 }
 
-_int CUmbrella::LateRender()
+_int CUmbrella::LightRender()
 {
 
 	return _int();

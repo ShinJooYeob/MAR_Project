@@ -210,9 +210,9 @@ _int CParticleObject::Render()
 	return _int();
 }
 
-_int CParticleObject::LateRender()
+_int CParticleObject::LightRender()
 {
-	if (0 > __super::LateRender())	return -1;
+	if (0 > __super::LightRender())	return -1;
 
 
 	return _int();

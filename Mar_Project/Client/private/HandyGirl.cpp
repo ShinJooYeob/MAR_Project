@@ -222,7 +222,7 @@ _int CHandyGirl::Render()
 	return _int();
 }
 
-_int CHandyGirl::LateRender()
+_int CHandyGirl::LightRender()
 {
 	return _int();
 }

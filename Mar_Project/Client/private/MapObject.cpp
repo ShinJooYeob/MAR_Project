@@ -38,7 +38,7 @@ _int CMapObject::Render()
 	return _int();
 }
 
-_int CMapObject::LateRender()
+_int CMapObject::LightRender()
 {
 	return _int();
 }

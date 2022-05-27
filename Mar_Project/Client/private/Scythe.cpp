@@ -117,7 +117,7 @@ _int CScythe::Render()
 	return _int();
 }
 
-_int CScythe::LateRender()
+_int CScythe::LightRender()
 {
 
 	return _int();

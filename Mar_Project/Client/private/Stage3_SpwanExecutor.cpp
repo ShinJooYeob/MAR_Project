@@ -209,9 +209,9 @@ _int CStage3_SpwanExecutor::Render()
 	return _int();
 }
 
-_int CStage3_SpwanExecutor::LateRender()
+_int CStage3_SpwanExecutor::LightRender()
 {
-	if (__super::LateRender() < 0)
+	if (__super::LightRender() < 0)
 		return -1;
 
 	return _int();

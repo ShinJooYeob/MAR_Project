@@ -86,7 +86,7 @@ _int CWeapon::Render()
 	return _int();
 }
 
-_int CWeapon::LateRender()
+_int CWeapon::LightRender()
 {
 	return _int();
 }

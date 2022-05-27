@@ -86,7 +86,7 @@ _int CMonster::Render()
 	return _int();
 }
 
-_int CMonster::LateRender()
+_int CMonster::LightRender()
 {
 	return _int();
 }

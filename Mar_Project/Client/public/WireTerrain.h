@@ -19,7 +19,7 @@ public:
 	virtual _int Update(_double fDeltaTime)override;
 	virtual _int LateUpdate(_double fDeltaTime)override;
 	virtual _int Render()override;
-	virtual _int LateRender()override;
+	virtual _int LightRender()override;
 
 public:
 	_float3 Pick_OnTerrain(_bool* pbIsObTerrain, _fVector ObjectWorldPos, _fVector ObjectOldWorldPos,_float3* vOutPlaneNormalVec = nullptr);

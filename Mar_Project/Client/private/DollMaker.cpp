@@ -188,7 +188,7 @@ _int CDollMaker::Render()
 	return _int();
 }
 
-_int CDollMaker::LateRender()
+_int CDollMaker::LightRender()
 {
 	return _int();
 }

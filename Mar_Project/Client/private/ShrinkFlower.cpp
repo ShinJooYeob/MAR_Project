@@ -125,7 +125,7 @@ _int CShrinkFlower::Render()
 	return _int();
 }
 
-_int CShrinkFlower::LateRender()
+_int CShrinkFlower::LightRender()
 {
 
 	return _int();

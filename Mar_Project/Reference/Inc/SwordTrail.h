@@ -14,6 +14,7 @@ public:
 		_float4 vColor = _float4(1);
 		_uint	iTextureIndex = 1;
 		_uint	iPassIndex = 0;
+		_float	NoiseSpeed = 1;
 	}TRAILDESC;
 
 private:

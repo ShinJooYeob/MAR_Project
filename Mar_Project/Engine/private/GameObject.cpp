@@ -49,7 +49,7 @@ _int CGameObject::Render()
 	return _int();
 }
 
-_int CGameObject::LateRender()
+_int CGameObject::LightRender()
 {
 	return _int();
 }

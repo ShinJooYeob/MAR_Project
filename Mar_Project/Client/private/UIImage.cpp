@@ -123,9 +123,9 @@ _int CUIImage::Render()
 	return _int();
 }
 
-_int CUIImage::LateRender()
+_int CUIImage::LightRender()
 {
-	if (__super::LateRender() < 0)
+	if (__super::LightRender() < 0)
 		return -1;
 
 

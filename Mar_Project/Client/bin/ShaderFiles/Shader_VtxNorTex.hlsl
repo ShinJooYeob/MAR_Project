@@ -1,23 +1,6 @@
 
 #include "Shader_Define.hpp" 
 
-//cbuffer LightDesc
-//{
-//	float4		g_vLightVector;
-//	float4		g_vLightDiffuse;
-//	float4		g_vLightAmbient;
-//	float4		g_vLightSpecular;
-//};
-//cbuffer CameraDesc
-//{
-//	float4			g_CamPosition;
-//	float4			g_CamLookDir;
-//};
-//cbuffer MtrlDesc
-//{
-//	float4		g_vMtrlAmbient = float4(0.2f, 0.2f, 0.2f, 1.f);
-//	float4		g_vMtrlSpecular = float4(1.f, 1.f, 1.f, 1.f);
-//};
 
 texture2D		g_DiffuseTexture;
 
@@ -61,6 +44,27 @@ struct VS_OUT
 	float4		vProjPos : TEXCOORD2;
 	float		bIsNotDraw : TEXCOORD3;
 };
+
+struct VS_OUT_SHADOW
+{
+	float4		vPosition : SV_POSITION;
+	float4		vClipPosition : TEXCOORD1;
+};
+
+VS_OUT_SHADOW VS_Shadow(VS_IN In)
+{
+
+	VS_OUT_SHADOW			Out = (VS_OUT_SHADOW)0;
+
+
+	Out.vPosition = mul(vector(In.vPosition, 1), g_WorldMatrix);
+	Out.vPosition = mul(Out.vPosition, g_LightViewMatrix);
+	Out.vPosition = mul(Out.vPosition, g_LightProjMatrix);
+
+	Out.vClipPosition = Out.vPosition;
+	return Out;
+};
+
 
 
 
@@ -106,6 +110,7 @@ struct PS_OUT
 	vector		vDiffuse : SV_TARGET0;
 	vector		vNormal : SV_TARGET1;
 	vector		vDepth : SV_TARGET2;
+	vector		vShadow : SV_TARGET3;
 };
 
 
@@ -312,6 +317,29 @@ PS_OUT PS_MAIN_TERRAIN_EDIT(PS_IN In)
 	return Out;
 }
 
+struct PS_IN_SHADOW
+{
+	float4		vPosition : SV_POSITION;
+	float4		vClipPosition : TEXCOORD1;
+};
+
+struct PS_OUT_SHADOW
+{
+	vector		vDiffuse : SV_TARGET0;
+};
+
+
+PS_OUT_SHADOW PS_Shadow(PS_IN_SHADOW In)
+{
+	PS_OUT_SHADOW		Out = (PS_OUT_SHADOW)0;
+
+	float Depth = In.vClipPosition.z / In.vClipPosition.w;
+
+	Out.vDiffuse = float4(Depth.x, In.vClipPosition.z, In.vClipPosition.w, 1);
+
+	return Out;
+}
+
 
 
 technique11		DefaultTechnique
@@ -356,5 +384,16 @@ technique11		DefaultTechnique
 		VertexShader = compile vs_5_0 VS_MAIN_TERRAIN();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN_TERRAIN_EDIT();
+	}
+
+	pass ShadowMap // 4
+	{
+		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(ZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_ccw);
+
+		VertexShader = compile vs_5_0 VS_Shadow();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_Shadow();
 	}
 }

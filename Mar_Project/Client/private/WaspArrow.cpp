@@ -115,7 +115,7 @@ _int CWaspArrow::Render()
 	return _int();
 }
 
-_int CWaspArrow::LateRender()
+_int CWaspArrow::LightRender()
 {
 	return _int();
 }

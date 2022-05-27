@@ -231,7 +231,7 @@ PS_OUT PS_MAIN_INST_DISORT(PS_IN In)
 
 	float Alpha = max(max(Out.vDiffuse.r, Out.vDiffuse.g), Out.vDiffuse.b);
 
-	if (Alpha < 0.5)
+	if (Alpha < 0.3)
 		discard;
 
 

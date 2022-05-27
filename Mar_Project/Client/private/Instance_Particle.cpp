@@ -103,7 +103,7 @@ _int CInstance_Particle::Render()
 	return _int();
 }
 
-_int CInstance_Particle::LateRender()
+_int CInstance_Particle::LightRender()
 {
 	return _int();
 }

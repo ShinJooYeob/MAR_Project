@@ -9,8 +9,6 @@ class CCollisionMgr final : public CBase
 	DECLARE_SINGLETON(CCollisionMgr);
 
 
-
-
 	typedef struct tagColliderObject
 	{
 		class  CGameObject* pCollisionObject = nullptr;

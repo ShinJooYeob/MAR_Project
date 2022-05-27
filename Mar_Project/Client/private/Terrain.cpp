@@ -140,11 +140,14 @@ _int CTerrain::Render()
 	return _int();
 }
 
-_int CTerrain::LateRender()
+_int CTerrain::LightRender()
 {
-	if (__super::LateRender() < 0)
+	if (__super::LightRender() < 0)
 		return -1;
 
+	NULL_CHECK_RETURN(m_pVIBufferCom, E_FAIL);
+	FAILED_CHECK(m_pTransformCom->Bind_OnShader(m_pShaderCom, "g_WorldMatrix"));
+	FAILED_CHECK(m_pVIBufferCom->Render(m_pShaderCom, 4));
 
 
 

@@ -59,7 +59,7 @@ public:
 	virtual _int Update(_double fTimeDelta)override;
 	virtual _int LateUpdate(_double fTimeDelta)override;
 	virtual _int Render()override;
-	virtual _int LateRender()override;
+	virtual _int LightRender()override;
 
 
 	virtual void ResetParticle(PARTICLEATT* attribute);

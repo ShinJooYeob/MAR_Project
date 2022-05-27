@@ -123,9 +123,9 @@ _int CDustWind::Render()
 	return _int();
 }
 
-_int CDustWind::LateRender()
+_int CDustWind::LightRender()
 {
-	if (__super::LateRender() < 0)
+	if (__super::LightRender() < 0)
 		return -1;
 
 

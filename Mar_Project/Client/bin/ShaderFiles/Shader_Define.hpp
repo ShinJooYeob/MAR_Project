@@ -6,6 +6,12 @@ cbuffer	RenderingPipeLine
 	matrix			g_ProjMatrix;
 };
 
+cbuffer	ShadowPipeLine
+{
+	matrix			g_LightViewMatrix;
+	matrix			g_LightProjMatrix;
+};
+
 
 
 sampler DefaultSampler = sampler_state

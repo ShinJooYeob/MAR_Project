@@ -23,7 +23,7 @@ public:
 	_int Update(_double fDeltaTime);
 	_int LateUpdate(_double fDeltaTime);
 	_int Render();
-	_int LateRender();
+	_int LightRender();
 
 public:
 	CScene*				Get_NowScene();

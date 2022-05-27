@@ -100,9 +100,9 @@ _int CTornadoSwirl::Render()
 	return _int();
 }
 
-_int CTornadoSwirl::LateRender()
+_int CTornadoSwirl::LightRender()
 {
-	if (__super::LateRender() < 0)
+	if (__super::LightRender() < 0)
 		return -1;
 
 

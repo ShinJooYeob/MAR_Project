@@ -67,7 +67,7 @@ _int CBullet::Render()
 	return _int();
 }
 
-_int CBullet::LateRender()
+_int CBullet::LightRender()
 {
 	return _int();
 }

@@ -28,7 +28,7 @@ public:
 	virtual _int Update(_double fDeltaTime)override;
 	virtual _int LateUpdate(_double fDeltaTime)override;
 	virtual _int Render()override;
-	virtual _int LateRender()override;
+	virtual _int LightRender()override;
 
 public:
 	HRESULT Set_TerrainTileKinds();

@@ -97,7 +97,7 @@ _int CRendererEditSceneUI::Render()
 	return _int();
 }
 
-_int CRendererEditSceneUI::LateRender()
+_int CRendererEditSceneUI::LightRender()
 {
 
 

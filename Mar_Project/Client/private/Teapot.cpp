@@ -338,7 +338,7 @@ _int CTeapot::Render()
 	return _int();
 }
 
-_int CTeapot::LateRender()
+_int CTeapot::LightRender()
 {
 
 	return _int();

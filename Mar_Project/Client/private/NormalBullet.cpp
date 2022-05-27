@@ -133,7 +133,7 @@ _int CNormalBullet::Render()
 	return _int();
 }
 
-_int CNormalBullet::LateRender()
+_int CNormalBullet::LightRender()
 {
 
 	return _int();

@@ -15,8 +15,8 @@ class CPlayer final : public CGameObject
 public:
 	enum eWeaponState
 	{
-		Weapon_None = 0, Weapon_Knife = 47, Weapon_Grinder = 73, Weapon_Horse = 89, Weapon_Teapot = 113, Weapon_Umbrella = 134, Weapon_Giant= 140, Weapon_End
-		//Weapon_None = 0, Weapon_Knife =88888888, Weapon_Grinder = 54665, Weapon_Horse = 47, Weapon_Teapot = 546645, Weapon_Umbrella = 5465167, Weapon_Giant= 1161565, Weapon_End
+		//Weapon_None = 0, Weapon_Knife = 47, Weapon_Grinder = 73, Weapon_Horse = 89, Weapon_Teapot = 113, Weapon_Umbrella = 134, Weapon_Giant= 140, Weapon_End
+		Weapon_None = 0, Weapon_Knife =88888888, Weapon_Grinder = 54665, Weapon_Horse = 47, Weapon_Teapot = 546645, Weapon_Umbrella = 5465167, Weapon_Giant= 1161565, Weapon_End
 	};
 
 
@@ -41,7 +41,7 @@ public:
 	virtual _int Update(_double fDeltaTime)override;
 	virtual _int LateUpdate(_double fDeltaTime)override;
 	virtual _int Render()override;
-	virtual _int LateRender()override;
+	virtual _int LightRender()override;
 
 	void	Add_Dmg_to_Player(_uint iDmgAmount);
 	void	Heal_to_Player(_uint iDmgAmount);

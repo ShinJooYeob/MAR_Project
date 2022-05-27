@@ -21,6 +21,7 @@ public:
 	HRESULT Add_MRT(const _tchar* pMRTTag, const _tchar* pRenderTargetTag);
 
 	HRESULT Begin(const _tchar* pMRTTag);
+	HRESULT Begin(const _tchar* pMRTTag,ID3D11DepthStencilView* DepthStencil);
 	HRESULT End(const _tchar* pMRTTag);
 
 #ifdef _DEBUG

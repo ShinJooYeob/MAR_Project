@@ -63,6 +63,39 @@ struct VS_OUT
 	float4		vProjPos : TEXCOORD2;
 };
 
+struct VS_OUT_SHADOW
+{
+	float4		vPosition : SV_POSITION;
+	float4		vClipPosition : TEXCOORD1;
+};
+
+VS_OUT_SHADOW VS_Shadow(VS_IN In)
+{
+	
+	VS_OUT_SHADOW			Out = (VS_OUT_SHADOW)0;
+
+	matrix			matWV, matWVP;
+
+
+	float		fWeightW = 1.f - (In.vBlendWeight.x + In.vBlendWeight.y + In.vBlendWeight.z);
+
+	matrix		BoneMatrix = g_BoneMatrices.BoneMatrices[In.vBlendIndex.x] * In.vBlendWeight.x +
+		g_BoneMatrices.BoneMatrices[In.vBlendIndex.y] * In.vBlendWeight.y +
+		g_BoneMatrices.BoneMatrices[In.vBlendIndex.z] * In.vBlendWeight.z +
+		g_BoneMatrices.BoneMatrices[In.vBlendIndex.w] * fWeightW;
+
+	vector		vLocalPosition = mul(vector(In.vModelDataPosition, 1.f), BoneMatrix);
+
+
+	Out.vPosition = mul(vLocalPosition, g_WorldMatrix);
+	Out.vPosition = mul(Out.vPosition, g_LightViewMatrix);
+	Out.vPosition = mul(Out.vPosition, g_LightProjMatrix);
+
+	Out.vClipPosition = Out.vPosition;
+	return Out;
+};
+
+
 VS_OUT VS_MAIN_DEFAULT(VS_IN In)
 {
 	VS_OUT			Out = (VS_OUT)0;
@@ -171,6 +204,7 @@ struct PS_OUT
 	vector		vDiffuse : SV_TARGET0;
 	vector		vNormal : SV_TARGET1;
 	vector		vDepth : SV_TARGET2;
+	vector		vShadow : SV_TARGET3;
 };
 
 PS_OUT PS_MAIN_DEFAULT(PS_IN In)
@@ -234,7 +268,31 @@ PS_OUT PS_MAIN_MSKINGTEX(PS_IN In)
 	return Out;
 }
 
+struct PS_IN_SHADOW
+{
+	float4		vPosition : SV_POSITION;
+	float4		vClipPosition : TEXCOORD1;
+};
 
+struct PS_OUT_SHADOW
+{
+	vector		vDiffuse : SV_TARGET0;
+};
+
+
+PS_OUT_SHADOW PS_Shadow(PS_IN_SHADOW In)
+{
+	PS_OUT_SHADOW		Out = (PS_OUT_SHADOW)0;
+
+	float Depth = In.vClipPosition.z / In.vClipPosition.w;
+
+	//Out.vDiffuse = float4(Depth.xxx, 1);
+
+
+	Out.vDiffuse = float4(Depth.x, In.vClipPosition.z, In.vClipPosition.w, 1);
+
+	return Out;
+}
 
 technique11		DefaultTechnique
 {
@@ -328,6 +386,17 @@ technique11		DefaultTechnique
 		VertexShader = compile vs_5_0 VS_MAIN_ATTACHEDNOWEIGHTW();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN_DEFAULT();
+	}
+
+	pass ShadowMap //9
+	{
+		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(ZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_ccw);
+
+		VertexShader = compile vs_5_0 VS_Shadow();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_Shadow();
 	}
 
 }

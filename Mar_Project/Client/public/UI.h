@@ -40,7 +40,7 @@ public:
 	virtual _int Update(_double fDeltaTime)override;
 	virtual _int LateUpdate(_double fDeltaTime)override;
 	virtual _int Render()override;
-	virtual _int LateRender()override;
+	virtual _int LightRender()override;
 
 
 	HRESULT Change_TextureLayer(const _tchar* tagTextureLayer, _double FrameTime = 6.0);

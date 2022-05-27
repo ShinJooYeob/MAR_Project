@@ -116,9 +116,9 @@ _int CEscalatorPad::Render()
 	return _int();
 }
 
-_int CEscalatorPad::LateRender()
+_int CEscalatorPad::LightRender()
 {
-	if (__super::LateRender() < 0)
+	if (__super::LightRender() < 0)
 		return -1;
 
 	return _int();

@@ -14,7 +14,7 @@ public:
 	virtual _int Update(_double fDeltaTime);
 	virtual _int LateUpdate(_double fDeltaTime);
 	virtual _int Render();
-	virtual _int LateRender();
+	virtual _int LightRender();
 
 	virtual _int Change_to_NextScene() { return 0; };
 	_bool	Get_bIsNeedToSceneChange() { return m_bIsNeedToSceneChange; }

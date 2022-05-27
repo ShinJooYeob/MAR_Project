@@ -128,9 +128,9 @@ _int CVentObj::Render()
 	return _int();
 }
 
-_int CVentObj::LateRender()
+_int CVentObj::LightRender()
 {
-	if (__super::LateRender() < 0)
+	if (__super::LightRender() < 0)
 		return -1;
 
 	return _int();

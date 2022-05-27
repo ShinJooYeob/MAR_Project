@@ -308,7 +308,7 @@ _int CExecutor::Render()
 	return _int();
 }
 
-_int CExecutor::LateRender()
+_int CExecutor::LightRender()
 {
 	return _int();
 }

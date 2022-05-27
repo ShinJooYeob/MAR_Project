@@ -207,7 +207,7 @@ _int CGrenadeBullet::Render()
 	return _int();
 }
 
-_int CGrenadeBullet::LateRender()
+_int CGrenadeBullet::LightRender()
 {
 
 	return _int();

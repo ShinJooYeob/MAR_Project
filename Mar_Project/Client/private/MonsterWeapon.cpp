@@ -69,7 +69,7 @@ _int CMonsterWeapon::Render()
 	return _int();
 }
 
-_int CMonsterWeapon::LateRender()
+_int CMonsterWeapon::LightRender()
 {
 	return _int();
 }

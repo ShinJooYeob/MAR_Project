@@ -31,7 +31,7 @@ public:
 	virtual _int Update(_double fDeltaTime,  _bool IsOrth = false);
 	virtual _int LateUpdate(_double fDeltaTime);
 	virtual _int Render();
-	virtual _int LateRender();
+	virtual _int LightRender();
 
 	//_float3 Get_Camera_Position() { return m_pTransform->Get_MatrixState(CTransform::STATE_POS); };
 	CTransform*	 Get_Camera_Transform() { return m_pTransform; };

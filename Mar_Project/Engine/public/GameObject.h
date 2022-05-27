@@ -17,7 +17,7 @@ public:
 	virtual _int LateUpdate(_double fDeltaTime);
 	
 	virtual _int Render();
-	virtual _int LateRender();
+	virtual _int LightRender();
 
 	virtual void CollisionTriger(_uint iMyColliderIndex, CGameObject* pConflictedObj,class CCollider* pConflictedCollider ,_uint iConflictedObjColliderIndex,CollisionTypeID eConflictedObjCollisionType) {};
 

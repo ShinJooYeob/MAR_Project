@@ -110,7 +110,7 @@ _int CGamePlayUI::Render()
 	return _int();
 }
 
-_int CGamePlayUI::LateRender()
+_int CGamePlayUI::LightRender()
 {
 	return _int();
 }

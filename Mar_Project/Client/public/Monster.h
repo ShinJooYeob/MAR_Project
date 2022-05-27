@@ -20,7 +20,7 @@ public:
 	virtual _int Update(_double fDeltaTime)override;
 	virtual _int LateUpdate(_double fDeltaTime)override;
 	virtual _int Render()override;
-	virtual _int LateRender()override;
+	virtual _int LightRender()override;
 
 
 	void Add_Force(CTransform* pTransfrom, _float3 vDir, _float Power);

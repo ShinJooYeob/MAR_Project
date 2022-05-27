@@ -46,7 +46,7 @@ private:
 
 private:
 	class CRenderTargetMgr*					m_pRenderTargetMgr = nullptr;
-	class CLightMgr*					m_pLightMgr			 = nullptr;
+	class CLightMgr*						m_pLightMgr			 = nullptr;
 
 	class CVIBuffer_Rect*					m_pVIBuffer = nullptr;
 	class CShader*							m_pShader = nullptr;
@@ -55,8 +55,14 @@ private:
 private:
 	MATRIXWVP					m_WVPmat;
 
+	MATRIXWVP					m_LightWVPmat;
+	ID3D11DepthStencilView*		m_LightDepthStencil = nullptr;
+
+
 private:
 	HRESULT Render_Priority();
+
+	HRESULT Render_ShadowMap();
 
 	HRESULT Render_NonAlpha();
 	HRESULT Render_PriorityAlpha();

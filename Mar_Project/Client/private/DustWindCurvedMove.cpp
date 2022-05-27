@@ -139,9 +139,9 @@ _int CDustWindCurvedMove::Render()
 	return _int();
 }
 
-_int CDustWindCurvedMove::LateRender()
+_int CDustWindCurvedMove::LightRender()
 {
-	if (__super::LateRender() < 0)
+	if (__super::LightRender() < 0)
 		return -1;
 
 

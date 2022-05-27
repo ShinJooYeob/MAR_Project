@@ -61,11 +61,11 @@ _int CSceneMgr::Render()
 	return m_pScene->Render();
 }
 
-_int CSceneMgr::LateRender()
+_int CSceneMgr::LightRender()
 {
 	NULL_CHECK_BREAK(m_pScene);
 
-	return m_pScene->LateRender();
+	return m_pScene->LightRender();
 }
 
 CScene * CSceneMgr::Get_NowScene()

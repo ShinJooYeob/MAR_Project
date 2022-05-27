@@ -74,12 +74,14 @@ HRESULT CHorse::Initialize_Clone(void * pArg)
 	m_tParticleDesc.m_iPassIndex = 9;
 	
 
-	m_pSwordTrailCom->Set_Color(_float4(0, 0.84705882f, 1, 1.f));
+	//m_pSwordTrailCom->Set_Color(_float4(0, 0.84705882f, 1, 1.f));
 
-	GetSingle(CUtilityMgr)->RandomFloat3(0, 1);
-	m_pSwordTrailCom->Set_PassIndex(2);
-	m_pSwordTrailCom->Set_TextureIndex(2);
-	//m_pSwordTrailCom->Set_TrailTurnOn(true, m_pColliderCom->Get_ColliderPosition(1), m_pColliderCom->Get_ColliderPosition(3));
+	//m_pSwordTrailCom->Set_PassIndex(2);
+	//m_pSwordTrailCom->Set_TextureIndex(2);
+
+	//m_pSubSwordTrailCom->Set_PassIndex(2);
+	//m_pSubSwordTrailCom->Set_TextureIndex(2);
+
 	return S_OK;
 }
 
@@ -92,9 +94,12 @@ _int CHorse::Update(_double fDeltaTime)
 	m_pColliderCom->Update_ConflictPassedTime(fDeltaTime);
 
 	_Vector ColDir = XMVector3Normalize(m_pColliderCom->Get_ColliderPosition(3).XMVector() - m_pColliderCom->Get_ColliderPosition(1).XMVector());
+	_Vector Right = XMVector3Normalize(XMVector3Cross(XMVectorSet(0, 1, 0, 0), ColDir)) * 0.5f;
 
 	m_pSwordTrailCom->Update_SwordTrail(m_pColliderCom->Get_ColliderPosition(1).XMVector() - ColDir,
 		m_pColliderCom->Get_ColliderPosition(3).XMVector() + ColDir, fDeltaTime);
+	m_pSubSwordTrailCom->Update_SwordTrail(m_pColliderCom->Get_ColliderPosition(3).XMVector() - Right,
+		m_pColliderCom->Get_ColliderPosition(3).XMVector() + Right, fDeltaTime);
 
 
 	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime * 2));
@@ -135,6 +140,7 @@ _int CHorse::LateUpdate(_double fDeltaTime)
 	
 	FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this));
 	FAILED_CHECK(m_pRendererCom->Add_TrailGroup(m_pSwordTrailCom));
+	FAILED_CHECK(m_pRendererCom->Add_TrailGroup(m_pSubSwordTrailCom));
 	m_vOldPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
 	return _int();
 }
@@ -173,7 +179,7 @@ _int CHorse::Render()
 	return _int();
 }
 
-_int CHorse::LateRender()
+_int CHorse::LightRender()
 {
 
 	return _int();
@@ -242,6 +248,7 @@ void CHorse::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedOb
 void CHorse::Set_TrailOn(_bool bBool)
 {
 	m_pSwordTrailCom->Set_TrailTurnOn(bBool, m_pColliderCom->Get_ColliderPosition(1), m_pColliderCom->Get_ColliderPosition(3));
+	m_pSubSwordTrailCom->Set_TrailTurnOn(bBool, m_pColliderCom->Get_ColliderPosition(1), m_pColliderCom->Get_ColliderPosition(3));
 }
 
 HRESULT CHorse::SetUp_Components()
@@ -290,7 +297,15 @@ HRESULT CHorse::SetUp_Components()
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Transform), TAG_COM(Com_Transform), (CComponent**)&m_pTransformCom));
 
-	FAILED_CHECK(Add_Component(SCENE_STATIC, L"Trail", TAG_COM(Com_SwordTrail), (CComponent**)&m_pSwordTrailCom));
+
+	CSwordTrail::TRAILDESC tTrailDsec;
+	tTrailDsec.iPassIndex = 2;
+	tTrailDsec.iTextureIndex = 2;
+	tTrailDsec.NoiseSpeed = 10;
+	tTrailDsec.vColor =  _float4(0, 0.84705882f, 1, 1.f);
+
+	FAILED_CHECK(Add_Component(SCENE_STATIC,TAG_CP(Prototype_Trail), TAG_COM(Com_SwordTrail), (CComponent**)&m_pSwordTrailCom,&tTrailDsec));
+	FAILED_CHECK(Add_Component(SCENE_STATIC,TAG_CP(Prototype_Trail), TAG_COM(Com_SubSwordTrail), (CComponent**)&m_pSubSwordTrailCom, &tTrailDsec));
 
 	m_pPlayerTransform = (CTransform*)m_pPlayer->Get_Component(TAG_COM(Com_Transform));
 	NULL_CHECK_RETURN(m_pPlayerTransform, E_FAIL);
@@ -333,4 +348,6 @@ void CHorse::Free()
 	Safe_Release(m_pColliderCom);
 
 	Safe_Release(m_pSwordTrailCom);
+	Safe_Release(m_pSubSwordTrailCom);
+	
 }

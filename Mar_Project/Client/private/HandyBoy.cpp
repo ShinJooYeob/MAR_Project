@@ -227,7 +227,7 @@ _int CHandyBoy::Render()
 	return _int();
 }
 
-_int CHandyBoy::LateRender()
+_int CHandyBoy::LightRender()
 {
 	return _int();
 }

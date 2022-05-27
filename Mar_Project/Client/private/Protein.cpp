@@ -127,7 +127,7 @@ _int CProtein::Render()
 	return _int();
 }
 
-_int CProtein::LateRender()
+_int CProtein::LightRender()
 {
 
 	return _int();
