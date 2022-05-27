@@ -127,8 +127,22 @@ _int CShrinkFlower::Render()
 
 _int CShrinkFlower::LightRender()
 {
+	if (__super::LightRender() < 0)
+		return -1;
+	NULL_CHECK_RETURN(m_pModel, E_FAIL);
+
+	FAILED_CHECK(m_pTransformCom->Bind_OnShader(m_pShaderCom, "g_WorldMatrix"));
+
+	_uint NumMaterial = m_pModel->Get_NumMaterial();
+
+	for (_uint i = 0; i < NumMaterial; i++)
+	{
+		FAILED_CHECK(m_pModel->Render(m_pShaderCom, 10, i, "g_BoneMatrices"));
+
+	}
 
 	return _int();
+
 }
 
 void CShrinkFlower::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedObj, CCollider* pConflictedCollider, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType)

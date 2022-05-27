@@ -264,7 +264,7 @@ _int CPlayer::LightRender()
 
 	for (_uint i = 0; i < NumMaterial; i++)
 	{
-		FAILED_CHECK(m_pModel->Render(m_pShaderCom, 9, i, "g_BoneMatrices"));
+		FAILED_CHECK(m_pModel->Render(m_pShaderCom, 10, i, "g_BoneMatrices"));
 
 	}
 

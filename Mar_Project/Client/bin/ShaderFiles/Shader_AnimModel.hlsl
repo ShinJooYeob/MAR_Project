@@ -94,6 +94,31 @@ VS_OUT_SHADOW VS_Shadow(VS_IN In)
 	Out.vClipPosition = Out.vPosition;
 	return Out;
 };
+VS_OUT_SHADOW VS_Shadow_NoWeightW(VS_IN In)
+{
+
+	VS_OUT_SHADOW			Out = (VS_OUT_SHADOW)0;
+
+	matrix			matWV, matWVP;
+
+
+	float		fWeightW = 1.f - (In.vBlendWeight.x + In.vBlendWeight.y + In.vBlendWeight.z);
+
+	matrix		BoneMatrix = g_BoneMatrices.BoneMatrices[In.vBlendIndex.x] * In.vBlendWeight.x +
+		g_BoneMatrices.BoneMatrices[In.vBlendIndex.y] * In.vBlendWeight.y +
+		g_BoneMatrices.BoneMatrices[In.vBlendIndex.z] * In.vBlendWeight.z +
+		g_BoneMatrices.BoneMatrices[In.vBlendIndex.w] * In.vBlendWeight.w;
+
+	vector		vLocalPosition = mul(vector(In.vModelDataPosition, 1.f), BoneMatrix);
+
+
+	Out.vPosition = mul(vLocalPosition, g_WorldMatrix);
+	Out.vPosition = mul(Out.vPosition, g_LightViewMatrix);
+	Out.vPosition = mul(Out.vPosition, g_LightProjMatrix);
+
+	Out.vClipPosition = Out.vPosition;
+	return Out;
+};
 
 
 VS_OUT VS_MAIN_DEFAULT(VS_IN In)
@@ -395,6 +420,26 @@ technique11		DefaultTechnique
 		SetRasterizerState(CullMode_ccw);
 
 		VertexShader = compile vs_5_0 VS_Shadow();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_Shadow();
+	}
+	pass ShadowMap_NoWeightW //10
+	{
+		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(ZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_ccw);
+
+		VertexShader = compile vs_5_0 VS_Shadow_NoWeightW();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_Shadow();
+	}
+	pass ShadowMap_NoWeightW_CullNone //11
+	{
+		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(ZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_None);
+
+		VertexShader = compile vs_5_0 VS_Shadow_NoWeightW();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_Shadow();
 	}

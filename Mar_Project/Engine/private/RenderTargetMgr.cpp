@@ -92,7 +92,6 @@ HRESULT CRenderTargetMgr::Begin(const _tchar * pMRTTag)
 
 	for (auto& pRenderTarget : *pMRTList)
 	{
-		pRenderTarget->Clear();
 		pRenderTargets[iNumViews++] = pRenderTarget->Get_RTV();
 	}
 
@@ -100,7 +99,8 @@ HRESULT CRenderTargetMgr::Begin(const _tchar * pMRTTag)
 
 
 	ID3D11ShaderResourceView* pSRV[8] = { nullptr };
-	m_pDeviceContext->PSSetShaderResources(0, iNumViews, pSRV);
+	m_pDeviceContext->PSSetShaderResources(0, 8, pSRV);
+
 	return S_OK;
 }
 
@@ -117,7 +117,6 @@ HRESULT CRenderTargetMgr::Begin(const _tchar * pMRTTag, ID3D11DepthStencilView *
 
 	for (auto& pRenderTarget : *pMRTList)
 	{
-		pRenderTarget->Clear();
 		pRenderTargets[iNumViews++] = pRenderTarget->Get_RTV();
 	}
 
@@ -125,7 +124,33 @@ HRESULT CRenderTargetMgr::Begin(const _tchar * pMRTTag, ID3D11DepthStencilView *
 
 
 	ID3D11ShaderResourceView* pSRV[8] = { nullptr };
-	m_pDeviceContext->PSSetShaderResources(0, iNumViews, pSRV);
+	m_pDeviceContext->PSSetShaderResources(0, 8, pSRV);
+	return S_OK;
+}
+
+HRESULT CRenderTargetMgr::Begin_WithBackBuffer(const _tchar * pMRTTag)
+{
+	list<CRenderTargetLayer*>*	pMRTList = Find_MRT(pMRTTag);
+	NULL_CHECK_RETURN(pMRTList, E_FAIL);
+
+	m_pDeviceContext->OMGetRenderTargets(1, &m_pOldRTV, &m_pOriginalDSV);
+
+	_uint iNumViews = 1;
+
+	ID3D11RenderTargetView*		pRenderTargets[8] = {  nullptr };
+
+	pRenderTargets[0] = m_pOldRTV;
+
+	for (auto& pRenderTarget : *pMRTList)
+	{
+		pRenderTargets[iNumViews++] = pRenderTarget->Get_RTV();
+	}
+
+	m_pDeviceContext->OMSetRenderTargets(iNumViews, pRenderTargets, m_pOriginalDSV);
+
+
+	ID3D11ShaderResourceView* pSRV[8] = { nullptr };
+	m_pDeviceContext->PSSetShaderResources(0, 8, pSRV);
 	return S_OK;
 }
 
@@ -139,7 +164,16 @@ HRESULT CRenderTargetMgr::End(const _tchar * pMRTTag)
 	Safe_Release(m_pOriginalDSV);
 
 	ID3D11ShaderResourceView* pSRV[8] = { nullptr };
-	m_pDeviceContext->PSSetShaderResources(0, iNumViews, pSRV);
+	m_pDeviceContext->PSSetShaderResources(0, 8, pSRV);
+
+	return S_OK;
+}
+
+HRESULT CRenderTargetMgr::Clear_All_RenderTargetColor()
+{
+
+	for (auto& pRenderTarget : m_mapRenderTarget)
+		pRenderTarget.second->Clear();
 
 	return S_OK;
 }

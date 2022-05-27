@@ -382,6 +382,16 @@ technique11		DefaultTechnique
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_Shadow();
 	}
+	pass ShadowMap_CullCW		//10
+	{
+		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(ZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_cw);
+
+		VertexShader = compile vs_5_0 VS_Shadow();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_Shadow();
+	}
 
 	
 }

@@ -144,6 +144,19 @@ _int CEntireCard::LightRender()
 	if (__super::LightRender() < 0)
 		return -1;
 
+
+	FAILED_CHECK(m_pTransformCom->Bind_OnShader(m_pShaderCom, "g_WorldMatrix"));
+
+
+	for (_uint k = 0; k < 4; k++)
+	{
+		_uint NumMaterial = (m_ModelArr)[k]->Get_NumMaterial();
+
+		for (_uint i = 0; i < NumMaterial; i++)
+		{
+			FAILED_CHECK((m_ModelArr)[k]->Render(m_pShaderCom, 9, i));
+		}
+	}
 	return _int();
 }
 

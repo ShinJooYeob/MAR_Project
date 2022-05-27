@@ -107,7 +107,7 @@ _int CButtonPad::Render()
 
 
 	NULL_CHECK_RETURN(m_pModel, E_FAIL);
-	NULL_CHECK_RETURN(m_pModel, E_FAIL);
+	NULL_CHECK_RETURN(m_pSubModel, E_FAIL);
 
 	FAILED_CHECK(__super::SetUp_ConstTable(m_pShaderCom));
 
@@ -150,6 +150,30 @@ _int CButtonPad::LightRender()
 {
 	if (__super::LightRender() < 0)
 		return -1;
+	NULL_CHECK_RETURN(m_pModel, E_FAIL);
+
+
+	FAILED_CHECK(m_pTransformCom->Bind_OnShader(m_pShaderCom, "g_WorldMatrix"));
+
+	_uint NumMaterial = m_pSubModel->Get_NumMaterial();
+	for (_uint i = 0; i < NumMaterial; i++)
+	{
+
+		FAILED_CHECK(m_pSubModel->Render(m_pShaderCom, 9, i));
+	}
+	_float4x4		ShaderWorldMatrix;
+	_float4x4		ButtonMat = m_pTransformCom->Get_WorldFloat4x4();
+	ButtonMat._42 -= m_ButtonHight;
+
+	XMStoreFloat4x4(&ShaderWorldMatrix, ButtonMat.TransposeXMatrix());
+	m_pShaderCom->Set_RawValue("g_WorldMatrix", &ShaderWorldMatrix, sizeof(_float4x4));
+
+	NumMaterial = m_pModel->Get_NumMaterial();
+
+	for (_uint i = 0; i < NumMaterial; i++)
+	{
+		FAILED_CHECK(m_pModel->Render(m_pShaderCom, 9, i));
+	}
 
 	return _int();
 }

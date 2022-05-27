@@ -57,6 +57,7 @@ private:
 
 	MATRIXWVP					m_LightWVPmat;
 	ID3D11DepthStencilView*		m_LightDepthStencil = nullptr;
+	ID3D11DepthStencilView*		m_DownScaledDepthStencil = nullptr;
 
 
 private:
@@ -67,6 +68,7 @@ private:
 	HRESULT Render_NonAlpha();
 	HRESULT Render_PriorityAlpha();
 
+	HRESULT Render_BlurShadow();
 	HRESULT Render_Lights();
 	HRESULT Render_DeferredTexture();
 
