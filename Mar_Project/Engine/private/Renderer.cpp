@@ -10,14 +10,17 @@
 
 #include "GameInstance.h"
 #include "PipeLineMgr.h"
+#include "Graphic_Device.h"
 
 CRenderer::CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CComponent(pDevice, pDeviceContext)
 	, m_pRenderTargetMgr(CRenderTargetMgr::GetInstance())
 	, m_pLightMgr(CLightMgr::GetInstance())
+	, m_pGraphicDevice(CGraphic_Device::GetInstance())
 {
 	Safe_AddRef(m_pRenderTargetMgr);
 	Safe_AddRef(m_pLightMgr);
+	Safe_AddRef(m_pGraphicDevice);
 
 }
 #define ShadowMapQuality 8
@@ -56,6 +59,11 @@ HRESULT CRenderer::Initialize_Prototype(void * pArg)
 	FAILED_CHECK(m_pRenderTargetMgr->Add_RenderTarget(TEXT("Target_UpScaledBluredShadow"), (_uint)Viewport.Width , (_uint)Viewport.Height , DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f)));
 
 	FAILED_CHECK(m_pRenderTargetMgr->Add_RenderTarget(TEXT("Target_AfterDefferred"), (_uint)Viewport.Width, (_uint)Viewport.Height, DXGI_FORMAT_B8G8R8A8_UNORM, _float4(0.f, 0.f, 0.f, 0.f)));
+	FAILED_CHECK(m_pRenderTargetMgr->Add_RenderTarget(TEXT("Target_ReferenceDefferred"), (_uint)Viewport.Width, (_uint)Viewport.Height, DXGI_FORMAT_B8G8R8A8_UNORM, _float4(0.f, 0.f, 0.f, 0.f)));
+
+	FAILED_CHECK(m_pRenderTargetMgr->Add_RenderTarget(TEXT("Target_SubVeiwPortA"), (_uint)Viewport.Width, (_uint)Viewport.Height, DXGI_FORMAT_B8G8R8A8_UNORM, _float4(0.f, 0.f, 0.f, 0.f)));
+	FAILED_CHECK(m_pRenderTargetMgr->Add_RenderTarget(TEXT("Target_SubVeiwPortB"), (_uint)Viewport.Width, (_uint)Viewport.Height, DXGI_FORMAT_B8G8R8A8_UNORM, _float4(0.f, 0.f, 0.f, 0.f)));
+
 
 
 	/* For.MRT_Deferred : 객체들을 그릴때 바인드. */
@@ -75,10 +83,17 @@ HRESULT CRenderer::Initialize_Prototype(void * pArg)
 
 	FAILED_CHECK(m_pRenderTargetMgr->Add_MRT(TEXT("MRT_ShadowUpScaling"), TEXT("Target_UpScaledBluredShadow")));
 
-	FAILED_CHECK(m_pRenderTargetMgr->Add_MRT(TEXT("MRT_ShadowBluring"), TEXT("Target_DownScaledBluredShadow")));
+	FAILED_CHECK(m_pRenderTargetMgr->Add_MRT(TEXT("MRT_ShadowBluringVerticle"), TEXT("Target_ReferenceShadow")));
+	FAILED_CHECK(m_pRenderTargetMgr->Add_MRT(TEXT("MRT_ShadowBluringHorizon"), TEXT("Target_DownScaledBluredShadow")));
 
 
 	FAILED_CHECK(m_pRenderTargetMgr->Add_MRT(TEXT("MRT_AfterDefferred"), TEXT("Target_AfterDefferred")));
+	FAILED_CHECK(m_pRenderTargetMgr->Add_MRT(TEXT("MRT_AfterDefferred"), TEXT("Target_ReferenceDefferred")));
+
+	FAILED_CHECK(m_pRenderTargetMgr->Add_MRT(TEXT("MRT_AfterPostProcessing"), TEXT("Target_AfterDefferred")));
+
+	FAILED_CHECK(m_pRenderTargetMgr->Add_MRT(TEXT("MRT_SubVeiwPortA"), TEXT("Target_SubVeiwPortA")));
+	FAILED_CHECK(m_pRenderTargetMgr->Add_MRT(TEXT("MRT_SubVeiwPortB"), TEXT("Target_SubVeiwPortB")));
 
 
 	m_pVIBuffer = CVIBuffer_Rect::Create(m_pDevice, m_pDeviceContext);
@@ -99,6 +114,10 @@ HRESULT CRenderer::Initialize_Prototype(void * pArg)
 	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_Specular"), 225.f, 225.f, 150.f, 150.f));
 
 	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_UpScaledBluredShadow"), 75.f, 625.f, 150.f, 150.f));
+	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_SubVeiwPortA"), 225.f, 625.f, 150.f, 150.f));
+	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_SubVeiwPortB"), 375.f, 625.f, 150.f, 150.f));
+	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_AfterDefferred"), 525.f, 625.f, 150.f, 150.f));
+
 #endif
 
 
@@ -207,11 +226,11 @@ HRESULT CRenderer::Render_RenderGroup()
 {
 	FAILED_CHECK(m_pRenderTargetMgr->Clear_All_RenderTargetColor());
 
-	FAILED_CHECK(Render_Priority());
 
 	FAILED_CHECK(Render_ShadowMap());
 
 	FAILED_CHECK(m_pRenderTargetMgr->Begin(TEXT("MRT_Deferred")));
+	FAILED_CHECK(Render_Priority());
 	FAILED_CHECK(Render_NonAlpha());
 	FAILED_CHECK(Render_PriorityAlpha());
 	FAILED_CHECK(m_pRenderTargetMgr->End(TEXT("MRT_Deferred")));
@@ -219,9 +238,12 @@ HRESULT CRenderer::Render_RenderGroup()
 	FAILED_CHECK(Render_BlurShadow());
 	FAILED_CHECK(Render_Lights());
 
-	FAILED_CHECK(m_pRenderTargetMgr->Begin_WithBackBuffer(TEXT("MRT_AfterDefferred")));
+	FAILED_CHECK(m_pRenderTargetMgr->Begin(TEXT("MRT_AfterDefferred")));
 	FAILED_CHECK(Render_DeferredTexture());
 	FAILED_CHECK(m_pRenderTargetMgr->End(TEXT("MRT_AfterDefferred")));
+
+	FAILED_CHECK(Render_PostProcessing());
+
 
 	FAILED_CHECK(Render_NonAlpha_NoDeferrd());
 
@@ -244,6 +266,16 @@ HRESULT CRenderer::Render_RenderGroup()
 		FAILED_CHECK(m_pRenderTargetMgr->Render_DebugBuffer(TEXT("MRT_Deferred")));
 		FAILED_CHECK(m_pRenderTargetMgr->Render_DebugBuffer(TEXT("MRT_LightAcc")));
 		FAILED_CHECK(m_pRenderTargetMgr->Render_DebugBuffer(TEXT("MRT_ShadowUpScaling")));
+		FAILED_CHECK(m_pRenderTargetMgr->Render_DebugBuffer(TEXT("MRT_SubVeiwPortA")));
+		FAILED_CHECK(m_pRenderTargetMgr->Render_DebugBuffer(TEXT("MRT_SubVeiwPortB")));
+		FAILED_CHECK(m_pRenderTargetMgr->Render_DebugBuffer(TEXT("MRT_AfterPostProcessing")));
+
+		
+
+
+		ID3D11ShaderResourceView* pSRV[8] = { nullptr };
+		m_pDeviceContext->PSSetShaderResources(0, 8, pSRV);
+
 	}
 
 #endif
@@ -444,21 +476,39 @@ HRESULT CRenderer::Render_BlurShadow()
 	FAILED_CHECK(m_pRenderTargetMgr->End(TEXT("MRT_ShadowDownScaling")));
 
 	
-	FAILED_CHECK(m_pRenderTargetMgr->Begin(TEXT("MRT_ShadowBluring"), m_DownScaledDepthStencil));
 
 
-	FAILED_CHECK(m_pShader->Set_Texture("g_ShadowMapTexture", m_pRenderTargetMgr->Get_SRV(TEXT("Target_ReferenceShadow"))));
-	
+
+
+	FAILED_CHECK(m_pRenderTargetMgr->Begin(TEXT("MRT_ShadowBluringVerticle"), m_DownScaledDepthStencil));
+
+	FAILED_CHECK(m_pShader->Set_Texture("g_ShadowMapTexture", m_pRenderTargetMgr->Get_SRV(TEXT("Target_DownScaledBluredShadow"))));
 	FAILED_CHECK(m_pShader->Set_RawValue("fScreemWidth", &ViewPortDesc.Width, sizeof(_float)));
 	FAILED_CHECK(m_pShader->Set_RawValue("fScreemHeight", &ViewPortDesc.Height, sizeof(_float)));
 
 	FAILED_CHECK(m_pVIBuffer->Render(m_pShader, 7));
+
+	FAILED_CHECK(m_pRenderTargetMgr->End(TEXT("MRT_ShadowBluringVerticle")));
+
+
+	FAILED_CHECK(m_pRenderTargetMgr->Begin(TEXT("MRT_ShadowBluringHorizon"), m_DownScaledDepthStencil));
+
+	FAILED_CHECK(m_pShader->Set_Texture("g_ShadowMapTexture", m_pRenderTargetMgr->Get_SRV(TEXT("Target_ReferenceShadow"))));
+
+
 	FAILED_CHECK(m_pVIBuffer->Render(m_pShader, 8));
 
-
-
 	m_pDeviceContext->RSSetViewports(iNumViewports, &OldViewPortDesc);
-	FAILED_CHECK(m_pRenderTargetMgr->End(TEXT("MRT_ShadowBluring")));
+	FAILED_CHECK(m_pRenderTargetMgr->End(TEXT("MRT_ShadowBluringHorizon")));
+
+
+
+
+
+
+
+
+
 
 
 
@@ -511,6 +561,50 @@ HRESULT CRenderer::Render_DeferredTexture()
 	//FAILED_CHECK(m_pShader->Set_RawValue("g_LightProjMatrix", &m_LightWVPmat.ProjMatrix, sizeof(_float4x4)));
 
 	FAILED_CHECK(m_pVIBuffer->Render(m_pShader, 3));
+
+	return S_OK;
+}
+
+HRESULT CRenderer::Render_PostProcessing()
+{
+
+
+	for (auto& RenderObject : m_RenderObjectList[RENDER_POSTPROCESSING])
+	{
+		if (RenderObject != nullptr)
+		{
+			FAILED_CHECK(RenderObject->Render());
+		}
+		Safe_Release(RenderObject);
+	}
+
+	m_RenderObjectList[RENDER_POSTPROCESSING].clear();
+
+
+
+
+
+	_uint iNumViews = 1;
+	ID3D11RenderTargetView*		pRenderTargets[8] = { nullptr };
+	pRenderTargets[0] = m_pGraphicDevice->Get_BackBufferRTV();
+	m_pDeviceContext->OMSetRenderTargets(iNumViews, pRenderTargets, m_pGraphicDevice->Get_OriginalDSV());
+
+	CPipeLineMgr*		pPipeLineMgr = GetSingle(CPipeLineMgr);
+
+	_float4x4		ViewMatrixInv, ProjMatrixInv;
+
+	XMStoreFloat4x4(&ViewMatrixInv, XMMatrixTranspose(XMMatrixInverse(nullptr, pPipeLineMgr->Get_Transform_Matrix(PLM_VIEW))));
+	XMStoreFloat4x4(&ProjMatrixInv, XMMatrixTranspose(XMMatrixInverse(nullptr, pPipeLineMgr->Get_Transform_Matrix(PLM_PROJ))));
+
+	m_pShader->Set_Texture("g_TargetTexture", m_pRenderTargetMgr->Get_SRV(L"Target_AfterDefferred"));
+
+	FAILED_CHECK(m_pShader->Set_RawValue("g_WorldMatrix", &m_WVPmat.WorldMatrix, sizeof(_float4x4)));
+	FAILED_CHECK(m_pShader->Set_RawValue("g_ViewMatrix", &m_WVPmat.ViewMatrix, sizeof(_float4x4)));
+	FAILED_CHECK(m_pShader->Set_RawValue("g_ProjMatrix", &m_WVPmat.ProjMatrix, sizeof(_float4x4)));
+
+	FAILED_CHECK(m_pVIBuffer->Render(m_pShader, 0));
+
+
 
 	return S_OK;
 }
@@ -653,6 +747,7 @@ void CRenderer::Free()
 
 	Safe_Release(m_pRenderTargetMgr);
 	Safe_Release(m_pLightMgr);
+	Safe_Release(m_pGraphicDevice);
 
 	for (_uint i = 0; i < RENDER_END; ++i)
 	{

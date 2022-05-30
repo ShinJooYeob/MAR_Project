@@ -45,8 +45,15 @@ private:
 	_bool				m_bHavetoMaking = true;
 	_uint				m_iOldAnimIndex = INT_MAX;
 	_uint				m_iAdjMovedIndex = 0;
+
+	PARTICLEDESC		m_tParticleDesc;
+
+	_bool				m_bDeadBomb = false;
+	_double				m_DeadPassedTime = 0;
 private:
 	HRESULT SetUp_Components();
+	HRESULT Ready_ParticleDesc();
+
 	HRESULT Adjust_AnimMovedTransform(_double fDeltatime);
 
 public:

@@ -209,7 +209,7 @@ HRESULT CFadeEffect::SetUp_Components()
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_VIBuffer_Rect), TAG_COM(Com_VIBuffer), (CComponent**)&m_pVIBufferCom));
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Texture_ScreenEffectUI), TAG_COM(Com_Texture), (CComponent**)&m_pTextureCom));
-
+	m_pTextureCom->Change_TextureLayer(L"ScreenEffect");
 	CTransform::TRANSFORMDESC tDesc = {};
 	tDesc.fMovePerSec = 5;
 	tDesc.fRotationPerSec = XMConvertToRadians(60);

@@ -65,7 +65,7 @@ _int CInstance_Particle::LateUpdate(_double TimeDelta)
 
 
 
-	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONBLEND_NOLIGHT, this);
 	return _int();
 }
 

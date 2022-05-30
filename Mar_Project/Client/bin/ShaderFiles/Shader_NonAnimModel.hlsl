@@ -19,6 +19,10 @@ texture2D			g_NormalTexture;
 //texture2D			g_DiffuseRoughTexture;
 //texture2D			g_AmbientOcculusionTexture;
 
+texture2D			g_BackBufferTexture;
+
+
+
 cbuffer AttechMatrix
 {
 	matrix g_AttechMatrix;
@@ -271,6 +275,34 @@ PS_OUT_SHADOW PS_Shadow(PS_IN_SHADOW In)
 
 	return Out;
 }
+PS_OUT_NODEFERRED PS_Distortion(PS_IN In)
+{
+	PS_OUT_NODEFERRED		Out = (PS_OUT_NODEFERRED)0;
+
+
+	vector BlurDesc = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
+	//float Alpha = max(max(Out.vDiffuse.r, Out.vDiffuse.g), Out.vDiffuse.b);
+
+	//if (Alpha < 0.3)
+	//	discard;
+
+
+	float2 PosToUv = float2(In.vPosition.x / 1280, In.vPosition.y / 780);
+
+
+	float2 TargetUV = float2(PosToUv.x + (0.5f - (BlurDesc.x))*0.15625f, PosToUv.y + (0.5f - (BlurDesc.y))*0.25f);
+	//float2 TargetUV = In.vTexUV + float2(PosToUv.x + (0.5f - (Noise.x))*0.0015625f, PosToUv.y + (0.5f - (Noise.y))*0.0025f);
+
+	vector BackBuffer = g_BackBufferTexture.Sample(DefaultSampler, TargetUV);
+
+	Out.vDiffuse = BackBuffer;
+
+	Out.vDiffuse.a = g_vMixColor.a;
+	//Out.vDiffuse.a = min(Alpha, In.vColor.a);
+
+	return Out;
+}
+
 
 
 
@@ -392,6 +424,17 @@ technique11		DefaultTechnique
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_Shadow();
 	}
+	pass Distortion_WriteZbuffer		//11
+	{
+		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(ZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_None);
+
+		VertexShader = compile vs_5_0 VS_MAIN_DEFAULT();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_Distortion();
+	}
+
 
 	
 }

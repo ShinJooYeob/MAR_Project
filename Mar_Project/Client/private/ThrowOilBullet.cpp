@@ -224,9 +224,11 @@ void CThrowOilBullet::CollisionTriger(_uint iMyColliderIndex, CGameObject * pCon
 
 			if (Radian < 0)
 			{
-				m_pPlayer->Set_UmbrellaReflected(true);
+				_Vector Dir = XMVectorSetY(m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0) - XMVectorSetY(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS), 0);
+
+				m_pPlayer->Set_UmbrellaReflected(true,m_pTransformCom->Get_MatrixState(CTransform::STATE_POS) + Dir, Dir);
 				GetSingle(CUtilityMgr)->SlowMotionStart();
-				Set_MovingStart(XMVectorSetY(m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0) - XMVectorSetY(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS), 0));
+				Set_MovingStart(Dir);
 			}
 		}
 	}

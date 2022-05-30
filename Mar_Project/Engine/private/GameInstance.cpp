@@ -638,6 +638,34 @@ ID3D11ShaderResourceView * CGameInstance::Get_SRV(const _tchar * pTargetTag) con
 	return m_pRenderTargetMgr->Get_SRV(pTargetTag);
 }
 
+HRESULT CGameInstance::Begin_MTV(const _tchar * pMRTTag)
+{
+	NULL_CHECK_BREAK(m_pRenderTargetMgr);
+
+	return m_pRenderTargetMgr->Begin(pMRTTag);
+}
+
+HRESULT CGameInstance::Begin_MTV_WithBackBuffer(const _tchar * pMRTTag)
+{
+	NULL_CHECK_BREAK(m_pRenderTargetMgr);
+
+	return m_pRenderTargetMgr->Begin_WithBackBuffer(pMRTTag);
+}
+
+HRESULT CGameInstance::Begin_MTV(const _tchar * pMRTTag, ID3D11DepthStencilView * DepthStencil)
+{
+	NULL_CHECK_BREAK(m_pRenderTargetMgr);
+
+	return m_pRenderTargetMgr->Begin(pMRTTag, DepthStencil);
+}
+
+HRESULT CGameInstance::End_MTV(const _tchar * pMRTTag)
+{
+	NULL_CHECK_BREAK(m_pRenderTargetMgr);
+
+	return m_pRenderTargetMgr->End(pMRTTag);
+}
+
 
 
 

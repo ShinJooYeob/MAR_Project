@@ -22,6 +22,8 @@ public:
 
 	virtual void CollisionTriger(_uint iMyColliderIndex, CGameObject* pConflictedObj,CCollider* pConflictedCollider, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType) override;
 	CModel*	Get_WeaponModel() override { return m_pModel; };
+	_float3 Get_ColliderPosition();
+	virtual void Set_AttackAble(_bool bBool = true);
 private:
 	CShader*			m_pShaderCom = nullptr;
 	CRenderer*			m_pRendererCom = nullptr;
@@ -29,6 +31,9 @@ private:
 	CModel*				m_pModel = nullptr;
 	CCollider*			m_pColliderCom = nullptr;
 
+
+	_bool				m_TempAttackAble = false;
+	_double				m_ATABPassedTime = 0;
 private:
 	HRESULT SetUp_Components();
 

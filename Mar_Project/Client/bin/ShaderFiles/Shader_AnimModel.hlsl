@@ -231,7 +231,10 @@ struct PS_OUT
 	vector		vDepth : SV_TARGET2;
 	vector		vShadow : SV_TARGET3;
 };
-
+struct PS_OUT_NODEFERRED
+{
+	vector		vDiffuse : SV_TARGET0;
+};
 PS_OUT PS_MAIN_DEFAULT(PS_IN In)
 {
 	PS_OUT		Out = (PS_OUT)0;
@@ -258,9 +261,9 @@ PS_OUT PS_MAIN_DEFAULT(PS_IN In)
 	return Out;
 }
 
-PS_OUT PS_MAIN_LOBYALICE(PS_IN In)
+PS_OUT_NODEFERRED PS_MAIN_LOBYALICE(PS_IN In)
 {
-	PS_OUT		Out = (PS_OUT)0;
+	PS_OUT_NODEFERRED		Out = (PS_OUT_NODEFERRED)0;
 
 	vector		vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
 
@@ -268,8 +271,6 @@ PS_OUT PS_MAIN_LOBYALICE(PS_IN In)
 		discard;
 
 	Out.vDiffuse = vDiffuse;
-	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-	Out.vDepth = vector(In.vProjPos.w / 300.0f, In.vProjPos.z / In.vProjPos.w, 0.f, 0.f);
 
 	return Out;
 }

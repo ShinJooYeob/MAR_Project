@@ -157,6 +157,11 @@ _int CParticleObject::Render()
 	if(m_ParticleDesc.m_fAlphaTestValue != 0.1f)
 		FAILED_CHECK(m_pShaderCom->Set_RawValue("g_fAlphaTestValue", &m_ParticleDesc.m_fAlphaTestValue, sizeof(_float)));
 
+	if (m_ParticleDesc.m_iPassIndex == 17)
+	{
+		FAILED_CHECK(m_pShaderCom->Set_Texture("g_DepthTexture", g_pGameInstance->Get_SRV(L"Target_Depth")));
+
+	}
 	
 
 	_Matrix vViewMat = pInstance->Get_Transform_Matrix(PLM_VIEW);

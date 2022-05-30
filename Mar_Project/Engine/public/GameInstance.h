@@ -141,6 +141,10 @@ public: //CollisionMgr
 
 public:
 	ID3D11ShaderResourceView* Get_SRV(const _tchar* pTargetTag) const;
+	HRESULT Begin_MTV(const _tchar* pMRTTag);
+	HRESULT Begin_MTV(const _tchar* pMRTTag, ID3D11DepthStencilView* DepthStencil);
+	HRESULT Begin_MTV_WithBackBuffer(const _tchar* pMRTTag);
+	HRESULT End_MTV(const _tchar* pMRTTag);
 
 private:
 	CGraphic_Device*	m_pGraphicDevice = nullptr;

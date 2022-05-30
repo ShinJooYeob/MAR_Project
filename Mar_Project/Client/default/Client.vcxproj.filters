@@ -301,6 +301,12 @@
     <Filter Include="01.GameObject\07.MapObject\01.DynamicObj\16.BreakalbeWall">
       <UniqueIdentifier>{5b98aede-182c-476c-96b3-0cf38bbfd438}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.GameObject\97.Effect\ScreenEffect\illusion">
+      <UniqueIdentifier>{961415da-6561-485f-b965-37ab2ef5eeba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\97.Effect\ScreenEffect\Blur">
+      <UniqueIdentifier>{0b76adc6-ece2-45cc-aaa4-ec97434171f8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -615,6 +621,18 @@
     <ClInclude Include="..\public\BreakableWall.h">
       <Filter>01.GameObject\07.MapObject\01.DynamicObj\16.BreakalbeWall</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\illusion.h">
+      <Filter>01.GameObject\97.Effect\ScreenEffect\illusion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\RadialBlur.h">
+      <Filter>01.GameObject\97.Effect\ScreenEffect\Blur</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\RadialBlurUmbrella.h">
+      <Filter>01.GameObject\97.Effect\ScreenEffect\Blur</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\CircleTornado.h">
+      <Filter>01.GameObject\00.Player\EffectMesh</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -904,6 +922,18 @@
     </ClCompile>
     <ClCompile Include="..\private\BreakableWall.cpp">
       <Filter>01.GameObject\07.MapObject\01.DynamicObj\16.BreakalbeWall</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\illusion.cpp">
+      <Filter>01.GameObject\97.Effect\ScreenEffect\illusion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\RadialBlur.cpp">
+      <Filter>01.GameObject\97.Effect\ScreenEffect\Blur</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\RadialBlurUmbrella.cpp">
+      <Filter>01.GameObject\97.Effect\ScreenEffect\Blur</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\CircleTornado.cpp">
+      <Filter>01.GameObject\00.Player\EffectMesh</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

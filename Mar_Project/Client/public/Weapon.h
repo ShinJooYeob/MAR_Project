@@ -31,7 +31,7 @@ public:
 	virtual _int LightRender()override;
 
 	virtual CModel*	Get_WeaponModel() { return nullptr; };
-	void Set_AttackAble(_bool bBool = true) { m_bIsAttackAble = bBool; };
+	virtual void Set_AttackAble(_bool bBool = true) { m_bIsAttackAble = bBool; };
 
 protected:
 	class CPlayer*			m_pPlayer = nullptr;

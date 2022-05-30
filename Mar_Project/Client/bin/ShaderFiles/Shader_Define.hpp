@@ -12,6 +12,12 @@ cbuffer	ShadowPipeLine
 	matrix			g_LightProjMatrix;
 };
 
+cbuffer ScreenSizeBuffer
+{
+	float				fScreemWidth = 1280;
+	float				fScreemHeight = 780;
+};
+
 
 
 sampler DefaultSampler = sampler_state

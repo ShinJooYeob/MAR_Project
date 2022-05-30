@@ -146,15 +146,15 @@ HRESULT CGamePlayUI::Add_Dmg_to_Player(_uint iNowHP, _int iDmg)
 	return S_OK;
 }
 
-void CGamePlayUI::Set_DrawClockBombUI()
+void CGamePlayUI::Set_DrawClockBombUI(_bool bBool)
 {
-	if (m_bDrawClockBomb) return;
+	if (m_bDrawClockBomb == bBool) return;
 
-	m_bDrawClockBomb = true;
+	m_bDrawClockBomb = bBool;
 	m_PassedClockBombTime = 0;
 
-	m_vecUIContainer[20]->Set_IsDraw(true);
-	m_vecUIContainer[21]->Set_IsDraw(true);
+	m_vecUIContainer[20]->Set_IsDraw(bBool);
+	m_vecUIContainer[21]->Set_IsDraw(bBool);
 }
 
 void CGamePlayUI::Set_DrawFightUI(_bool bBool)

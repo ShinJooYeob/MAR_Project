@@ -23,6 +23,8 @@ enum OBJECTPROTOTYPEID
 	Prototype_Bullet_Normal,
 	Prototype_Bullet_Grenade,
 	Prototype_ScreenEffectUI,
+	Prototype_RadialBlur,
+	Prototype_illusionEffect,
 	Prototype_TriggerCollider_SceneChager,
 
 
@@ -43,6 +45,7 @@ enum OBJECTPROTOTYPEID
 	Prototype_PlayerLoby,
 	Prototype_Player,
 	Prototype_PlayerTornado,
+	Prototype_PlayerCircleTornado,
 
 	Prototype_WeaponKnife,
 	Prototype_WeaponGrinder,
@@ -121,7 +124,12 @@ static const _tchar* Tag_Object_Prototype(OBJECTPROTOTYPEID eTag)
 	switch (eTag)
 	{
 		
-		
+	case Prototype_illusionEffect:
+		return TEXT("Prototype_illusionEffect");
+		break;
+	case Prototype_RadialBlur:
+		return TEXT("Prototype_RadialBlur");
+		break;
 	case Prototype_EatableProtein:
 		return TEXT("Prototype_EatableProtein");
 		break;
@@ -149,6 +157,10 @@ static const _tchar* Tag_Object_Prototype(OBJECTPROTOTYPEID eTag)
 	case Prototype_PlayerTornado:
 		return TEXT("Prototype_PlayerTornado");
 		break;
+	case Prototype_PlayerCircleTornado:
+		return TEXT("Prototype_PlayerCircleTornado");
+		break;
+		
 	case Prototype_UILoading:
 		return TEXT("Prototype_UILoading");
 		break;
@@ -855,6 +867,7 @@ enum COMPONENTPROTOTYPEID
 		Prototype_Mesh_Teapot,
 		Prototype_Mesh_Umbrella,
 		Prototype_Mesh_ClockBomb,
+		Prototype_Mesh_CircleMesh,
 
 
 		Prototype_Mesh_DustTornado,
@@ -947,7 +960,10 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 	case Prototype_Mesh_None:
 		return TEXT("Mesh_None");
 		break;
-
+		
+	case Prototype_Mesh_CircleMesh:
+		return TEXT("Prototype_Mesh_CircleMesh");
+		break;
 	case Prototype_Mesh_AlgaeRock_Ledge:
 		return TEXT("Mesh_AlgaeRock_Ledge");
 		break;

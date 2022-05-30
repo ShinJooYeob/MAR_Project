@@ -9,8 +9,8 @@
 #include "DustWind.h"
 #include "Knife.h"
 #include "Horse.h"
-
-
+#include "CircleTornado.h"
+#include "Umbrella.h"
 
 
 
@@ -85,11 +85,8 @@ _int CPlayer::Update(_double fDeltaTime)
 
 
 
-	//if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
-	//	Set_GettingBigger(!m_bIsGiant);
 
-	//if (g_pGameInstance->Get_DIKeyState(DIK_2)&DIS_Down)
-	//	Add_Dmg_to_Player(1);
+
 
 	//if (g_pGameInstance->Get_DIKeyState(DIK_3)&DIS_Down)
 	//{
@@ -733,10 +730,29 @@ void CPlayer::Set_PlayerDeadAnimStart()
 }
 
 
-void CPlayer::Set_UmbrellaReflected(_bool bBool)
+void CPlayer::Set_UmbrellaReflected(_bool bBool, _float3 vPosition, _float3 vLookDir)
 {
 	m_bUmbrellaReflected = bBool;
 	m_ReflectPassedTime = 0;
+
+	GetSingle(CUtilityMgr)->Start_InstanceParticle(m_eNowSceneNum, vPosition, 3);
+	GetSingle(CUtilityMgr)->Start_InstanceParticle(m_eNowSceneNum, vPosition, 2);
+
+
+	CCircleTornado::CIRCLETORNADODESC tDesc;
+	tDesc.vLook = vLookDir;
+	tDesc.vPosition = vPosition;
+	g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerCircleTornado), &tDesc);
+
+
+	tDesc.vLook = m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK);
+	tDesc.vPosition = ((CUmbrella*)m_vecWeapon[m_iWeaponModelIndex])->Get_ColliderPosition().XMVector() + tDesc.vLook.XMVector() * 0.5f;
+	tDesc.fSize = 1.5f;
+	g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerCircleTornado), &tDesc);
+
+
+	GetSingle(CUtilityMgr)->Start_InstanceParticle(m_eNowSceneNum, tDesc.vPosition, 4);
+	GetSingle(CUtilityMgr)->Start_InstanceParticle(m_eNowSceneNum, tDesc.vPosition, 0);
 
 	m_vecWeapon[m_iWeaponModelIndex]->Set_AttackAble(false);
 	m_pModel->Change_AnimIndex_ReturnTo_Must(Weapon_Umbrella + 4, Weapon_Umbrella + 1, 0, true);
@@ -1583,6 +1599,8 @@ HRESULT CPlayer::Ready_ParticleDesc()
 
 
 
+
+
 	return S_OK;
 }
 
@@ -2131,7 +2149,8 @@ HRESULT CPlayer::Dash_Update(_double fDeltaTime, CGameInstance* pInstance, _floa
 	if (m_fDashPassedTime)
 	{
 		m_fDashPassedTime += _float(fDeltaTime);
-		m_fDashPower = pInstance->Easing_Return(TYPE_ExpoInOut, TYPE_ExpoInOut,0, PlayerMaxDashPower, m_fDashPassedTime, TotalDashTime);
+
+		m_fDashPower = pInstance->Easing_Return(TYPE_Linear, TYPE_Linear, 0, PlayerMaxDashPower, m_fDashPassedTime, TotalDashTime);
 		
 		if (m_fDashPassedTime > TotalDashTime)
 		{

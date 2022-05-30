@@ -22,7 +22,7 @@ public:
 	virtual _int LightRender()override;
 	HRESULT Add_Dmg_to_Player(_uint iNowHP,_int iDmg);
 
-	void Set_DrawClockBombUI();
+	void Set_DrawClockBombUI(_bool bBool);
 
 	void Set_DrawFightUI(_bool bBool);
 protected:

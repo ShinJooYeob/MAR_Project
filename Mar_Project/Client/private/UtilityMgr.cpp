@@ -4,6 +4,9 @@
 #include "MainApp.h"
 #include "Camera_Main.h"
 #include "FadeEffect.h"
+#include "RadialBlur.h"
+#include "RadialBlurUmbrella.h"
+#include "illusion.h"
 
 IMPLEMENT_SINGLETON(CUtilityMgr);
 
@@ -32,6 +35,22 @@ HRESULT CUtilityMgr::Initialize_UtilityMgr(ID3D11Device * pDevice, ID3D11DeviceC
 	m_pFadeEffect = (CFadeEffect*)g_pGameInstance->Get_GameObject_By_LayerLastIndex(SCENEID::SCENE_STATIC, TAG_LAY(Layer_ScreenEffect));
 
 	NULL_CHECK_RETURN(m_pFadeEffect, E_FAIL);
+
+
+
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_illusionEffect), Cillusion::Create(m_pDevice, m_pDeviceContext)));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENEID::SCENE_STATIC, TAG_LAY(Layer_ScreenEffect), TAG_OP(Prototype_illusionEffect)));
+
+
+
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_RadialBlur), CRadialBlur::Create(m_pDevice, m_pDeviceContext)));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENEID::SCENE_STATIC, TAG_LAY(Layer_ScreenEffect), TAG_OP(Prototype_RadialBlur)));
+
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_Prototype(L"RadialUmbrella", CRadialBlurUmbrella::Create(m_pDevice, m_pDeviceContext)));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENEID::SCENE_STATIC, TAG_LAY(Layer_ScreenEffect), L"RadialUmbrella"));
+
+	
+
 
 	FAILED_CHECK(Ready_InstanceParticleDesc());
 
@@ -263,6 +282,7 @@ HRESULT CUtilityMgr::Ready_InstanceParticleDesc()
 
 	INSTPARTICLEDESC tDesc;
 
+	//0
 	tDesc.ColorChangeFrequency = 1;
 	tDesc.vStartColor = _float4(1, 0.64313725f, 0.141176470f, 1);
 	//tDesc.vTargetColor = _float4(0.7333333f, 0.31372549f, 0.f, 0.2f);
@@ -275,7 +295,8 @@ HRESULT CUtilityMgr::Ready_InstanceParticleDesc()
 
 
 
-	
+
+	//1
 	tDesc.ColorChangeFrequency = 4;
 	tDesc.vStartColor = _float4(0, 0.066666f, 0.72156862f, 1);
 	//tDesc.vTargetColor = _float4(0.7333333f, 0.31372549f, 0.f, 0.2f);
@@ -288,6 +309,7 @@ HRESULT CUtilityMgr::Ready_InstanceParticleDesc()
 
 
 
+	//2
 	tDesc.ColorChangeFrequency = 1;
 	tDesc.vStartColor = _float4(1, 0.64313725f, 0.141176470f, 1);
 	tDesc.vTargetColor = _float4(1, 1, 1, 0.2f);
@@ -297,9 +319,23 @@ HRESULT CUtilityMgr::Ready_InstanceParticleDesc()
 	tDesc.vTargetSize = _float3(0.015f);
 	m_vecInstanceParticleDesc.push_back(tDesc);
 
+	//3
 	tDesc.ColorChangeFrequency = 4;
 	tDesc.vStartColor = _float4(0.72156862f, 0.066666f,0 , 1);
 	tDesc.vTargetColor = _float4(1, 1, 1, 0.2f);
+	m_vecInstanceParticleDesc.push_back(tDesc);
+
+
+
+	//4
+	tDesc.ColorChangeFrequency = 4;
+	tDesc.vStartColor = _float4(0.72156862f, 0.066666f,0, 1);
+	//tDesc.vTargetColor = _float4(0.7333333f, 0.31372549f, 0.f, 0.2f);
+	tDesc.vTargetColor = _float4(1, 1, 1, 0.2f);
+
+	tDesc.SizeChangingEndRate = 0.7f;
+	tDesc.vStartSize = _float3(0.01f, 0.2f, 1);
+	tDesc.vTargetSize = _float3(0.01f);
 	m_vecInstanceParticleDesc.push_back(tDesc);
 
 

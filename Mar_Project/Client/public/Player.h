@@ -16,7 +16,7 @@ public:
 	enum eWeaponState
 	{
 		//Weapon_None = 0, Weapon_Knife = 47, Weapon_Grinder = 73, Weapon_Horse = 89, Weapon_Teapot = 113, Weapon_Umbrella = 134, Weapon_Giant= 140, Weapon_End
-		Weapon_None = 0, Weapon_Knife =88888888, Weapon_Grinder = 54665, Weapon_Horse = 47, Weapon_Teapot = 546645, Weapon_Umbrella = 5465167, Weapon_Giant= 1161565, Weapon_End
+		Weapon_None = 0, Weapon_Knife =88888888, Weapon_Grinder = 54665, Weapon_Horse = 72735, Weapon_Teapot = 546645, Weapon_Umbrella = 47, Weapon_Giant= 1161565, Weapon_End
 	};
 
 
@@ -77,10 +77,12 @@ public:
 	void Set_IsVenting(_bool bBool,_float3 vTargetLook);
 	void Set_PlayerDeadAnimStart();
 
-	void Set_UmbrellaReflected(_bool bBool);
+	void Set_UmbrellaReflected(_bool bBool,_float3 vPosition,_float3 vLookDir);
 
 	HRESULT Update_EattingProtein(_double fDeltatime);
 	_bool	Get_IsGiantAtteck();
+	_float Get_DashPower() { return m_fDashPower; }
+	_float Get_UmbrellaIntro() { return m_fUmbrellaIntro; }
 private:
 	CShader*			m_pShaderCom = nullptr;
 	CRenderer*			m_pRendererCom = nullptr;

@@ -19,6 +19,8 @@ public:
 		WINMODE			eWinMode;
 	}GRAPHICDESC;
 
+
+
 public:
 	CGraphic_Device();
 	virtual ~CGraphic_Device() = default;
@@ -28,6 +30,9 @@ public:
 	HRESULT Clear_BackBuffer_View(_float4 vClearColor);
 	HRESULT Clear_DepthStencil_View();
 	HRESULT Present();
+
+	ID3D11RenderTargetView* Get_BackBufferRTV() { return m_pBackBufferRTV; };
+	ID3D11DepthStencilView* Get_OriginalDSV() { return m_pDepthStencilView; };
 
 private:	
 	/* 메모리 할당. (정점버퍼, 인덱스버퍼, 텍스쳐로드) */

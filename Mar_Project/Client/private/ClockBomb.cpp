@@ -2,6 +2,9 @@
 #include "..\public\ClockBomb.h"
 #include "Terrain.h"
 #include "GamePlayUI.h"
+#include "Monster.h"
+#include "BreakableObj.h"
+#include "CircleTornado.h"
 
 
 
@@ -18,7 +21,8 @@ CClockBomb::CClockBomb(const CClockBomb & rhs)
 
 CClockBomb::CClockBomb(const CClockBomb & rhs, _uint Clone2CloneChecker)
 	: CWeapon(rhs,1),
-	m_bHavetoMaking(true)
+	m_bHavetoMaking(true),
+	m_tParticleDesc(rhs.m_tParticleDesc)
 {
 }
 
@@ -37,6 +41,8 @@ HRESULT CClockBomb::Initialize_Clone(void * pArg)
 	FAILED_CHECK(SetUp_Components());
 
 	m_bHavetoMaking = true;
+
+	FAILED_CHECK(Ready_ParticleDesc());
 	return S_OK;
 }
 
@@ -58,57 +64,48 @@ _int CClockBomb::Update(_double fDeltaTime)
 	if (m_bIsDead) return 0;
 	m_pColliderCom->Update_ConflictPassedTime(fDeltaTime);
 
-
-	m_SpwanPassedTime += fDeltaTime;
-	if (!m_bIsOn && m_SpwanPassedTime < 1.3)
+	if (m_bDeadBomb)
 	{
-		_Matrix Scale = m_pTransformCom->Get_MatrixScale_All();
+		m_DeadPassedTime += fDeltaTime;
+		_float Scale = g_pGameInstance->Easing(TYPE_Linear, 1, 5, (_float)m_DeadPassedTime, 0.2f);
 
-		_Matrix			TransformMatrix = XMLoadFloat4x4(m_tATBMat.pUpdatedNodeMat) * XMLoadFloat4x4(m_tATBMat.pDefaultPivotMat);
-		TransformMatrix.r[0] = XMVector3Normalize(TransformMatrix.r[0]);
-		TransformMatrix.r[1] = XMVector3Normalize(TransformMatrix.r[1]);
-		TransformMatrix.r[2] = XMVector3Normalize(TransformMatrix.r[2]);
+		m_pTransformCom->Scaled_All(_float3(Scale));
 
-
-		m_pTransformCom->Set_Matrix(TransformMatrix* m_tWeaponDesc.pParantTransform->Get_WorldMatrix());
-
-		m_bIsOn = false;
-		m_LevitationTime = 0.3;
-		CGameInstance* pInstance = GetSingle(CGameInstance);
-
-		//m_LevitationTime += fDeltaTime;
-		//_float fGravity = _float((m_LevitationTime) * (m_LevitationTime)* -29.4f);
-
-		//m_pTransformCom->MovetoDir_bySpeed(XMVectorSet(0, 1.f, 0, 0), fGravity, fDeltaTime);
-
-
-		CTerrain* pTerrain = (CTerrain*)(pInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Terrain)));
-
-		_uint eNowTile = Tile_End;
-		_float3 CaculatedPos = pTerrain->PutOnTerrain(&m_bIsOn, m_pTransformCom->Get_MatrixState(CTransform::STATE_POS) + XMVectorSet(0,0.1f,0,0), m_vOldPos.XMVector(), nullptr, &eNowTile);
-
-		if (eNowTile == Tile_None)
+		if (m_DeadPassedTime > 0.2f)
 		{
-			m_bIsOn = true;
-			m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, CaculatedPos.XMVector() - XMVectorSet(0, 0.1f, 0, 0));
+			Set_IsDead();
+			return 0;
 		}
-		else if (m_bIsOn)
-		{
-			m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, CaculatedPos.XMVector() - XMVectorSet(0, 0.1f, 0, 0));
-		}
-	
 
+
+		m_BoneMatrix = XMMatrixInverse(nullptr,XMMatrixTranslation(-1.065f, 0.306f, -1.229f))  *  m_pTransformCom->Get_WorldMatrix() * XMMatrixTranslation(0, 1.f, 0);
+		for (_uint i = 0; i < m_pColliderCom->Get_NumColliderBuffer(); i++)
+			m_pColliderCom->Update_Transform(i, m_BoneMatrix.XMatrix());
 	}
 	else
 	{
-		if (!m_bIsOn)
-		{
 
+		m_SpwanPassedTime += fDeltaTime;
+		if (!m_bIsOn && m_SpwanPassedTime < 1.3)
+		{
+			_Matrix Scale = m_pTransformCom->Get_MatrixScale_All();
+
+			_Matrix			TransformMatrix = XMLoadFloat4x4(m_tATBMat.pUpdatedNodeMat) * XMLoadFloat4x4(m_tATBMat.pDefaultPivotMat);
+			TransformMatrix.r[0] = XMVector3Normalize(TransformMatrix.r[0]);
+			TransformMatrix.r[1] = XMVector3Normalize(TransformMatrix.r[1]);
+			TransformMatrix.r[2] = XMVector3Normalize(TransformMatrix.r[2]);
+
+
+			m_pTransformCom->Set_Matrix(TransformMatrix* m_tWeaponDesc.pParantTransform->Get_WorldMatrix());
+
+			m_bIsOn = false;
+			m_LevitationTime = 0.3;
 			CGameInstance* pInstance = GetSingle(CGameInstance);
 
-			m_LevitationTime += fDeltaTime;
-			_float fGravity = _float((m_LevitationTime) * (m_LevitationTime)* -29.4f);
-			m_pTransformCom->MovetoDir_bySpeed(XMVectorSet(0, 1.f, 0, 0), fGravity, fDeltaTime);
+			//m_LevitationTime += fDeltaTime;
+			//_float fGravity = _float((m_LevitationTime) * (m_LevitationTime)* -29.4f);
+
+			//m_pTransformCom->MovetoDir_bySpeed(XMVectorSet(0, 1.f, 0, 0), fGravity, fDeltaTime);
 
 
 			CTerrain* pTerrain = (CTerrain*)(pInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Terrain)));
@@ -126,49 +123,103 @@ _int CClockBomb::Update(_double fDeltaTime)
 				m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, CaculatedPos.XMVector() - XMVectorSet(0, 0.1f, 0, 0));
 			}
 
+
 		}
 		else
 		{
-			if (m_pModel->Get_NowAnimIndex() == 4)
-				m_pModel->Change_AnimIndex_ReturnTo_Must(5, 0, 0.15, true);
-
-
-			 
-			if (m_ClockPassedTime > 0)
+			if (!m_bIsOn)
 			{
-				m_ClockPassedTime -= fDeltaTime;
+
+				CGameInstance* pInstance = GetSingle(CGameInstance);
+
+				m_LevitationTime += fDeltaTime;
+				_float fGravity = _float((m_LevitationTime) * (m_LevitationTime)* -29.4f);
+				m_pTransformCom->MovetoDir_bySpeed(XMVectorSet(0, 1.f, 0, 0), fGravity, fDeltaTime);
 
 
-				if (m_ClockPassedTime < 2.5)
-					m_pModel->Change_AnimIndex(1, 0.15, true);
+				CTerrain* pTerrain = (CTerrain*)(pInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Terrain)));
 
+				_uint eNowTile = Tile_End;
+				_float3 CaculatedPos = pTerrain->PutOnTerrain(&m_bIsOn, m_pTransformCom->Get_MatrixState(CTransform::STATE_POS) + XMVectorSet(0, 0.1f, 0, 0), m_vOldPos.XMVector(), nullptr, &eNowTile);
 
-				if (m_ClockPassedTime < 0)
+				if (eNowTile == Tile_None)
 				{
-					Set_IsDead();
+					m_bIsOn = true;
+					m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, CaculatedPos.XMVector() - XMVectorSet(0, 0.1f, 0, 0));
+				}
+				else if (m_bIsOn)
+				{
+					m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, CaculatedPos.XMVector() - XMVectorSet(0, 0.1f, 0, 0));
 				}
 
+			}
+			else
+			{
+				if (m_pModel->Get_NowAnimIndex() == 4)
+					m_pModel->Change_AnimIndex_ReturnTo_Must(5, 0, 0.15, true);
+
+
+
+				if (m_ClockPassedTime > 0)
+				{
+					m_ClockPassedTime -= fDeltaTime;
+
+
+					if (m_ClockPassedTime < 2.5)
+						m_pModel->Change_AnimIndex(1, 0.15, true);
+
+
+					if (m_ClockPassedTime < 0)
+					{
+						CUtilityMgr* pUtil = GetSingle(CUtilityMgr);
+
+
+						m_tParticleDesc.FixedTarget = m_pColliderCom->Get_ColliderPosition();
+						pUtil->Create_ParticleObject(m_eNowSceneNum, m_tParticleDesc);
+
+
+						pUtil->Start_InstanceParticle(m_eNowSceneNum, m_tParticleDesc.FixedTarget, 0);
+						pUtil->Start_InstanceParticle(m_eNowSceneNum, m_tParticleDesc.FixedTarget, 0);
+
+
+
+						CCircleTornado::CIRCLETORNADODESC tDesc;
+						tDesc.vLook = _float3(0.00000001f, 1.f, 0);
+						tDesc.vPosition = m_tParticleDesc.FixedTarget;
+						tDesc.fSize = 1.5f;
+						g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerCircleTornado), &tDesc);
+						tDesc.vPosition = m_tParticleDesc.FixedTarget.XMVector() + XMVectorSet(0, 0.15f, 0, 0);
+						tDesc.fSize = 1;
+						g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerCircleTornado), &tDesc);
+
+						m_bDeadBomb = true;
+						m_DeadPassedTime = 0;
+					}
+
+
+				}
 
 			}
 
+
 		}
+
+
+
+
+
+
+		m_BoneMatrix = m_pTransformCom->Get_WorldMatrix();
+		for (_uint i = 0; i < m_pColliderCom->Get_NumColliderBuffer(); i++)
+			m_pColliderCom->Update_Transform(i, m_BoneMatrix.XMatrix());
+
+		FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime));
+		FAILED_CHECK(Adjust_AnimMovedTransform(fDeltaTime));
+
 
 
 	}
 
-
-
-
-
-
-
-
-	m_BoneMatrix = m_pTransformCom->Get_WorldMatrix();
-	for (_uint i = 0; i < m_pColliderCom->Get_NumColliderBuffer(); i++)
-		m_pColliderCom->Update_Transform(i, m_BoneMatrix.XMatrix());
-
-	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime));
-	FAILED_CHECK(Adjust_AnimMovedTransform(fDeltaTime));
 
 	g_pGameInstance->Add_CollisionGroup(CollisionType_PlayerWeapon, this, m_pColliderCom);
 #ifdef _DEBUG
@@ -187,8 +238,11 @@ _int CClockBomb::LateUpdate(_double fDeltaTime)
 	if (m_bIsDead) return 0;
 
 
-	//if (m_bIsOnScreen)	
+	if (!m_bDeadBomb)
+	{
 		FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this));
+	}
+
 	m_vOldPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
 	return _int();
 }
@@ -275,6 +329,185 @@ _int CClockBomb::LightRender()
 
 void CClockBomb::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedObj, CCollider* pConflictedCollider, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType)
 {
+	if (m_SpwanPassedTime > 1.3)
+	{
+		if (!m_bDeadBomb)
+		{
+
+			switch (eConflictedObjCollisionType)
+			{
+
+			case Engine::CollisionType_Monster:
+			{
+				if (lstrcmp(pConflictedObj->Get_NameTag(), TAG_LAY(Layer_Breakable)))
+				{
+					CUtilityMgr* pUtil = GetSingle(CUtilityMgr);
+
+					pConflictedCollider->Set_Conflicted();
+					pUtil->SlowMotionStart();
+					((CMonster*)(pConflictedObj))->Add_Dmg_to_Monster(20);
+
+
+					m_tParticleDesc.FixedTarget = m_pColliderCom->Get_ColliderPosition();
+					pUtil->Create_ParticleObject(m_eNowSceneNum, m_tParticleDesc);
+
+
+					pUtil->Start_InstanceParticle(m_eNowSceneNum, m_tParticleDesc.FixedTarget, 0);
+					pUtil->Start_InstanceParticle(m_eNowSceneNum, m_tParticleDesc.FixedTarget, 0);
+
+
+
+					CCircleTornado::CIRCLETORNADODESC tDesc;
+					tDesc.vLook = _float3(0.00000001f, 1.f, 0);
+
+					tDesc.vPosition = m_tParticleDesc.FixedTarget;
+					tDesc.fSize = 1.5f;
+					g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerCircleTornado), &tDesc);
+					tDesc.vPosition = m_tParticleDesc.FixedTarget.XMVector() + XMVectorSet(0, 0.15f, 0, 0);
+					tDesc.fSize = 1;
+					g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerCircleTornado), &tDesc);
+					m_bDeadBomb = true;
+					m_DeadPassedTime = 0;
+
+				}
+				else
+				{
+
+					CGamePlayUI* pGameObj = (CGamePlayUI*)(g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_UI_GamePlay)));
+					NULL_CHECK_BREAK(pGameObj);
+					pGameObj->Set_DrawClockBombUI(false);
+
+					CUtilityMgr* pUtil = GetSingle(CUtilityMgr);
+
+					pConflictedCollider->Set_Conflicted();
+					pUtil->SlowMotionStart();
+					((CBreakableObj*)(pConflictedObj))->Add_Dmg_To_BreakableObj(20);
+
+
+					m_tParticleDesc.FixedTarget = m_pColliderCom->Get_ColliderPosition();
+					pUtil->Create_ParticleObject(m_eNowSceneNum, m_tParticleDesc);
+
+
+					pUtil->Start_InstanceParticle(m_eNowSceneNum, m_tParticleDesc.FixedTarget, 0);
+					pUtil->Start_InstanceParticle(m_eNowSceneNum, m_tParticleDesc.FixedTarget, 0);
+
+
+
+					CCircleTornado::CIRCLETORNADODESC tDesc;
+					tDesc.vLook = _float3(0.00000001f, 1.f, 0);
+					tDesc.vPosition = m_tParticleDesc.FixedTarget;
+					tDesc.fSize = 1.5f;
+					g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerCircleTornado), &tDesc);
+					tDesc.vPosition = m_tParticleDesc.FixedTarget.XMVector() + XMVectorSet(0, 0.15f, 0, 0);
+					tDesc.fSize = 1;
+					g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerCircleTornado), &tDesc);
+					m_bDeadBomb = true;
+					m_DeadPassedTime = 0;
+
+				}
+
+			}
+			break;
+			case Engine::CollisionType_Terrain:
+				break;
+
+			default:
+				break;
+			}
+
+		}
+		else if(m_DeadPassedTime > 0.15f)
+		{
+			switch (eConflictedObjCollisionType)
+			{
+
+			case Engine::CollisionType_Monster:
+			{
+				if (lstrcmp(pConflictedObj->Get_NameTag(), TAG_LAY(Layer_Breakable)))
+				{
+
+					m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, pConflictedCollider->Get_ColliderPosition(iConflictedObjColliderIndex));
+
+					CUtilityMgr* pUtil = GetSingle(CUtilityMgr);
+
+					pConflictedCollider->Set_Conflicted();
+					pUtil->SlowMotionStart();
+					((CMonster*)(pConflictedObj))->Add_Dmg_to_Monster(20);
+
+
+					m_tParticleDesc.FixedTarget = pConflictedCollider->Get_ColliderPosition(iConflictedObjColliderIndex);
+					pUtil->Create_ParticleObject(m_eNowSceneNum, m_tParticleDesc);
+
+
+					pUtil->Start_InstanceParticle(m_eNowSceneNum, m_tParticleDesc.FixedTarget, 0);
+					pUtil->Start_InstanceParticle(m_eNowSceneNum, m_tParticleDesc.FixedTarget, 0);
+
+
+
+					CCircleTornado::CIRCLETORNADODESC tDesc;
+					tDesc.vLook = _float3(0.00000001f, 1.f, 0);
+
+					tDesc.vPosition = m_tParticleDesc.FixedTarget;
+					tDesc.fSize = 1.5f;
+					g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerCircleTornado), &tDesc);
+					tDesc.vPosition = m_tParticleDesc.FixedTarget.XMVector() + XMVectorSet(0, 0.15f, 0, 0);
+					tDesc.fSize = 1;
+					g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerCircleTornado), &tDesc);
+
+					m_bDeadBomb = true;
+					m_DeadPassedTime = 0;
+
+
+				}
+				else
+				{
+
+					m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, pConflictedCollider->Get_ColliderPosition(iConflictedObjColliderIndex));
+
+					CGamePlayUI* pGameObj = (CGamePlayUI*)(g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_UI_GamePlay)));
+					NULL_CHECK_BREAK(pGameObj);
+					pGameObj->Set_DrawClockBombUI(false);
+
+					CUtilityMgr* pUtil = GetSingle(CUtilityMgr);
+
+					pConflictedCollider->Set_Conflicted();
+					pUtil->SlowMotionStart();
+					((CBreakableObj*)(pConflictedObj))->Add_Dmg_To_BreakableObj(20);
+
+
+					m_tParticleDesc.FixedTarget = pConflictedCollider->Get_ColliderPosition(iConflictedObjColliderIndex);
+					pUtil->Create_ParticleObject(m_eNowSceneNum, m_tParticleDesc);
+
+
+					pUtil->Start_InstanceParticle(m_eNowSceneNum, m_tParticleDesc.FixedTarget, 0);
+					pUtil->Start_InstanceParticle(m_eNowSceneNum, m_tParticleDesc.FixedTarget, 0);
+
+
+
+					CCircleTornado::CIRCLETORNADODESC tDesc;
+					tDesc.vLook = _float3(0.00000001f, 1.f, 0);
+					tDesc.vPosition = m_tParticleDesc.FixedTarget;
+					tDesc.fSize = 1.5f;
+					g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerCircleTornado), &tDesc);
+					tDesc.vPosition = m_tParticleDesc.FixedTarget.XMVector() + XMVectorSet(0, 0.15f, 0, 0);
+					tDesc.fSize = 1;
+					g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerCircleTornado), &tDesc);
+
+					m_bDeadBomb = true;
+					m_DeadPassedTime = 0;
+
+				}
+
+			}
+			break;
+			case Engine::CollisionType_Terrain:
+				break;
+
+			default:
+				break;
+			}
+		}
+	}
 }
 
 
@@ -311,6 +544,62 @@ HRESULT CClockBomb::SetUp_Components()
 	return S_OK;
 }
 
+HRESULT CClockBomb::Ready_ParticleDesc()
+{
+
+	/////////5///////////////////////////////////////////////////////////////
+	m_tParticleDesc = PARTICLEDESC();
+
+	m_tParticleDesc.eParticleTypeID = Particle_Cone;
+
+	m_tParticleDesc.FollowingTarget = nullptr;
+
+	m_tParticleDesc.szTextureProtoTypeTag = TAG_CP(Prototype_Texture_PlayerEffect);
+	m_tParticleDesc.szTextureLayerTag = L"Explosion2";
+	m_tParticleDesc.iSimilarLayerNum = 1;
+
+	m_tParticleDesc.TextureChageFrequency = 1;
+	m_tParticleDesc.vTextureXYNum = _float2(4, 4);
+
+	m_tParticleDesc.TotalParticleTime = 0.1f;
+	m_tParticleDesc.EachParticleLifeTime = 0.34f;
+	m_tParticleDesc.MaxParticleCount = 30;
+
+	m_tParticleDesc.SizeChageFrequency = 1;
+	m_tParticleDesc.ParticleSize = _float3(0.15f, 0.15f, 0.15f);
+	m_tParticleDesc.ParticleSize2 = _float3(5.f, 5.f, 5.f);
+
+	m_tParticleDesc.ColorChageFrequency = 1;
+	m_tParticleDesc.TargetColor = _float4(1.f, 0.643f, 0.141f, 1.f);
+	m_tParticleDesc.TargetColor2 = _float4(1.f, 1.f, 1.f, 0.f);
+
+
+	m_tParticleDesc.Particle_Power = 4;
+	m_tParticleDesc.PowerRandomRange = _float2(0.8f, 1.5f);
+
+	m_tParticleDesc.vUp = _float3(0, 1, 0);
+
+	m_tParticleDesc.MaxBoundaryRadius = 6;
+
+	m_tParticleDesc.m_bIsUI = false;
+	m_tParticleDesc.m_bUIDepth = 0;
+
+	m_tParticleDesc.ParticleStartRandomPosMin = _float3(0.f, 0, 0.f);
+	m_tParticleDesc.ParticleStartRandomPosMax = _float3(0, 0, 0);
+
+	m_tParticleDesc.DepthTestON = true;
+	m_tParticleDesc.AlphaBlendON = true;
+
+	m_tParticleDesc.m_fAlphaTestValue = 0.1f;
+	m_tParticleDesc.m_iPassIndex = 10;
+
+
+
+
+
+	return S_OK;
+}
+
 HRESULT CClockBomb::Adjust_AnimMovedTransform(_double fDeltatime)
 {
 	_uint iNowAnimIndex = m_pModel->Get_NowAnimIndex();
@@ -332,7 +621,7 @@ HRESULT CClockBomb::Adjust_AnimMovedTransform(_double fDeltatime)
 
 				CGamePlayUI* pGameObj = (CGamePlayUI*)(g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_UI_GamePlay)));
 				NULL_CHECK_RETURN(pGameObj, E_FAIL);
-				pGameObj->Set_DrawClockBombUI();
+				pGameObj->Set_DrawClockBombUI(true);
 				
 				m_bHavetoMaking = false;
 			}
@@ -351,7 +640,7 @@ HRESULT CClockBomb::Adjust_AnimMovedTransform(_double fDeltatime)
 
 				CGamePlayUI* pGameObj = (CGamePlayUI*)(g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_UI_GamePlay)));
 				NULL_CHECK_RETURN(pGameObj, E_FAIL);
-				pGameObj->Set_DrawClockBombUI();
+				pGameObj->Set_DrawClockBombUI(true);
 
 				m_bHavetoMaking = false;
 			}

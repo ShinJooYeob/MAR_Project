@@ -12,7 +12,7 @@ class ENGINE_DLL CRenderer final :public CComponent
 public:
 	enum RENDERGROUP 
 	{
-		RENDER_PRIORITY, RENDER_NONBLEND, RENDER_PRIORITYBLEND, RENDER_NONBLEND_NOLIGHT, RENDER_BLEND, RENDER_AFTEROBJ, RENDER_UI, RENDER_END
+		RENDER_PRIORITY, RENDER_NONBLEND, RENDER_PRIORITYBLEND, RENDER_POSTPROCESSING, RENDER_NONBLEND_NOLIGHT, RENDER_BLEND, RENDER_AFTEROBJ, RENDER_UI, RENDER_END
 	};
 
 private:
@@ -46,7 +46,8 @@ private:
 
 private:
 	class CRenderTargetMgr*					m_pRenderTargetMgr = nullptr;
-	class CLightMgr*						m_pLightMgr			 = nullptr;
+	class CLightMgr*						m_pLightMgr = nullptr;
+	class CGraphic_Device*					m_pGraphicDevice= nullptr;
 
 	class CVIBuffer_Rect*					m_pVIBuffer = nullptr;
 	class CShader*							m_pShader = nullptr;
@@ -72,6 +73,7 @@ private:
 	HRESULT Render_Lights();
 	HRESULT Render_DeferredTexture();
 
+	HRESULT Render_PostProcessing();
 
 	HRESULT Render_NonAlpha_NoDeferrd();
 	

@@ -16,6 +16,7 @@ class CUtilityMgr final :public CBase
 		ScreenEffect_FadeOutIn,
 		ScreenEffect_CamShaking,
 		ScreenEffect_HitEffect,
+		ScreenEffect_RadialBlur,
 		ScreenEffect_END
 	};
 

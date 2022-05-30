@@ -148,7 +148,7 @@ VS_OUT_BLUR VS_HorizBlur(VS_IN In)
 	float texelSize = 1.f / fScreemHeight;
 
 
-	Out.texCoord1 = In.vTexUV + float2( 0.0f, texelSize * -4.0f);
+	Out.texCoord1 = In.vTexUV + float2(0.0f, texelSize * -4.0f);
 	Out.texCoord2 = In.vTexUV + float2(0.0f, texelSize * -3.0f);
 	Out.texCoord3 = In.vTexUV + float2(0.0f, texelSize * -2.0f);
 	Out.texCoord4 = In.vTexUV + float2(0.0f, texelSize * -1.0f);
@@ -397,7 +397,7 @@ PS_OUT PS_Blur(PS_IN_BLUR In)
 
 	//weight0 = 	weight1 = 	weight2 =	weight3 = 	weight4 = 0.1f;
 
-	normalization = (weight0 + 3.5f * (weight1 + weight2 + weight3 + weight4));
+	normalization = (weight0 + 2.5f * (weight1 + weight2 + weight3 + weight4));
 
 	// 가중치들을 정규화합니다.
 	weight0 = weight0 / normalization;
@@ -428,6 +428,8 @@ PS_OUT PS_Blur(PS_IN_BLUR In)
 	Out.vColor = color;
 	return Out;
 }
+
+
 
 BlendState	NonBlending
 {
@@ -551,7 +553,6 @@ technique11		DefaultTechnique
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_Blur();
 	}
-
 	pass HorizonBlur// 8
 	{
 		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
@@ -562,4 +563,5 @@ technique11		DefaultTechnique
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_Blur();
 	}
+
 }

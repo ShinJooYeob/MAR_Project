@@ -152,7 +152,7 @@ PS_OUT PS_MAIN_TERRAIN_DIRECTIONAL(PS_IN In)
 		//	+ (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
 
 
-		float  FogShaderRate = 1 - saturate(  max((3.f - In.vWorldPos.y), 0) / 3.f);
+		float  FogShaderRate = 1 - saturate(  max((2.f - In.vWorldPos.y), 0) / 3.f);
 		Out.vDiffuse = vMtrlDiffuse;
 		Out.vDiffuse.a *= FogShaderRate;
 
