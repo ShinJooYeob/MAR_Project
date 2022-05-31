@@ -135,7 +135,7 @@ HRESULT CScene_Loby::Ready_Light()
 
 	LightDesc.eLightType = tagLightDesc::TYPE_DIRECTIONAL;
 	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
-	LightDesc.vAmbient = _float4(0.2f);
+	LightDesc.vAmbient = _float4(1.0f);
 	LightDesc.vSpecular = _float4(1);
 	LightDesc.vVector = _float4(1, -1, 1, 0);
 

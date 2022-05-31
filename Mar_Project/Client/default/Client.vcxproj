@@ -183,6 +183,7 @@
     <ClInclude Include="..\public\illusion.h" />
     <ClInclude Include="..\public\Instance_Particle.h" />
     <ClInclude Include="..\public\Protein.h" />
+    <ClInclude Include="..\public\StageBoss_SpwanBoss.h" />
     <ClInclude Include="..\public\Stage2_SpwanEyePot.h" />
     <ClInclude Include="..\public\Stage3_GientTrigger.h" />
     <ClInclude Include="..\public\ThrowOilBullet.h" />
@@ -284,6 +285,7 @@
     <ClCompile Include="..\private\illusion.cpp" />
     <ClCompile Include="..\private\Instance_Particle.cpp" />
     <ClCompile Include="..\private\Protein.cpp" />
+    <ClCompile Include="..\private\StageBoss_SpwanBoss.cpp" />
     <ClCompile Include="..\private\Stage2_SpwanEyePot.cpp" />
     <ClCompile Include="..\private\Stage3_GientTrigger.cpp" />
     <ClCompile Include="..\private\ThrowOilBullet.cpp" />

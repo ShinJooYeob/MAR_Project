@@ -72,6 +72,8 @@ struct VS_OUT
 	float2		vTexUV : TEXCOORD0;
 	float4		vWorldPos : TEXCOORD1;
 	float4		vProjPos : TEXCOORD2;
+	float4		vTangent : TANGENT;
+	float4		vBinormal : BINORMAL;
 
 };
 
@@ -113,8 +115,9 @@ VS_OUT VS_MAIN_DEFAULT(VS_IN In)
 	Out.vProjPos = Out.vPosition;
 
 
+	Out.vTangent = normalize(mul(vector(In.vTangent, 0.f), g_WorldMatrix));
+	Out.vBinormal = normalize(vector(cross(Out.vNormal.xyz, Out.vTangent.xyz), 0.f));
 
-	Out.vTexUV = In.vTexUV;
 	
 	return Out;
 }
@@ -136,8 +139,11 @@ VS_OUT VS_MAIN_ATTACHBONE(VS_IN In)
 	Out.vNormal = normalize(mul(vector(In.vNormal, 0.f), WorldMatrix));
 	Out.vTexUV = In.vTexUV;
 	Out.vWorldPos = mul(vector(In.vPosition, 1.f), WorldMatrix);
-	Out.vTexUV = In.vTexUV;
+
 	Out.vProjPos = Out.vPosition;
+
+	Out.vTangent = normalize(mul(vector(In.vTangent, 0.f), g_WorldMatrix));
+	Out.vBinormal = normalize(vector(cross(Out.vNormal.xyz, Out.vTangent.xyz), 0.f));
 
 	return Out;
 }
@@ -152,6 +158,8 @@ struct PS_IN
 	float2		vTexUV : TEXCOORD0;
 	float4		vWorldPos : TEXCOORD1;
 	float4		vProjPos : TEXCOORD2;
+	float4		vTangent : TANGENT;
+	float4		vBinormal : BINORMAL;
 };
 
 struct PS_OUT
@@ -159,7 +167,7 @@ struct PS_OUT
 	vector		vDiffuse : SV_TARGET0;
 	vector		vNormal : SV_TARGET1;
 	vector		vDepth : SV_TARGET2;
-	vector		vShadow : SV_TARGET3;
+	vector		vSpecular : SV_TARGET3;
 };
 
 struct PS_OUT_NODEFERRED
@@ -172,20 +180,18 @@ PS_OUT PS_MAIN_DEFAULT(PS_IN In)
 	PS_OUT		Out = (PS_OUT)0;
 
 	vector		vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
-	//float		fShade = saturate(dot(normalize(g_vLightVector) * -1.f, In.vNormal));
+	vector		vNormalDesc = g_NormalTexture.Sample(DefaultSampler, In.vTexUV);
 
-	//float4		vReflect = reflect(normalize(g_vLightVector), In.vNormal);
-	//float4		vLook = normalize(In.vWorldPos - g_CamPosition);
+	float3		vNormal = vNormalDesc.xyz * 2.f - 1.f;
 
-	//float		fSpecular = pow(saturate(dot(normalize(vReflect) * -1.f, vLook)), 30.f);
+	float3x3	WorldMatrix = float3x3(In.vTangent.xyz, In.vBinormal.xyz, In.vNormal.xyz);
 
-	//Out.vColor = (g_vLightDiffuse * vDiffuse) * (fShade + (g_vLightAmbient * g_vMtrlAmbient)) +
-	//	(g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
-
+	vNormal = mul(vNormal, WorldMatrix);
 
 	Out.vDiffuse = vDiffuse;
-	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+	Out.vNormal = vector(vNormal.xyz * 0.5f + 0.5f, 0.f);
 	Out.vDepth = vector(In.vProjPos.w / 300.0f, In.vProjPos.z / In.vProjPos.w, 0.f, 0.f);
+	Out.vSpecular = g_SpecularTexture.Sample(DefaultSampler, In.vTexUV);
 
 	return Out;
 }
@@ -194,13 +200,22 @@ PS_OUT PS_MAIN_ZTESTALLMOST(PS_IN In)
 	PS_OUT		Out = (PS_OUT)0;
 
 	vector		vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
+	vector		vNormalDesc = g_NormalTexture.Sample(DefaultSampler, In.vTexUV);
+
+	float3		vNormal = vNormalDesc.xyz * 2.f - 1.f;
+
+	float3x3	WorldMatrix = float3x3(In.vTangent.xyz, In.vBinormal.xyz, In.vNormal.xyz);
+
+	vNormal = mul(vNormal, WorldMatrix);
+
 
 	if (vDiffuse.a < 1)
 		discard;
 
 	Out.vDiffuse = vDiffuse;
-	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+	Out.vNormal = vector(vNormal.xyz * 0.5f + 0.5f, 0.f);
 	Out.vDepth = vector(In.vProjPos.w / 300.0f, In.vProjPos.z / In.vProjPos.w, 0.f, 0.f);
+	Out.vSpecular = g_SpecularTexture.Sample(DefaultSampler, In.vTexUV);
 
 
 	return Out;
@@ -211,13 +226,19 @@ PS_OUT PS_MAIN_HIDDENPAD(PS_IN In)
 	PS_OUT		Out = (PS_OUT)0;
 
 	vector		vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
+	vector		vNormalDesc = g_NormalTexture.Sample(DefaultSampler, In.vTexUV);
+
+	float3		vNormal = vNormalDesc.xyz * 2.f - 1.f;
+
+	float3x3	WorldMatrix = float3x3(In.vTangent.xyz, In.vBinormal.xyz, In.vNormal.xyz);
 
 	if ((vDiffuse.r + vDiffuse.g + vDiffuse.b) / 3 > g_fVisualValue)
 		discard;
 
 	Out.vDiffuse = vDiffuse;
-	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+	Out.vNormal = vector(vNormal.xyz * 0.5f + 0.5f, 0.f);
 	Out.vDepth = vector(In.vProjPos.w / 300.0f, In.vProjPos.z / In.vProjPos.w, 0.f, 0.f);
+	Out.vSpecular = g_SpecularTexture.Sample(DefaultSampler, In.vTexUV);
 
 	return Out;
 }
@@ -244,7 +265,7 @@ PS_OUT_NODEFERRED PS_MAIN_SKYBOX(PS_IN In)
 	PS_OUT_NODEFERRED		Out = (PS_OUT_NODEFERRED)0;
 
 	Out.vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
-
+	Out.vDiffuse.a = 1;
 
 	return Out;
 }

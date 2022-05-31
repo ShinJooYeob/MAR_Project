@@ -40,7 +40,7 @@ HRESULT CHandyBoy::Initialize_Clone(void * pArg)
 	m_pTransformCom->LookAt(TargetAt);
 	__super::SetUp_WanderLook(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK));
 
-	m_PoleGrabPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+	m_PoleGrabPos = _float3(76, 10, 63);
 	m_PoleGrabLook = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_LOOK);
 
 	return S_OK;
@@ -379,9 +379,10 @@ void CHandyBoy::Add_Dmg_to_Monster(_float iDmgAmount)
 	m_DmgPassedTime = MonsterDmgTime;
 	m_fDmgAmount += iDmgAmount;
 	m_fHP -= iDmgAmount;
-
+#ifdef _DEBUG
 	wstring ttDebugLog = L"HadyBoy HP: " + to_wstring(m_fHP) + L"\n";;
 	OutputDebugStringW(ttDebugLog.c_str());
+#endif // _DEBUG
 }
 
 void CHandyBoy::Make_Hand_PoleGrab()
@@ -410,7 +411,7 @@ void CHandyBoy::Enter_Hand()
 	m_bIsPatternFinished = true;
 	m_fHP = m_fMaxHP;
 
-	m_pModel->Change_AnimIndex_ReturnTo_Must(27, 0, 0, true);
+	m_pModel->Change_AnimIndex_ReturnTo_Must(27, 0, 0.15, true);
 }
 
 HRESULT CHandyBoy::SetUp_Components()
@@ -772,6 +773,39 @@ HRESULT CHandyBoy::Adjust_MovedTransform_byAnim(_double fDeltatime)
 		}
 			break;
 
+		case 26:
+		{
+			static _float3 TargetPos = _float3(71, 10, 60);
+
+			if (PlayRate > 0.000001)
+			{
+				CGameInstance* pInstance = g_pGameInstance;
+
+				_float3 EasedPos = pInstance->Easing_Vector(TYPE_Linear, m_PoleGrabPos, TargetPos, (_float)PlayRate, 1.f);
+
+				m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, EasedPos);
+
+			}
+
+		}
+		break;
+		case 27:
+		{
+
+			if (PlayRate < 0.01)
+			{
+				m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, _float3(0, 0, 0));
+				m_iAdjMovedIndex++;
+			}
+			else 
+			{
+				m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, _float3(71, 10, 60));
+				m_iAdjMovedIndex++;
+
+			}
+
+		}
+		break;
 
 		default:
 			break;

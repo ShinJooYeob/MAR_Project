@@ -4,6 +4,7 @@
 #include "Player.h"
 #include "StaticMapObject.h"
 #include "Camera_Main.h"
+#include "StageBoss_SpwanBoss.h"
 
 
 
@@ -37,17 +38,13 @@ HRESULT CScene_Boss::Initialize()
 	FAILED_CHECK(Ready_Layer_StaticMapObj(TAG_LAY(Layer_StaticMapObj)));
 
 
-	FAILED_CHECK(Ready_Layer_DollMaker(TAG_LAY(Layer_Monster)));
-	//FAILED_CHECK(Ready_Layer_HandyBoy(TAG_LAY(Layer_Monster)));
-	//FAILED_CHECK(Ready_Layer_HandyGirl(TAG_LAY(Layer_Monster)));
+	//FAILED_CHECK(Ready_Layer_DollMaker(TAG_LAY(Layer_Monster)));
+
+
+	FAILED_CHECK(Ready_Layer_TriggerCollider(TAG_LAY(Layer_TriggerCollider)));
 	
 
-		
-			
-			
-		
-
-	//GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeIn, 0.5, { 0,0,0,1 });
+	
 
 	return S_OK;
 }
@@ -329,6 +326,18 @@ HRESULT CScene_Boss::Ready_Layer_HandyBoy(const _tchar * pLayerTag)
 HRESULT CScene_Boss::Ready_Layer_HandyGirl(const _tchar * pLayerTag)
 {
 	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_BOSS, pLayerTag, TAG_OP(Prototype_HandyGirl), &_float3(67, 10, 78)));
+	return S_OK;
+}
+
+HRESULT CScene_Boss::Ready_Layer_TriggerCollider(const _tchar * pLayerTag)
+{
+	CStageBoss_SpwanBoss::SPWANTRIGGERDESC tSwpanDesc;
+
+	tSwpanDesc.vPosition = _float3(56.251f, 16.300f, 62.691f);
+
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_BOSS, pLayerTag, L"StageBoss_SpwanBoss", &tSwpanDesc));
+
+
 	return S_OK;
 }
 

@@ -215,13 +215,14 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
 {
 	PS_OUT_LIGHT	Out = (PS_OUT_LIGHT)0;
 
-	vector		vNormalDesc = g_NormalTexture.Sample(DefaultSampler, In.vTexUV);
-	vector		vDepthDesc = g_DepthTexture.Sample(DefaultSampler, In.vTexUV);
+	vector		vNormalDesc		= g_NormalTexture.Sample(DefaultSampler, In.vTexUV);
+	vector		vDepthDesc			= g_DepthTexture.Sample(DefaultSampler, In.vTexUV);
+	vector		vMtrlSpecularMap	= g_SpecularTexture.Sample(DefaultSampler, In.vTexUV);
 	float		fViewZ = vDepthDesc.x * 300.f;
 
 	vector		vNormal = vector(vNormalDesc.xyz * 2.f - 1.f, 0.f);
 
-	Out.vShade = g_vLightDiffuse * saturate(dot(normalize(g_vLightDir) * -1.f, vNormal)) + (g_vLightAmbient * g_vMtrlAmbient);
+	Out.vShade = g_vLightDiffuse * saturate(dot(normalize(g_vLightDir) * -1.f, vNormal)) + (g_vLightAmbient * saturate(vMtrlSpecularMap.b + 0.2f));
 	//Out.vShade = 0.5f;
 
 	Out.vShade.a = 1.f;
@@ -248,8 +249,8 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
 	vWorldPos = mul(vWorldPos, g_ViewMatrixInv);
 
 	vector		vLook = vWorldPos - g_vCamPosition;
-
-	Out.vSpecular = (g_vLightSpecular * g_vMtrlSpecular) * pow(saturate(dot(normalize(vReflect) * -1.f, normalize(vLook))), 30.f);
+	
+	Out.vSpecular = (g_vLightSpecular * vMtrlSpecularMap.r) * pow(saturate(dot(normalize(vReflect) * -1.f, normalize(vLook))), vMtrlSpecularMap.g * 30);
 	Out.vSpecular.a = 0.f;
 
 
@@ -261,6 +262,7 @@ PS_OUT_LIGHT PS_MAIN_POINT(PS_IN In)
 
 	vector		vNormalDesc = g_NormalTexture.Sample(DefaultSampler, In.vTexUV);
 	vector		vDepthDesc = g_DepthTexture.Sample(DefaultSampler, In.vTexUV);
+	vector		vMtrlSpecularMap = g_SpecularTexture.Sample(DefaultSampler, In.vTexUV);
 	float		fViewZ = vDepthDesc.x * 300.f;
 
 	vector		vNormal = vector(vNormalDesc.xyz * 2.f - 1.f, 0.f);
@@ -283,7 +285,7 @@ PS_OUT_LIGHT PS_MAIN_POINT(PS_IN In)
 
 	float		fAtt = max(g_fLightRange - fDistance, 0.f) / g_fLightRange;
 
-	Out.vShade = (g_vLightDiffuse * saturate(dot(normalize(vLightDir) * -1.f, vNormal)) + (g_vLightAmbient * g_vMtrlAmbient)) * fAtt;
+	Out.vShade = (g_vLightDiffuse * saturate(dot(normalize(vLightDir) * -1.f, vNormal)) + (g_vLightAmbient *  saturate(vMtrlSpecularMap.b + 0.2f))) * fAtt;
 	//Out.vShade = 0.5f;
 
 	Out.vShade.a = 1.f;
@@ -293,7 +295,7 @@ PS_OUT_LIGHT PS_MAIN_POINT(PS_IN In)
 
 	vector		vLook = vWorldPos - g_vCamPosition;
 
-	Out.vSpecular = (g_vLightSpecular * g_vMtrlSpecular) * pow(saturate(dot(normalize(vReflect) * -1.f, normalize(vLook))), 30.f) * fAtt;
+	Out.vSpecular = (g_vLightSpecular * vMtrlSpecularMap.r) * pow(saturate(dot(normalize(vReflect) * -1.f, normalize(vLook))), vMtrlSpecularMap.g * 30) * fAtt;
 	Out.vSpecular.a = 0.f;
 
 	return Out;
@@ -306,20 +308,25 @@ PS_OUT_AfterDeferred PS_MAIN_BLEND(PS_IN In)
 	vector		vShadeDesc = g_ShadeTexture.Sample(DefaultSampler, In.vTexUV);
 	vector		vSpecularDesc = g_SpecularTexture.Sample(DefaultSampler, In.vTexUV);
 	vector		vShadowMapDesc = g_ShadowMapTexture.Sample(DefaultSampler, In.vTexUV);
+	vector		vDepthDesc = g_DepthTexture.Sample(DefaultSampler, In.vTexUV);
 
 	
 	//vector		vDepthDesc = g_DepthTexture.Sample(DefaultSampler, In.vTexUV);
 	//float		fViewZ = vDepthDesc.x * 300.f;
 
+
 	Out.vColor = vDiffuseDesc * vShadeDesc + vSpecularDesc;
+
 
 
 
 	if (Out.vColor.a == 0.0f)
 		discard;
 
-	Out.vColor *= (1 - vShadowMapDesc);
-	
+	if (vDepthDesc.g > 0)
+	{
+		Out.vColor *= (1 - vShadowMapDesc);
+	}
 
 	Out.vColor2 = Out.vColor;
 	return Out;

@@ -429,12 +429,12 @@ HRESULT CDollMaker::SetUp_Weapon()
 
 
 	CMonsterWeapon* pWeapon = nullptr;
-	FAILED_CHECK(pInstance->Add_GameObject_Out_of_Manager((CGameObject**)&pWeapon, m_eNowSceneNum, TAG_OP(Prototype_HandyBoy), &_float3(76, 10, 63)));
+	FAILED_CHECK(pInstance->Add_GameObject_Out_of_Manager((CGameObject**)&pWeapon, m_eNowSceneNum, TAG_OP(Prototype_HandyBoy), &_float3(71, 10, 60)));
 	NULL_CHECK_RETURN(pWeapon, E_FAIL);
 	m_vecWeapon.push_back(pWeapon);
 
 	pWeapon = nullptr;
-	FAILED_CHECK(pInstance->Add_GameObject_Out_of_Manager((CGameObject**)&pWeapon, m_eNowSceneNum, TAG_OP(Prototype_HandyGirl), &_float3(67, 10, 78)));
+	FAILED_CHECK(pInstance->Add_GameObject_Out_of_Manager((CGameObject**)&pWeapon, m_eNowSceneNum, TAG_OP(Prototype_HandyGirl), &_float3(63, 10, 75)));
 	NULL_CHECK_RETURN(pWeapon, E_FAIL);
 	m_vecWeapon.push_back(pWeapon);
 

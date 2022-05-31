@@ -108,11 +108,6 @@ _int CVentObj::LateUpdate(_double fDeltaTime)
 
 
 
-#ifdef _DEBUG
-
-	if (m_bIsOnScreen)
-		FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this));
-#endif // _DEBUG
 	m_vOldPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
 
 	return _int();

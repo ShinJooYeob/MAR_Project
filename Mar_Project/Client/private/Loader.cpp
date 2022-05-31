@@ -52,6 +52,7 @@
 #include "Stage2_SpwanEyePot.h"
 #include "Stage3_SpwanExecutor.h"
 #include "Stage3_GientTrigger.h"
+#include "StageBoss_SpwanBoss.h"
 
 #include "StaticMapObject.h"
 
@@ -225,7 +226,7 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 
 
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Player),
-		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Alice", "Alice.FBX", TransformMatrix, 3)));
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Alice", "Alice.FBX", TransformMatrix, 1)));
 
 	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Tornado1),
@@ -346,21 +347,21 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 	TransformMatrix = XMMatrixScaling(0.0001f, 0.0001f, 0.0001f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////Grunt
-	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_Grunt),
-		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Grunt", "Grunt.FBX", TransformMatrix)));
-	
-	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_GruntSwpanMesh),
-		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Grunt", "GruntSpwanMesh.FBX", TransformMatrix)));
-	
-	
-	
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////WaspInk
-	TransformMatrix = XMMatrixScaling(0.0003f, 0.0003f, 0.0003f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
-	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_WaspInk),
-		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "WaspInk", "WaspInk.FBX", TransformMatrix)));
-	TransformMatrix = XMMatrixScaling(0.0001f, 0.0001f, 0.0001f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
-	
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////SpwanMesh
+	//FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_Grunt),
+	//	CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Grunt", "Grunt.FBX", TransformMatrix)));
+	//
+	//FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_GruntSwpanMesh),
+	//	CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Grunt", "GruntSpwanMesh.FBX", TransformMatrix)));
+	//
+	//
+	//
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////WaspInk
+	//TransformMatrix = XMMatrixScaling(0.0003f, 0.0003f, 0.0003f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
+	//FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_WaspInk),
+	//	CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "WaspInk", "WaspInk.FBX", TransformMatrix)));
+	//TransformMatrix = XMMatrixScaling(0.0001f, 0.0001f, 0.0001f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
+	//
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////SpwanMesh
 	TransformMatrix = XMMatrixScaling(0.0001f, 0.0001f, 0.0001f);
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, L"Grunt_StaticSwpanMesh",
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "Grunt", "GruntSpwanMesh2.FBX", TransformMatrix)));
@@ -1142,8 +1143,10 @@ HRESULT CLoader::Load_Scene_Boss(_bool * _IsClientQuit, CRITICAL_SECTION * _CriS
 	TransformMatrix = XMMatrixScaling(0.05f, 0.05f, 0.05f);
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_BOSS, TAG_CP(Prototype_QueenTower_BrokenC),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "QueenTower", "QueenTower_BrokenC.FBX", TransformMatrix)));
-	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
 
+	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_BOSS, TAG_CP(Prototype_Mesh_HatterPillarsG),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "Chapter2", "HatterPillarsG.FBX", TransformMatrix)));
 
 	TransformMatrix = XMMatrixScaling(0.0005f, 0.0005f, 0.0005f) * XMMatrixRotationY(XMConvertToRadians(90.0f));
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_BOSS, TAG_CP(Prototype_Mesh_SkyBox),
@@ -1177,6 +1180,10 @@ HRESULT CLoader::Load_Scene_Boss(_bool * _IsClientQuit, CRITICAL_SECTION * _CriS
 		CHandyBoy::Create(m_pDevice, m_pDeviceContext)));
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_HandyGirl),
 		CHandyGirl::Create(m_pDevice, m_pDeviceContext)));
+
+
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(L"StageBoss_SpwanBoss",
+		CStageBoss_SpwanBoss::Create(m_pDevice, m_pDeviceContext)));
 
 
 

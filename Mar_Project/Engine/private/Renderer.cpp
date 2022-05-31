@@ -44,8 +44,11 @@ HRESULT CRenderer::Initialize_Prototype(void * pArg)
 	FAILED_CHECK(m_pRenderTargetMgr->Add_RenderTarget(TEXT("Target_Normal"), (_uint)Viewport.Width, (_uint)Viewport.Height, DXGI_FORMAT_R16G16B16A16_UNORM, _float4(0.f, 0.f, 0.f, 1.f)));
 
 	/* For.Target_Depth */
-	FAILED_CHECK(m_pRenderTargetMgr->Add_RenderTarget(TEXT("Target_Depth"), (_uint)Viewport.Width, (_uint)Viewport.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 1.f)));
+	FAILED_CHECK(m_pRenderTargetMgr->Add_RenderTarget(TEXT("Target_Depth"), (_uint)Viewport.Width, (_uint)Viewport.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(1.f, 0.f, 0.f, 1.f)));
 
+	/* For.Target_Specular */
+	FAILED_CHECK(m_pRenderTargetMgr->Add_RenderTarget(TEXT("Target_MtrlSpecularMap"), (_uint)Viewport.Width, (_uint)Viewport.Height, DXGI_FORMAT_B8G8R8A8_UNORM, _float4(0.f, 0.f, 1.f, 0.f)));
+	
 	/* For.Target_Shade */
 	FAILED_CHECK(m_pRenderTargetMgr->Add_RenderTarget(TEXT("Target_Shade"), (_uint)Viewport.Width, (_uint)Viewport.Height, DXGI_FORMAT_B8G8R8A8_UNORM, _float4(0.f, 0.f, 0.f, 1.f)));
 
@@ -70,7 +73,8 @@ HRESULT CRenderer::Initialize_Prototype(void * pArg)
 	FAILED_CHECK(m_pRenderTargetMgr->Add_MRT(TEXT("MRT_Deferred"), TEXT("Target_Diffuse")));
 	FAILED_CHECK(m_pRenderTargetMgr->Add_MRT(TEXT("MRT_Deferred"), TEXT("Target_Normal")));
 	FAILED_CHECK(m_pRenderTargetMgr->Add_MRT(TEXT("MRT_Deferred"), TEXT("Target_Depth")));
-
+	FAILED_CHECK(m_pRenderTargetMgr->Add_MRT(TEXT("MRT_Deferred"), TEXT("Target_MtrlSpecularMap")));
+	
 
 	/* For.MRT_LightAcc : 빛을 그릴때 바인드 */
 	FAILED_CHECK(m_pRenderTargetMgr->Add_MRT(TEXT("MRT_LightAcc"), TEXT("Target_Shade")));
@@ -106,17 +110,16 @@ HRESULT CRenderer::Initialize_Prototype(void * pArg)
 
 #ifdef _DEBUG
 
-	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_Diffuse"), 75.f, 75.f, 150.f, 150.f));
-	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_Normal"), 75.f, 225.f, 150.f, 150.f));
-	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_Depth"), 75.f, 375.f, 150.f, 150.f));
+	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_Diffuse"), 50, 50, 100, 100));
+	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_Normal"), 50, 150, 100, 100));
+	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_Depth"), 50, 250, 100, 100));
+	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_MtrlSpecularMap"), 50, 350, 100, 100));
 
-	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_Shade"), 225.f, 75.f, 150.f, 150.f));
-	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_Specular"), 225.f, 225.f, 150.f, 150.f));
+	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_Shade"), 150, 50, 100, 100));
+	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_Specular"), 150, 150, 100, 100));
 
-	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_UpScaledBluredShadow"), 75.f, 625.f, 150.f, 150.f));
-	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_SubVeiwPortA"), 225.f, 625.f, 150.f, 150.f));
-	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_SubVeiwPortB"), 375.f, 625.f, 150.f, 150.f));
-	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_AfterDefferred"), 525.f, 625.f, 150.f, 150.f));
+	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_UpScaledBluredShadow"), 50, 680, 100, 100));
+	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_AfterDefferred"), 150, 680, 100, 100));
 
 #endif
 
@@ -266,8 +269,6 @@ HRESULT CRenderer::Render_RenderGroup()
 		FAILED_CHECK(m_pRenderTargetMgr->Render_DebugBuffer(TEXT("MRT_Deferred")));
 		FAILED_CHECK(m_pRenderTargetMgr->Render_DebugBuffer(TEXT("MRT_LightAcc")));
 		FAILED_CHECK(m_pRenderTargetMgr->Render_DebugBuffer(TEXT("MRT_ShadowUpScaling")));
-		FAILED_CHECK(m_pRenderTargetMgr->Render_DebugBuffer(TEXT("MRT_SubVeiwPortA")));
-		FAILED_CHECK(m_pRenderTargetMgr->Render_DebugBuffer(TEXT("MRT_SubVeiwPortB")));
 		FAILED_CHECK(m_pRenderTargetMgr->Render_DebugBuffer(TEXT("MRT_AfterPostProcessing")));
 
 		
@@ -549,6 +550,7 @@ HRESULT CRenderer::Render_DeferredTexture()
 	FAILED_CHECK(m_pShader->Set_Texture("g_DiffuseTexture", m_pRenderTargetMgr->Get_SRV(TEXT("Target_Diffuse"))));
 	FAILED_CHECK(m_pShader->Set_Texture("g_ShadeTexture", m_pRenderTargetMgr->Get_SRV(TEXT("Target_Shade"))));
 	FAILED_CHECK(m_pShader->Set_Texture("g_SpecularTexture", m_pRenderTargetMgr->Get_SRV(TEXT("Target_Specular"))));
+	FAILED_CHECK(m_pShader->Set_Texture("g_DepthTexture", m_pRenderTargetMgr->Get_SRV(TEXT("Target_Depth"))));
 
 	FAILED_CHECK(m_pShader->Set_Texture("g_ShadowMapTexture", m_pRenderTargetMgr->Get_SRV(TEXT("Target_UpScaledBluredShadow"))));
 

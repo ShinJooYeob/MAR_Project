@@ -307,6 +307,9 @@
     <Filter Include="01.GameObject\97.Effect\ScreenEffect\Blur">
       <UniqueIdentifier>{0b76adc6-ece2-45cc-aaa4-ec97434171f8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.GameObject\09.TriggerCollider\06.StageBoss_SpwanBoss">
+      <UniqueIdentifier>{c3075686-d754-49d6-a452-8ec9209a894a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -633,6 +636,9 @@
     <ClInclude Include="..\public\CircleTornado.h">
       <Filter>01.GameObject\00.Player\EffectMesh</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\StageBoss_SpwanBoss.h">
+      <Filter>01.GameObject\09.TriggerCollider\06.StageBoss_SpwanBoss</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -934,6 +940,9 @@
     </ClCompile>
     <ClCompile Include="..\private\CircleTornado.cpp">
       <Filter>01.GameObject\00.Player\EffectMesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\StageBoss_SpwanBoss.cpp">
+      <Filter>01.GameObject\09.TriggerCollider\06.StageBoss_SpwanBoss</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

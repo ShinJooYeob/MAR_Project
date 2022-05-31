@@ -109,8 +109,9 @@ struct PS_OUT
 {
 	vector		vDiffuse : SV_TARGET0;
 	vector		vNormal : SV_TARGET1;
-	vector		vDepth : SV_TARGET2;
-	vector		vShadow : SV_TARGET3;
+	vector		vDepth : SV_TARGET2;	
+	vector		vSpecular : SV_TARGET3;
+
 };
 
 
@@ -140,22 +141,13 @@ PS_OUT PS_MAIN_TERRAIN_DIRECTIONAL(PS_IN In)
 
 
 
-		//float	fShade = max(dot(normalize(g_vLightVector) * -1.f, In.vWorldNormal), 0.f);
-
-		//vector	vReflect = reflect(normalize(g_vLightVector), In.vWorldNormal);
-		//vector	vLook = normalize(In.vWorldPos - g_CamPosition);
-
-		//float	fSpecular = pow(max(dot(normalize(vReflect) * -1.f, vLook), 0.f), 30.f);
-
-
-		//Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient))
-		//	+ (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
-
-
 		float  FogShaderRate = 1 - saturate(  max((2.f - In.vWorldPos.y), 0) / 3.f);
 		Out.vDiffuse = vMtrlDiffuse;
-		Out.vDiffuse.a *= FogShaderRate;
 
+
+		Out.vSpecular = vector((Out.vDiffuse.r + Out.vDiffuse.g + Out.vDiffuse.b) * 0.34f, 0.5f, 0.4f,1);
+		
+		Out.vDiffuse.a *= FogShaderRate;
 		Out.vNormal = vector(In.vWorldNormal.xyz * 0.5f + 0.5f, 0.f);
 		Out.vDepth = vector(In.vProjPos.w / 300.0f, In.vProjPos.z / In.vProjPos.w, 0.f, 0.f);
 
@@ -199,6 +191,7 @@ PS_OUT PS_MAIN_TERRAIN_POINT(PS_IN In)
 
 		Out.vNormal = vector(In.vWorldNormal.xyz * 0.5f + 0.5f, 0.f);
 		Out.vDepth = vector(In.vProjPos.w / 300.0f, In.vProjPos.z / In.vProjPos.w, 0.f, 0.f);
+		Out.vSpecular = 1;
 	}
 
 	return Out;
@@ -253,6 +246,7 @@ PS_OUT PS_MAIN_TERRAIN_WIRE(PS_IN In)
 		/* 1 - > 1*/
 		Out.vNormal = vector(In.vWorldNormal.xyz * 0.5f + 0.5f, 0.f);
 		Out.vDepth = vector(In.vProjPos.w / 300.0f, In.vProjPos.z / In.vProjPos.w, 0.f, 0.f);
+		Out.vSpecular = 1;
 
 	}
 
@@ -313,6 +307,7 @@ PS_OUT PS_MAIN_TERRAIN_EDIT(PS_IN In)
 
 		Out.vNormal = vector(In.vWorldNormal.xyz * 0.5f + 0.5f, 0.f);
 		Out.vDepth = vector(In.vProjPos.w / 300.0f, In.vProjPos.z / In.vProjPos.w, 0.f, 0.f);
+		Out.vSpecular = 1;
 	}
 	return Out;
 }
