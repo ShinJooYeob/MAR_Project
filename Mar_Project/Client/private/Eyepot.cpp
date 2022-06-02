@@ -87,8 +87,6 @@ _int CEyepot::Update(_double fDeltaTime)
 		Add_Dmg_to_Monster(1);
 
 
-
-
 	_uint AnimIndex = m_pModel->Get_NowAnimIndex();
 
 	if (m_bDeathAnimStart)
@@ -166,9 +164,22 @@ _int CEyepot::Update(_double fDeltaTime)
 	if (m_bIsOnScreen)
 	{
 
-		for (_uint i = 0; i < m_pColliderCom->Get_NumColliderBuffer(); i++)
+		for (_uint i = 0; i < 3; i++)
 			m_pColliderCom->Update_Transform(i, m_pTransformCom->Get_WorldMatrix());
 
+		for (_uint i = 0; i < 2; i++)
+		{
+			_Matrix			TransformMatrix = XMLoadFloat4x4(m_ArrCollisionAttach[i].pUpdatedNodeMat) * XMLoadFloat4x4(m_ArrCollisionAttach[i].pDefaultPivotMat);
+
+			TransformMatrix.r[0] = XMVector3Normalize(TransformMatrix.r[0]);
+			TransformMatrix.r[1] = XMVector3Normalize(TransformMatrix.r[1]);
+			TransformMatrix.r[2] = XMVector3Normalize(TransformMatrix.r[2]);
+
+
+			TransformMatrix = TransformMatrix* m_pTransformCom->Get_WorldMatrix();
+			m_pColliderCom->Update_Transform(i+ 3, TransformMatrix);
+
+		}
 
 	}
 	if (!m_bIsPatternFinished && (m_ePattern == 0 || m_ePattern == 2))
@@ -660,6 +671,32 @@ HRESULT CEyepot::SetUp_Components()
 	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
 	ColliderDesc.vPosition = _float4(0.000000f, 1.065000f, 0.f, 1);
 	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_OBB, &ColliderDesc));
+	m_pColliderCom->Set_ParantBuffer();
+
+
+
+	/*
+
+Pivot  : -3.559997f , 0.000000f , -4.330004f , 1
+size  : 1.000000f , 1.000000f , 1.000000f
+	*/
+	ColliderDesc.vScale = _float3(1.f, 1.f, 1.f);
+	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
+	ColliderDesc.vPosition = _float4(-3.559997f, 0.000000f, -4.330004f, 1);
+	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
+	m_ArrCollisionAttach[0] = m_pModel->Find_AttachMatrix_InHirarchyNode("Bone_Gob03");
+	NULL_CHECK_RETURN(m_ArrCollisionAttach[0].pDefaultPivotMat, E_FAIL);
+	m_pColliderCom->Set_ParantBuffer();
+
+	//Pivot  : 0.000000f , 0.000000f , -5.580033f , 1
+	//size  : 1.000000f , 1.000000f , 1.000000f  
+
+	ColliderDesc.vScale = _float3(1.f, 1.f, 1.f);
+	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
+	ColliderDesc.vPosition = _float4(0.000000f, 0.000000f, -5.580033f, 1);
+	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
+	m_ArrCollisionAttach[1] = m_pModel->Find_AttachMatrix_InHirarchyNode("Pot");
+	NULL_CHECK_RETURN(m_ArrCollisionAttach[1].pDefaultPivotMat, E_FAIL);
 	m_pColliderCom->Set_ParantBuffer();
 
 

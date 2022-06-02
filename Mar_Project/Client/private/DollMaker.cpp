@@ -256,7 +256,6 @@ _int CDollMaker::Update_Pattern(_double fDeltaTime)
 	if (m_bIsPatternFinished)
 	{
 		m_ePattern += 1;
-		m_ePattern = 1;
 		if (m_ePattern > 1) m_ePattern = 0;
 		m_bIsPatternFinished = false;
 		m_PatternPassedTime = 0;

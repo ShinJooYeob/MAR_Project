@@ -51,6 +51,7 @@ private:
 	_bool				m_bDeathAnimStart = false;
 	_bool				m_bStartSprout = false;
 
+	ATTACHBONEMATRIX_PTR  m_ArrCollisionAttach[2];
 private:
 	HRESULT SetUp_Components();
 	HRESULT FarPatternWander(_double fDeltaTime);
