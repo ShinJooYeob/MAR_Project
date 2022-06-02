@@ -68,6 +68,10 @@ enum OBJECTPROTOTYPEID
 	Prototype_ExplosiveParticle,
 	Prototype_Thron,
 	Prototype_DustWind,
+	Prototype_ScrechedBlock,
+	Prototype_ScrechedDust,
+	Prototype_HyperVoice,
+	Prototype_HandyGirlBullet,
 
 
 	Prototype_Bow,
@@ -124,6 +128,19 @@ static const _tchar* Tag_Object_Prototype(OBJECTPROTOTYPEID eTag)
 	switch (eTag)
 	{
 		
+		
+	case Prototype_HandyGirlBullet:
+		return TEXT("Prototype_HandyGirlBullet");
+		break;
+	case Prototype_HyperVoice:
+		return TEXT("Prototype_HyperVoice");
+		break;
+	case Prototype_ScrechedDust:
+		return TEXT("Prototype_ScrechedDust");
+		break;
+	case Prototype_ScrechedBlock:
+		return TEXT("Prototype_ScrechedBlock");
+		break;
 	case Prototype_illusionEffect:
 		return TEXT("Prototype_illusionEffect");
 		break;
@@ -449,6 +466,8 @@ enum LAYERID
 
 	Layer_Monster,
 	Layer_MonsterBullet,
+	Layer_MonsterBullet1,
+	Layer_MonsterBullet2,
 	Layer_Particle,
 
 	Layer_Terrain,
@@ -534,6 +553,12 @@ static const _tchar* Tag_Layer(LAYERID eTag)
 
 	case Layer_MonsterBullet:
 		return TEXT("Layer_MonsterBullet");
+		break;
+	case Layer_MonsterBullet1:
+		return TEXT("Layer_MonsterBullet1");
+		break;
+	case Layer_MonsterBullet2:
+		return TEXT("Layer_MonsterBullet2");
 		break;
 
 
@@ -806,7 +831,8 @@ enum COMPONENTPROTOTYPEID
 		Prototype_Mesh_ProteinTable,
 		Prototype_Mesh_ProteinTableCover,
 		
-		
+		Prototype_Mesh_BallMesh,
+
 		
 
 
@@ -1419,6 +1445,11 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 		return TEXT("Prototype_Mesh_ProteinTableCover");
 		break;
 
+	case Prototype_Mesh_BallMesh:
+		return TEXT("Prototype_Mesh_BallMesh");
+		break;
+
+		
 		
 
 	case Prototype_Mesh_Player:

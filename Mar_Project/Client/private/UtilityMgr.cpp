@@ -6,6 +6,7 @@
 #include "FadeEffect.h"
 #include "RadialBlur.h"
 #include "RadialBlurUmbrella.h"
+#include "RadialBlurMonster.h"
 #include "illusion.h"
 
 IMPLEMENT_SINGLETON(CUtilityMgr);
@@ -49,7 +50,13 @@ HRESULT CUtilityMgr::Initialize_UtilityMgr(ID3D11Device * pDevice, ID3D11DeviceC
 	FAILED_CHECK(g_pGameInstance->Add_GameObject_Prototype(L"RadialUmbrella", CRadialBlurUmbrella::Create(m_pDevice, m_pDeviceContext)));
 	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENEID::SCENE_STATIC, TAG_LAY(Layer_ScreenEffect), L"RadialUmbrella"));
 
-	
+
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_Prototype(L"RadialBlurMonster", CRadialBlurMonster::Create(m_pDevice, m_pDeviceContext)));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENEID::SCENE_STATIC, TAG_LAY(Layer_ScreenEffect), L"RadialBlurMonster"));
+	m_pMonsterRadial = (CRadialBlurMonster*)g_pGameInstance->Get_GameObject_By_LayerLastIndex(SCENEID::SCENE_STATIC, TAG_LAY(Layer_ScreenEffect));
+
+	NULL_CHECK_RETURN(m_pMonsterRadial, E_FAIL);
+
 
 
 	FAILED_CHECK(Ready_InstanceParticleDesc());
@@ -253,6 +260,24 @@ HRESULT CUtilityMgr::Start_InstanceParticle(_uint eNowSceneNum, _float3 vPositio
 }
 
 
+
+HRESULT CUtilityMgr::Set_MonsterBlurPos(_float3 vPos)
+{
+	NULL_CHECK_RETURN(m_pMonsterRadial, E_FAIL);
+
+	m_pMonsterRadial->Set_TargetPos(vPos);
+	
+	return S_OK;
+}
+
+HRESULT CUtilityMgr::Set_MonsterBlurOn(_bool bBool)
+{
+	NULL_CHECK_RETURN(m_pMonsterRadial, E_FAIL);
+
+
+	m_pMonsterRadial->Set_IsOn(bBool);
+	return S_OK;
+}
 
 HRESULT CUtilityMgr::Clear_RenderGroup_forSceneChange()
 {

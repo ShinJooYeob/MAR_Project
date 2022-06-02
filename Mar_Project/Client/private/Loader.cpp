@@ -65,6 +65,11 @@
 #include "BreakedGazebo.h"
 #include "ExecutorThron.h"
 #include "DustWindCurvedMove.h"
+#include "ScrechedBlock.h"
+#include "ScrechedDust.h"
+#include "TransparencyBall.h"
+#include "HyperVoice.h"
+#include "HandyGirlBullet.h"
 
 #include "Grunt.h"
 #include "ChainExplosion.h"
@@ -218,6 +223,7 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
 
+
 #pragma region PROTOTYPE_COMPONENT
 	//Anim 모델 프로토타입
 	_Matrix			TransformMatrix;
@@ -252,8 +258,6 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 	TransformMatrix = XMMatrixScaling(0.0001f, 0.0001f, 0.0001f);
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Protein),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "Protein", "Protein.FBX", TransformMatrix)));
-
-
 
 	//Pivot  :-0.61f, -0.01, -1.32f
 	////////////////*무기*/
@@ -1154,6 +1158,26 @@ HRESULT CLoader::Load_Scene_Boss(_bool * _IsClientQuit, CRITICAL_SECTION * _CriS
 
 
 
+	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_BOSS, TAG_CP(Prototype_QBattleTowerParticleA),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "QBattleTower", "QBattleTowerParticleA.FBX", TransformMatrix)));
+	TransformMatrix = XMMatrixScaling(0.03f, 0.03f, 0.03f);
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_BOSS, TAG_CP(Prototype_QBattleTowerParticleB),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "QBattleTower", "QBattleTowerParticleB.FBX", TransformMatrix)));
+
+
+	//TransparencyBall
+
+	TransformMatrix = XMMatrixScaling(0.0003f, 0.0003f, 0.0003f);
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_BOSS, TAG_CP(Prototype_Mesh_BallMesh),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "BallMesh", "BallMesh.FBX", TransformMatrix)));
+
+	TransformMatrix = XMMatrixScaling(0.0001f, 0.0001f, 0.0001f);
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_BOSS, L"HandyGirlBulletMesh",
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "Grunt", "GruntSpwanMesh2.FBX", TransformMatrix)));
+
+
+
 	//////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////
@@ -1180,6 +1204,25 @@ HRESULT CLoader::Load_Scene_Boss(_bool * _IsClientQuit, CRITICAL_SECTION * _CriS
 		CHandyBoy::Create(m_pDevice, m_pDeviceContext)));
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_HandyGirl),
 		CHandyGirl::Create(m_pDevice, m_pDeviceContext)));
+
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_BreakedGazbo),
+		CBreakedGazebo::Create(m_pDevice, m_pDeviceContext)));
+
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_ScrechedBlock),
+		CScrechedBlock::Create(m_pDevice, m_pDeviceContext)));
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_ScrechedDust),
+		CScrechedDust::Create(m_pDevice, m_pDeviceContext)));
+
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_HyperVoice),
+		CHyperVoice::Create(m_pDevice, m_pDeviceContext)));
+
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_HandyGirlBullet),
+		CHandyGirlBullet::Create(m_pDevice, m_pDeviceContext)));
+
+	
+
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(L"TransparencyBall",
+		CTransparencyBall::Create(m_pDevice, m_pDeviceContext)));
 
 
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(L"StageBoss_SpwanBoss",
@@ -1598,6 +1641,11 @@ HRESULT CLoader::Load_Scene_Edit(_bool * _IsClientQuit, CRITICAL_SECTION * _CriS
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "Protein", "Table.FBX", TransformMatrix)));
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_ProteinTableCover),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "Protein", "Cover.FBX", TransformMatrix)));
+
+
+	TransformMatrix = XMMatrixScaling(0.0003f, 0.0003f, 0.0003f);
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_BallMesh),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "BallMesh", "BallMesh.FBX", TransformMatrix)));
 	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
 
 	

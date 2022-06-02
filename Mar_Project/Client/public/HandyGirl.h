@@ -27,6 +27,10 @@ public:
 	virtual _int Update_Pattern(_double fDeltaTime)override;
 	virtual void Add_Dmg_to_Monster(_float iDmgAmount)override;
 
+	_double	Get_PlayRate() { return m_pModel->Get_PlayRate(); };
+	_uint Get_NowModelAnimIndex() { return m_pModel->Get_NowAnimIndex(); };
+	_float3 Get_ColliderPosition(_uint iIndex) { return m_pColliderCom->Get_ColliderPosition(iIndex); };
+
 	virtual HRESULT Object_Function(void* pArg = nullptr) { return (m_pModel->Get_NowAnimIndex() == 35) ? S_FALSE: S_OK; };
 
 
@@ -47,7 +51,7 @@ private:
 	_uint				m_iOldAnimIndex = INT_MAX;
 	_uint				m_iAdjMovedIndex = 0;
 
-	ATTACHBONEMATRIX_PTR m_ArrCollisionAttach[8];
+	ATTACHBONEMATRIX_PTR m_ArrCollisionAttach[9];
 
 
 	_bool				m_bIsGrabed = false;
@@ -57,8 +61,10 @@ private:
 
 	_bool				m_bIsDealTime = false;
 
+	vector<PARTICLEDESC>		m_vecParticleDesc;
 private:
 	HRESULT SetUp_Components();
+	HRESULT Ready_ParticleDesc();
 	HRESULT Adjust_MovedTransform_byAnim(_double fDeltatime);
 	HRESULT Update_WanderAround_PatterDelay(_double fDeltatime, _float RandRange = 1.f, _float TurningMixRate = 0.15f);
 

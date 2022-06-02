@@ -38,6 +38,8 @@ private:
 	CModel*				m_pModel = nullptr;
 	CTransform*			m_pTransformCom = nullptr;
 	CCollider*			m_pColliderCom = nullptr;
+	CSwordTrail*		m_pSwordTrail	= nullptr;
+	CSwordTrail*		m_pSubSwordTrail = nullptr;
 
 	_bool				m_bIsDmgAnimUpdated[3];
 
@@ -52,8 +54,12 @@ private:
 	_float3				m_PoleGrabLook;
 
 	_bool				m_bIsDealTime = false;
+
+	vector<PARTICLEDESC>		m_vecParticleDesc;
+
 private:
 	HRESULT SetUp_Components();
+	HRESULT Ready_ParticleDesc();
 	HRESULT Adjust_MovedTransform_byAnim(_double fDeltatime);
 	HRESULT Update_WanderAround_PatterDelay(_double fDeltatime,_float RandRange = 1.f,_float TurningMixRate = 0.15f);
 

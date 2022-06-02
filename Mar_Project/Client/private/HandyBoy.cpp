@@ -1,6 +1,10 @@
 #include "stdafx.h"
 #include "..\public\HandyBoy.h"
 #include "Terrain.h"
+#include "BreakedGazebo.h"
+#include "CircleTornado.h"
+#include "DustWind.h"
+#include "ScrechedBlock.h"
 
 
 
@@ -43,6 +47,7 @@ HRESULT CHandyBoy::Initialize_Clone(void * pArg)
 	m_PoleGrabPos = _float3(76, 10, 63);
 	m_PoleGrabLook = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_LOOK);
 
+	FAILED_CHECK(Ready_ParticleDesc());
 	return S_OK;
 }
 
@@ -106,7 +111,8 @@ _int CHandyBoy::Update(_double fDeltaTime)
 
 			if (m_PatternDelayTime < 0)
 			{
-				m_bIsDealTime = (rand() % 3)?false:true;
+				m_bIsDealTime = (rand() % 4)?false:true;
+				//m_bIsDealTime = false;
 
 				if (m_bIsDealTime)
 				{
@@ -190,6 +196,8 @@ _int CHandyBoy::LateUpdate(_double fDeltaTime)
 	if (m_bIsOnScreen)
 		FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this));
 
+	FAILED_CHECK(m_pRendererCom->Add_TrailGroup(m_pSwordTrail));
+	FAILED_CHECK(m_pRendererCom->Add_TrailGroup(m_pSubSwordTrail));
 
 	m_vOldPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
 	return _int();
@@ -392,6 +400,22 @@ void CHandyBoy::Make_Hand_PoleGrab()
 	m_PatternPassedTime = 0;
 	m_bIsDealTime = true;
 
+	m_pSwordTrail->Set_TrailTurnOn(false, m_pColliderCom->Get_ColliderPosition(3), m_pColliderCom->Get_ColliderPosition(6));
+	m_pSubSwordTrail->Set_TrailTurnOn(false, m_pColliderCom->Get_ColliderPosition(0), m_pColliderCom->Get_ColliderPosition(4));
+
+
+	list<CGameObject*>* pBulletList = g_pGameInstance->Get_ObjectList_from_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet1));
+	
+	if (pBulletList != nullptr)
+	{
+
+		for (auto& pObj : *pBulletList)
+		{
+			((CScrechedBlock*)(pObj))->Set_Spout();
+		}
+
+	}
+
 	m_pModel->Change_AnimIndex_UntilNReturn_Must(24, 25,25, 0.15, true);
 }
 
@@ -433,6 +457,16 @@ HRESULT CHandyBoy::SetUp_Components()
 	FAILED_CHECK(Add_Component(m_eNowSceneNum, TAG_CP(Prototype_Mesh_HandyBoy), TAG_COM(Com_Model), (CComponent**)&m_pModel));
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Collider), TAG_COM(Com_Collider), (CComponent**)&m_pColliderCom));
+
+
+	CSwordTrail::TRAILDESC tTrailDsec;
+	tTrailDsec.iPassIndex = 2;
+	tTrailDsec.iTextureIndex = 2;
+	tTrailDsec.NoiseSpeed = 10;
+	tTrailDsec.vColor = _float4(0, 0.84705882f, 1, 1.f);
+
+	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Trail), TAG_COM(Com_SwordTrail), (CComponent**)&m_pSwordTrail, &tTrailDsec));
+	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Trail), TAG_COM(Com_SubSwordTrail), (CComponent**)&m_pSubSwordTrail, &tTrailDsec));
 	
 	COLLIDERDESC			ColliderDesc;
 	/* For.Com_AABB */
@@ -532,6 +566,70 @@ HRESULT CHandyBoy::SetUp_Components()
 	return S_OK;
 }
 
+HRESULT CHandyBoy::Ready_ParticleDesc()
+{
+
+	m_vecParticleDesc.clear();
+	m_vecParticleDesc.reserve(5);
+
+	//GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[0]);
+
+	/////////0//////////////////
+	PARTICLEDESC tDesc;
+
+	tDesc.eParticleTypeID = Particle_Spread;
+
+	tDesc.FollowingTarget = nullptr;
+
+	tDesc.szTextureProtoTypeTag = TAG_CP(Prototype_Texture_PlayerEffect);
+	tDesc.szTextureLayerTag = L"Dust4";
+	tDesc.iSimilarLayerNum = 1;
+
+	tDesc.TextureChageFrequency = 1;
+	tDesc.vTextureXYNum = _float2(5, 4);
+
+	tDesc.TotalParticleTime = 0.1f;
+	tDesc.EachParticleLifeTime = 0.34f;
+	tDesc.MaxParticleCount = 30;
+
+	tDesc.SizeChageFrequency = 1;
+	tDesc.ParticleSize = _float3(5.f);
+	tDesc.ParticleSize2 = _float3(2.f);
+
+	tDesc.ColorChageFrequency = 1;
+
+	tDesc.TargetColor = _float4(0.25f, 0.25f, 0.25f, 1.f);
+	tDesc.TargetColor2 = _float4(0, 0, 0, 0.f);
+	//tDesc.TargetColor = _float4(1.f, 0.643f, 0.141f, 1.f);
+	//tDesc.TargetColor2 = _float4(1.f, 0.643f, 0.141f, 0.f);
+
+
+	tDesc.Particle_Power = 30;
+	tDesc.PowerRandomRange = _float2(0.8f, 1.2f);
+
+	tDesc.vUp = _float3(0, 1, 0);
+
+	tDesc.MaxBoundaryRadius = 10;
+
+	tDesc.m_bIsUI = false;
+	tDesc.m_bUIDepth = 0;
+
+	tDesc.ParticleStartRandomPosMin = _float3(0, 0.3f, 0);
+	tDesc.ParticleStartRandomPosMax = _float3(0, 0.3f, 0);
+
+	tDesc.DepthTestON = true;
+	tDesc.AlphaBlendON = true;
+
+	tDesc.m_fAlphaTestValue = 0.1f;
+	tDesc.m_iPassIndex = 10;
+
+	m_vecParticleDesc.push_back(tDesc);
+
+
+
+	return S_OK;
+}
+
 HRESULT CHandyBoy::Adjust_MovedTransform_byAnim(_double fDeltatime)
 {
 	_uint iNowAnimIndex = m_pModel->Get_NowAnimIndex();
@@ -539,29 +637,6 @@ HRESULT CHandyBoy::Adjust_MovedTransform_byAnim(_double fDeltatime)
 
 	if (iNowAnimIndex != m_iOldAnimIndex || PlayRate > 0.95)
 		m_iAdjMovedIndex = 0;
-
-	//static float Power = 7.2f;
-	//if (g_pGameInstance->Get_DIKeyState(DIK_UP)& DIS_Down)
-	//{
-	//	Power += 0.2f;
-	//	string ttszLog = "//Power  : " + to_string(Power) + "\n";
-
-	//	wstring ttDebugLog;
-	//	ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-
-	//	OutputDebugStringW(ttDebugLog.c_str());
-
-	//}
-	//else if (g_pGameInstance->Get_DIKeyState(DIK_DOWN)& DIS_Down)
-	//{
-	//	Power -= 0.2f;
-	//	string ttszLog = "//Power  : " + to_string(Power) + "\n";
-
-	//	wstring ttDebugLog;
-	//	ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-
-	//	OutputDebugStringW(ttDebugLog.c_str());
-	//}
 
 
 	if (PlayRate <= 0.95)
@@ -577,7 +652,91 @@ HRESULT CHandyBoy::Adjust_MovedTransform_byAnim(_double fDeltatime)
 			}
 
 			break;
+
+		case 4:
+		{
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.01)
+			{
+				m_pSwordTrail->Set_TrailTurnOn(true, m_pColliderCom->Get_ColliderPosition(3), m_pColliderCom->Get_ColliderPosition(6));
+				m_pSubSwordTrail->Set_TrailTurnOn(true, m_pColliderCom->Get_ColliderPosition(0), m_pColliderCom->Get_ColliderPosition(4));
+				m_iAdjMovedIndex++;
+			}
+
+			_Vector ColDir = XMVector3Normalize(m_pColliderCom->Get_ColliderPosition(3).XMVector() - m_pColliderCom->Get_ColliderPosition(6).XMVector());
+			//_Vector Right = XMVector3Normalize(XMVector3Cross(XMVectorSet(0, 1, 0, 0), ColDir)) * 0.5f;
+
+
+			//m_pSwordTrail->Update_SwordTrail(m_pColliderCom->Get_ColliderPosition(1).XMVector() - ColDir,
+			//	m_pColliderCom->Get_ColliderPosition(3).XMVector() + ColDir, fDeltatime);
+			//m_pSubSwordTrail->Update_SwordTrail(m_pColliderCom->Get_ColliderPosition(3).XMVector() - Right,
+			//	m_pColliderCom->Get_ColliderPosition(3).XMVector() + Right, fDeltatime);
+
+
+			m_pSwordTrail->Update_SwordTrail(m_pColliderCom->Get_ColliderPosition(3).XMVector() + ColDir,
+				m_pColliderCom->Get_ColliderPosition(6).XMVector() - ColDir, fDeltatime);
+			m_pSubSwordTrail->Update_SwordTrail(m_pColliderCom->Get_ColliderPosition(0).XMVector(),
+				m_pColliderCom->Get_ColliderPosition(4).XMVector(), fDeltatime);
+
+		}
+			break;
+
+		case 5:
+		{
+			_Vector ColDir = XMVector3Normalize(m_pColliderCom->Get_ColliderPosition(3).XMVector() - m_pColliderCom->Get_ColliderPosition(6).XMVector());
+
+			m_pSwordTrail->Update_SwordTrail(m_pColliderCom->Get_ColliderPosition(3).XMVector() + ColDir,
+				m_pColliderCom->Get_ColliderPosition(6).XMVector() - ColDir, fDeltatime);
+			m_pSubSwordTrail->Update_SwordTrail(m_pColliderCom->Get_ColliderPosition(0).XMVector() ,
+				m_pColliderCom->Get_ColliderPosition(4).XMVector() , fDeltatime);
+
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.15625)
+			{
+				CDustWind::DUSTWINDDESC tDesc;
+
+				tDesc.vPosition = (m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
+				tDesc.ToTalLifeTime = 0.75f;
+				tDesc.StartScale = _float3(2, 5, 2);
+				tDesc.TargetScale = _float3(8, 1.f, 8);
+				tDesc.eEasingType = TYPE_ExpoIn;
+				tDesc.vColor = _float4(0, 0, 0, 1.f);
+
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_DustWind), &(tDesc));
+
+
+				m_iAdjMovedIndex++;
+			}
+			else if (m_iAdjMovedIndex == 1 && PlayRate > 0.21875)
+			{
+				CDustWind::DUSTWINDDESC tDesc;
+
+				tDesc.vPosition = (m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));			
+				tDesc.ToTalLifeTime = 0.75f;
+				tDesc.StartScale = _float3(2, 5, 2);
+				tDesc.TargetScale = _float3(8, 1.f, 8);
+				tDesc.eEasingType = TYPE_ExpoIn;
+				tDesc.vColor = _float4(0, 0, 0, 1.f);
+
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_DustWind), &(tDesc));
+				m_iAdjMovedIndex++;
+			}
+			else if (m_iAdjMovedIndex == 2 && PlayRate > 0.28125)
+			{
+				CDustWind::DUSTWINDDESC tDesc;
+
+				tDesc.vPosition = (m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
+				tDesc.ToTalLifeTime = 0.75f;
+				tDesc.StartScale = _float3(2, 5, 2);
+				tDesc.TargetScale = _float3(8, 1.f, 8);
+				tDesc.eEasingType = TYPE_ExpoIn;
+				tDesc.vColor = _float4(0, 0, 0, 1.f);
+
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_DustWind), &(tDesc));
+				m_iAdjMovedIndex++;
+			}
+		}
+			break;
 		case 6:
+
 
 			_Vector RandFloat = GetSingle(CUtilityMgr)->RandomFloat3(-0.3f, 0.3f).XMVector();
 			XMVectorSetY(RandFloat, 0);
@@ -591,6 +750,8 @@ HRESULT CHandyBoy::Adjust_MovedTransform_byAnim(_double fDeltatime)
 			break;
 
 		case 7:
+
+
 			if (PlayRate > 0.01 && PlayRate < 0.90)
 			{
 				if (m_bIsGrabed)
@@ -615,10 +776,17 @@ HRESULT CHandyBoy::Adjust_MovedTransform_byAnim(_double fDeltatime)
 			}
 			break;
 
-		case 8:
 		case 9:
 		{
+			if (PlayRate > 0.01)
+			{
 
+				GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.1f, _float4(0.5f));
+			}
+
+		}
+		case 8:
+		{ 
 			_Matrix			TransformMatrix = XMLoadFloat4x4(m_ArrCollisionAttach[7].pUpdatedNodeMat) * XMLoadFloat4x4(m_ArrCollisionAttach[7].pDefaultPivotMat);
 			TransformMatrix.r[0] = XMVector3Normalize(TransformMatrix.r[0]);
 			TransformMatrix.r[1] = XMVector3Normalize(TransformMatrix.r[1]);
@@ -647,6 +815,9 @@ HRESULT CHandyBoy::Adjust_MovedTransform_byAnim(_double fDeltatime)
 				{
 					if (m_bIsGrabed)
 					{
+
+						GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.25f, _float4(2.5f));
+
 						m_bIsGrabed = false;
 						m_pPlayer->Set_IsAttached(false);
 					}
@@ -679,6 +850,30 @@ HRESULT CHandyBoy::Adjust_MovedTransform_byAnim(_double fDeltatime)
 
 	
 		case 12:
+		{
+
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.01)
+			{
+				m_pSwordTrail->Set_TrailTurnOn(true, m_pColliderCom->Get_ColliderPosition(3), m_pColliderCom->Get_ColliderPosition(6));
+				m_pSubSwordTrail->Set_TrailTurnOn(true, m_pColliderCom->Get_ColliderPosition(0), m_pColliderCom->Get_ColliderPosition(4));
+				m_iAdjMovedIndex++;
+			}
+
+			_Vector ColDir = m_pColliderCom->Get_ColliderPosition(0).XMVector() - m_pColliderCom->Get_ColliderPosition(1).XMVector();
+			_Vector SubDir = XMVector3Normalize(m_pTransformCom->Get_MatrixState(CTransform::STATE_RIGHT));
+
+
+			m_pSwordTrail->Update_SwordTrail(m_pColliderCom->Get_ColliderPosition(0).XMVector() + ColDir,
+				m_pColliderCom->Get_ColliderPosition(0).XMVector() + ColDir - (SubDir * 2.f), fDeltatime);
+
+			m_pSubSwordTrail->Update_SwordTrail(m_pColliderCom->Get_ColliderPosition(0).XMVector() + ColDir - (SubDir * 1.f) 
+				- XMVector3Normalize(m_pTransformCom->Get_MatrixState(CTransform::STATE_UP)),
+				m_pColliderCom->Get_ColliderPosition(0).XMVector() + ColDir - (SubDir * 1.f)  
+				+ XMVector3Normalize(m_pTransformCom->Get_MatrixState(CTransform::STATE_UP)), fDeltatime);
+			//m_pSwordTrail->Update_SwordTrail(m_pColliderCom->Get_ColliderPosition(2).XMVector() + SubDir * 3,
+			//	m_pColliderCom->Get_ColliderPosition(2).XMVector() - SubDir * 3, fDeltatime);
+
+
 			if (PlayRate > 0.01 && PlayRate < 0.875)
 			{
 
@@ -695,17 +890,86 @@ HRESULT CHandyBoy::Adjust_MovedTransform_byAnim(_double fDeltatime)
 					m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, CaculatedPos);
 
 			}
+			if (m_iAdjMovedIndex == 1 && PlayRate > 0.875)
+			{
+
+				GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.3f, _float4(0.8f));
+
+				m_vecParticleDesc[0].FixedTarget = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+
+				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[0]);
+				
+				CGameInstance* pInstance = g_pGameInstance;
+				CBreakedGazebo::BREAKEDGAZBODESC tDesc;
+				tDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+
+				for (_uint i = 0; i < 20; i++)
+				{
+					tDesc.MeshKinds = rand() % 2 + Prototype_QBattleTowerParticleA;
+					pInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_BreakedGazbo), &tDesc);
+				}
+
+
+				CCircleTornado::CIRCLETORNADODESC tTornadoDesc;
+				tTornadoDesc.vLook = _float3(0.00000001f, 1.f, 0);
+				tTornadoDesc.vPosition = m_vecParticleDesc[0].FixedTarget;
+				tTornadoDesc.fSize = 5.0f;
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerCircleTornado), &tTornadoDesc);
+				tTornadoDesc.vPosition = m_vecParticleDesc[0].FixedTarget.XMVector() + XMVectorSet(0, 0.5f, 0, 0);
+				tTornadoDesc.fSize = 3.0f;
+				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerCircleTornado), &tTornadoDesc);
+
+				
+				m_iAdjMovedIndex++;
+			}
+		}
 			break;
 
 		case 14:
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.01)
+			{
+
+				_Vector ColDir = m_pColliderCom->Get_ColliderPosition(0).XMVector() - m_pColliderCom->Get_ColliderPosition(1).XMVector();
+				_Vector SubDir = XMVector3Normalize(m_pTransformCom->Get_MatrixState(CTransform::STATE_RIGHT));
+
+
+				m_pSwordTrail->Update_SwordTrail(m_pColliderCom->Get_ColliderPosition(0).XMVector() + ColDir * 1.3f,
+					m_pColliderCom->Get_ColliderPosition(0).XMVector() + ColDir* 1.3f - (SubDir * 2.f), fDeltatime);
+
+
+				m_pSwordTrail->Set_TrailTurnOn(true, m_pColliderCom->Get_ColliderPosition(0).XMVector() + ColDir * 1.3f,
+					m_pColliderCom->Get_ColliderPosition(0).XMVector() + ColDir* 1.3f - (SubDir * 2.f));
+				m_pSubSwordTrail->Set_TrailTurnOn(true, m_pColliderCom->Get_ColliderPosition(0).XMVector() + ColDir* 1.3f - (SubDir * 1.f)
+					- XMVector3Normalize(m_pTransformCom->Get_MatrixState(CTransform::STATE_UP)),
+					m_pColliderCom->Get_ColliderPosition(0).XMVector() + ColDir* 1.3f - (SubDir * 1.f)
+					+ XMVector3Normalize(m_pTransformCom->Get_MatrixState(CTransform::STATE_UP)));
+				m_iAdjMovedIndex++;
+			}
 		case 15:
+		{
+
+			_Vector ColDir = m_pColliderCom->Get_ColliderPosition(0).XMVector() - m_pColliderCom->Get_ColliderPosition(1).XMVector();
+			_Vector SubDir = XMVector3Normalize(m_pTransformCom->Get_MatrixState(CTransform::STATE_RIGHT));
+
+
+			m_pSwordTrail->Update_SwordTrail(m_pColliderCom->Get_ColliderPosition(0).XMVector() + ColDir * 1.3f,
+				m_pColliderCom->Get_ColliderPosition(0).XMVector() + ColDir* 1.3f - (SubDir * 2.f), fDeltatime);
+
+			m_pSubSwordTrail->Update_SwordTrail(m_pColliderCom->Get_ColliderPosition(0).XMVector() + ColDir* 1.3f - (SubDir * 1.f)
+				- XMVector3Normalize(m_pTransformCom->Get_MatrixState(CTransform::STATE_UP)),
+				m_pColliderCom->Get_ColliderPosition(0).XMVector() + ColDir* 1.3f - (SubDir * 1.f)
+				+ XMVector3Normalize(m_pTransformCom->Get_MatrixState(CTransform::STATE_UP)), fDeltatime);
+
 			if (PlayRate > 0.01 && PlayRate < 0.95)
 			{
 				m_pTransformCom->Set_MoveSpeed(20.5f);
 				FAILED_CHECK(Update_WanderAround_PatterDelay(fDeltatime, 1.f, 0.15f));
 			}
+		}
 			break;
 		case 16:
+			m_pSwordTrail->Set_TrailTurnOn(false, m_pColliderCom->Get_ColliderPosition(3), m_pColliderCom->Get_ColliderPosition(6));
+			m_pSubSwordTrail->Set_TrailTurnOn(false, m_pColliderCom->Get_ColliderPosition(0), m_pColliderCom->Get_ColliderPosition(4));
 			m_pTransformCom->Set_MoveSpeed(3.5f);
 			break;
 
@@ -726,9 +990,16 @@ HRESULT CHandyBoy::Adjust_MovedTransform_byAnim(_double fDeltatime)
 			break;
 
 		case 18:
-			if (PlayRate > 0.01)
-			{
+		{
+			static _double ScrechedBlockTimer = 0;
 
+			if (PlayRate < 0.01)
+			{
+				ScrechedBlockTimer = 0;
+			}
+			else
+			{
+				ScrechedBlockTimer += fDeltatime;
 
 				m_pTransformCom->MovetoDir_bySpeed(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), -7.f, fDeltatime);
 
@@ -741,9 +1012,86 @@ HRESULT CHandyBoy::Adjust_MovedTransform_byAnim(_double fDeltatime)
 				if (eNowTile == Tile_None || bIsOn)
 					m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, CaculatedPos);
 
+				if(ScrechedBlockTimer > 0.1)
+				{
+
+					GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.05f, _float4(0.3f));
+
+					CGameInstance* pInstance = g_pGameInstance;
+
+					CScrechedBlock::BREAKEDGAZBODESC tDesc;
+				
+					for (_uint i = 0 ; i< 4; i++)
+					{
+						tDesc.MeshKinds = rand() % 2 + Prototype_QBattleTowerParticleA;
+						tDesc.vPosition = m_pColliderCom->Get_ColliderPosition(3 + i).XMVector() - XMVectorSet(0,GetSingle(CUtilityMgr)->RandomFloat(1.0f,1.3f),0,0);
+						tDesc.MoveDir = XMVector3Normalize(XMVectorSetY(tDesc.vPosition.XMVector(), 0) - XMVectorSetY(m_pColliderCom->Get_ColliderPosition(0).XMVector(), 0) );
+
+
+						pInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet1), TAG_OP(Prototype_ScrechedBlock), &tDesc);
+
+					}
+
+
+					CCircleTornado::CIRCLETORNADODESC tTornadoDesc;
+					tTornadoDesc.vLook = _float3(0.00000001f, 1.f, 0);
+					tTornadoDesc.vPosition = m_pColliderCom->Get_ColliderPosition(4).XMVector() + XMVectorSet(0, -0.7f, 0, 0);
+					tTornadoDesc.fSize = 1.0f;
+					g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerCircleTornado), &tTornadoDesc);
+					tTornadoDesc.vPosition = tTornadoDesc.vPosition.XMVector() + XMVectorSet(0, 0.1f, 0, 0);
+					tTornadoDesc.fSize = 0.5f;
+					g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerCircleTornado), &tTornadoDesc);
+
+
+					ScrechedBlockTimer = 0;
+				}
 			}
+		}
 			break;
 
+
+
+		case 19:
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.01)
+			{
+				m_pSwordTrail->Set_TrailTurnOn(true, m_pColliderCom->Get_ColliderPosition(3), m_pColliderCom->Get_ColliderPosition(5));
+				m_pSubSwordTrail->Set_TrailTurnOn(true, m_pColliderCom->Get_ColliderPosition(4), m_pColliderCom->Get_ColliderPosition(6));
+				m_iAdjMovedIndex++;
+			}
+			{
+
+				_Vector ColDir = XMVector3Normalize(m_pColliderCom->Get_ColliderPosition(3).XMVector() - m_pColliderCom->Get_ColliderPosition(5).XMVector());
+				_Vector SubDir = XMVector3Normalize(m_pColliderCom->Get_ColliderPosition(4).XMVector() - m_pColliderCom->Get_ColliderPosition(6).XMVector());
+
+				m_pSwordTrail->Update_SwordTrail(m_pColliderCom->Get_ColliderPosition(3).XMVector() + ColDir *0.5f, m_pColliderCom->Get_ColliderPosition(5).XMVector(), fDeltatime);
+				m_pSubSwordTrail->Update_SwordTrail(m_pColliderCom->Get_ColliderPosition(4).XMVector(), m_pColliderCom->Get_ColliderPosition(6).XMVector() - SubDir *0.5f, fDeltatime);
+			}
+			break;
+		case 20:
+
+		{
+
+			_Vector ColDir = XMVector3Normalize(m_pColliderCom->Get_ColliderPosition(3).XMVector() - m_pColliderCom->Get_ColliderPosition(5).XMVector());
+			_Vector SubDir = XMVector3Normalize(m_pColliderCom->Get_ColliderPosition(4).XMVector() - m_pColliderCom->Get_ColliderPosition(6).XMVector());
+
+			m_pSwordTrail->Update_SwordTrail(m_pColliderCom->Get_ColliderPosition(3).XMVector() + ColDir *0.5f, m_pColliderCom->Get_ColliderPosition(5).XMVector(), fDeltatime);
+			m_pSubSwordTrail->Update_SwordTrail(m_pColliderCom->Get_ColliderPosition(4).XMVector(), m_pColliderCom->Get_ColliderPosition(6).XMVector() - SubDir *0.5f, fDeltatime);
+		}
+		if (m_iAdjMovedIndex == 0 && PlayRate > 0.2941176470)
+		{
+
+			list<CGameObject*>* pBulletList = g_pGameInstance->Get_ObjectList_from_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet1));
+			NULL_CHECK_BREAK(pBulletList);
+			
+			for (auto& pObj : *pBulletList)
+			{
+				((CScrechedBlock*)(pObj))->Set_Spout();
+			}
+
+
+			m_iAdjMovedIndex++;
+		}
+			break;
 
 		case 24:
 		{
@@ -812,8 +1160,32 @@ HRESULT CHandyBoy::Adjust_MovedTransform_byAnim(_double fDeltatime)
 		}
 
 	}
+	else
+	{
+		switch (iNowAnimIndex)
+		{
+
+		case 5:
+		case 9:
+		case 12:
+		case 20:
+		{
+			m_pSwordTrail->Set_TrailTurnOn(false, m_pColliderCom->Get_ColliderPosition(3), m_pColliderCom->Get_ColliderPosition(6));
+			m_pSubSwordTrail->Set_TrailTurnOn(false, m_pColliderCom->Get_ColliderPosition(0), m_pColliderCom->Get_ColliderPosition(4));
+		}
+		break;
+		case 14:
+
+			m_pTransformCom->Set_MoveSpeed(20.5f);
+			FAILED_CHECK(Update_WanderAround_PatterDelay(fDeltatime, 1.f, 0.15f));
+			break;
 
 
+
+		}
+	}
+
+	m_iOldAnimIndex = iNowAnimIndex;
 	return S_OK;
 }
 
@@ -909,5 +1281,10 @@ void CHandyBoy::Free()
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModel);
 	Safe_Release(m_pColliderCom);
+	Safe_Release(m_pSwordTrail);
+	Safe_Release(m_pSubSwordTrail);
+	
+		
+
 
 }

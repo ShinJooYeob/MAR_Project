@@ -165,6 +165,27 @@ void CGamePlayUI::Set_DrawFightUI(_bool bBool)
 		m_PassedFightUITime = 0;
 		m_vecUIContainer[22]->Set_IsDraw(true);
 		m_vecUIContainer[23]->Set_IsDraw(true);
+
+
+		UIDESC tUIDesc;
+
+		tUIDesc.fX = 640;
+		tUIDesc.fY = -64;
+		tUIDesc.fCX = 1280;
+		tUIDesc.fCY = 128;
+
+		m_vecUIContainer[22]->Apply_UI_To_MemberValue(tUIDesc);
+		(m_vecUIContainer[22]->Apply_UIDesc_To_Transform());
+
+
+		tUIDesc.fX = 640;
+		tUIDesc.fY = 784;
+		tUIDesc.fCX = 1280;
+		tUIDesc.fCY = 128;
+
+		m_vecUIContainer[23]->Apply_UI_To_MemberValue(tUIDesc);
+		(m_vecUIContainer[23]->Apply_UIDesc_To_Transform());
+
 	}
 	else
 	{
@@ -173,6 +194,25 @@ void CGamePlayUI::Set_DrawFightUI(_bool bBool)
 		m_vecUIContainer[23]->Set_IsDraw(true);
 		m_PassedFightUITime = 0;
 
+
+		UIDESC tUIDesc;
+
+		tUIDesc.fX = 640;
+		tUIDesc.fY = 64;
+		tUIDesc.fCX = 1280;
+		tUIDesc.fCY = 128;
+
+		m_vecUIContainer[22]->Apply_UI_To_MemberValue(tUIDesc);
+		(m_vecUIContainer[22]->Apply_UIDesc_To_Transform());
+
+
+		tUIDesc.fX = 640;
+		tUIDesc.fY = 656;
+		tUIDesc.fCX = 1280;
+		tUIDesc.fCY = 128;
+
+		m_vecUIContainer[23]->Apply_UI_To_MemberValue(tUIDesc);
+		(m_vecUIContainer[23]->Apply_UIDesc_To_Transform());
 	}
 
 

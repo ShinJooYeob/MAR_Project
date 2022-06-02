@@ -310,6 +310,21 @@
     <Filter Include="01.GameObject\09.TriggerCollider\06.StageBoss_SpwanBoss">
       <UniqueIdentifier>{c3075686-d754-49d6-a452-8ec9209a894a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.GameObject\03.Monster\99.MonsterWeapon\07.DollMaker">
+      <UniqueIdentifier>{2fe9f8a2-88c5-47b4-8c53-1966d73e25c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\03.Monster\99.MonsterWeapon\07.DollMaker\TransparencyBall">
+      <UniqueIdentifier>{08a2ab6f-0c88-45be-a18b-f03205d67fa3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\03.Monster\99.MonsterWeapon\07.DollMaker\ScrechedDust">
+      <UniqueIdentifier>{d03b4bc0-baf1-4103-94e5-387b2019083b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\03.Monster\99.MonsterWeapon\07.DollMaker\HyperVoice">
+      <UniqueIdentifier>{f2727235-7e2f-4b80-8c35-6aae2145b709}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\03.Monster\99.MonsterWeapon\07.DollMaker\HandyGirlBullet">
+      <UniqueIdentifier>{2e26fd00-f2c4-48fa-9c55-cbf4d45f114f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -639,6 +654,24 @@
     <ClInclude Include="..\public\StageBoss_SpwanBoss.h">
       <Filter>01.GameObject\09.TriggerCollider\06.StageBoss_SpwanBoss</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\ScrechedBlock.h">
+      <Filter>01.GameObject\03.Monster\99.MonsterWeapon\07.DollMaker</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\TransparencyBall.h">
+      <Filter>01.GameObject\03.Monster\99.MonsterWeapon\07.DollMaker\TransparencyBall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\ScrechedDust.h">
+      <Filter>01.GameObject\03.Monster\99.MonsterWeapon\07.DollMaker\ScrechedDust</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\HyperVoice.h">
+      <Filter>01.GameObject\03.Monster\99.MonsterWeapon\07.DollMaker\HyperVoice</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\RadialBlurMonster.h">
+      <Filter>01.GameObject\97.Effect\ScreenEffect\Blur</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\HandyGirlBullet.h">
+      <Filter>01.GameObject\03.Monster\99.MonsterWeapon\07.DollMaker\HandyGirlBullet</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -943,6 +976,24 @@
     </ClCompile>
     <ClCompile Include="..\private\StageBoss_SpwanBoss.cpp">
       <Filter>01.GameObject\09.TriggerCollider\06.StageBoss_SpwanBoss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\ScrechedBlock.cpp">
+      <Filter>01.GameObject\03.Monster\99.MonsterWeapon\07.DollMaker</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\TransparencyBall.cpp">
+      <Filter>01.GameObject\03.Monster\99.MonsterWeapon\07.DollMaker\TransparencyBall</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\ScrechedDust.cpp">
+      <Filter>01.GameObject\03.Monster\99.MonsterWeapon\07.DollMaker\ScrechedDust</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\HyperVoice.cpp">
+      <Filter>01.GameObject\03.Monster\99.MonsterWeapon\07.DollMaker\HyperVoice</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\RadialBlurMonster.cpp">
+      <Filter>01.GameObject\97.Effect\ScreenEffect\Blur</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\HandyGirlBullet.cpp">
+      <Filter>01.GameObject\03.Monster\99.MonsterWeapon\07.DollMaker\HandyGirlBullet</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

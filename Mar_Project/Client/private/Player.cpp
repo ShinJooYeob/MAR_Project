@@ -12,6 +12,7 @@
 #include "CircleTornado.h"
 #include "Umbrella.h"
 
+#include "TransparencyBall.h"
 
 
 _uint CALLBACK Add_Force_Thread(void* _Prameter)
@@ -86,13 +87,17 @@ _int CPlayer::Update(_double fDeltaTime)
 
 
 
-
-
-	//if (g_pGameInstance->Get_DIKeyState(DIK_3)&DIS_Down)
+	//if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
 	//{
-
+	//
 	//	Eat_Protain();
 	//}
+	//if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
+	//{
+	//
+	//	Eat_Protain();
+	//}
+
 
 
 

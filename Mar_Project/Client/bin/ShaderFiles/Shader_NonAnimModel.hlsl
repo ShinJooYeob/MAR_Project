@@ -20,6 +20,7 @@ texture2D			g_NormalTexture;
 //texture2D			g_AmbientOcculusionTexture;
 
 texture2D			g_BackBufferTexture;
+texture2D			g_NoiseTexture;
 
 
 
@@ -47,6 +48,10 @@ cbuffer AttechMatrix
 //	float4		g_vMtrlSpecular = float4(1.f, 1.f, 1.f, 1.f);
 //};
 
+cbuffer DeltaTime
+{
+	float			g_fDeltaTime = 0;
+};
 cbuffer HiddenPad
 {
 	float	g_fVisualValue;
@@ -324,6 +329,39 @@ PS_OUT_NODEFERRED PS_Distortion(PS_IN In)
 	return Out;
 }
 
+PS_OUT_NODEFERRED PS_Distortion_Ball(PS_IN In)
+{
+	PS_OUT_NODEFERRED		Out = (PS_OUT_NODEFERRED)0;
+
+
+	
+
+	vector BlurDesc = g_NoiseTexture.Sample(DefaultSampler, In.vTexUV );
+	vector DiffuseDesc = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
+
+	float Alpha = max(DiffuseDesc.r - 0.5f , 0) * 2.f;
+
+
+	float2 PosToUv = float2(In.vPosition.x / 1280, In.vPosition.y / 780) ;
+
+
+	float2 TargetUV = saturate(float2(PosToUv.x + (0.5f - (BlurDesc.x))*0.15625f, PosToUv.y + (0.5f - (BlurDesc.y))*0.25f));
+	//float2 TargetUV = In.vTexUV + float2(PosToUv.x + (0.5f - (Noise.x))*0.0015625f, PosToUv.y + (0.5f - (Noise.y))*0.0025f);
+
+	vector BackBuffer = g_BackBufferTexture.Sample(DefaultSampler, TargetUV);
+
+	Out.vDiffuse = BackBuffer * (1 - Alpha) + (Alpha * g_vMixColor);
+	//Out.vDiffuse.a = (Alpha - 0.45f) * 2.f;
+
+	/*if (Alpha < 0.1)
+		discard;*/
+
+	//Out.vDiffuse.a = g_vMixColor.a;
+	//Out.vDiffuse.a = min(Alpha, In.vColor.a);
+
+	return Out;
+}
+
 
 
 
@@ -454,6 +492,16 @@ technique11		DefaultTechnique
 		VertexShader = compile vs_5_0 VS_MAIN_DEFAULT();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_Distortion();
+	}
+	pass Distortion_Ball_WriteZbuffer		//12
+	{
+		SetBlendState(AlphaBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(ZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_None);
+
+		VertexShader = compile vs_5_0 VS_MAIN_DEFAULT();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_Distortion_Ball();
 	}
 
 

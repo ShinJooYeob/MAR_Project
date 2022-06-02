@@ -52,6 +52,11 @@ public:
 
 	HRESULT Start_InstanceParticle(_uint eNowSceneNum, _float3 vPosition, _uint iParticleDescIndex = 0);
 
+
+
+	HRESULT Set_MonsterBlurPos(_float3 vPos);
+	HRESULT Set_MonsterBlurOn(_bool	 bBool);
+
 public:
 	HRESULT Clear_RenderGroup_forSceneChange();
 	void Set_Renderer(CRenderer* pRenderer);
@@ -65,7 +70,9 @@ private:
 	class CMainApp*			m_pMainApp = nullptr;
 	CRenderer*				m_pRenderer = nullptr;
 
-	class CFadeEffect*		m_pFadeEffect = nullptr;
+	class CFadeEffect*			m_pFadeEffect = nullptr;
+	class CRadialBlurMonster*		m_pMonsterRadial = nullptr;
+	
 
 	vector<INSTPARTICLEDESC> m_vecInstanceParticleDesc;
 private:
