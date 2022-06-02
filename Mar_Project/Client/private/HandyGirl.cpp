@@ -116,8 +116,8 @@ _int CHandyGirl::Update(_double fDeltaTime)
 			}
 			if (m_PatternDelayTime < 0)
 			{
-				//m_bIsDealTime = (rand() % 4) ? false : true;
-				m_bIsDealTime = false;
+				m_bIsDealTime = (rand() % 4) ? false : true;
+				//m_bIsDealTime = false;
 
 				if (m_bIsDealTime)
 				{
@@ -319,7 +319,6 @@ _int CHandyGirl::Update_Pattern(_double fDeltaTime)
 	if (m_bIsPatternFinished)
 	{
 		m_ePattern += 1;
-		m_ePattern = 1;
 		if (m_ePattern > 6) m_ePattern = 0;
 		m_bIsPatternFinished = false;
 		m_PatternPassedTime = 0;

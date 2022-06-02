@@ -49,6 +49,12 @@ HRESULT CChainExplosion::Initialize_Clone(void * pArg)
 
 	GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_tParticleDesc);
 
+
+	CUtilityMgr* pUtil = GetSingle(CUtilityMgr);
+
+	pUtil->Start_InstanceParticle(m_eNowSceneNum, m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0);
+	pUtil->Start_InstanceParticle(m_eNowSceneNum, m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0);
+
 	return S_OK;
 }
 

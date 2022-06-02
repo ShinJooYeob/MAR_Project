@@ -178,6 +178,7 @@
     <ClInclude Include="..\bin\ShaderFiles\Shader_Define.hpp" />
     <ClInclude Include="..\public\BreakableWall.h" />
     <ClInclude Include="..\public\BreakableObj.h" />
+    <ClInclude Include="..\public\DollMakerBullet.h" />
     <ClInclude Include="..\public\HyperVoice.h" />
     <ClInclude Include="..\public\RadialBlurMonster.h" />
     <ClInclude Include="..\public\ScrechedDust.h" />
@@ -286,6 +287,7 @@
   <ItemGroup>
     <ClCompile Include="..\private\BreakableWall.cpp" />
     <ClCompile Include="..\private\BreakableObj.cpp" />
+    <ClCompile Include="..\private\DollMakerBullet.cpp" />
     <ClCompile Include="..\private\HyperVoice.cpp" />
     <ClCompile Include="..\private\RadialBlurMonster.cpp" />
     <ClCompile Include="..\private\ScrechedDust.cpp" />

@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "..\public\HandyGirlBullet.h"
+#include "..\public\DollMakerBullet.h"
 #include "Terrain.h"
 #include "Player.h"
 #include "Monster.h"
@@ -7,23 +7,23 @@
 
 
 
-CHandyGirlBullet::CHandyGirlBullet(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
+CDollMakerBullet::CDollMakerBullet(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
 	:CMonsterWeapon(pDevice,pDeviceContext)
 {
 }
 
-CHandyGirlBullet::CHandyGirlBullet(const CHandyGirlBullet & rhs)
+CDollMakerBullet::CDollMakerBullet(const CDollMakerBullet & rhs)
 	: CMonsterWeapon(rhs)
 {
 }
 
-HRESULT CHandyGirlBullet::Initialize_Prototype(void * pArg)
+HRESULT CDollMakerBullet::Initialize_Prototype(void * pArg)
 {
 	FAILED_CHECK(__super::Initialize_Prototype(pArg));
 	return S_OK;
 }
 
-HRESULT CHandyGirlBullet::Initialize_Clone(void * pArg)
+HRESULT CDollMakerBullet::Initialize_Clone(void * pArg)
 {
 	//FAILED_CHECK(__super::Initialize_Clone(pArg));
 
@@ -41,32 +41,27 @@ HRESULT CHandyGirlBullet::Initialize_Clone(void * pArg)
 
 	FAILED_CHECK(SetUp_Components());
 
+	CUtilityMgr* pUtilMgr = GetSingle(CUtilityMgr);
 	
-	m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, m_tDesc.vPosition);
+	m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, m_tDesc.vPosition.XMVector() + XMVectorSetY(pUtilMgr->RandomFloat3(-0.35f, 0.35f).XMVector(),0));
 	m_fStartTimer = 0;
 
-	CUtilityMgr* pUtilMgr = GetSingle(CUtilityMgr);
-
-
-	m_tDesc.MoveDir = XMVector3Normalize(m_tDesc.MoveDir.XMVector() * 8.f + pUtilMgr->RandomFloat3(-999.0f, 999.f).Get_Nomalize());
 
 	m_pTransformCom->Scaled_All(_float3(1));
 
 	m_RandScale = pUtilMgr->RandomFloat(3.5f, 8.5f);
-	m_fRandHeight = pUtilMgr->RandomFloat(13.5f, 15.f);
-	m_TargetTime = pUtilMgr->RandomFloat(0.5f,0.8f);
+	m_TargetTime = pUtilMgr->RandomFloat(0.64f,0.8f);
 	m_fStartTimer = 0;
 	m_DeathTimer = 0;
 	m_bGoingtoDeath = false;
 
 	FAILED_CHECK(SetUp_ParticleDesc());
 
-	GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[0]);
 
 	return S_OK;
 }
 
-_int CHandyGirlBullet::Update(_double fDeltaTime)
+_int CDollMakerBullet::Update(_double fDeltaTime)
 {
 	if (__super::Update(fDeltaTime) < 0)
 		return -1;
@@ -81,14 +76,14 @@ _int CHandyGirlBullet::Update(_double fDeltaTime)
 
 		if (m_DeathTimer < 0.3f)
 		{
-			_float3 EasedScale = g_pGameInstance->Easing_Vector(TYPE_ExpoOut, _float3(1,1,1), _float3(m_RandScale, 0.2f, m_RandScale), (_float)m_DeathTimer,0.3f);
+			_float3 EasedScale = g_pGameInstance->Easing_Vector(TYPE_ExpoOut, _float3(1, 1, 1), _float3(m_RandScale, 0.2f, m_RandScale), (_float)m_DeathTimer, 0.3f);
 
 			m_pTransformCom->Scaled_All(EasedScale);
 
 		}
 		else if (m_DeathTimer < 1.3f)
 		{
-			_float3 EasedScale = g_pGameInstance->Easing_Vector(TYPE_SinIn, _float3(m_RandScale, 0.2f, m_RandScale), _float3(0.1f, 0.2f, 0.1f), (_float)( m_DeathTimer - 0.3f), 1.f);
+			_float3 EasedScale = g_pGameInstance->Easing_Vector(TYPE_SinIn, _float3(m_RandScale, 0.2f, m_RandScale), _float3(0.1f, 0.2f, 0.1f), (_float)(m_DeathTimer - 0.3f), 1.f);
 
 			m_pTransformCom->Scaled_All(EasedScale);
 		}
@@ -104,65 +99,51 @@ _int CHandyGirlBullet::Update(_double fDeltaTime)
 	{
 		m_fStartTimer += fDeltaTime;
 
-		m_pTransformCom->MovetoDir(m_tDesc.MoveDir.XMVector(), fDeltaTime);
+		m_pTransformCom->MovetoDir(m_tDesc.vMoveDir.XMVector(), fDeltaTime);
+		_float EasedHeight = g_pGameInstance->Easing(TYPE_SinOut, m_tDesc.vPosition.y, 8, (_float)(m_fStartTimer), (_float)m_TargetTime);
 
-		if (m_fStartTimer < 0.35f * m_TargetTime)
+		if (EasedHeight < 9.7f)
 		{
-			_float EasedHeight = g_pGameInstance->Easing(TYPE_SinOut, m_tDesc.vPosition.y, m_fRandHeight, (_float)m_fStartTimer, 0.35f * (_float)m_TargetTime);
-			_float3 OldPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
-			OldPos.y = EasedHeight;
-			m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, OldPos);
-		}
-		else
-		{
-			_float EasedHeight = g_pGameInstance->Easing(TYPE_SinIn, m_fRandHeight, 8, (_float)( m_fStartTimer - (0.35f * m_TargetTime)), 0.65f * (_float)m_TargetTime);
+			m_pTransformCom->Set_IsOwnerDead(true);
+			EasedHeight = 9.8f;
+			m_bGoingtoDeath = true;
+			m_DeathTimer = 0;
 
-			if (EasedHeight < 9.7f)
-			{
-				m_pTransformCom->Set_IsOwnerDead(true);
-				EasedHeight = 9.8f;
-				m_bGoingtoDeath = true;
-				m_DeathTimer = 0;
+			CUtilityMgr* pUtil = GetSingle(CUtilityMgr);
 
-				CUtilityMgr* pUtil = GetSingle(CUtilityMgr);
-
-				pUtil->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[1]);
+			pUtil->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[1]);
 
 
-				m_vecParticleDesc[1].FixedTarget = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
-				m_vecParticleDesc[1].FixedTarget.y = 10.1f;
+			m_vecParticleDesc[1].FixedTarget = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+			m_vecParticleDesc[1].FixedTarget.y = 10.1f;
 
-				pUtil->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[1]);
+			pUtil->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[1]);
 
 
-				pUtil->Start_InstanceParticle(m_eNowSceneNum,m_vecParticleDesc[1].FixedTarget, 0);
-				pUtil->Start_InstanceParticle(m_eNowSceneNum,m_vecParticleDesc[1].FixedTarget, 0);
+			pUtil->Start_InstanceParticle(m_eNowSceneNum, m_vecParticleDesc[1].FixedTarget, 0);
+			pUtil->Start_InstanceParticle(m_eNowSceneNum, m_vecParticleDesc[1].FixedTarget, 0);
 
 
 
-				CCircleTornado::CIRCLETORNADODESC tDesc;
-				tDesc.vLook = _float3(0.00000001f, 1.f, 0);
-				tDesc.vPosition = m_vecParticleDesc[1].FixedTarget;
-				tDesc.vPosition.y -=0.05f ;
-				tDesc.fSize = 1.5f;
+			CCircleTornado::CIRCLETORNADODESC tDesc;
+			tDesc.vLook = _float3(0.00000001f, 1.f, 0);
+			tDesc.vPosition = m_vecParticleDesc[1].FixedTarget;
+			tDesc.vPosition.y -= 0.05f;
+			tDesc.fSize = 1.5f;
 
-				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerCircleTornado), &tDesc);
-				tDesc.vPosition = tDesc.vPosition;
-				tDesc.vPosition.y += 0.1f;
-				tDesc.fSize = 1;
-				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerCircleTornado), &tDesc);
-
-
-
-			}
-
-			_float3 OldPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
-			OldPos.y = EasedHeight;
-
-			m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, OldPos);
-
+			g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerCircleTornado), &tDesc);
+			tDesc.vPosition = tDesc.vPosition;
+			tDesc.vPosition.y += 0.1f;
+			tDesc.fSize = 1;
+			g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerCircleTornado), &tDesc);
 		}
 
+
+
+		_float3 OldPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+		OldPos.y = EasedHeight;
+
+		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, OldPos);
 
 	}
 
@@ -177,7 +158,7 @@ _int CHandyGirlBullet::Update(_double fDeltaTime)
 
 
 		g_pGameInstance->Add_CollisionGroup(CollisionType_MonsterWeapon, this, m_pColliderCom);
-		
+
 #ifdef _DEBUG
 		FAILED_CHECK(m_pRendererCom->Add_DebugGroup(m_pColliderCom));
 #endif // _DEBUG
@@ -188,7 +169,7 @@ _int CHandyGirlBullet::Update(_double fDeltaTime)
 	return _int();
 }
 
-_int CHandyGirlBullet::LateUpdate(_double fDeltaTime)
+_int CDollMakerBullet::LateUpdate(_double fDeltaTime)
 {
 	if (__super::LateUpdate(fDeltaTime) < 0)
 		return -1;
@@ -204,7 +185,7 @@ _int CHandyGirlBullet::LateUpdate(_double fDeltaTime)
 	return _int();
 }
 
-_int CHandyGirlBullet::Render()
+_int CDollMakerBullet::Render()
 {
 	if (__super::Render() < 0)
 		return -1;
@@ -221,17 +202,6 @@ _int CHandyGirlBullet::Render()
 	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ProjMatrix", &pInstance->Get_Transform_Float4x4_TP(PLM_PROJ), sizeof(_float4x4)));
 
 
-	//FAILED_CHECK(m_pShaderCom->Set_RawValue("g_CamPosition", &pInstance->Get_TargetPostion_float4(PLV_CAMERA), sizeof(_float4)));
-	//FAILED_CHECK(m_pShaderCom->Set_RawValue("g_CamLookDir", &pInstance->Get_TargetPostion_float4(PLV_CAMLOOK), sizeof(_float4)));
-
-
-	//const LIGHTDESC* pLightDesc = pInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0);
-	//NULL_CHECK_RETURN(pLightDesc, -1);
-
-	//FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vLightVector", &(pLightDesc->vVector), sizeof(_float4)));
-	//FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4)));
-	//FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4)));
-	//FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4)));
 
 
 
@@ -250,7 +220,7 @@ _int CHandyGirlBullet::Render()
 	return _int();
 }
 
-_int CHandyGirlBullet::LightRender()
+_int CDollMakerBullet::LightRender()
 {
 	if (__super::LightRender() < 0)
 		return -1;
@@ -272,7 +242,7 @@ _int CHandyGirlBullet::LightRender()
 }
 
 
-void CHandyGirlBullet::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedObj, CCollider * pConflictedCollider, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType)
+void CDollMakerBullet::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedObj, CCollider * pConflictedCollider, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType)
 {
 	switch (eConflictedObjCollisionType)
 	{
@@ -296,7 +266,7 @@ void CHandyGirlBullet::CollisionTriger(_uint iMyColliderIndex, CGameObject * pCo
 	}
 }
 
-HRESULT CHandyGirlBullet::SetUp_Components()
+HRESULT CDollMakerBullet::SetUp_Components()
 {
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Renderer), TAG_COM(Com_Renderer), (CComponent**)&m_pRendererCom));
 
@@ -308,7 +278,7 @@ HRESULT CHandyGirlBullet::SetUp_Components()
 
 	CTransform::TRANSFORMDESC tDesc = {};
 
-	tDesc.fMovePerSec = GetSingle(CUtilityMgr)->RandomFloat(5.f, 16.f);
+	tDesc.fMovePerSec = GetSingle(CUtilityMgr)->RandomFloat(5.f, 7.f);
 	tDesc.fRotationPerSec = XMConvertToRadians(GetSingle(CUtilityMgr)->RandomFloat(50,70));
 	tDesc.fScalingPerSec = 1;
 	tDesc.vPivot = _float3(0, 0.3f, 0);
@@ -328,7 +298,6 @@ HRESULT CHandyGirlBullet::SetUp_Components()
 	//Pivot  : 0.030000f , -10.630148f , -10.410143f , 1
 	//size  : 6.080047f , 3.000000f , 3.000000f  
 	ColliderDesc.vScale = _float3(0.4f);
-
 	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
 	ColliderDesc.vPosition = _float4(0, 0, 0, 1);
 	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
@@ -342,7 +311,7 @@ HRESULT CHandyGirlBullet::SetUp_Components()
 	return S_OK;
 }
 
-HRESULT CHandyGirlBullet::SetUp_ParticleDesc()
+HRESULT CDollMakerBullet::SetUp_ParticleDesc()
 {
 
 	PARTICLEDESC tParticleDesc;
@@ -454,31 +423,31 @@ HRESULT CHandyGirlBullet::SetUp_ParticleDesc()
 
 
 
-CHandyGirlBullet * CHandyGirlBullet::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, void * pArg)
+CDollMakerBullet * CDollMakerBullet::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, void * pArg)
 {
-	CHandyGirlBullet*	pInstance = new CHandyGirlBullet(pDevice, pDeviceContext);
+	CDollMakerBullet*	pInstance = new CDollMakerBullet(pDevice, pDeviceContext);
 
 	if (FAILED(pInstance->Initialize_Prototype(pArg)))
 	{
-		MSGBOX("Failed to Created CHandyGirlBullet");
+		MSGBOX("Failed to Created CDollMakerBullet");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-CGameObject * CHandyGirlBullet::Clone(void * pArg)
+CGameObject * CDollMakerBullet::Clone(void * pArg)
 {
-	CHandyGirlBullet*	pInstance = new CHandyGirlBullet(*this);
+	CDollMakerBullet*	pInstance = new CDollMakerBullet(*this);
 
 	if (FAILED(pInstance->Initialize_Clone(pArg)))
 	{
-		MSGBOX("Failed to Created CHandyGirlBullet");
+		MSGBOX("Failed to Created CDollMakerBullet");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-void CHandyGirlBullet::Free()
+void CDollMakerBullet::Free()
 {
 	__super::Free();
 	Safe_Release(m_pTransformCom);

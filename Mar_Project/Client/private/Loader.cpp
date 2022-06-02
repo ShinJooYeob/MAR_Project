@@ -70,6 +70,7 @@
 #include "TransparencyBall.h"
 #include "HyperVoice.h"
 #include "HandyGirlBullet.h"
+#include "DollMakerBullet.h"
 
 #include "Grunt.h"
 #include "ChainExplosion.h"
@@ -1219,6 +1220,8 @@ HRESULT CLoader::Load_Scene_Boss(_bool * _IsClientQuit, CRITICAL_SECTION * _CriS
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_HandyGirlBullet),
 		CHandyGirlBullet::Create(m_pDevice, m_pDeviceContext)));
 
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_DollMakerBullet),
+		CDollMakerBullet::Create(m_pDevice, m_pDeviceContext)));
 	
 
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(L"TransparencyBall",

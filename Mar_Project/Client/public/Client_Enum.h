@@ -72,6 +72,7 @@ enum OBJECTPROTOTYPEID
 	Prototype_ScrechedDust,
 	Prototype_HyperVoice,
 	Prototype_HandyGirlBullet,
+	Prototype_DollMakerBullet,
 
 
 	Prototype_Bow,
@@ -128,7 +129,10 @@ static const _tchar* Tag_Object_Prototype(OBJECTPROTOTYPEID eTag)
 	switch (eTag)
 	{
 		
-		
+
+	case Prototype_DollMakerBullet:
+		return TEXT("Prototype_DollMakerBullet");
+		break;
 	case Prototype_HandyGirlBullet:
 		return TEXT("Prototype_HandyGirlBullet");
 		break;

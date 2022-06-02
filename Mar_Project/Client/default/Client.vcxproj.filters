@@ -325,6 +325,9 @@
     <Filter Include="01.GameObject\03.Monster\99.MonsterWeapon\07.DollMaker\HandyGirlBullet">
       <UniqueIdentifier>{2e26fd00-f2c4-48fa-9c55-cbf4d45f114f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.GameObject\03.Monster\99.MonsterWeapon\07.DollMaker\DollMakerBullet">
+      <UniqueIdentifier>{e74361ab-bbe0-4d74-83be-6b8a7518e09b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -672,6 +675,9 @@
     <ClInclude Include="..\public\HandyGirlBullet.h">
       <Filter>01.GameObject\03.Monster\99.MonsterWeapon\07.DollMaker\HandyGirlBullet</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\DollMakerBullet.h">
+      <Filter>01.GameObject\03.Monster\99.MonsterWeapon\07.DollMaker\DollMakerBullet</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -994,6 +1000,9 @@
     </ClCompile>
     <ClCompile Include="..\private\HandyGirlBullet.cpp">
       <Filter>01.GameObject\03.Monster\99.MonsterWeapon\07.DollMaker\HandyGirlBullet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\DollMakerBullet.cpp">
+      <Filter>01.GameObject\03.Monster\99.MonsterWeapon\07.DollMaker\DollMakerBullet</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

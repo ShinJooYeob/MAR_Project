@@ -4,6 +4,8 @@
 #include "Terrain.h"
 #include "HandyBoy.h"
 #include "HandyGirl.h"
+#include "DollMakerBullet.h"
+#include "HyperVoice.h"
 
 
 
@@ -228,12 +230,15 @@ _int CDollMaker::Update_DmgCalculate(_double fDeltaTime)
 
 	if (!m_bIsDmgAnimUpdated[0] && m_fDmgAmount > 3 && NowAnimIndex >= 1 && NowAnimIndex <=3 )
 	{
+		GetSingle(CUtilityMgr)->Set_MonsterBlurOn(false);
 
 		m_pModel->Change_AnimIndex_ReturnTo_Must(19, 4, 0.15, true);
 		m_bIsDmgAnimUpdated[0] = true;
 	}
 	if (!m_bIsDmgAnimUpdated[0] && m_fDmgAmount > 3 && NowAnimIndex >= 5 && NowAnimIndex <= 6)
 	{
+		GetSingle(CUtilityMgr)->Set_MonsterBlurOn(false);
+
 		m_pModel->Change_AnimIndex_ReturnTo_Must(20, 8, 0.15, true);
 		m_bIsDmgAnimUpdated[0] = true;
 	}
@@ -251,6 +256,7 @@ _int CDollMaker::Update_Pattern(_double fDeltaTime)
 	if (m_bIsPatternFinished)
 	{
 		m_ePattern += 1;
+		m_ePattern = 1;
 		if (m_ePattern > 1) m_ePattern = 0;
 		m_bIsPatternFinished = false;
 		m_PatternPassedTime = 0;
@@ -429,14 +435,16 @@ HRESULT CDollMaker::SetUp_Weapon()
 
 
 	CMonsterWeapon* pWeapon = nullptr;
-	FAILED_CHECK(pInstance->Add_GameObject_Out_of_Manager((CGameObject**)&pWeapon, m_eNowSceneNum, TAG_OP(Prototype_HandyGirl), &_float3(63, 10, 75)));
+	FAILED_CHECK(pInstance->Add_GameObject_Out_of_Manager((CGameObject**)&pWeapon, m_eNowSceneNum, TAG_OP(Prototype_HandyBoy), &_float3(71, 10, 60)));
 	NULL_CHECK_RETURN(pWeapon, E_FAIL);
 	m_vecWeapon.push_back(pWeapon);
 
 	pWeapon = nullptr;
-	FAILED_CHECK(pInstance->Add_GameObject_Out_of_Manager((CGameObject**)&pWeapon, m_eNowSceneNum, TAG_OP(Prototype_HandyBoy), &_float3(71, 10, 60)));
+	FAILED_CHECK(pInstance->Add_GameObject_Out_of_Manager((CGameObject**)&pWeapon, m_eNowSceneNum, TAG_OP(Prototype_HandyGirl), &_float3(63, 10, 75)));
 	NULL_CHECK_RETURN(pWeapon, E_FAIL);
 	m_vecWeapon.push_back(pWeapon);
+
+
 
 	return S_OK;
 }
@@ -490,6 +498,83 @@ HRESULT CDollMaker::Adjust_AnimMovedTransform(_double fDeltatime)
 		case 0:
 			break;
 	
+
+		case 2:
+		case 3:
+		{
+			static _double AmilazeTimer = 0;
+
+			if (PlayRate < 0.0001f)
+			{
+				AmilazeTimer = 0;
+			}
+			else
+			{
+				AmilazeTimer -= fDeltatime;
+				if (AmilazeTimer < 0)
+				{
+					CDollMakerBullet::HANDYGRILBULLETDESC tDesc;
+
+					tDesc.vPosition = m_pColliderCom->Get_ColliderPosition(2).XMVector();
+
+					_Vector TargetAt = m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS);
+
+					tDesc.vMoveDir = XMVector3Normalize(XMVectorSetY(TargetAt, 0) - XMVectorSetY(tDesc.vPosition.XMVector(), 0) );
+
+
+
+					g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_DollMakerBullet), &tDesc);
+
+					AmilazeTimer = GetSingle(CUtilityMgr)->RandomFloat(0.64f, 1.f);
+				}
+
+			}
+		}
+			break;
+
+		case 6:
+
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.45)
+			{
+				GetSingle(CUtilityMgr)->Set_MonsterBlurOn(true);
+				m_iAdjMovedIndex++;
+			}
+
+			GetSingle(CUtilityMgr)->Set_MonsterBlurPos(m_pColliderCom->Get_ColliderPosition(2));
+
+
+
+
+			break;
+
+		case 7:
+		{
+			GetSingle(CUtilityMgr)->Set_MonsterBlurPos(m_pColliderCom->Get_ColliderPosition(2));
+
+
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.3)
+			{
+
+				CHyperVoice::CIRCLETORNADODESC tDesc;
+
+				tDesc.fSize = 2.5f;
+				tDesc.Power = 25.f;
+				tDesc.vPosition = m_pColliderCom->Get_ColliderPosition(2);
+
+				_Vector TargetAt = m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS);
+				tDesc.vLook = XMVector3Normalize((TargetAt) - (tDesc.vPosition.XMVector()));
+
+
+
+
+				FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_HyperVoice), &tDesc));
+
+
+				GetSingle(CUtilityMgr)->Set_MonsterBlurOn(false);
+				m_iAdjMovedIndex++;
+			}
+		}
+			break;
 
 		case 10:
 			if (PlayRate > 0.85 && m_pHanddyIndex == 0)
