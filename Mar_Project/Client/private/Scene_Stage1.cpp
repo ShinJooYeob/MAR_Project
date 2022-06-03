@@ -82,7 +82,6 @@ _int CScene_Stage1::Update(_double fDeltaTime)
 	if (g_pGameInstance->Get_DIKeyState(DIK_P)&DIS_Down)
 		FAILED_CHECK(Ready_Layer_Grunt(TAG_LAY(Layer_Monster)));
 
-	
 
 	if (GetKeyState(VK_RETURN) & 0x8000)
 	{

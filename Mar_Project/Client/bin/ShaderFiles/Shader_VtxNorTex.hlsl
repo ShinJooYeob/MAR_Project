@@ -145,7 +145,7 @@ PS_OUT PS_MAIN_TERRAIN_DIRECTIONAL(PS_IN In)
 		Out.vDiffuse = vMtrlDiffuse;
 
 
-		Out.vSpecular = vector((Out.vDiffuse.r + Out.vDiffuse.g + Out.vDiffuse.b) * 0.34f, 0.5f, 0.4f,1);
+		Out.vSpecular = vector((Out.vDiffuse.r + Out.vDiffuse.g + Out.vDiffuse.b) * 0.34f, 0.167f, 0.2f,1);
 		
 		Out.vDiffuse.a *= FogShaderRate;
 		Out.vNormal = vector(In.vWorldNormal.xyz * 0.5f + 0.5f, 0.f);

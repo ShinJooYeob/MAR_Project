@@ -10,6 +10,11 @@ cbuffer	ShadowPipeLine
 	matrix			g_LightProjMatrix;
 };
 
+cbuffer	ForHDR
+{
+	float g_fBlurLuminence = 0.5f;
+	float g_fAttenuationValue = 1.f;
+};
 
 
 cbuffer LightDesc
@@ -42,6 +47,12 @@ texture2D			g_NormalTexture;
 texture2D			g_DepthTexture;
 texture2D			g_ShadeTexture;
 texture2D			g_SpecularTexture;
+texture2D			g_LinerTexture;
+
+texture2D			g_UpScaledTexture1;
+texture2D			g_UpScaledTexture2;
+texture2D			g_UpScaledTexture3;
+texture2D			g_UpScaledTexture4;
 
 
 texture2D			g_ShadowMapTexture;
@@ -209,7 +220,26 @@ PS_OUT PS_MAIN_RECT(PS_IN In)
 
 	return Out;
 }
+PS_OUT_AfterDeferred PS_MAIN_EndProsseing(PS_IN In)
+{
+	PS_OUT_AfterDeferred		Out = (PS_OUT_AfterDeferred)0;
 
+	vector LinerTex = (g_LinerTexture.Sample(DefaultSampler, In.vTexUV));
+	
+
+	vector Hdr = max((g_TargetTexture.Sample(DefaultSampler, In.vTexUV) + LinerTex) - 0.004, 0);
+
+
+	Out.vColor = (Hdr * (6.2f * Hdr + 0.5f)) / (Hdr * (6.2f * Hdr + 1.7f) + 0.06f);
+	
+	Out.vColor2 = Out.vColor;
+	//Out.vColor = pow(Out.vColor,1.f/2.2f);
+
+	
+
+
+	return Out;
+}
 
 PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
 {
@@ -250,7 +280,7 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
 
 	vector		vLook = vWorldPos - g_vCamPosition;
 	
-	Out.vSpecular = (g_vLightSpecular * vMtrlSpecularMap.r) * pow(saturate(dot(normalize(vReflect) * -1.f, normalize(vLook))), vMtrlSpecularMap.g * 30);
+	Out.vSpecular = (g_vLightSpecular *vMtrlSpecularMap.r) * pow(saturate(dot(normalize(vReflect) * -1.f, normalize(vLook))), 5 / vMtrlSpecularMap.g);
 	Out.vSpecular.a = 0.f;
 
 
@@ -295,7 +325,7 @@ PS_OUT_LIGHT PS_MAIN_POINT(PS_IN In)
 
 	vector		vLook = vWorldPos - g_vCamPosition;
 
-	Out.vSpecular = (g_vLightSpecular * vMtrlSpecularMap.r) * pow(saturate(dot(normalize(vReflect) * -1.f, normalize(vLook))), vMtrlSpecularMap.g * 30) * fAtt;
+	Out.vSpecular = (g_vLightSpecular * vMtrlSpecularMap.g) * pow(saturate(dot(normalize(vReflect) * -1.f, normalize(vLook))), vMtrlSpecularMap.r * 30) * fAtt;
 	Out.vSpecular.a = 0.f;
 
 	return Out;
@@ -304,7 +334,7 @@ PS_OUT_AfterDeferred PS_MAIN_BLEND(PS_IN In)
 {
 	PS_OUT_AfterDeferred		Out = (PS_OUT_AfterDeferred)0;
 
-	vector		vDiffuseDesc = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
+	vector		vDiffuseDesc = pow(g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV),2.2f);
 	vector		vShadeDesc = g_ShadeTexture.Sample(DefaultSampler, In.vTexUV);
 	vector		vSpecularDesc = g_SpecularTexture.Sample(DefaultSampler, In.vTexUV);
 	vector		vShadowMapDesc = g_ShadowMapTexture.Sample(DefaultSampler, In.vTexUV);
@@ -374,16 +404,30 @@ PS_OUT_AfterDeferred PS_DOWNSCALING(PS_IN In)
 	//if (CurrentDepth > ShadowDepth )
 	if (CurrentDepth > ShadowDepth + 0.00000025f)
 	{
-		Out.vColor = vector(0.5f, 0.5f, 0.5f,1);
+		Out.vColor = vector(0.8f, 0.8f, 0.8f,1);
 	}
 	Out.vColor2 = Out.vColor;
 	return Out;
 }
+
 PS_OUT PS_UPSCALING(PS_IN In)
 {
 	PS_OUT		Out = (PS_OUT)0;
 
 	Out.vColor= g_ShadowMapTexture.Sample(DefaultSampler, In.vTexUV);
+
+	return Out;
+}
+PS_OUT_AfterDeferred PS_DOWNSCALING_Luminence(PS_IN In)
+{
+	PS_OUT_AfterDeferred		Out = (PS_OUT_AfterDeferred)0;
+
+	vector LinerDesc = g_LinerTexture.Sample(DefaultSampler, In.vTexUV);
+	float Lumi	= dot(LinerDesc.xyz, float3(0.2125f, 0.7154f, 0.0721f));
+	if (Lumi < g_fBlurLuminence) discard;
+	Out.vColor = Lumi;
+	
+	Out.vColor2 = Out.vColor;
 
 	return Out;
 }
@@ -436,6 +480,94 @@ PS_OUT PS_Blur(PS_IN_BLUR In)
 	return Out;
 }
 
+
+PS_OUT PS_Blur_Luminence(PS_IN_BLUR In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	vector LinerDesc = g_LinerTexture.Sample(DefaultSampler, In.texCrd5);
+
+
+
+
+		float weight0, weight1, weight2, weight3, weight4;
+		float normalization;
+		float4 color;
+
+		weight0 = 1.0f;
+		weight1 = 0.9f;
+		weight2 = 0.55f;
+		weight3 = 0.18f;
+		weight4 = 0.1f;
+
+		//weight0 = 	weight1 = 	weight2 =	weight3 = 	weight4 = 0.1f;
+
+		normalization = (weight0 + 2.5f * (weight1 + weight2 + weight3 + weight4));
+
+		// 가중치들을 정규화합니다.
+		weight0 = weight0 / normalization;
+		weight1 = weight1 / normalization;
+		weight2 = weight2 / normalization;
+		weight3 = weight3 / normalization;
+		weight4 = weight4 / normalization;
+
+		// 색깔을 검정색으로 초기화합니다.
+		color = float4(0.0f, 0.0f, 0.0f, 0.0f);
+
+		// 수평선상의 아홉 픽셀값들을 가중치를 곱해 더합니다.
+		color += g_LinerTexture.Sample(DefaultSampler, In.texCrd1) * weight4;
+		color += g_LinerTexture.Sample(DefaultSampler, In.texCrd2) * weight3;
+		color += g_LinerTexture.Sample(DefaultSampler, In.texCrd3) * weight2;
+		color += g_LinerTexture.Sample(DefaultSampler, In.texCrd4) * weight1;
+		color += g_LinerTexture.Sample(DefaultSampler, In.texCrd5) * weight0;
+		color += g_LinerTexture.Sample(DefaultSampler, In.texCrd6) * weight1;
+		color += g_LinerTexture.Sample(DefaultSampler, In.texCrd7) * weight2;
+		color += g_LinerTexture.Sample(DefaultSampler, In.texCrd8) * weight3;
+		color += g_LinerTexture.Sample(DefaultSampler, In.texCrd9) * weight4;
+
+		// 알파 채널을 1로 설정합니다.
+
+		color.a = 1.0f;
+
+
+		Out.vColor = color;
+
+	
+
+	return Out;
+}
+
+PS_OUT_AfterDeferred PS_JUSTDOWN(PS_IN In)
+{
+	PS_OUT_AfterDeferred		Out = (PS_OUT_AfterDeferred)0;
+
+	Out.vColor = g_TargetTexture.Sample(DefaultSampler, In.vTexUV);
+	Out.vColor2 = Out.vColor;
+
+	return Out;
+}
+
+PS_OUT PS_UPSCALING_Lumi(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+
+	Out.vColor = g_ShadowMapTexture.Sample(DefaultSampler, In.vTexUV)
+		+ g_UpScaledTexture1.Sample(DefaultSampler, In.vTexUV)
+		+ g_UpScaledTexture2.Sample(DefaultSampler, In.vTexUV)
+		+ g_UpScaledTexture3.Sample(DefaultSampler, In.vTexUV)
+		+ g_UpScaledTexture4.Sample(DefaultSampler, In.vTexUV);
+
+	return Out;
+}
+PS_OUT PS_MAIN_Att(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	Out.vColor = g_TargetTexture.Sample(DefaultSampler, In.vTexUV) * g_fAttenuationValue;
+
+	return Out;
+}
 
 
 BlendState	NonBlending
@@ -570,5 +702,76 @@ technique11		DefaultTechnique
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_Blur();
 	}
+	pass EndProsessingBuffer // 9
+	{
+		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(NonZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_ccw);
 
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_EndProsseing();
+	}
+
+	pass DownFittering_Luminece// 10
+	{
+		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(NonZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_ccw);
+
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_DOWNSCALING_Luminence();
+	}
+
+	pass UpFittering_Luminece// 11
+	{
+		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(NonZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_ccw);
+
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_UPSCALING_Lumi();
+	}
+	pass VerticleBlur_Luminece// 12
+	{
+		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(NonZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_ccw);
+
+		VertexShader = compile vs_5_0 VS_VerticleBlur();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_Blur_Luminence();
+	}
+	pass HorizonBlur_Luminece// 13
+	{
+		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(NonZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_ccw);
+
+		VertexShader = compile vs_5_0 VS_HorizBlur();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_Blur_Luminence();
+	}
+	pass HorizonBlur_JustDown// 14
+	{
+		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(NonZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_ccw);
+
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_JUSTDOWN();
+	}
+	pass AttenuationValue// 15
+	{
+		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(NonZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_ccw);
+
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_Att();
+	}
 }
