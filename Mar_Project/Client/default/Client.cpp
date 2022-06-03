@@ -30,7 +30,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_ int       nCmdShow)
 {
 
-
+	 
 
 #ifndef USE_IMGUI
 #ifdef _DEBUG

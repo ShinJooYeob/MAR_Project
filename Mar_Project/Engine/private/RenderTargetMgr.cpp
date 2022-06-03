@@ -28,12 +28,14 @@ HRESULT CRenderTargetMgr::Initialize_RenderTargetMgr(ID3D11Device* pDevice, ID3D
 	Safe_AddRef(m_pDevice);
 	Safe_AddRef(m_pDeviceContext);
 
+#ifdef _DEBUG
 	m_pVIBuffer = CVIBuffer_Rect::Create(m_pDevice, m_pDeviceContext);
 	NULL_CHECK_RETURN(m_pVIBuffer, E_FAIL);
 
 	m_pShader = CShader::Create(m_pDevice, m_pDeviceContext, TEXT("Shader_Deferred.hlsl"), VTXTEX_DECLARATION::Elements, VTXTEX_DECLARATION::iNumElements);
 
 	NULL_CHECK_RETURN(m_pShader, E_FAIL);
+#endif // _DEBUG
 
 	return S_OK;
 }
@@ -229,8 +231,11 @@ list<CRenderTargetLayer*>* CRenderTargetMgr::Find_MRT(const _tchar * pMRTTag)
 
 void CRenderTargetMgr::Free()
 {
+#ifdef _DEBUG
+
 	Safe_Release(m_pVIBuffer);
 	Safe_Release(m_pShader);
+#endif // _DEBUG
 
 	for (auto& Pair : m_mapMRTGroup)
 	{

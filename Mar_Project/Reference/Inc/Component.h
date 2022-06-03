@@ -20,9 +20,9 @@ public:
 
 
 
-#ifdef _DEBUG
 public:
 	virtual HRESULT Render() { return S_OK; }
+#ifdef _DEBUG
 #endif // _DEBUG
 
 protected:

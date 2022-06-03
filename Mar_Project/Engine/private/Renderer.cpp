@@ -749,7 +749,7 @@ HRESULT CRenderer::Render_BlurLuminence()
 		wstring ttDebugLog = L"iTargetSize : " + to_wstring(iTargetSize) + L"\n";
 		OutputDebugStringW(ttDebugLog.c_str());
 	}
-
+	 
 	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_LEFT)&DIS_Down)
 	{
 		iTargetSize -= 1;
@@ -992,6 +992,7 @@ HRESULT CRenderer::Render_UI()
 	return S_OK;
 }
 
+#ifdef _DEBUG
 HRESULT CRenderer::Render_Debug()
 {
 	FAILED_CHECK(m_pShader->Apply(4));
@@ -1008,6 +1009,7 @@ HRESULT CRenderer::Render_Debug()
 
 	return S_OK;
 }
+#endif // _DEBUG
 
 CRenderer * CRenderer::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, void * pArg)
 {

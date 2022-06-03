@@ -15,6 +15,12 @@ cbuffer	ForHDR
 	float g_fBlurLuminence = 0.5f;
 	float g_fAttenuationValue = 1.f;
 };
+cbuffer	ForLightShaft
+{
+	float4 g_vLightShaftValue  = 0;
+	float2 g_vScreenLightUVPos = 0;
+};
+
 
 
 cbuffer LightDesc
@@ -570,6 +576,63 @@ PS_OUT PS_MAIN_Att(PS_IN In)
 }
 
 
+
+
+PS_OUT PS_MAIN_Shaft(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+	//float4 g_vLightShaftValue
+
+	// x = Density
+	// y = Decay
+	// z = Weight
+	// w = Exposure
+
+
+
+#define NUM_SAMPLES 64
+
+	//화면 공간에서 픽셀로부터 광원을 향하는 벡터 계산
+	float2 DeltaTexCoord = (In.vTexUV.xy - g_vScreenLightUVPos.xy);
+
+	//샘플링할 수로 나누고 제어 팩터로 스케일링한다
+	DeltaTexCoord *= 1.0 / NUM_SAMPLES* g_vLightShaftValue.x;
+
+	//샘플링
+	vector Color = g_TargetTexture.Sample(DefaultSampler, In.vTexUV);
+
+	//일루미네이션 감소 팩터 설정
+	float IlluminationDecay = 1.0;
+
+	//방정식 3의 적용
+	for (int i = 0; i < NUM_SAMPLES; ++i)
+	{
+		//광선을 따라 샘플링
+		In.vTexUV -= DeltaTexCoord;
+
+		//샘플을 새 좌표로 위치 시킴
+	
+		vector Sample = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
+
+		//스케일 / 감쇄 팩터를 적용해 감소를 수행
+		Sample *= IlluminationDecay * g_vLightShaftValue.z;
+
+		//합쳐진 색 저장
+		Color += Sample;
+
+		//감쇄 팩터 지수 업데이트
+		IlluminationDecay *= g_vLightShaftValue.y;
+	}
+
+	// 최종 컬러를 추가 컨트롤 팩터와 함께 출력
+	Out.vColor = saturate(float4((Color * g_vLightShaftValue.w).xyz, 1.0));
+
+
+	return Out;
+}
+
+
+
 BlendState	NonBlending
 {
 	BlendEnable[0] = false;
@@ -773,5 +836,15 @@ technique11		DefaultTechnique
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN_Att();
+	}
+	pass LightShaft// 15
+	{
+		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(NonZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_ccw);
+
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_Shaft();
 	}
 }

@@ -143,6 +143,12 @@
     <PreBuildEvent>
       <Command>call BeforBuildBat.bat</Command>
     </PreBuildEvent>
+    <FxCompile>
+      <ShaderType>Effect</ShaderType>
+    </FxCompile>
+    <FxCompile>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\public\AnimationClip.h" />

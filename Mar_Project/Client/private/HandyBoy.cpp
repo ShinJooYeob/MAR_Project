@@ -781,7 +781,7 @@ HRESULT CHandyBoy::Adjust_MovedTransform_byAnim(_double fDeltatime)
 			if (PlayRate > 0.01)
 			{
 
-				GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.1f, _float4(0.5f));
+				GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.1f, _float4(0.2f));
 			}
 
 		}
@@ -816,7 +816,7 @@ HRESULT CHandyBoy::Adjust_MovedTransform_byAnim(_double fDeltatime)
 					if (m_bIsGrabed)
 					{
 
-						GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.25f, _float4(2.5f));
+						GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.25f, _float4(0.8f));
 
 						m_bIsGrabed = false;
 						m_pPlayer->Set_IsAttached(false);
