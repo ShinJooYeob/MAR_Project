@@ -293,6 +293,8 @@ HRESULT CRenderer::Render_RenderGroup()
 	FAILED_CHECK(Render_BlurShadow());
 	FAILED_CHECK(Render_Lights());
 
+
+
 	FAILED_CHECK(m_pRenderTargetMgr->Begin(TEXT("MRT_AfterDefferred")));
 	FAILED_CHECK(Render_DeferredTexture());
 	FAILED_CHECK(m_pRenderTargetMgr->End(TEXT("MRT_AfterDefferred")));
@@ -581,6 +583,8 @@ HRESULT CRenderer::Render_BlurShadow()
 	FAILED_CHECK(m_pShader->Set_Texture("g_ShadowMapTexture", m_pRenderTargetMgr->Get_SRV(TEXT("Target_DownScaledBluredShadow"))));
 	FAILED_CHECK(m_pVIBuffer->Render(m_pShader, 6));
 	FAILED_CHECK(m_pRenderTargetMgr->End(TEXT("MRT_ShadowUpScaling")));
+
+
 	return S_OK;
 }
 
@@ -643,8 +647,7 @@ HRESULT CRenderer::Render_PostProcessing()
 
 	m_RenderObjectList[RENDER_POSTPROCESSING].clear();
 
-
-
+	FAILED_CHECK(Render_GodRay());
 	FAILED_CHECK(Render_BlurLuminence());
 
 
@@ -654,26 +657,8 @@ HRESULT CRenderer::Render_PostProcessing()
 	m_pDeviceContext->OMSetRenderTargets(iNumViews, pRenderTargets, m_pGraphicDevice->Get_OriginalDSV());
 
 	
-	FAILED_CHECK(m_pRenderTargetMgr->Begin(TEXT("MRT_CopyDefferred")));
 
-	CPipeLineMgr*		pPipeLineMgr = GetSingle(CPipeLineMgr);
-
-	_float4x4		ViewMatrixInv, ProjMatrixInv;
-
-	XMStoreFloat4x4(&ViewMatrixInv, XMMatrixTranspose(XMMatrixInverse(nullptr, pPipeLineMgr->Get_Transform_Matrix(PLM_VIEW))));
-	XMStoreFloat4x4(&ProjMatrixInv, XMMatrixTranspose(XMMatrixInverse(nullptr, pPipeLineMgr->Get_Transform_Matrix(PLM_PROJ))));
-
-	m_pShader->Set_Texture("g_TargetTexture", m_pRenderTargetMgr->Get_SRV(L"Target_AfterDefferred"));
-
-	FAILED_CHECK(m_pShader->Set_RawValue("g_WorldMatrix", &m_WVPmat.WorldMatrix, sizeof(_float4x4)));
-	FAILED_CHECK(m_pShader->Set_RawValue("g_ViewMatrix", &m_WVPmat.ViewMatrix, sizeof(_float4x4)));
-	FAILED_CHECK(m_pShader->Set_RawValue("g_ProjMatrix", &m_WVPmat.ProjMatrix, sizeof(_float4x4)));
-
-	FAILED_CHECK(m_pVIBuffer->Render(m_pShader, 0));
-	FAILED_CHECK(m_pRenderTargetMgr->End(TEXT("MRT_CopyDefferred")));
-
-
-
+	FAILED_CHECK(Copy_ReferenceToDeferred());
 
 	FAILED_CHECK(m_pRenderTargetMgr->Begin_WithBackBuffer(TEXT("MRT_AfterPostProcessing")));
 
@@ -842,15 +827,6 @@ HRESULT CRenderer::Render_BlurLuminence()
 
 
 
-
-
-
-
-
-
-
-
-
 	FAILED_CHECK(m_pRenderTargetMgr->Begin(TEXT("MRT_LumineceBluringVerticle"), m_DownScaledDepthStencil[0]));
 
 
@@ -900,6 +876,67 @@ HRESULT CRenderer::Render_BlurLuminence()
 	FAILED_CHECK(m_pShader->Set_Texture("g_TargetTexture", m_pRenderTargetMgr->Get_SRV(TEXT("Target_DownScaledLuminece"))));
 	FAILED_CHECK(m_pVIBuffer->Render(m_pShader, 0));
 	FAILED_CHECK(m_pRenderTargetMgr->End(TEXT("MRT_LumineceUpScaling")));
+
+
+	return S_OK;
+}
+
+HRESULT CRenderer::Render_GodRay()
+{
+	CGameInstance* pInstace = GetSingle(CGameInstance);
+	_float4 ProjSpacePos = XMVector3TransformCoord(_float3(0, 30, -30).Multiply_Matrix_AsPosVector(pInstace->Get_Transform_Matrix(PLM_VIEW)), pInstace->Get_Transform_Matrix(PLM_PROJ));
+	//_float3 ProjSpacePos = XMVector3TransformCoord(_float3(0, 256, -128).Multiply_Matrix_AsPosVector(pInstace->Get_Transform_Matrix(PLM_VIEW)), pInstace->Get_Transform_Matrix(PLM_PROJ));
+
+	_float2 ScreenLightPos = _float2(ProjSpacePos.x * 0.5f + 0.5f, ProjSpacePos.y * -0.5f + 0.5f);
+	
+	FAILED_CHECK(m_pRenderTargetMgr->Begin(TEXT("MRT_AfterPostProcessing")));
+
+
+	FAILED_CHECK(m_pShader->Set_RawValue("g_vLightShaftValue", &_float4(0.002f, 1.05f, 0.8f, 1.f), sizeof(_float4)));
+	//FAILED_CHECK(m_pShader->Set_RawValue("g_vLightShaftValue", &_float4(0.002f, 1.05f, 0.8f, 0.04f), sizeof(_float4)));
+	FAILED_CHECK(m_pShader->Set_RawValue("g_vScreenLightUVPos", &ScreenLightPos, sizeof(_float2)));
+
+
+
+	FAILED_CHECK(m_pShader->Set_RawValue("g_WorldMatrix", &m_WVPmat.WorldMatrix, sizeof(_float4x4)));
+	FAILED_CHECK(m_pShader->Set_RawValue("g_ViewMatrix", &m_WVPmat.ViewMatrix, sizeof(_float4x4)));
+	FAILED_CHECK(m_pShader->Set_RawValue("g_ProjMatrix", &m_WVPmat.ProjMatrix, sizeof(_float4x4)));
+
+
+
+	FAILED_CHECK(m_pShader->Set_Texture("g_DiffuseTexture", m_pRenderTargetMgr->Get_SRV(L"Target_ReferenceDefferred")));
+	FAILED_CHECK(m_pShader->Set_Texture("g_TargetTexture", m_pRenderTargetMgr->Get_SRV(L"Target_Depth")));
+	
+	FAILED_CHECK(m_pVIBuffer->Render(m_pShader, 16));
+
+
+	FAILED_CHECK(m_pRenderTargetMgr->End(TEXT("MRT_AfterPostProcessing")));
+
+
+
+	return S_OK;
+}
+
+HRESULT CRenderer::Copy_ReferenceToDeferred()
+{
+	FAILED_CHECK(m_pRenderTargetMgr->Begin(TEXT("MRT_CopyDefferred")));
+
+	CPipeLineMgr*		pPipeLineMgr = GetSingle(CPipeLineMgr);
+
+	_float4x4		ViewMatrixInv, ProjMatrixInv;
+
+	XMStoreFloat4x4(&ViewMatrixInv, XMMatrixTranspose(XMMatrixInverse(nullptr, pPipeLineMgr->Get_Transform_Matrix(PLM_VIEW))));
+	XMStoreFloat4x4(&ProjMatrixInv, XMMatrixTranspose(XMMatrixInverse(nullptr, pPipeLineMgr->Get_Transform_Matrix(PLM_PROJ))));
+
+	m_pShader->Set_Texture("g_TargetTexture", m_pRenderTargetMgr->Get_SRV(L"Target_AfterDefferred"));
+
+	FAILED_CHECK(m_pShader->Set_RawValue("g_WorldMatrix", &m_WVPmat.WorldMatrix, sizeof(_float4x4)));
+	FAILED_CHECK(m_pShader->Set_RawValue("g_ViewMatrix", &m_WVPmat.ViewMatrix, sizeof(_float4x4)));
+	FAILED_CHECK(m_pShader->Set_RawValue("g_ProjMatrix", &m_WVPmat.ProjMatrix, sizeof(_float4x4)));
+
+	FAILED_CHECK(m_pVIBuffer->Render(m_pShader, 0));
+	FAILED_CHECK(m_pRenderTargetMgr->End(TEXT("MRT_CopyDefferred")));
+
 
 
 	return S_OK;

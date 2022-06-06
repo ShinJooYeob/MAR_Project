@@ -59,7 +59,7 @@ private:
 	MATRIXWVP					m_LightWVPmat;
 	ID3D11DepthStencilView*		m_LightDepthStencil = nullptr;
 	ID3D11DepthStencilView*		m_DownScaledDepthStencil[5] = { nullptr };
-	_float						m_BlurLuminence = 0.192f;
+	_float						m_BlurLuminence = 0.387f;
 
 
 private:
@@ -76,6 +76,8 @@ private:
 
 	HRESULT Render_PostProcessing();
 	HRESULT Render_BlurLuminence();
+	HRESULT Render_GodRay();
+	HRESULT Copy_ReferenceToDeferred();
 
 	HRESULT Render_NonAlpha_NoDeferrd();
 	

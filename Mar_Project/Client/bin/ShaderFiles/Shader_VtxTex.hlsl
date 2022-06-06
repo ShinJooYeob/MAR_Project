@@ -496,7 +496,7 @@ PS_OUT PS_RadialBlur(PS_IN In)
 	[unroll(100)]for (int i = 0; i < Count; i++)
 	{
 
-		color += g_BlurTargetTexture.Sample(DefaultSampler, saturate( In.vTexUV + (vDir * fPower * (float)i)));
+		color += g_BlurTargetTexture.Sample(ClampSampler, saturate( In.vTexUV + (vDir * fPower * (float)i))    );
 	}
 	color /= min((Count),100);
 
