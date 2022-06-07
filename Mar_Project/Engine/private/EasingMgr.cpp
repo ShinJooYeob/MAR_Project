@@ -158,7 +158,7 @@ _float3 CEasingMgr::Easing_Return_Vector(_uint eGoEasingType, _uint eBackEasingT
 	vResult.y = Easing_Return(eGoEasingType,eBackEasingType, fStartPoint.y, fTargetPoint.y, fPassedTime, fTotalTime);
 	vResult.z = Easing_Return(eGoEasingType,eBackEasingType, fStartPoint.z, fTargetPoint.z, fPassedTime, fTotalTime);
 
-	return _float3();
+	return vResult;
 }
 
 

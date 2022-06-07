@@ -36,6 +36,7 @@ private:
 	CModel*				m_pSubModel = nullptr;
 	CTransform*			m_pTransformCom = nullptr;
 	CTransform*			m_pParticleTargetTransformCom = nullptr;
+	CTransform*			m_pSubTransformCom = nullptr;
 	CCollider*			m_pColliderCom = nullptr;
 
 
@@ -47,10 +48,11 @@ private:
 	_float				m_SpwanMeshScale = 2;
 	_double				m_SpwanedPassedTime = 0;
 	ATTACHBONEMATRIX_PTR m_tCollisionAttachPtr;
+	ATTACHBONEMATRIX_PTR m_tCollisionAttachPtr2;
 	_bool				m_PatternChecker = false;
 
 
-	PARTICLEDESC		m_tParticleDesc;
+	vector<PARTICLEDESC>		m_vecParticleDesc;
 
 
 	_bool				m_bDeathAnimStart = false;

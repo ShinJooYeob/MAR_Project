@@ -71,9 +71,19 @@ _int CThrowOilBullet::Update(_double fDeltaTime)
 	m_pColliderCom->Update_ConflictPassedTime(fDeltaTime);
 
 	m_fStartTimer += (_float)fDeltaTime;
+	m_fInstanceTimer += (_float)fDeltaTime;
+	
+
+	if (m_fInstanceTimer > 0.1f)
+	{
+		GetSingle(CUtilityMgr)->Start_InstanceParticle(m_eNowSceneNum, m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0);
+		m_fInstanceTimer = 0;
+	}
 
 	if (m_fStartTimer > 3)
 	{
+
+
 		m_pTransformCom->Set_IsOwnerDead(true);
 		Set_IsDead();
 	}

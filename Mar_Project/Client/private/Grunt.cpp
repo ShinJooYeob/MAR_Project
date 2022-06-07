@@ -76,7 +76,28 @@ _int CGrunt::Update(_double fDeltaTime)
 		m_pParticleTargetTransformCom->Set_Matrix(TransformMatrix);
 	}
 
+	{
+		{
 
+
+			_Matrix			TransformMatrix = XMLoadFloat4x4(m_tCollisionAttachPtr2.pUpdatedNodeMat) * XMLoadFloat4x4(m_tCollisionAttachPtr2.pDefaultPivotMat);
+
+			TransformMatrix.r[0] = XMVector3Normalize(TransformMatrix.r[0]);
+			TransformMatrix.r[1] = XMVector3Normalize(TransformMatrix.r[1]);
+
+
+			TransformMatrix.r[2] = XMVector3Normalize(TransformMatrix.r[2]);
+
+
+			//Pivot  : -0.360000f , 0.000000f , -1.959998f , 1
+			TransformMatrix = XMMatrixTranslation(-0.360000f, 0.000000f, -1.959998f) * TransformMatrix * m_pTransformCom->Get_WorldMatrix();
+			m_pSubTransformCom->Set_MatrixState(CTransform::STATE_POS, TransformMatrix.r[3]);
+
+		}
+
+
+
+	}
 
 	if (g_pGameInstance->Get_DIKeyState(DIK_F1)&DIS_Down)
 		m_pModel->Change_AnimIndex(0);
@@ -195,6 +216,8 @@ _int CGrunt::Update(_double fDeltaTime)
 			}
 			else if (m_iSpwanMeshRend == 1 && PlayRate > 0.95)
 			{
+
+				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[1]);
 				m_iSpwanMeshRend = 2; 
 				GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.2f, _float4(0.2f));
 			}
@@ -628,7 +651,7 @@ HRESULT CGrunt::Adjust_AnimMovedTransform(_double fDeltatime)
 			{
 
 				m_pParticleTargetTransformCom->Set_IsOwnerDead(false);
-				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_tParticleDesc);
+				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[0]);
 				m_iAdjMovedIndex++;
 
 			}
@@ -688,7 +711,7 @@ HRESULT CGrunt::Adjust_AnimMovedTransform(_double fDeltatime)
 			if (m_iAdjMovedIndex == 0 && PlayRate > 0.01)
 			{
 				m_pParticleTargetTransformCom->Set_IsOwnerDead(false);
-				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_tParticleDesc);
+				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[0]);
 				m_iAdjMovedIndex++;
 			}
 
@@ -839,6 +862,21 @@ HRESULT CGrunt::SetUp_Components()
 
 
 
+	//Pivot  : -1.394999f , -0.140000f , -0.515000f , 1
+	//size  : 12.570192f , 0.100000f , 0.100000f  
+	ColliderDesc.vScale = _float3(1.2570192f, 0.100000f, 0.100000f);
+	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
+	ColliderDesc.vPosition = _float4(0, 0, 0, 1);
+	//ColliderDesc.vPosition = _float4(-1.394999f, -0.140000f, -0.515000f, 1);
+	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));
+	m_pColliderCom->Set_ParantBuffer();
+	m_tCollisionAttachPtr2 = m_pModel->Find_AttachMatrix_InHirarchyNode("CATRig01");
+	NULL_CHECK_RETURN(m_tCollisionAttachPtr2.pDefaultPivotMat, E_FAIL);
+
+
+	
+
+
 	CTransform::TRANSFORMDESC tDesc = {};
 
 	tDesc.fMovePerSec = 0.5;
@@ -848,6 +886,7 @@ HRESULT CGrunt::SetUp_Components()
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Transform), TAG_COM(Com_Transform), (CComponent**)&m_pTransformCom, &tDesc));
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Transform), TAG_COM(Com_SubTransform), (CComponent**)&m_pParticleTargetTransformCom, &tDesc));
+	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Transform), L"Com_SubTransform2", (CComponent**)&m_pSubTransformCom, &tDesc));
 	
 
 
@@ -857,51 +896,90 @@ HRESULT CGrunt::SetUp_Components()
 HRESULT CGrunt::SetUp_ParticleDesc()
 {
 
-	m_tParticleDesc = PARTICLEDESC();
+	 PARTICLEDESC tDesc;
 
-	m_tParticleDesc.eParticleTypeID = Particle_Straight;
+	tDesc.eParticleTypeID = Particle_Straight;
+	tDesc.FollowingTarget = m_pParticleTargetTransformCom;
+	tDesc.szTextureProtoTypeTag = TAG_CP(Prototype_Texture_PlayerEffect);
+	tDesc.szTextureLayerTag = L"Explosion";
+	tDesc.iSimilarLayerNum = 2;
+	tDesc.TextureChageFrequency = 1;
+	tDesc.vTextureXYNum = _float2(5, 4);
+	tDesc.TotalParticleTime = 7.f;
+	tDesc.EachParticleLifeTime = 0.34f;
+	tDesc.MaxParticleCount = 10;
+	tDesc.SizeChageFrequency = 2;
+	tDesc.ParticleSize = _float3(3);
+	tDesc.ParticleSize2 = _float3(0.2f);
+	tDesc.ColorChageFrequency = 0;
+	tDesc.TargetColor = _float4(1.f, 1.f, 1.f, 0.7f);
+	tDesc.TargetColor2 = _float4(1.f, 1.f, 1.f, 1.f);
+	tDesc.Particle_Power = 3;
+	tDesc.PowerRandomRange = _float2(0.8f, 1.0f);
+	tDesc.vUp = _float3(0, 1, 0);
+	tDesc.MaxBoundaryRadius = 3;
+	tDesc.m_bIsUI = false;
+	tDesc.m_bUIDepth = 0;
+	tDesc.ParticleStartRandomPosMin = _float3(-0.05f, 0.00f, -0.05f);
+	tDesc.ParticleStartRandomPosMax = _float3(0.05f, 0.01f, 0.05f);
+	tDesc.DepthTestON = true;
+	tDesc.AlphaBlendON = true;
+	tDesc.m_fAlphaTestValue = 0.1f;
+	tDesc.m_iPassIndex = 3;
 
-	m_tParticleDesc.FollowingTarget = m_pParticleTargetTransformCom;
-
-	m_tParticleDesc.szTextureProtoTypeTag = TAG_CP(Prototype_Texture_PlayerEffect);
-	m_tParticleDesc.szTextureLayerTag = L"Explosion";
-	m_tParticleDesc.iSimilarLayerNum = 2;
-
-	m_tParticleDesc.TextureChageFrequency = 1;
-	m_tParticleDesc.vTextureXYNum = _float2(5, 4);
-
-	m_tParticleDesc.TotalParticleTime = 7.f;
-	m_tParticleDesc.EachParticleLifeTime = 0.34f;
-
-	m_tParticleDesc.MaxParticleCount = 10;
-
-	m_tParticleDesc.SizeChageFrequency = 2;
-	m_tParticleDesc.ParticleSize = _float3(3);
-	m_tParticleDesc.ParticleSize2 = _float3(0.2f);
-
-	m_tParticleDesc.ColorChageFrequency = 0;
-	m_tParticleDesc.TargetColor = _float4(1.f, 1.f, 1.f, 0.7f);
-	m_tParticleDesc.TargetColor2 = _float4(1.f, 1.f, 1.f, 1.f);
+	m_vecParticleDesc.push_back(tDesc);
 
 
-	m_tParticleDesc.Particle_Power = 3;
-	m_tParticleDesc.PowerRandomRange = _float2(0.8f, 1.0f);
 
-	m_tParticleDesc.vUp = _float3(0, 1, 0);
 
-	m_tParticleDesc.MaxBoundaryRadius = 3;
 
-	m_tParticleDesc.m_bIsUI = false;
-	m_tParticleDesc.m_bUIDepth = 0;
 
-	m_tParticleDesc.ParticleStartRandomPosMin = _float3(-0.05f, 0.00f, -0.05f);
-	m_tParticleDesc.ParticleStartRandomPosMax = _float3(0.05f, 0.01f, 0.05f);
 
-	m_tParticleDesc.DepthTestON = true;
-	m_tParticleDesc.AlphaBlendON = true;
 
-	m_tParticleDesc.m_fAlphaTestValue = 0.1f;
-	m_tParticleDesc.m_iPassIndex = 3;
+	///////////////////////////////
+	/////////5//////////////////
+
+	tDesc.eParticleTypeID = Particle_Cone;
+	tDesc.FollowingTarget = m_pSubTransformCom;
+	tDesc.szTextureProtoTypeTag = TAG_CP(Prototype_Texture_PlayerEffect);
+	tDesc.szTextureLayerTag = L"Fire";
+	tDesc.iSimilarLayerNum = 1;
+	tDesc.szNoiseTextureLayerTag = L"Noise";
+	tDesc.iNoiseTextureIndex = 0;
+	tDesc.TextureChageFrequency = 1;
+
+
+	tDesc.vTextureXYNum = _float2(1, 1);
+	tDesc.TotalParticleTime = 99999999.f;
+	tDesc.EachParticleLifeTime = 0.6f;
+	tDesc.MaxParticleCount = 10;
+
+	tDesc.SizeChageFrequency = 1;
+
+
+	tDesc.ParticleSize = _float3(0.5f);
+	tDesc.ParticleSize2 = _float3(0.3f);
+	tDesc.ColorChageFrequency = 1;
+	tDesc.TargetColor = _float4(1.f, 1.f, 1.f, 1.f);
+	tDesc.TargetColor2 = _float4(1.f, 1.f, 1.f, 0.f);
+
+	tDesc.Particle_Power = 1.f;
+	tDesc.PowerRandomRange = _float2(0.8f, 1.2f);
+	tDesc.vUp = _float3(0, 1, 0);
+	tDesc.MaxBoundaryRadius = 10;
+	tDesc.m_bIsUI = false;
+	tDesc.m_bUIDepth = 0;
+	tDesc.ParticleStartRandomPosMin = _float3(-0.4f, 0.0f, -0.4f);
+	tDesc.ParticleStartRandomPosMax = _float3(0.4f, 0.2f, 0.4f);
+	tDesc.DepthTestON = true;
+	tDesc.AlphaBlendON = true;
+	tDesc.m_fAlphaTestValue = 0.1f;
+	tDesc.m_iPassIndex = 18;
+
+
+	m_vecParticleDesc.push_back(tDesc);
+
+
 
 	return S_OK;
 }
@@ -959,5 +1037,6 @@ void CGrunt::Free()
 	
 	Safe_Release(m_pColliderCom);
 	Safe_Release(m_pParticleTargetTransformCom);
+	Safe_Release(m_pSubTransformCom);
 	
 }

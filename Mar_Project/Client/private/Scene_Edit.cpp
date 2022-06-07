@@ -2818,7 +2818,7 @@ HRESULT CScene_Edit::Update_ParticleTab(_double fDeltatime)
 	return S_OK;
 }
 
-#define DefaultParticleNameTag "Dust3"
+#define DefaultParticleNameTag "Fire"
 
 HRESULT CScene_Edit::Ready_ParticleDesc()
 {
@@ -2830,8 +2830,11 @@ HRESULT CScene_Edit::Ready_ParticleDesc()
 	m_tParticleDesc.szTextureLayerTag = TEXT( DefaultParticleNameTag);
 	m_tParticleDesc.iSimilarLayerNum = 1;
 
+	m_tParticleDesc.szNoiseTextureLayerTag = L"Noise";
+	m_tParticleDesc.iNoiseTextureIndex = 0;
+
 	m_tParticleDesc.TextureChageFrequency = 6;
-	m_tParticleDesc.vTextureXYNum = _float2(4, 4);
+	m_tParticleDesc.vTextureXYNum = _float2(1, 1);
 
 	m_tParticleDesc.TotalParticleTime = 0.1f;
 	m_tParticleDesc.EachParticleLifeTime = 2.f;
@@ -2846,7 +2849,7 @@ HRESULT CScene_Edit::Ready_ParticleDesc()
 	m_tParticleDesc.TargetColor2 = _float4(1.f, 1.f, 1.f, 1.f);
 
 
-	m_tParticleDesc.Particle_Power = 3;
+	m_tParticleDesc.Particle_Power = 0;
 	m_tParticleDesc.PowerRandomRange = _float2(0.5f, 1.5f);
 
 	m_tParticleDesc.vUp = _float3(0, 1, 0);
@@ -2856,14 +2859,14 @@ HRESULT CScene_Edit::Ready_ParticleDesc()
 	m_tParticleDesc.m_bIsUI = false;
 	m_tParticleDesc.m_bUIDepth = 0;
 
-	m_tParticleDesc.ParticleStartRandomPosMin = _float3(-1.0f, 0.0f, -1.0f);
-	m_tParticleDesc.ParticleStartRandomPosMax = _float3(1.f, 0.f, 1.f);
+	m_tParticleDesc.ParticleStartRandomPosMin = _float3(0);
+	m_tParticleDesc.ParticleStartRandomPosMax = _float3(0);
 
 	m_tParticleDesc.DepthTestON = true;
 	m_tParticleDesc.AlphaBlendON = true;
 
 	m_tParticleDesc.m_fAlphaTestValue = 0.1f;
-	m_tParticleDesc.m_iPassIndex = 10;
+	m_tParticleDesc.m_iPassIndex = 18;
 
 	/*m_tParticleDesc.eParticleTypeID = Particle_Fixed;
 

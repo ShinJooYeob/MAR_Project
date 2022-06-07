@@ -3,22 +3,22 @@
 
 BEGIN(Client)
 
-class CThrowOilBullet final :public CMonsterWeapon
+class CEyepotChainGranade final :public CMonsterWeapon
 {
 public:
-	typedef struct tagBreakedGazboDesc
+	typedef struct tagEyepotChainGranadeDesc
 	{
 		_float3 vPosition;
-		_uint MeshKinds;
 		_float3 MoveDir;
+		_uint MeshKinds;
 
-	}BREAKEDGAZBODESC;
+	}ECGDESC;
 
 
 private:
-	CThrowOilBullet(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
-	CThrowOilBullet(const CThrowOilBullet& rhs);
-	virtual ~CThrowOilBullet() = default;
+	CEyepotChainGranade(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
+	CEyepotChainGranade(const CEyepotChainGranade& rhs);
+	virtual ~CEyepotChainGranade() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype(void* pArg)override;
@@ -30,36 +30,38 @@ public:
 	virtual _int Render()override;
 	virtual _int LightRender()override;
 
-
-	void Set_Position(_float3 vPosition);
-	void Set_MovingStart(_float3 vDir);
-
 	virtual void CollisionTriger(_uint iMyColliderIndex, CGameObject* pConflictedObj, CCollider* pConflictedCollider, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType) override;
 
 
 private:
-
 	CShader*			m_pShaderCom = nullptr;
 	CRenderer*			m_pRendererCom = nullptr;
 	CTransform*			m_pTransformCom = nullptr;
 	CModel*				m_pModel = nullptr;
 	CCollider*			m_pColliderCom = nullptr;
+	CTexture*			m_pTextureCom = nullptr;
+
+private:
+	_double				m_fStartTimer = 0;
+
+	_float				m_RandHeight = 0;
+	_bool				m_bGonnabeDie = false;
+	_double				m_DyingTime = 0;
+
 	PARTICLEDESC		m_tParticleDesc;
 
-private:
-	CTransform*			m_pPlayerTransfrom = nullptr;
-	_float				m_fStartTimer = 0;
-	_float				m_fInstanceTimer= 0;
-	_bool				m_bIsHavetoMoving = false;
 
-	BREAKEDGAZBODESC		m_tDesc;
+	list<_float3>				m_PassedPositionList;
+
+	ECGDESC		m_tDesc;
 private:
 	HRESULT SetUp_Components();
-	HRESULT SetUp_ParticleDesc();
+	HRESULT Set_Bullet_On_Terrain();
+	HRESULT Ready_ParticleDesc();
 
 
 public:
-	static CThrowOilBullet* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, void* pArg = nullptr);
+	static CEyepotChainGranade* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, void* pArg = nullptr);
 	virtual CGameObject* Clone(void* pArg);
 	virtual void Free() override;
 };

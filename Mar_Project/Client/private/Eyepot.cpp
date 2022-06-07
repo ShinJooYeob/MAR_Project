@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "..\public\Eyepot.h"
 #include "Terrain.h"
+#include "EyepotChainGranade.h"
 
 
 
@@ -39,6 +40,9 @@ HRESULT CEyepot::Initialize_Clone(void * pArg)
 	m_iPatternCount = 0;
 	m_bIsJumping = false;
 	m_bIsFarPattern = false;
+
+
+	FAILED_CHECK(Ready_ParticleDesc());
 
 	return S_OK;
 }
@@ -180,7 +184,7 @@ _int CEyepot::Update(_double fDeltaTime)
 			m_pColliderCom->Update_Transform(i+ 3, TransformMatrix);
 
 		}
-
+		
 	}
 	if (!m_bIsPatternFinished && (m_ePattern == 0 || m_ePattern == 2))
 	{
@@ -195,6 +199,8 @@ _int CEyepot::Update(_double fDeltaTime)
 #ifdef _DEBUG
 	FAILED_CHECK(m_pRendererCom->Add_DebugGroup(m_pColliderCom));
 #endif // _DEBUG
+	
+	m_pSubTransformCom->Set_MatrixState(CTransform::STATE_POS, m_pColliderCom->Get_ColliderPosition(4));
 	return _int();
 }
 
@@ -402,6 +408,7 @@ _int CEyepot::Update_Pattern(_double fDeltaTime)
 	if (m_bIsPatternFinished)
 	{
 		m_ePattern += 1;
+		m_ePattern = 1;
 		if (m_ePattern > 2) m_ePattern = 0;
 		m_bIsPatternFinished = false;
 		m_PatternPassedTime = 0;
@@ -483,6 +490,8 @@ _int CEyepot::Update_Pattern(_double fDeltaTime)
 
 		if (m_iPatternCount < 4)
 		{
+			static _uint iChecker = 0;
+
 
 			if (m_bIsFarPattern)
 			{
@@ -501,6 +510,7 @@ _int CEyepot::Update_Pattern(_double fDeltaTime)
 					m_bIsFarPattern = false;
 					m_pTransformCom->Set_MoveSpeed(1.5f);
 					m_pModel->Change_AnimIndex_UntilTo(8, 12, 0.3, true);
+					iChecker = 0;
 				}
 
 			}
@@ -508,11 +518,37 @@ _int CEyepot::Update_Pattern(_double fDeltaTime)
 			{
 				_uint Temp = m_pModel->Get_NowAnimIndex();
 
+				
+				if (m_pModel->Get_NowAnimIndex() == 8 && iChecker == 0)
+				{
+					m_pSubTransformCom->Set_IsOwnerDead(false);
+					GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_tParticleDesc);
+					iChecker++;
+				}
+
 				if (m_pModel->Get_NowAnimIndex() == 9)
 				{
+
 					m_vLookDir = XMVector3Normalize(XMVectorSetY(m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS) - m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0));
 					m_pTransformCom->LookDir(m_vLookDir.XMVector()*(0.15f) + m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * (0.85f));
 				}
+
+				if (iChecker == 1&& m_pModel->Get_NowAnimIndex() == 11 && m_pModel->Get_PlayRate() > 0.7)
+				{
+					m_pSubTransformCom->Set_IsOwnerDead(true);
+
+					CEyepotChainGranade::ECGDESC tDesc;
+
+					tDesc.vPosition = m_pColliderCom->Get_ColliderPosition(3);
+					tDesc.MeshKinds = 0;
+
+					tDesc.MoveDir = XMVector3Normalize(XMVectorSetY(m_pColliderCom->Get_ColliderPosition(3).XMVector() - m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0));
+					g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), L"ProtoType_EyepotChainGranade", &tDesc);
+				
+					iChecker++;
+				}
+
+
 
 				if (m_pModel->Get_NowAnimIndex() == 12)
 				{
@@ -708,7 +744,8 @@ size  : 1.000000f , 1.000000f , 1.000000f
 	tDesc.vPivot = _float3(0, 0, 0);
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Transform), TAG_COM(Com_Transform), (CComponent**)&m_pTransformCom, &tDesc));
-
+	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Transform), TAG_COM(Com_SubTransform), (CComponent**)&m_pSubTransformCom, &tDesc));
+	
 
 	__super::SetUp_WanderLook(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK));
 
@@ -755,6 +792,56 @@ HRESULT CEyepot::DashPatternWander(_double fDeltaTime)
 	return S_OK;
 }
 
+HRESULT CEyepot::Ready_ParticleDesc()
+{
+	m_tParticleDesc.eParticleTypeID = Particle_Cone;
+
+	m_tParticleDesc.FollowingTarget = m_pSubTransformCom;
+
+	m_tParticleDesc.szTextureProtoTypeTag = TAG_CP(Prototype_Texture_PlayerEffect);
+	m_tParticleDesc.szTextureLayerTag = L"Dust5";
+	m_tParticleDesc.iSimilarLayerNum = 1;
+
+	m_tParticleDesc.TextureChageFrequency = 1;
+	m_tParticleDesc.vTextureXYNum = _float2(5, 4);
+
+	m_tParticleDesc.TotalParticleTime = 9999999999.f;
+	m_tParticleDesc.EachParticleLifeTime = 0.34f;
+	m_tParticleDesc.MaxParticleCount = 25;
+
+	m_tParticleDesc.SizeChageFrequency = 1;
+	m_tParticleDesc.ParticleSize = _float3(0.1f);
+	m_tParticleDesc.ParticleSize2 = _float3(3.5f);
+
+	m_tParticleDesc.ColorChageFrequency = 1;
+	m_tParticleDesc.TargetColor = _float4(0.5f,0.5f,0.5f, 1.f);
+	m_tParticleDesc.TargetColor2 = _float4(0.f);
+
+
+	m_tParticleDesc.Particle_Power = 15;
+	m_tParticleDesc.PowerRandomRange = _float2(0.8f, 1.f);
+	m_tParticleDesc.SubPowerRandomRange = _float2(5.f, 6.f);
+
+	m_tParticleDesc.vUp = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_UP);
+
+	m_tParticleDesc.MaxBoundaryRadius = 999999.f;
+
+	m_tParticleDesc.m_bIsUI = false;
+	m_tParticleDesc.m_bUIDepth = 0;
+
+	m_tParticleDesc.ParticleStartRandomPosMin = _float3(-0.1f, -1.f, -0.1f);
+	m_tParticleDesc.ParticleStartRandomPosMax = _float3(0.1f, -1.f, 0.1f);
+
+	m_tParticleDesc.DepthTestON = true;
+	m_tParticleDesc.AlphaBlendON = true;
+
+	m_tParticleDesc.m_fAlphaTestValue = 0.18f;
+	m_tParticleDesc.m_iPassIndex = 5;
+
+
+	return S_OK;
+}
+
 CEyepot * CEyepot::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, void * pArg)
 {
 	CEyepot*	pInstance = new CEyepot(pDevice, pDeviceContext);
@@ -788,5 +875,8 @@ void CEyepot::Free()
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModel);
 	Safe_Release(m_pColliderCom);
+	Safe_Release(m_pSubTransformCom);
+
+	
 
 }

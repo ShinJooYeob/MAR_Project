@@ -66,7 +66,7 @@ HRESULT CPlayer::Initialize_Clone(void * pArg)
 
 _int CPlayer::Update(_double fDeltaTime)
 {
-	if (m_eNowSceneNum == SCENE_LOADING)
+	if (m_eNowSceneNum == SCENE_LOADING || m_eNowSceneNum == SCENE_LOBY)
 		return 0;
 
 	if (__super::Update(fDeltaTime) < 0)return -1;
@@ -87,11 +87,11 @@ _int CPlayer::Update(_double fDeltaTime)
 
 
 
-	//if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
-	//{
-	//
-	//	Eat_Protain();
-	//}
+	if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
+	{	
+		GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[5]);
+
+	}
 	//if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
 	//{
 	//
@@ -151,7 +151,7 @@ _int CPlayer::Update(_double fDeltaTime)
 
 _int CPlayer::LateUpdate(_double fDeltaTime)
 {
-	if (m_eNowSceneNum == SCENE_LOADING)
+	if (m_eNowSceneNum == SCENE_LOADING || m_eNowSceneNum == SCENE_LOBY)
 		return 0;
 
 	if (__super::LateUpdate(fDeltaTime) < 0)
@@ -1598,8 +1598,8 @@ HRESULT CPlayer::Ready_ParticleDesc()
 
 
 
-
-
+	
+	
 
 
 
@@ -4134,6 +4134,13 @@ HRESULT CPlayer::Set_Player_On_Terrain()
 	CGameInstance* pInstance = GetSingle(CGameInstance);
 	
 	CTerrain* pTerrain =(CTerrain*)(pInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Terrain)));
+
+	if (pTerrain == nullptr)
+	{
+		OutputDebugStringW(L"Not Exist Terrain Object!!\n");
+
+		return S_FALSE;
+	}
 
 	_bool bIsOn = false;
 	_uint eNowTile = Tile_End;

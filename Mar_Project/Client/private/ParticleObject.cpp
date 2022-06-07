@@ -204,7 +204,25 @@ _int CParticleObject::Render()
 
 				FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vUVPos", &iter._TextureUV, sizeof(_float2)));
 				FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vColor", &iter._color, sizeof(_float4)));
-				FAILED_CHECK(m_pTextureCom->Bind_OnShader(m_pShaderCom, "g_DiffuseTexture", iter._TextureIndex));
+				if (m_ParticleDesc.szNoiseTextureLayerTag)
+				{
+					FAILED_CHECK(m_pTextureCom->Change_TextureLayer(m_ParticleDesc.szNoiseTextureLayerTag));
+					FAILED_CHECK(m_pTextureCom->Bind_OnShader(m_pShaderCom, "g_NoiseTexture", 0));
+					FAILED_CHECK(m_pTextureCom->Bind_OnShader(m_pShaderCom, "g_SourTexture", 1));
+					//iter._age
+					//m_PassedLifeTime
+					_float ShaderTime = (_float)iter._age;
+					FAILED_CHECK(m_pShaderCom->Set_RawValue("g_fTime", &ShaderTime, sizeof(_float)));
+					
+
+					FAILED_CHECK(m_pTextureCom->Change_TextureLayer(m_TextureLayer.c_str()));
+					FAILED_CHECK(m_pTextureCom->Bind_OnShader(m_pShaderCom, "g_DiffuseTexture", iter._TextureIndex));
+				}
+				else
+				{
+					FAILED_CHECK(m_pTextureCom->Bind_OnShader(m_pShaderCom, "g_DiffuseTexture", iter._TextureIndex));
+				}
+
 				FAILED_CHECK(m_pParticleTransformCom->Bind_OnShader_BillBoard(m_pShaderCom,"g_WorldMatrix", vViewMat));
 				FAILED_CHECK(m_pVIBufferCom->Render(m_pShaderCom, m_ParticleDesc.m_iPassIndex));
 			}
@@ -356,7 +374,7 @@ HRESULT CParticleObject::SetUp_Components()
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, m_ParticleDesc.szTextureProtoTypeTag, TAG_COM(Com_Texture), (CComponent**)&m_pTextureCom));
 	FAILED_CHECK(m_pTextureCom->Change_TextureLayer(m_ParticleDesc.szTextureLayerTag));
-	
+	m_TextureLayer = m_ParticleDesc.szTextureLayerTag;
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Transform), TAG_COM(Com_Transform), (CComponent**)&m_pParentTransformCom));
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Transform), TAG_COM(Com_SubTransform), (CComponent**)&m_pParticleTransformCom));

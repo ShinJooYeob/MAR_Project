@@ -26,7 +26,7 @@ HRESULT CObjectMgr::Add_GameObject_Prototype(const _tchar * tagPrototype, CGameO
 
 	if (Find_Prototype(tagPrototype) != nullptr)
 	{
-		OutputDebugString(TEXT("Prototypes already exist,So won't add more And did Release Parameter GameObject\n"));
+		OutputDebugString(TEXT("GameObject Prototypes already exist,So won't add more And did Release Parameter GameObject\n"));
 		Safe_Release(pPrototype);
 		return S_FALSE;
 	}

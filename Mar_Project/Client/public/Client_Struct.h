@@ -75,6 +75,8 @@ typedef struct tagParticleDesc
 	const _tchar* szTextureLayerTag = nullptr;
 	_uint		iSimilarLayerNum = 1;
 
+	const _tchar* szNoiseTextureLayerTag = nullptr;
+	_uint		iNoiseTextureIndex = 0;
 
 	_uint	 TextureChageFrequency = 0;
 	_float2	 vTextureXYNum = _float2(1, 1);

@@ -646,8 +646,8 @@ HRESULT CRenderer::Render_PostProcessing()
 	}
 
 	m_RenderObjectList[RENDER_POSTPROCESSING].clear();
-
-	FAILED_CHECK(Render_GodRay());
+	 
+	//FAILED_CHECK(Render_GodRay());
 	FAILED_CHECK(Render_BlurLuminence());
 
 
@@ -725,26 +725,8 @@ HRESULT CRenderer::Render_BlurLuminence()
 	m_pDeviceContext->RSSetViewports(iNumViewports, &OldViewPortDesc);
 	FAILED_CHECK(m_pRenderTargetMgr->End(TEXT("MRT_LumineceDownScaling")));
 
-	static _int iTargetSize = 5;
-	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_RIGHT)&DIS_Down)
-	{
-		iTargetSize += 1;
-		if (iTargetSize > 5)iTargetSize = 5;
 
-		wstring ttDebugLog = L"iTargetSize : " + to_wstring(iTargetSize) + L"\n";
-		OutputDebugStringW(ttDebugLog.c_str());
-	}
-	 
-	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_LEFT)&DIS_Down)
-	{
-		iTargetSize -= 1;
-		if (iTargetSize < 0)iTargetSize = 0;
-
-		wstring ttDebugLog = L"iTargetSize : " + to_wstring(iTargetSize) + L"\n";
-		OutputDebugStringW(ttDebugLog.c_str());
-	}
-
-	for (_uint i = 1; i < (_uint)iTargetSize; i++)
+	for (_uint i = 1; i < 5; i++)
 	{
 		m_pDeviceContext->ClearDepthStencilView(m_DownScaledDepthStencil[i], D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
 
@@ -764,7 +746,7 @@ HRESULT CRenderer::Render_BlurLuminence()
 		FAILED_CHECK(m_pRenderTargetMgr->Begin(TargetMrt.c_str(), m_DownScaledDepthStencil[i]));
 
 		FAILED_CHECK(m_pShader->Set_Texture("g_TargetTexture", m_pRenderTargetMgr->Get_SRV(TEXT("Target_ReferenceLuminece"))));
-		_float Att = GetSingle(CGameInstance)->Easing(TYPE_ExpoOut, 1, 0, (_float)i, 5);
+		_float Att = GetSingle(CGameInstance)->Easing(TYPE_QuarticOut, 1, 0, (_float)i, 5);
 		FAILED_CHECK(m_pShader->Set_RawValue("g_fAttenuationValue", &Att, sizeof(_float)));
 
 		FAILED_CHECK(m_pVIBuffer->Render(m_pShader, 15));

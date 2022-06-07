@@ -17,6 +17,7 @@ public:
 	virtual _int LightRender()override;
 
 
+	virtual _int Change_to_NextScene() override;
 
 private:
 	HRESULT Ready_Light();

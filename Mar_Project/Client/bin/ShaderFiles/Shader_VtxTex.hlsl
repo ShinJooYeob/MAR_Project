@@ -7,10 +7,21 @@ texture2D			g_BackBufferTexture;
 texture2D			g_BlurTargetTexture;
 texture2D			g_DepthTexture;
 texture2D			g_NoiseTexture;
-float				g_fTime;
-float2				g_vCenter = float2(0.5f, 0.5f);
-float				g_fZoomSize = 0.25f;
-float				g_fZoomPower = 0.5f;
+
+
+cbuffer Blur 
+{
+	float2				g_vCenter = float2(0.5f, 0.5f);
+	float				g_fZoomSize = 0.25f;
+	float				g_fZoomPower = 0.5f;
+	float				g_fTime;
+}
+cbuffer ForNoise
+{
+	float3				g_vScale = float3(1, 2, 3);
+	float3				g_vScrollSpeeds = float3(2.f,3.f,4.f);
+}
+
 
 cbuffer Particle {
 
@@ -19,9 +30,19 @@ cbuffer Particle {
 	float2 g_vUVSize = float2(1, 1);
 	float4 g_vColor = float4(1.f, 1.f, 1.f, 1.f);
 
+	float g_CutY = 0;
+
 };
 
-float g_CutY = 0;
+cbuffer DistortionBuffer
+{
+	float2 distortion1 = float2(0.1f, 0.2f);
+	float2 distortion2 = float2(0.1f, 0.3f);
+	float2 distortion3 = float2(0.1f, 0.1f);
+	float distortionScale = 0.8f;
+	float distortionBias = 0.5f;
+};
+
 
 
 struct VS_IN
@@ -34,6 +55,15 @@ struct VS_OUT
 {
 	float4		vPosition : SV_POSITION;
 	float2		vTexUV : TEXCOORD0;
+};
+
+struct VS_Noise_OUT
+{
+	float4		vPosition : SV_POSITION;
+	float2		vTexUV : TEXCOORD0;
+	float2		texCoords1 : TEXCOORD1;
+	float2		texCoords2 : TEXCOORD2;
+	float2		texCoords3 : TEXCOORD3;
 };
 struct VS_OUT_BLUR
 {
@@ -177,6 +207,37 @@ VS_OUT_SOFT VS_MAIN_SOFTRECT(VS_IN In)
 	return Out;
 }
 
+VS_Noise_OUT VS_MAIN_Noise(VS_IN In)
+{
+	VS_Noise_OUT			Out;
+
+	matrix			matWV, matWVP;
+
+	matWV = mul(g_WorldMatrix, g_ViewMatrix);
+	matWVP = mul(matWV, g_ProjMatrix);
+
+	Out.vPosition = mul(vector(In.vPosition, 1.f), matWVP);
+	Out.vTexUV = In.vTexUV;
+
+	Out.vTexUV.x = g_vUVPos.x + In.vTexUV.x*g_vUVSize.x;
+	Out.vTexUV.y = g_vUVPos.y + In.vTexUV.y*g_vUVSize.y;
+
+
+	// 첫번째 노이즈 텍스쳐의 좌표를 첫번째 크기 및 윗방향 스크롤 속도 값을 이용하여 계산합니다.
+	Out.texCoords1 = (Out.vTexUV * g_vScale.x);
+	Out.texCoords1.y = Out.texCoords1.y + (g_fTime * g_vScrollSpeeds.x);
+
+	// 두번째 노이즈 텍스쳐의 좌표를 두번째 크기 및 윗방향 스크롤 속도 값을 이용하여 계산합니다.
+	Out.texCoords2 = (Out.vTexUV * g_vScale.y);
+	Out.texCoords2.y = Out.texCoords2.y + (g_fTime * g_vScrollSpeeds.y);
+
+	// 세번째 노이즈 텍스쳐의 좌표를 세번째 크기 및 윗방향 스크롤 속도 값을 이용하여 계산합니다.
+	Out.texCoords3 = (Out.vTexUV * g_vScale.z);
+	Out.texCoords3.y = Out.texCoords3.y + (g_fTime * g_vScrollSpeeds.z);
+
+	return Out;
+}
+
 
 
 struct PS_IN
@@ -190,6 +251,16 @@ struct PS_IN_SOFT
 	float2		vTexUV : TEXCOORD0;
 	float4		vProjPos : TEXCOORD1;
 };
+
+struct PS_IN_Noise
+{
+	float4		vPosition : SV_POSITION;
+	float2		vTexUV : TEXCOORD0;
+	float2		texCoords1 : TEXCOORD1;
+	float2		texCoords2 : TEXCOORD2;
+	float2		texCoords3 : TEXCOORD3;
+};
+
 
 
 struct PS_IN_BLUR
@@ -543,6 +614,62 @@ PS_OUT PS_MAIN_SOFTRECT(PS_IN_SOFT In)
 }
 
 
+PS_OUT PS_MAIN_NoiseFireEffect(PS_IN_Noise In)
+{
+
+	PS_OUT		Out = (PS_OUT)0;
+
+	vector noise1 = g_NoiseTexture.Sample(DefaultSampler, In.texCoords1);
+	vector noise2 = g_NoiseTexture.Sample(DefaultSampler, In.texCoords2);
+	vector noise3 = g_NoiseTexture.Sample(DefaultSampler, In.texCoords3);
+
+	noise1 = (noise1 - 0.5f) * 2.0f;
+	noise2 = (noise2 - 0.5f) * 2.0f;
+	noise3 = (noise3 - 0.5f) * 2.0f;
+
+	// 노이즈의 x와 y값을 세 개의 다른 왜곡 x및 y좌표로 흩뜨립니다.
+	noise1.xy = noise1.xy * distortion1.xy;
+	noise2.xy = noise2.xy * distortion2.xy;
+	noise3.xy = noise3.xy * distortion3.xy;
+
+	// 왜곡된 세 노이즈 값들을 하나의 노이즈로 함성합니다.
+	vector finalNoise = noise1 + noise2 + noise3;
+
+	// 입력으로 들어온 텍스쳐의 Y좌표를 왜곡 크기와 바이어스 값으로 교란시킵니다.
+	// 이 교란은 텍스쳐의 위쪽으로 갈수록 강해져서 맨 위쪽에는 깜박이는 효과를 만들어냅니다.
+	float perturb = saturate(((1.0f - In.vTexUV.y) * distortionScale) + distortionBias);
+
+	// 불꽃 색상 텍스쳐를 샘플링하는데 사용될 왜곡 및 교란된 텍스쳐 좌표를 만듭니다.
+	float2 noiseCoords= saturate((finalNoise.xy * perturb) + In.vTexUV.xy);
+
+	// 왜곡되고 교란된 텍스쳐 좌표를 이용하여 불꽃 텍스쳐에서 색상을 샘플링합니다.
+	// wrap를 사용하는 스테이트 대신 clamp를 사용하는 스테이트를 사용하여 불꽃 텍스쳐가 래핑되는 것을 방지합니다.
+	vector fireColor = g_DiffuseTexture.Sample(ClampSampler, noiseCoords.xy);
+	//ClampSampler
+	// 왜곡되고 교란된 텍스쳐 좌표를 이용하여 알파 텍스쳐에서 알파값을 샘플링합니다.
+	// 불꽃의 투명도를 지정하는 데 사용될 것입니다.
+	// wrap를 사용하는 스테이트 대신 clamp를 사용하는 스테이트를 사용하여 불꽃 텍스쳐가 래핑되는 것을 방지합니다.
+	vector alphaColor = g_SourTexture.Sample(ClampSampler, noiseCoords.xy);
+
+	fireColor *= alphaColor;
+	fireColor.a = alphaColor.r * g_vColor.a;
+	Out.vColor = fireColor;
+
+
+	if (Out.vColor.a < g_fAlphaTestValue)
+		discard;
+
+	return Out;
+
+	//Out.vColor.a = (DiscardValue  - g_fAlphaTestValue )/(1- g_fAlphaTestValue)  * g_vColor.a;
+
+}
+
+
+
+
+
+
 technique11		DefaultTechnique
 {
 	pass Rect			//0
@@ -728,5 +855,15 @@ technique11		DefaultTechnique
 		VertexShader = compile vs_5_0 VS_MAIN_SOFTRECT();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN_SOFTRECT();
+	}
+	pass NoiseFireEffect	//18
+	{
+		SetBlendState(AlphaBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(ZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_ccw);
+
+		VertexShader = compile vs_5_0 VS_MAIN_Noise();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_NoiseFireEffect();
 	}
 }

@@ -29,8 +29,9 @@ HRESULT CComponentMgr::Add_Component_Prototype(_uint eSceneIdx, const _tchar * t
 	if (Find_Component(eSceneIdx, tagComPrototype) != nullptr)
 	{
 
-		__debugbreak();
-		return E_FAIL;
+		OutputDebugString(TEXT("Component Prototypes already exist, So won't add more And did Release Parameter Component\n"));
+		Safe_Release(pComponenet);
+		return S_FALSE;
 	}
 
 	m_mapComPrototype[eSceneIdx].emplace(tagComPrototype, pComponenet);

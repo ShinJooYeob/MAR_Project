@@ -36,7 +36,7 @@ HRESULT CStageBoss_SpwanBoss::Initialize_Clone(void * pArg)
 
 	FAILED_CHECK(SetUp_Components());
 
-	FAILED_CHECK(Load_ActionCam(L"Stage2_CameAction_0"));
+	FAILED_CHECK(Load_ActionCam(L"StageBoss_CameAction_0"));
 	FAILED_CHECK(Load_ActionCam2(L"Stage2_CameAction_1"));
 
 	
@@ -116,6 +116,33 @@ _int CStageBoss_SpwanBoss::LightRender()
 	return _int();
 }
 
+void CStageBoss_SpwanBoss::PlayCamAction()
+{
+	CCamera_Main* pCamera = (CCamera_Main*)g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Camera_Main));
+	NULL_CHECK_BREAK(pCamera);
+
+	CAMERAACTION tDesc;
+
+	tDesc.vecCamPos = m_vecCamPositions;
+	tDesc.vecLookAt = m_vecLookPostions;
+
+
+	CAMACTDESC Return;
+	Return.fDuration = 0.3f;
+	Return.vPosition = m_pPlayerTransform->Get_MatrixState(CTransform::STATE_POS) + XMVectorSet(0.00000001f, 0.7f, 0, 0);
+	tDesc.vecCamPos.push_back(Return);
+
+	Return.fDuration = 1.0f;
+	Return.vPosition = m_pPlayerTransform->Get_MatrixState(CTransform::STATE_POS) + XMVectorSet(0,0.8f,0,0);
+	tDesc.vecLookAt.push_back(Return);
+	Return.fDuration = 0.3f;
+	Return.vPosition = m_pPlayerTransform->Get_MatrixState(CTransform::STATE_POS) + XMVectorSet(0, 0.8f, 0, 0);
+	tDesc.vecLookAt.push_back(Return);
+
+	pCamera->CamActionStart(tDesc);
+
+}
+
 
 
 
@@ -131,26 +158,6 @@ void CStageBoss_SpwanBoss::CollisionTriger(_uint iMyColliderIndex, CGameObject *
 		m_SpwanPassedTime = 0;
 		m_iChecker = 0;
 		((CGamePlayUI*)(g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_UI_GamePlay))))->Set_DrawFightUI(true);
-
-		//CCamera_Main* pCamera = (CCamera_Main*)g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Camera_Main));
-		//NULL_CHECK_BREAK(pCamera);
-
-		//CAMERAACTION tDesc;
-
-		//tDesc.vecCamPos = m_vecCamPositions;
-		//tDesc.vecLookAt = m_vecLookPostions;
-
-
-		//CAMACTDESC Return;
-		//Return.fDuration = 0.5f;
-		//Return.vPosition = pCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_POS);
-		//tDesc.vecCamPos.push_back(Return);
-
-		//Return.fDuration = 0.5f;
-		//Return.vPosition = Return.vPosition.XMVector() + (pCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_LOOK));
-		//tDesc.vecLookAt.push_back(Return);
-
-		//pCamera->CamActionStart(tDesc);
 
 	}
 	break;

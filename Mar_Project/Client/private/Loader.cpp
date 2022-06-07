@@ -76,6 +76,8 @@
 #include "ChainExplosion.h"
 #include "ThrowOilBullet.h"
 
+#include "EyepotChainGranade.h"
+
 
 #include "WaspArrow.h"
 #include "WaspInk.h"
@@ -352,20 +354,20 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 	TransformMatrix = XMMatrixScaling(0.0001f, 0.0001f, 0.0001f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////Grunt
-	//FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_Grunt),
-	//	CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Grunt", "Grunt.FBX", TransformMatrix)));
-	//
-	//FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_GruntSwpanMesh),
-	//	CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Grunt", "GruntSpwanMesh.FBX", TransformMatrix)));
-	//
-	//
-	//
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////WaspInk
-	//TransformMatrix = XMMatrixScaling(0.0003f, 0.0003f, 0.0003f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
-	//FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_WaspInk),
-	//	CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "WaspInk", "WaspInk.FBX", TransformMatrix)));
-	//TransformMatrix = XMMatrixScaling(0.0001f, 0.0001f, 0.0001f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
-	//
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_Grunt),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Grunt", "Grunt.FBX", TransformMatrix)));
+
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_GruntSwpanMesh),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Grunt", "GruntSpwanMesh.FBX", TransformMatrix)));
+
+
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////WaspInk
+	TransformMatrix = XMMatrixScaling(0.0003f, 0.0003f, 0.0003f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_WaspInk),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "WaspInk", "WaspInk.FBX", TransformMatrix)));
+	TransformMatrix = XMMatrixScaling(0.0001f, 0.0001f, 0.0001f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////SpwanMesh
 	TransformMatrix = XMMatrixScaling(0.0001f, 0.0001f, 0.0001f);
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, L"Grunt_StaticSwpanMesh",
@@ -583,6 +585,12 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "ShrinkFlower", "ShrinkFlower.FBX", TransformMatrix)));
 
 
+
+
+	//TransparencyBall
+	TransformMatrix = XMMatrixScaling(0.0003f, 0.0003f, 0.0003f);
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_BallMesh),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "BallMesh", "BallMesh.FBX", TransformMatrix)));
 
 
 
@@ -922,6 +930,12 @@ HRESULT CLoader::Load_Scene_Stage2(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 		CStage2_SpwanEyePot::Create(m_pDevice, m_pDeviceContext)));
 	
 
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(L"ProtoType_EyepotChainGranade",
+		CEyepotChainGranade::Create(m_pDevice, m_pDeviceContext)));
+
+
+	
+
 #pragma endregion
 
 	RELEASE_INSTANCE(CGameInstance);
@@ -1167,11 +1181,6 @@ HRESULT CLoader::Load_Scene_Boss(_bool * _IsClientQuit, CRITICAL_SECTION * _CriS
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "QBattleTower", "QBattleTowerParticleB.FBX", TransformMatrix)));
 
 
-	//TransparencyBall
-
-	TransformMatrix = XMMatrixScaling(0.0003f, 0.0003f, 0.0003f);
-	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_BOSS, TAG_CP(Prototype_Mesh_BallMesh),
-		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "BallMesh", "BallMesh.FBX", TransformMatrix)));
 
 	TransformMatrix = XMMatrixScaling(0.0001f, 0.0001f, 0.0001f);
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_BOSS, L"HandyGirlBulletMesh",

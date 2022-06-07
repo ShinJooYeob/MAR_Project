@@ -27,6 +27,8 @@ public:
 	virtual _int Render()override;
 	virtual _int LightRender()override;
 
+	void PlayCamAction();
+
 public:
 	virtual void CollisionTriger(_uint iMyColliderIndex, CGameObject* pConflictedObj, CCollider* pConflictedCollider, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType) override;
 	HRESULT Load_ActionCam(const _tchar* szPath);

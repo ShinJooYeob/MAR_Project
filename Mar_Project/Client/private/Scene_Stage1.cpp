@@ -86,7 +86,7 @@ _int CScene_Stage1::Update(_double fDeltaTime)
 	if (GetKeyState(VK_RETURN) & 0x8000)
 	{
 		FAILED_CHECK(GetSingle(CUtilityMgr)->Clear_RenderGroup_forSceneChange());
-		FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Loading::Create(m_pDevice, m_pDeviceContext, SCENEID::SCENE_BOSS), SCENEID::SCENE_LOADING));
+		FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Loading::Create(m_pDevice, m_pDeviceContext, SCENEID::SCENE_STAGE2), SCENEID::SCENE_LOADING));
 	}
 
 	return 0;
@@ -223,10 +223,15 @@ HRESULT CScene_Stage1::Ready_Layer_Terrain(const _tchar * pLayerTag)
 
 HRESULT CScene_Stage1::Ready_Layer_Player(const _tchar * pLayerTag)
 {
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STATIC, pLayerTag, TAG_OP(Prototype_Player),&_float3(7,20,7)));
 	CPlayer* pPlayer = (CPlayer*)(g_pGameInstance->Get_GameObject_By_LayerIndex(SCENE_STATIC, TAG_LAY(Layer_Player)));
-	NULL_CHECK_RETURN(pPlayer, E_FAIL);
-	FAILED_CHECK(pPlayer->SetUp_Weapon());
+
+	if (pPlayer == nullptr)
+	{
+		FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STATIC, pLayerTag, TAG_OP(Prototype_Player), &_float3(7, 20, 7)));
+		pPlayer = (CPlayer*)(g_pGameInstance->Get_GameObject_By_LayerIndex(SCENE_STATIC, TAG_LAY(Layer_Player)));
+		NULL_CHECK_RETURN(pPlayer, E_FAIL);
+		FAILED_CHECK(pPlayer->SetUp_Weapon());
+	}
 
 	/*그런트 있는곳*/
 	//pPlayer->Renew_Player(_float3(144.58f, 10.f, 129.779f), _float3(160.f, 2.8701f, 147.668f));

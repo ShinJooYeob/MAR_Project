@@ -37,6 +37,7 @@ private:
 	CRenderer*			m_pRendererCom = nullptr;
 	CModel*				m_pModel = nullptr;
 	CTransform*			m_pTransformCom = nullptr;
+	CTransform*			m_pSubTransformCom = nullptr;
 	CCollider*			m_pColliderCom = nullptr;
 
 
@@ -51,11 +52,15 @@ private:
 	_bool				m_bDeathAnimStart = false;
 	_bool				m_bStartSprout = false;
 
+	PARTICLEDESC		m_tParticleDesc;
+
+
 	ATTACHBONEMATRIX_PTR  m_ArrCollisionAttach[2];
 private:
 	HRESULT SetUp_Components();
 	HRESULT FarPatternWander(_double fDeltaTime);
 	HRESULT DashPatternWander(_double fDeltaTime);
+	HRESULT Ready_ParticleDesc();
 
 public:
 	static CEyepot* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, void* pArg = nullptr);

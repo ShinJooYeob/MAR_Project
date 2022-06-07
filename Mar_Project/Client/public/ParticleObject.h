@@ -104,6 +104,7 @@ protected:
 	_float3					m_vUp = _float3(0, 1, 0);
 
 	_float3					m_vPivot = _float3(0, 0, 0);
+	wstring					m_TextureLayer = L"";
 
 	list<PARTICLEATT>		m_ParticleList;
 

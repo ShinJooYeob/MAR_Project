@@ -328,6 +328,9 @@
     <Filter Include="01.GameObject\03.Monster\99.MonsterWeapon\07.DollMaker\DollMakerBullet">
       <UniqueIdentifier>{e74361ab-bbe0-4d74-83be-6b8a7518e09b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.GameObject\03.Monster\99.MonsterWeapon\02.EyePot">
+      <UniqueIdentifier>{10db04e3-58c3-42d7-b567-3a7d702b7df2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -473,9 +476,6 @@
     </ClInclude>
     <ClInclude Include="..\public\Executor.h">
       <Filter>01.GameObject\03.Monster\05.Executor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\Eyepot.h">
-      <Filter>01.GameObject\03.Monster\04.Eyepot</Filter>
     </ClInclude>
     <ClInclude Include="..\public\WaspInk.h">
       <Filter>01.GameObject\03.Monster\03.WaspInk</Filter>
@@ -677,6 +677,12 @@
     </ClInclude>
     <ClInclude Include="..\public\DollMakerBullet.h">
       <Filter>01.GameObject\03.Monster\99.MonsterWeapon\07.DollMaker\DollMakerBullet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\EyepotChainGranade.h">
+      <Filter>01.GameObject\03.Monster\99.MonsterWeapon\02.EyePot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Eyepot.h">
+      <Filter>01.GameObject\03.Monster\04.Eyepot</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1003,6 +1009,9 @@
     </ClCompile>
     <ClCompile Include="..\private\DollMakerBullet.cpp">
       <Filter>01.GameObject\03.Monster\99.MonsterWeapon\07.DollMaker\DollMakerBullet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\EyepotChainGranade.cpp">
+      <Filter>01.GameObject\03.Monster\99.MonsterWeapon\02.EyePot</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

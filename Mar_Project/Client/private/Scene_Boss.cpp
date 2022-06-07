@@ -54,8 +54,8 @@ _int CScene_Boss::Update(_double fDeltaTime)
 	if (__super::Update(fDeltaTime) < 0)
 		return -1;
 
-	//if (g_pGameInstance->Get_DIKeyState(DIK_J)&DIS_Down)
-	//	FAILED_CHECK(Ready_Layer_HandyBoy(TAG_LAY(Layer_Monster)));
+	if (g_pGameInstance->Get_DIKeyState(DIK_J)&DIS_Down)
+		FAILED_CHECK(Ready_Layer_DollMaker(TAG_LAY(Layer_Monster)));
 
 
 	return 0;
@@ -88,6 +88,14 @@ _int CScene_Boss::LightRender()
 		return -1;
 
 	return 0;
+}
+
+_int CScene_Boss::Change_to_NextScene()
+{
+	FAILED_CHECK(GetSingle(CUtilityMgr)->Clear_RenderGroup_forSceneChange());
+	FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Loading::Create(m_pDevice, m_pDeviceContext, (SCENEID)m_eNextScene), SCENEID::SCENE_LOADING));
+
+	return _int();
 }
 
 

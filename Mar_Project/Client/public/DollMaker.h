@@ -46,6 +46,13 @@ private:
 
 	_uint				m_pHanddyIndex = 0;
 	_bool				m_bSummonHandy = false;
+
+	_bool				m_bDeadAnimStart = false;
+	_double				m_DeadPassedTime = 0;
+	_uint				m_iDeadAnimChecker = 0;
+	_float3				m_vDeadStartLookAt;
+
+
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_Weapon();

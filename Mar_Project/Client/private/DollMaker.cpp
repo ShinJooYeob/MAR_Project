@@ -6,6 +6,8 @@
 #include "HandyGirl.h"
 #include "DollMakerBullet.h"
 #include "HyperVoice.h"
+#include "StageBoss_SpwanBoss.h"
+#include "Scene_Boss.h"
 
 
 
@@ -37,7 +39,7 @@ HRESULT CDollMaker::Initialize_Clone(void * pArg)
 	if (pArg != nullptr)
 		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, * ((_float3*)pArg));
 
-	m_fHP = m_fMaxHP = 32;
+	m_fHP = m_fMaxHP = 56;
 
 
 	FAILED_CHECK(SetUp_Weapon());
@@ -59,79 +61,195 @@ _int CDollMaker::Update(_double fDeltaTime)
 		Add_Dmg_to_Monster(10);
 
 
+	if (m_bDeadAnimStart)
 	{
-		_Vector TargetAt = m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS);
+		CGameInstance* pInstance = g_pGameInstance;
+		m_DeadPassedTime += fDeltaTime;
 
-		TargetAt = XMVectorSetY(TargetAt, m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS).y);
-
-		m_pTransformCom->LookAt(TargetAt);
-	}
-	
-
-
-	if (m_PatternDelayTime > 0)
-	{
-		m_PatternDelayTime -= fDeltaTime;
-
-		if (m_fHP < m_fMaxHP * 0.8f && m_pHanddyIndex == 0)
+		if (m_DeadPassedTime < 6.5)
 		{
-			m_PatternDelayTime = 4;
-			if (!m_bSummonHandy)
+			_float3 EasedPos;
+			if (m_DeadPassedTime < 3.25f)
 			{
-				m_bSummonHandy = true;
-				m_pModel->Change_AnimIndex_UntilNReturn_Must(9, 12, 0, 0.15, true);
+				EasedPos = pInstance->Easing_Vector( TYPE_Linear, _float3(85, 10, 78), _float3(92.5f, 10.f, 74.f), (_float)m_DeadPassedTime, 3.25f);
 			}
+			else
+			{
+				EasedPos = pInstance->Easing_Vector(TYPE_Linear, _float3(92.5f, 10.f, 74.f), _float3(91, 10, 82), (_float)m_DeadPassedTime - 3.25f, 3.25f);
+			}
+			_float3 EasedAt = pInstance->Easing_Return_Vector(TYPE_Linear, TYPE_Linear, m_vDeadStartLookAt, _float3(98.5f, 10.f, 58.5f), (_float)m_DeadPassedTime, 6.5f);
+
+			m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, EasedPos);
+			m_pTransformCom->LookAt(EasedAt.XMVector());
+
+			if (m_DeadPassedTime < 1) // 올라
+			{
+				if (!m_iDeadAnimChecker)
+				{
+					GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.5f, _float4(0.8f));
+					m_iDeadAnimChecker++;
+				}
+				else
+				{
+					GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.1f, _float4(0.1f));
+
+				}
+
+				_float EasedHeight = pInstance->Easing(TYPE_SinInOut, 10 , 15 , (_float)m_DeadPassedTime, 1.f);
+				EasedPos.y = EasedHeight;
+				m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, EasedPos);
+
+
+			}
+			else if (m_DeadPassedTime < 3.25f)// 반쯤 잠기게 내려가
+			{
+				if (m_DeadPassedTime < 3.1)
+				{
+					GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.1f, _float4(0.1f));
+				}
+
+				_float EasedHeight = pInstance->Easing(TYPE_SinInOut, 15, 5, (_float)m_DeadPassedTime - 1, 2.25f);
+				EasedPos.y = EasedHeight;
+				m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, EasedPos);
+			}
+			else if (m_DeadPassedTime < 4.25f)//다보이게 올라가
+			{
+				if (m_iDeadAnimChecker == 1)
+				{
+					GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.5f, _float4(0.8f));
+					m_iDeadAnimChecker++;
+				}
+				else
+				{
+					GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.1f, _float4(0.1f));
+
+				}
+
+				_float EasedHeight = pInstance->Easing(TYPE_SinInOut, 5, 15, (_float)m_DeadPassedTime - 3.25f, 1.f);
+				EasedPos.y = EasedHeight;
+				m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, EasedPos);
+			}
+			else if (m_DeadPassedTime < 6.5f) // 완전히 내려가
+			{
+				GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.1f, _float4(0.1f));
+
+
+				_float EasedHeight = pInstance->Easing(TYPE_SinInOut, 15, 7, (_float)m_DeadPassedTime - 4.25f, 2.25f);
+				EasedPos.y = EasedHeight;
+				m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, EasedPos);
+			}
+
+
+
+			m_bIsOnScreen = true;
+			FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime, m_bIsOnScreen));
+			FAILED_CHECK(Adjust_AnimMovedTransform(fDeltaTime));
+
+		}
+		else if (m_DeadPassedTime < 7.5)
+		{
+			GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.1f, _float4(0.1f *  (7.5f- (_float)m_DeadPassedTime)));
+
+
+			if (m_iDeadAnimChecker == 2 && m_DeadPassedTime > 7.2f)
+			{
+				GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeOut, 0.25f, _float4(1, 1, 1, 1));
+				m_iDeadAnimChecker++;
+			}
+
+			_float3 EasedPos = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+
+			_float EasedHeight = pInstance->Easing(TYPE_SinInOut, 7, 0, (_float)m_DeadPassedTime - 6.5f, 1.f);
+			EasedPos.y = EasedHeight;
+			m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, EasedPos);
+		}
+		else
+		{
+			Set_IsDead();
+			g_pGameInstance->Get_NowScene()->Set_SceneChanging(SCENE_LOBY);
 		}
 
-		if (m_fHP < m_fMaxHP * 0.6f && m_pHanddyIndex == 1)
-		{
-			m_PatternDelayTime = 4;
-			if (!m_bSummonHandy)
-			{
-				m_bSummonHandy = true;
-				m_pModel->Change_AnimIndex_UntilNReturn_Must(14, 17, 0, 0.15, true);
-			}
-		}
 	}
 	else
 	{
-		_uint iChecker = 1;
 
-		for (_uint i = 0; i < m_pHanddyIndex; i++)
-			iChecker *= m_vecWeapon[i]->Object_Function();
 
-		if (iChecker || !m_bIsPatternFinished)
-			FAILED_CHECK(Update_Pattern(fDeltaTime));
-	}
+		{
+			_Vector TargetAt = m_pPlayerTransfrom->Get_MatrixState(CTransform::STATE_POS);
 
-	m_bIsOnScreen = true;
-	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime, m_bIsOnScreen));
-	FAILED_CHECK(Adjust_AnimMovedTransform(fDeltaTime));
+			TargetAt = XMVectorSetY(TargetAt, m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS).y);
 
-	for (_uint i = 0; i < 7; i++)
-	{
-		_Matrix			TransformMatrix = XMLoadFloat4x4(m_ArrCollisionAttach[i].pUpdatedNodeMat) * XMLoadFloat4x4(m_ArrCollisionAttach[i].pDefaultPivotMat);
-		TransformMatrix.r[0] = XMVector3Normalize(TransformMatrix.r[0]);
-		TransformMatrix.r[1] = XMVector3Normalize(TransformMatrix.r[1]);
-		TransformMatrix.r[2] = XMVector3Normalize(TransformMatrix.r[2]);
-		m_pColliderCom->Update_Transform(i, TransformMatrix * m_pTransformCom->Get_WorldMatrix());
-	}
+			m_pTransformCom->LookAt(TargetAt);
+		}
 
-	_uint NowIndex = m_pModel->Get_NowAnimIndex();
 
-	if ((NowIndex >= 1 && NowIndex <= 3) || (NowIndex >= 5 && NowIndex <= 6))
-	{
-		g_pGameInstance->Add_CollisionGroup(CollisionType_Monster, this, m_pColliderCom);
+
+		if (m_PatternDelayTime > 0)
+		{
+			m_PatternDelayTime -= fDeltaTime;
+
+			if (m_fHP < m_fMaxHP * 0.8f && m_pHanddyIndex == 0)
+			{
+				m_PatternDelayTime = 4;
+				if (!m_bSummonHandy)
+				{
+					m_bSummonHandy = true;
+					m_pModel->Change_AnimIndex_UntilNReturn_Must(9, 12, 0, 0.15, true);
+				}
+			}
+
+			if (m_fHP < m_fMaxHP * 0.6f && m_pHanddyIndex == 1)
+			{
+				m_PatternDelayTime = 4;
+				if (!m_bSummonHandy)
+				{
+					m_bSummonHandy = true;
+					m_pModel->Change_AnimIndex_UntilNReturn_Must(14, 17, 0, 0.15, true);
+				}
+			}
+		}
+		else
+		{
+			_uint iChecker = 1;
+
+			for (_uint i = 0; i < m_pHanddyIndex; i++)
+				iChecker *= m_vecWeapon[i]->Object_Function();
+
+			if (iChecker || !m_bIsPatternFinished)
+				FAILED_CHECK(Update_Pattern(fDeltaTime));
+		}
+
+
+		m_bIsOnScreen = true;
+		FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime, m_bIsOnScreen));
+		FAILED_CHECK(Adjust_AnimMovedTransform(fDeltaTime));
+
+		for (_uint i = 0; i < 7; i++)
+		{
+			_Matrix			TransformMatrix = XMLoadFloat4x4(m_ArrCollisionAttach[i].pUpdatedNodeMat) * XMLoadFloat4x4(m_ArrCollisionAttach[i].pDefaultPivotMat);
+			TransformMatrix.r[0] = XMVector3Normalize(TransformMatrix.r[0]);
+			TransformMatrix.r[1] = XMVector3Normalize(TransformMatrix.r[1]);
+			TransformMatrix.r[2] = XMVector3Normalize(TransformMatrix.r[2]);
+			m_pColliderCom->Update_Transform(i, TransformMatrix * m_pTransformCom->Get_WorldMatrix());
+		}
+
+		_uint NowIndex = m_pModel->Get_NowAnimIndex();
+
+		if ((NowIndex >= 1 && NowIndex <= 3) || (NowIndex >= 5 && NowIndex <= 6))
+		{
+			g_pGameInstance->Add_CollisionGroup(CollisionType_Monster, this, m_pColliderCom);
 
 #ifdef _DEBUG
-		FAILED_CHECK(m_pRendererCom->Add_DebugGroup(m_pColliderCom));
+			FAILED_CHECK(m_pRendererCom->Add_DebugGroup(m_pColliderCom));
 #endif // _DEBUG
+		}
+
 	}
-
-
-	for (_uint i = 0; i < m_pHanddyIndex; i++)
-		m_vecWeapon[i]->Update(fDeltaTime);
-
+	if (!m_bDeadAnimStart)
+	{
+		for (_uint i = 0; i < m_pHanddyIndex; i++)
+			m_vecWeapon[i]->Update(fDeltaTime);
+	}
 
 	return _int();
 }
@@ -145,8 +263,11 @@ _int CDollMaker::LateUpdate(_double fDeltaTime)
 	{
 		FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this));
 
-		for (_uint i = 0; i < m_pHanddyIndex; i++)
-			m_vecWeapon[i]->LateUpdate(fDeltaTime);
+		if (!m_bDeadAnimStart)
+		{
+			for (_uint i = 0; i < m_pHanddyIndex; i++)
+				m_vecWeapon[i]->LateUpdate(fDeltaTime);
+		}
 	}
 
 	m_vOldPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
@@ -211,6 +332,8 @@ _int CDollMaker::LightRender()
 
 _int CDollMaker::Update_DmgCalculate(_double fDeltaTime)
 {
+	if (m_bDeadAnimStart) return 0;
+
 	if (m_DmgPassedTime <= 0)
 	{
 		if (m_fDmgAmount > 0)
@@ -289,10 +412,30 @@ _int CDollMaker::Update_Pattern(_double fDeltaTime)
 
 void CDollMaker::Add_Dmg_to_Monster(_float iDmgAmount)
 {
+	if (m_fHP <= 0) return;
+
 	m_DmgPassedTime = MonsterDmgTime * 5.f;
 	m_fDmgAmount += iDmgAmount;
 	m_fHP -= iDmgAmount;
 
+
+	if (m_fHP <= 0 && !m_bDeadAnimStart)
+	{
+		m_vDeadStartLookAt = m_pPlayerTransfrom->Get_MatrixState_Float3(CTransform::STATE_POS);
+		m_vDeadStartLookAt.y = 10;
+
+
+		 CStageBoss_SpwanBoss* pTrigger = (CStageBoss_SpwanBoss*)g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_TriggerCollider), 0);
+
+		 NULL_CHECK_BREAK(pTrigger);
+
+		 pTrigger->PlayCamAction();
+
+		m_bDeadAnimStart = true;
+		m_iDeadAnimChecker = 0;
+		m_DeadPassedTime = 0;
+		m_pModel->Change_AnimIndex(21, 0.15f, true);
+	}
 }
 
 HRESULT CDollMaker::SetUp_Components()
