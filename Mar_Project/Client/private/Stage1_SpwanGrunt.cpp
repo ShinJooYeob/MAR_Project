@@ -171,6 +171,13 @@ _int CStage1_SpwanGrunt::Update(_double fDeltaTime)
 				m_SpwanPassedTime += fDeltaTime;
 
 
+				_float EasedPos = (g_pGameInstance->Easing(TYPE_SinInOut, -128, 512, (_float)m_SpwanPassedTime - 13.f, 10.4f));
+				if (m_SpwanPassedTime > 23.4f)
+					EasedPos = 512.f;
+
+				g_pGameInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0)->vVector.z = EasedPos;;
+
+
 				CJumpPad::JUMPPADDESC tDesc;
 
 				if (!m_JumpPadSpwanCount)
@@ -230,7 +237,7 @@ _int CStage1_SpwanGrunt::Update(_double fDeltaTime)
 
 
 				}
-				else if (m_JumpPadSpwanCount == 3 && m_SpwanPassedTime > 23.8)
+				else if (m_JumpPadSpwanCount == 3 && m_SpwanPassedTime > 23.4)
 				{
 					tDesc.vPosition = _float3(209.339249f, 19.f, 102.125732f);
 					tDesc.vScale = _float3(2);

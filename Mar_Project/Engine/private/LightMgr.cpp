@@ -65,8 +65,7 @@ HRESULT CLightMgr::Render(CShader * pShader, CVIBuffer_Rect * pViBuffer, MATRIXW
 	return S_OK;
 }
 
-const LIGHTDESC * CLightMgr::Get_LightDesc(LIGHTDESC::TYPE eLightType, _uint iIndex) const
-{
+LIGHTDESC * CLightMgr::Get_LightDesc(LIGHTDESC::TYPE eLightType, _uint iIndex) {
 	if (iIndex >= m_ArrLightList[eLightType].size())
 		return nullptr;
 
@@ -95,6 +94,35 @@ HRESULT CLightMgr::EasingDiffuseLightDesc(LIGHTDESC::TYPE eLightType, _uint iInd
 
 
 	LightDesc->vDiffuse = XMVectorLerp(XMVectorSet(1,1,1,1), vTargetDiffuse, MixRate);
+
+
+	return S_OK;
+}
+
+HRESULT CLightMgr::Relocate_LightDesc(LIGHTDESC::TYPE eLightType, _uint iIndex, _fVector vRelocatePosition, _float fRange)
+{
+	if (iIndex >= m_ArrLightList[eLightType].size())
+		return E_FAIL;
+
+	auto	iter = m_ArrLightList[eLightType].begin();
+
+
+	for (_uint i = 0; i < iIndex; ++i)
+		++iter;
+
+	LIGHTDESC* LightDesc = ((*iter)->Get_LightDesc());
+
+	NULL_CHECK_RETURN(LightDesc, E_FAIL);
+
+	if (eLightType  == tagLightDesc::TYPE_DIRECTIONAL)
+	{
+		LightDesc->vVector = vRelocatePosition;
+	}
+	else
+	{
+		LightDesc->vVector = vRelocatePosition;
+		LightDesc->fRange = fRange;
+	}
 
 
 	return S_OK;

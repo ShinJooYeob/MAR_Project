@@ -102,6 +102,17 @@ _int CStage1_SpwanWasp::Update(_double fDeltaTime)
 
 				pCamera->CamActionStart(tDesc);
 
+
+
+				CJumpPad::JUMPPADDESC tJumpDesc;
+
+				tJumpDesc.vPosition = _float3(180.069580f, 20.f, 73.953476f);
+				tJumpDesc.vScale = _float3(1);
+				tJumpDesc.fPower = 25;
+
+				FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, TAG_LAY(Layer_JumpPad), TAG_OP(Prototype_JumpPad), &tJumpDesc));
+
+
 				Set_IsDead();
 			}
 		}

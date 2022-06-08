@@ -8,6 +8,7 @@ cbuffer	ShadowPipeLine
 {
 	matrix			g_LightViewMatrix;
 	matrix			g_LightProjMatrix;
+	float4			g_vPlayerWorldPosition ;
 };
 
 cbuffer	ForHDR
@@ -66,7 +67,7 @@ texture2D			g_ShadowMapTexture;
 cbuffer ScreenSizeBuffer
 {
 	float				fScreemWidth = 1280;
-	float				fScreemHeight = 780;
+	float				fScreemHeight = 720;
 };
 
 sampler DefaultSampler = sampler_state
@@ -243,9 +244,28 @@ PS_OUT_AfterDeferred PS_MAIN_EndProsseing(PS_IN In)
 
 	vector Hdr = max((g_TargetTexture.Sample(DefaultSampler, In.vTexUV) + LinerTex) - 0.004, 0);
 
+	vector		vDepthDesc = g_DepthTexture.Sample(DefaultSampler, In.vTexUV);
+	float		fViewZ = vDepthDesc.x * 300.f;
+	//vector		vWorldPos;
+
+	//vWorldPos.x = (In.vTexUV.x * 2.f - 1.f) * fViewZ;
+	//vWorldPos.y = (In.vTexUV.y * -2.f + 1.f) * fViewZ;
+	//vWorldPos.z = vDepthDesc.y * fViewZ; /* 0 ~ f */
+	//vWorldPos.w = 1.f * fViewZ;
+
+	///* 로컬위치 * 월드행렬 * 뷰행렬 */
+	//vWorldPos = mul(vWorldPos, g_ProjMatrixInv);
+	///* 로컬위치 * 월드행렬 */
+	//vWorldPos = mul(vWorldPos, g_ViewMatrixInv);
+
+
+
+
+
+	Hdr*=(pow(saturate((64.f - fViewZ) / 64.f), 2.2f) + 0.01f);
 
 	Out.vColor = (Hdr * (6.2f * Hdr + 0.5f)) / (Hdr * (6.2f * Hdr + 1.7f) + 0.06f);
-	
+
 	Out.vColor2 = Out.vColor;
 	//Out.vColor = pow(Out.vColor,1.f/2.2f);
 
@@ -294,7 +314,7 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
 
 	vector		vLook = vWorldPos - g_vCamPosition;
 	
-	Out.vSpecular = (g_vLightSpecular * pow(vMtrlSpecularMap.r,1/1.8f)) * pow(saturate(dot(normalize(vReflect) * -1.f, normalize(vLook))), pow(1 / vMtrlSpecularMap.g,2));
+	Out.vSpecular = (g_vLightSpecular * pow(vMtrlSpecularMap.r,1/1.2f)) * pow(saturate(dot(normalize(vReflect) * -1.f, normalize(vLook))), pow(1 / vMtrlSpecularMap.g,2));
 	Out.vSpecular.a = 0.f;
 
 
@@ -353,10 +373,6 @@ PS_OUT_AfterDeferred PS_MAIN_BLEND(PS_IN In)
 	vector		vSpecularDesc = g_SpecularTexture.Sample(DefaultSampler, In.vTexUV);
 	vector		vShadowMapDesc = g_ShadowMapTexture.Sample(DefaultSampler, In.vTexUV);
 	vector		vDepthDesc = g_DepthTexture.Sample(DefaultSampler, In.vTexUV);
-
-	
-	//vector		vDepthDesc = g_DepthTexture.Sample(DefaultSampler, In.vTexUV);
-	//float		fViewZ = vDepthDesc.x * 300.f;
 
 
 	Out.vColor = vDiffuseDesc * vShadeDesc + vSpecularDesc;

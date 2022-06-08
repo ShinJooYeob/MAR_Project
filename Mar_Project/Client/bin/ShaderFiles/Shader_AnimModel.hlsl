@@ -37,6 +37,16 @@ texture2D			g_OpacityTexture;
 texture2D			g_MskingTextrue;
 
 
+texture2D			g_NoiseTexture;
+texture2D			g_BurnRampTexture;
+
+cbuffer DeltaTime
+{
+	float			g_fDeltaTime = 0;
+	float			g_fVisualValue  = 0;
+};
+
+
 //cbuffer MtrlDesc
 //{
 //	float4		g_vMtrlAmbient = float4(0.4f, 0.4f, 0.4f, 1.f);
@@ -252,8 +262,8 @@ PS_OUT PS_MAIN_DEFAULT(PS_IN In)
 
 	vector		vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
 
-	if (vDiffuse.a < 0.1f)
-		discard;
+	//if (vDiffuse.a < 0.1f)
+	//	discard;
 
 	vector		vNormalDesc = g_NormalTexture.Sample(DefaultSampler, In.vTexUV);
 
@@ -287,8 +297,8 @@ PS_OUT_NODEFERRED PS_MAIN_LOBYALICE(PS_IN In)
 
 	vector		vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
 
-	if (vDiffuse.a < 0.1f)
-		discard;
+	//if (vDiffuse.a < 0.1f)
+	//	discard;
 
 	Out.vDiffuse = vDiffuse;
 
@@ -310,8 +320,56 @@ PS_OUT PS_MAIN_MSKINGTEX(PS_IN In)
 	vNormal = mul(vNormal, WorldMatrix);
 
 
+
+
 	if (vDiffuse.a < 0.1f)
 		discard;
+
+
+	Out.vDiffuse = vDiffuse;
+	Out.vNormal = vector(vNormal.xyz * 0.5f + 0.5f, 0.f);
+	Out.vDepth = vector(In.vProjPos.w / 300.0f, In.vProjPos.z / In.vProjPos.w, 0.f, 0.f);
+	Out.vSpecular = g_SpecularTexture.Sample(DefaultSampler, In.vTexUV);
+
+	return Out;
+}
+
+
+PS_OUT PS_MAIN_DEFAULT_Dissolve(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	vector		vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
+
+	//if (vDiffuse.a < 0.1f)
+	//	discard;
+
+	vector		vNormalDesc = g_NormalTexture.Sample(DefaultSampler, In.vTexUV);
+
+	float3		vNormal = vNormalDesc.xyz * 2.f - 1.f;
+
+	float3x3	WorldMatrix = float3x3(In.vTangent.xyz, In.vBinormal.xyz, In.vNormal.xyz);
+
+	vNormal = mul(vNormal, WorldMatrix);
+
+
+	vector		NoiseDesc = g_NoiseTexture.Sample(DefaultSampler, In.vTexUV) - g_fVisualValue;
+
+	if (NoiseDesc.r < 0)
+		discard;
+
+	if (NoiseDesc.r < 0.15 && g_fVisualValue > 0 && g_fVisualValue < 1)
+	{
+		vector		BurnRampDesc = pow(g_BurnRampTexture.Sample(DefaultSampler, float2(NoiseDesc.r *(1 / 0.15), 0)), 1.5f);
+
+		vDiffuse = BurnRampDesc;
+		//Out.vEmissive = max((max(BurnRampDesc.r, BurnRampDesc.g), BurnRampDesc.b) - 0.15f, 0);
+		Out.vEmissive = 1.f;
+		//o.Emission = tex2D(_BurnRamp, float2(test *(1 / _BurnSize), 0));
+		//o.Albedo *= o.Emission;
+	}
+
+
 
 
 	Out.vDiffuse = vDiffuse;
@@ -473,4 +531,25 @@ technique11		DefaultTechnique
 		PixelShader = compile ps_5_0 PS_Shadow();
 	}
 
+	pass Dissolve_NOWEIGHTW_CullNone //12
+	{
+		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(ZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_None);
+
+		VertexShader = compile vs_5_0 VS_MAIN_NOWEIGHTW();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_DEFAULT_Dissolve();
+	}
+
+	pass Dissolve_AttachedWeapon_CullNone //13
+	{
+		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(ZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_None);
+
+		VertexShader = compile vs_5_0 VS_MAIN_ATTACHEDNOWEIGHTW();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_DEFAULT_Dissolve();
+	}
 }

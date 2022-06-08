@@ -13,6 +13,8 @@ CLight::CLight(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
 HRESULT CLight::Initilize_Protoype(const LIGHTDESC & LightDesc)
 {
 	memcpy(&m_LightDesc, &LightDesc, sizeof(LIGHTDESC));
+
+	
 	return S_OK;
 }
 
@@ -22,7 +24,9 @@ HRESULT CLight::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer)
 
 	if (LIGHTDESC::TYPE_DIRECTIONAL == m_LightDesc.eLightType)
 	{
-		pShader->Set_RawValue("g_vLightDir", &m_LightDesc.vVector, sizeof(_float4));
+
+		_float4 ShaderLightDir = XMVector3Normalize(XMVectorSetW(XMVectorSet(128, 0, 128, 1) -m_LightDesc.vVector.XMVector() ,0));
+		pShader->Set_RawValue("g_vLightDir", &ShaderLightDir, sizeof(_float4));
 		iPassIndex = 1;
 	}
 	else

@@ -38,6 +38,8 @@ HRESULT CJumpPad::Initialize_Clone(void * pArg)
 	m_pModel->Change_AnimIndex(0);
 
 	m_fRangeRadius = 0.707f * (m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_RIGHT).Get_Lenth());
+	m_SwpanPassedTime = 0;
+
 	return S_OK;
 }
 
@@ -46,7 +48,7 @@ _int CJumpPad::Update(_double fDeltaTime)
 	if (__super::Update(fDeltaTime) < 0)
 		return -1;
 
-
+	m_SwpanPassedTime += (_float)fDeltaTime;
 	
 // 	if (g_pGameInstance->Get_DIKeyState(DIK_UP) & DIS_Down)
 // 	{
@@ -130,17 +132,45 @@ _int CJumpPad::Render()
 	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ProjMatrix", &pInstance->Get_Transform_Float4x4_TP(PLM_PROJ), sizeof(_float4x4)));
 
 
-	_uint NumMaterial = m_pModel->Get_NumMaterial();
-
-
-	for (_uint i = 0; i < NumMaterial; i++)
+	if (m_SwpanPassedTime < 1.f)
 	{
-		for (_uint j = 0; j < AI_TEXTURE_TYPE_MAX; j++)
-			FAILED_CHECK(m_pModel->Bind_OnShader(m_pShaderCom, i, j, MODLETEXTYPE(j)));
+		FAILED_CHECK(GetSingle(CUtilityMgr)->BindOnShader_DissolveTexture(m_pShaderCom, "g_BurnRampTexture", "g_NoiseTexture"));
 
-		FAILED_CHECK(m_pModel->Render(m_pShaderCom, 0, i, "g_BoneMatrices"));
+		_float VisualValue = 1.f - m_SwpanPassedTime;
+
+
+		FAILED_CHECK(m_pShaderCom->Set_RawValue("g_fVisualValue", &(VisualValue), sizeof(_float)));
+
+
+
+		_uint NumMaterial = m_pModel->Get_NumMaterial();
+
+
+		for (_uint i = 0; i < NumMaterial; i++)
+		{
+			for (_uint j = 0; j < AI_TEXTURE_TYPE_MAX; j++)
+				FAILED_CHECK(m_pModel->Bind_OnShader(m_pShaderCom, i, j, MODLETEXTYPE(j)));
+
+			FAILED_CHECK(m_pModel->Render(m_pShaderCom, 12, i, "g_BoneMatrices"));
+		}
+
 	}
+	else
+	{
 
+
+		_uint NumMaterial = m_pModel->Get_NumMaterial();
+
+
+		for (_uint i = 0; i < NumMaterial; i++)
+		{
+			for (_uint j = 0; j < AI_TEXTURE_TYPE_MAX; j++)
+				FAILED_CHECK(m_pModel->Bind_OnShader(m_pShaderCom, i, j, MODLETEXTYPE(j)));
+
+			FAILED_CHECK(m_pModel->Render(m_pShaderCom, 0, i, "g_BoneMatrices"));
+		}
+
+	}
 
 	return _int();
 }

@@ -337,7 +337,7 @@ PS_OUT_NODEFERRED PS_Distortion(PS_IN In)
 	//	discard;
 
 
-	float2 PosToUv = float2(In.vPosition.x / 1280, In.vPosition.y / 780);
+	float2 PosToUv = float2(In.vPosition.x / 1280, In.vPosition.y / 720);
 
 
 	float2 TargetUV = float2(PosToUv.x + (0.5f - (BlurDesc.x))*0.15625f, PosToUv.y + (0.5f - (BlurDesc.y))*0.25f);
@@ -366,7 +366,7 @@ PS_OUT_NODEFERRED PS_Distortion_Ball(PS_IN In)
 	float Alpha = max(DiffuseDesc.r - 0.5f , 0) * 2.f;
 
 
-	float2 PosToUv = float2(In.vPosition.x / 1280, In.vPosition.y / 780) ;
+	float2 PosToUv = float2(In.vPosition.x / 1280, In.vPosition.y / 720) ;
 
 
 	float2 TargetUV = saturate(float2(PosToUv.x + (0.5f - (BlurDesc.x))*0.15625f, PosToUv.y + (0.5f - (BlurDesc.y))*0.25f));
@@ -399,7 +399,7 @@ PS_OUT_NODEFERRED PS_Distortion_Ball_NoColor(PS_IN In)
 	float Alpha = max(DiffuseDesc.r - 0.5f, 0) * 2.f;
 
 
-	float2 PosToUv = float2(In.vPosition.x / 1280, In.vPosition.y / 780);
+	float2 PosToUv = float2(In.vPosition.x / 1280, In.vPosition.y / 720);
 
 
 	float2 TargetUV = saturate(float2(PosToUv.x + (0.5f - (BlurDesc.x))*0.15625f, PosToUv.y + (0.5f - (BlurDesc.y))*0.25f));

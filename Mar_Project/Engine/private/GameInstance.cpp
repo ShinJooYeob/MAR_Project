@@ -596,7 +596,7 @@ _bool CGameInstance::Get_Channel_IsPaused(CHANNELID eID)
 	return 	m_pSoundMgr->Get_Channel_IsPaused(eID);
 }
 
-const LIGHTDESC * CGameInstance::Get_LightDesc(LIGHTDESC::TYPE eLightType, _uint iIndex) const
+LIGHTDESC * CGameInstance::Get_LightDesc(LIGHTDESC::TYPE eLightType, _uint iIndex)
 {
 	NULL_CHECK_BREAK(m_pLightMgr);
 
@@ -615,6 +615,13 @@ HRESULT CGameInstance::EasingDiffuseLightDesc(LIGHTDESC::TYPE eLightType, _uint 
 	NULL_CHECK_BREAK(m_pLightMgr);
 
 	return m_pLightMgr->EasingDiffuseLightDesc(eLightType, iIndex, vTargetDiffuse, MixRate);
+}
+
+HRESULT CGameInstance::Relocate_LightDesc(LIGHTDESC::TYPE eLightType, _uint iIndex, _fVector vRelocatePosition, _float fRange)
+{
+	NULL_CHECK_BREAK(m_pLightMgr);
+
+	return m_pLightMgr->Relocate_LightDesc(eLightType, iIndex, vRelocatePosition, fRange);;
 }
 
 HRESULT CGameInstance::Add_CollisionGroup(CollisionTypeID eType, CGameObject * pCollisionObject, CCollider * pCollider)

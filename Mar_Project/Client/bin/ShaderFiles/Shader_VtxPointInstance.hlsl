@@ -145,6 +145,10 @@ struct PS_IN
 struct PS_OUT
 {
 	vector		vColor : SV_TARGET0;
+	vector		vNormal : SV_TARGET1;
+	vector		vDepth : SV_TARGET2;
+	vector		vSpecular : SV_TARGET3;
+	vector		vEmissive : SV_TARGET4;
 };
 
 PS_OUT PS_MAIN_INST(PS_IN In)
@@ -158,7 +162,8 @@ PS_OUT PS_MAIN_INST(PS_IN In)
 		discard;
 
 	Out.vColor *= In.vColor;
-
+	Out.vEmissive = 1;
+	
 	return Out;
 }
 

@@ -15,7 +15,7 @@ cbuffer	ShadowPipeLine
 cbuffer ScreenSizeBuffer
 {
 	float				fScreemWidth = 1280;
-	float				fScreemHeight = 780;
+	float				fScreemHeight = 720;
 };
 
 

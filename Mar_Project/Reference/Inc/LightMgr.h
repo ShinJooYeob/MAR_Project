@@ -19,8 +19,9 @@ public:
 public:
 	HRESULT Render(class CShader* pShader, class CVIBuffer_Rect* pViBuffer, MATRIXWVP* pWVPMat);
 public:
-	const LIGHTDESC* Get_LightDesc(LIGHTDESC::TYPE eLightType, _uint iIndex) const;
+	LIGHTDESC* Get_LightDesc(LIGHTDESC::TYPE eLightType, _uint iIndex);
 	HRESULT EasingDiffuseLightDesc(LIGHTDESC::TYPE eLightType, _uint iIndex, _fVector vTargetDiffuse, _float MixRate = 1.f);
+	HRESULT Relocate_LightDesc(LIGHTDESC::TYPE eLightType, _uint iIndex, _fVector vRelocatePosition, _float fRange = 8.f);
 	HRESULT Add_Light(const LIGHTDESC& LightDesc);
 
 

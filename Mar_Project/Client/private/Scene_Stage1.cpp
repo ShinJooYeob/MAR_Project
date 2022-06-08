@@ -92,6 +92,9 @@ _int CScene_Stage1::Update(_double fDeltaTime)
 		FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Loading::Create(m_pDevice, m_pDeviceContext, SCENEID::SCENE_STAGE2), SCENEID::SCENE_LOADING));
 	}
 
+
+
+
 	return 0;
 }
 
@@ -142,27 +145,28 @@ _int CScene_Stage1::Change_to_NextScene()
 
 HRESULT CScene_Stage1::Ready_Light()
 {
-	LIGHTDESC LightDesc;
+
+	const LIGHTDESC* pLightDesc = g_pGameInstance->Get_LightDesc(tagLightDesc::TYPE_DIRECTIONAL, 0);
+
+	if (pLightDesc == nullptr)
+	{
+
+		LIGHTDESC LightDesc;
+
+		LightDesc.eLightType = tagLightDesc::TYPE_DIRECTIONAL;
+		LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
+		LightDesc.vAmbient = _float4(1.0f);
+		LightDesc.vSpecular = _float4(1);
+		LightDesc.vVector = _float4(0, 256, -128, 0);
+
+		g_pGameInstance->Add_Light(LightDesc);
+	}
+	else
+	{
+		g_pGameInstance->Relocate_LightDesc(tagLightDesc::TYPE_DIRECTIONAL, 0, _float4(0, 256, -128, 0).XMVector());
+	}
 
 
-
-	//LightDesc.eLightType = tagLightDesc::TYPE_DIRECTIONAL;
-	//LightDesc.vDiffuse = _float4(1.f, 1.f,1.f,1.f);
-	//LightDesc.vAmbient = _float4(1);
-	//LightDesc.vSpecular = _float4(1);
-	//LightDesc.vVector = _float4(1, -1, 1, 0);
-
-	//g_pGameInstance->Add_Light(LightDesc);
-
-
-
-	//LightDesc.eLightType = tagLightDesc::TYPE_POINT;
-	//LightDesc.vDiffuse = _float4(1);
-	//LightDesc.vAmbient = _float4(1);
-	//LightDesc.vSpecular = _float4(1);
-	//LightDesc.vVector = _float4(5, 5, 5, 1);
-	//LightDesc.fRange = 10.f;
-	//g_pGameInstance->Add_Light(LightDesc);
 
 	return S_OK;
 }
@@ -254,13 +258,13 @@ HRESULT CScene_Stage1::Ready_Layer_UI(const _tchar * pLayerTag)
 
 HRESULT CScene_Stage1::Ready_Layer_JumpPad(const _tchar * pLayerTag)
 {
-	CJumpPad::JUMPPADDESC tDesc;
+	//CJumpPad::JUMPPADDESC tDesc;
 
-	tDesc.vPosition = _float3(180.069580f, 20.f, 73.953476f);
-	tDesc.vScale = _float3(1);
-	tDesc.fPower = 25;
+	//tDesc.vPosition = _float3(180.069580f, 20.f, 73.953476f);
+	//tDesc.vScale = _float3(1);
+	//tDesc.fPower = 25;
 
-	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_JumpPad), &tDesc));
+	//FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_JumpPad), &tDesc));
 
 	return S_OK;
 }

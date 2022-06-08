@@ -44,6 +44,9 @@ private:
 	_bool				m_bIsPlayerCloser = false;
 	_float				m_fRangeRadius = 0.707f;
 
+
+	_float				m_SwpanPassedTime = 0;
+
 	JUMPPADDESC			m_tDesc;
 
 private:

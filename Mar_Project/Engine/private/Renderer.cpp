@@ -23,7 +23,7 @@ CRenderer::CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	Safe_AddRef(m_pGraphicDevice);
 
 }
-#define ShadowMapQuality 1
+#define ShadowMapQuality 8
 
 HRESULT CRenderer::Initialize_Prototype(void * pArg)
 {
@@ -159,18 +159,12 @@ HRESULT CRenderer::Initialize_Prototype(void * pArg)
 
 	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_Shade"), 150, 50, 100, 100));
 	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_Specular"), 150, 150, 100, 100));
+	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_UpScaledBluredShadow"), 150, 250, 100, 100));
 
-	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_UpScaledBluredShadow"), 50, 680, 100, 100));
-	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_AfterDefferred"), 150, 680, 100, 100));
+	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_AfterDefferred"), 50, 680, 100, 100));
+	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_UpScaledLuminece"), 150, 680, 100, 100));
 
-	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_UpScaledLuminece"), 250, 680, 100, 100));
-
-	//FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_UpScaled_By4"), 360, 680, 100, 100));
-	//FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_UpScaled_By8"), 460, 680, 100, 100));
-	//FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_UpScaled_By16"), 560, 680, 100, 100));
-	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_DownScaled_By4"), 360, 680, 100, 100));
-	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_DownScaled_By8"), 460, 680, 100, 100));
-	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_DownScaled_By16"), 560, 680, 100, 100));
+	
 
 
 	
@@ -333,16 +327,7 @@ HRESULT CRenderer::Render_RenderGroup()
 		FAILED_CHECK(m_pRenderTargetMgr->Render_DebugBuffer(TEXT("MRT_AfterPostProcessing")));
 		FAILED_CHECK(m_pRenderTargetMgr->Render_DebugBuffer(TEXT("MRT_LumineceUpScaling")));
 
-		//FAILED_CHECK(m_pRenderTargetMgr->Render_DebugBuffer(TEXT("MRT_UpScaled_By4")));
-		//FAILED_CHECK(m_pRenderTargetMgr->Render_DebugBuffer(TEXT("MRT_UpScaled_By8")));
-		//FAILED_CHECK(m_pRenderTargetMgr->Render_DebugBuffer(TEXT("MRT_UpScaled_By16")));
-	   
-
-		FAILED_CHECK(m_pRenderTargetMgr->Render_DebugBuffer(TEXT("MRT_DownScaled_By4")));
-		FAILED_CHECK(m_pRenderTargetMgr->Render_DebugBuffer(TEXT("MRT_DownScaled_By8")));
-		FAILED_CHECK(m_pRenderTargetMgr->Render_DebugBuffer(TEXT("MRT_DownScaled_By16")));
-
-
+		
 
 		ID3D11ShaderResourceView* pSRV[8] = { nullptr };
 		m_pDeviceContext->PSSetShaderResources(0, 8, pSRV);
@@ -423,6 +408,13 @@ HRESULT CRenderer::Render_ShadowMap()
 
 	m_pDeviceContext->RSSetViewports(iNumViewports, &ViewPortDesc);
 
+	LIGHTDESC* pLightDesc = GetSingle(CGameInstance)->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0);
+	if (pLightDesc)
+	{
+		m_LightWVPmat.ViewMatrix = XMMatrixTranspose(XMMatrixLookAtLH(XMVectorSetW(pLightDesc->vVector.XMVector(),1), XMVectorSet(128, 0, 128, 1), XMVectorSet(0, 1, 0, 0)));
+
+	}
+
 	CShader* ObjShader = nullptr;
 	
 
@@ -499,6 +491,12 @@ HRESULT CRenderer::Render_PriorityAlpha()
 
 HRESULT CRenderer::Render_SwordTrail_NoLight()
 {
+	{
+		ID3D11ShaderResourceView* pSRV[8] = { nullptr };
+		m_pDeviceContext->PSSetShaderResources(0, 8, pSRV);
+
+	}
+
 	for (auto& pComponent : m_TrailObjectList)
 	{
 		if (nullptr != pComponent)
@@ -511,6 +509,12 @@ HRESULT CRenderer::Render_SwordTrail_NoLight()
 	}
 
 	m_TrailObjectList.clear();
+
+	{
+		ID3D11ShaderResourceView* pSRV[8] = { nullptr };
+		m_pDeviceContext->PSSetShaderResources(0, 8, pSRV);
+
+	}
 	return S_OK;
 }
 
@@ -648,9 +652,10 @@ HRESULT CRenderer::Render_DeferredTexture()
 	XMStoreFloat4x4(&ViewMatrixInv, XMMatrixTranspose(XMMatrixInverse(nullptr, pPipeLineMgr->Get_Transform_Matrix(PLM_VIEW))));
 	XMStoreFloat4x4(&ProjMatrixInv, XMMatrixTranspose(XMMatrixInverse(nullptr, pPipeLineMgr->Get_Transform_Matrix(PLM_PROJ))));
 
-
 	FAILED_CHECK(m_pShader->Set_RawValue("g_ViewMatrixInv", &ViewMatrixInv, sizeof(_float4x4)));
 	FAILED_CHECK(m_pShader->Set_RawValue("g_ProjMatrixInv", &ProjMatrixInv, sizeof(_float4x4)));
+
+
 
 	FAILED_CHECK(m_pShader->Set_Texture("g_DiffuseTexture", m_pRenderTargetMgr->Get_SRV(TEXT("Target_Diffuse"))));
 	FAILED_CHECK(m_pShader->Set_Texture("g_ShadeTexture", m_pRenderTargetMgr->Get_SRV(TEXT("Target_Shade"))));
@@ -705,6 +710,24 @@ HRESULT CRenderer::Render_PostProcessing()
 
 	m_pShader->Set_Texture("g_LinerTexture", m_pRenderTargetMgr->Get_SRV(L"Target_UpScaledLuminece"));
 	m_pShader->Set_Texture("g_TargetTexture", m_pRenderTargetMgr->Get_SRV(L"Target_ReferenceDefferred"));
+
+
+	FAILED_CHECK(m_pShader->Set_Texture("g_DepthTexture", m_pRenderTargetMgr->Get_SRV(TEXT("Target_Depth"))));
+
+
+	CPipeLineMgr*		pPipeLineMgr = GetSingle(CPipeLineMgr);
+
+	_float4x4		ViewMatrixInv, ProjMatrixInv;
+
+	XMStoreFloat4x4(&ViewMatrixInv, XMMatrixTranspose(XMMatrixInverse(nullptr, pPipeLineMgr->Get_Transform_Matrix(PLM_VIEW))));
+	XMStoreFloat4x4(&ProjMatrixInv, XMMatrixTranspose(XMMatrixInverse(nullptr, pPipeLineMgr->Get_Transform_Matrix(PLM_PROJ))));
+
+	FAILED_CHECK(m_pShader->Set_RawValue("g_ViewMatrixInv", &ViewMatrixInv, sizeof(_float4x4)));
+	FAILED_CHECK(m_pShader->Set_RawValue("g_ProjMatrixInv", &ProjMatrixInv, sizeof(_float4x4)));
+
+	_float4 PlayerPosition = pPipeLineMgr->Get_TargetPostion_float4(PLV_PLAYER);
+	FAILED_CHECK(m_pShader->Set_RawValue("g_vPlayerWorldPosition", &PlayerPosition, sizeof(_float4)));
+
 
 	FAILED_CHECK(m_pVIBuffer->Render(m_pShader, 9));
 	FAILED_CHECK(m_pRenderTargetMgr->End(TEXT("MRT_AfterPostProcessing")));

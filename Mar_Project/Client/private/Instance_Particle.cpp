@@ -36,6 +36,7 @@ HRESULT CInstance_Particle::Initialize_Clone(void * pArg)
 
 	m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, m_tDesc.vWorldPosition);
 
+
 	return S_OK;
 }
 
@@ -53,7 +54,6 @@ _int CInstance_Particle::Update(_double TimeDelta)
 	//}
 
 
-
 	return _int();
 }
 
@@ -63,9 +63,7 @@ _int CInstance_Particle::LateUpdate(_double TimeDelta)
 		return -1;
 
 
-
-
-	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONBLEND_NOLIGHT, this);
+	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 	return _int();
 }
 

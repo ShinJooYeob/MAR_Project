@@ -72,6 +72,65 @@ _int CScene_Stage2::Update(_double fDeltaTime)
 		FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Loading::Create(m_pDevice, m_pDeviceContext, SCENEID::SCENE_STAGE3), SCENEID::SCENE_LOADING));
 	}
 
+	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_HOME)&DIS_Press)
+	{
+
+		LIGHTDESC* pLightDesc = g_pGameInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0);
+		pLightDesc->vVector.z += 1.f;
+
+		wstring ttDebugLog = L"LightPosLuminece : X: " + to_wstring(pLightDesc->vVector.x) + L",  Y: " + to_wstring(pLightDesc->vVector.y) + L",  Z: " + to_wstring(pLightDesc->vVector.z) + L"\n";
+		OutputDebugStringW(ttDebugLog.c_str());
+	}
+
+	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_END)&DIS_Press)
+	{
+
+		LIGHTDESC* pLightDesc = g_pGameInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0);
+		pLightDesc->vVector.z -= 1.f;
+
+		wstring ttDebugLog = L"LightPosLuminece : X: " + to_wstring(pLightDesc->vVector.x) + L",  Y: " + to_wstring(pLightDesc->vVector.y) + L",  Z: " + to_wstring(pLightDesc->vVector.z) + L"\n";
+		OutputDebugStringW(ttDebugLog.c_str());
+	}
+	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_DELETE)&DIS_Press)
+	{
+
+		LIGHTDESC* pLightDesc = g_pGameInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0);
+		pLightDesc->vVector.x -= 1.f;
+
+		wstring ttDebugLog = L"LightPosLuminece : X: " + to_wstring(pLightDesc->vVector.x) + L",  Y: " + to_wstring(pLightDesc->vVector.y) + L",  Z: " + to_wstring(pLightDesc->vVector.z) + L"\n";
+		OutputDebugStringW(ttDebugLog.c_str());
+	}
+
+	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_PGDN)&DIS_Press)
+	{
+
+		LIGHTDESC* pLightDesc = g_pGameInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0);
+		pLightDesc->vVector.x += 1.f;
+
+		wstring ttDebugLog = L"LightPosLuminece : X: " + to_wstring(pLightDesc->vVector.x) + L",  Y: " + to_wstring(pLightDesc->vVector.y) + L",  Z: " + to_wstring(pLightDesc->vVector.z) + L"\n";
+		OutputDebugStringW(ttDebugLog.c_str());
+	}
+
+	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_INSERT)&DIS_Press)
+	{
+
+		LIGHTDESC* pLightDesc = g_pGameInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0);
+		pLightDesc->vVector.y += 1.f;
+
+		wstring ttDebugLog = L"LightPosLuminece : X: " + to_wstring(pLightDesc->vVector.x) + L",  Y: " + to_wstring(pLightDesc->vVector.y) + L",  Z: " + to_wstring(pLightDesc->vVector.z) + L"\n";
+		OutputDebugStringW(ttDebugLog.c_str());
+	}
+
+	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_PGUP)&DIS_Press)
+	{
+
+		LIGHTDESC* pLightDesc = g_pGameInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0);
+		pLightDesc->vVector.y -= 1.f;
+
+		wstring ttDebugLog = L"LightPosLuminece : X: " + to_wstring(pLightDesc->vVector.x) + L",  Y: " + to_wstring(pLightDesc->vVector.y) + L",  Z: " + to_wstring(pLightDesc->vVector.z) + L"\n";
+		OutputDebugStringW(ttDebugLog.c_str());
+	}
+
 
 
 	return 0;
@@ -122,27 +181,25 @@ _int CScene_Stage2::Change_to_NextScene()
 
 HRESULT CScene_Stage2::Ready_Light()
 {
-	//LIGHTDESC LightDesc;
+	const LIGHTDESC* pLightDesc = g_pGameInstance->Get_LightDesc(tagLightDesc::TYPE_DIRECTIONAL, 0);
 
+	if (pLightDesc == nullptr)
+	{
 
+		LIGHTDESC LightDesc;
 
-	//LightDesc.eLightType = tagLightDesc::TYPE_DIRECTIONAL;
-	//LightDesc.vDiffuse = _float4(1.f, 1.f,1.f,1.f);
-	//LightDesc.vAmbient = _float4(1);
-	//LightDesc.vSpecular = _float4(1);
-	//LightDesc.vVector = _float4(1, -1, 1, 0);
+		LightDesc.eLightType = tagLightDesc::TYPE_DIRECTIONAL;
+		LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
+		LightDesc.vAmbient = _float4(1.0f);
+		LightDesc.vSpecular = _float4(1);
+		LightDesc.vVector = _float4(0, 256, -128, 0);
 
-	//g_pGameInstance->Add_Light(LightDesc);
-
-
-
-	//LightDesc.eLightType = tagLightDesc::TYPE_POINT;
-	//LightDesc.vDiffuse = _float4(1);
-	//LightDesc.vAmbient = _float4(1);
-	//LightDesc.vSpecular = _float4(1);
-	//LightDesc.vVector = _float4(5, 5, 5, 1);
-
-	//g_pGameInstance->Add_Light(LightDesc);
+		g_pGameInstance->Add_Light(LightDesc);
+	}
+	else
+	{
+		g_pGameInstance->Relocate_LightDesc(tagLightDesc::TYPE_DIRECTIONAL, 0, _float4(0, 256, -128, 0).XMVector());
+	}
 
 	return S_OK;
 }

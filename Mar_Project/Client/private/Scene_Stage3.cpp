@@ -120,27 +120,27 @@ _int CScene_Stage3::Change_to_NextScene()
 
 HRESULT CScene_Stage3::Ready_Light()
 {
-	//LIGHTDESC LightDesc;
 
+	const LIGHTDESC* pLightDesc = g_pGameInstance->Get_LightDesc(tagLightDesc::TYPE_DIRECTIONAL, 0);
 
+	if (pLightDesc == nullptr)
+	{
 
-	//LightDesc.eLightType = tagLightDesc::TYPE_DIRECTIONAL;
-	//LightDesc.vDiffuse = _float4(1.f, 1.f,1.f,1.f);
-	//LightDesc.vAmbient = _float4(1);
-	//LightDesc.vSpecular = _float4(1);
-	//LightDesc.vVector = _float4(1, -1, 1, 0);
+		LIGHTDESC LightDesc;
 
-	//g_pGameInstance->Add_Light(LightDesc);
+		LightDesc.eLightType = tagLightDesc::TYPE_DIRECTIONAL;
+		LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
+		LightDesc.vAmbient = _float4(1.0f);
+		LightDesc.vSpecular = _float4(1);
+		LightDesc.vVector = _float4(0.f, 256, 128.f, 0);
 
+		g_pGameInstance->Add_Light(LightDesc);
+	}
+	else
+	{
+		g_pGameInstance->Relocate_LightDesc(tagLightDesc::TYPE_DIRECTIONAL, 0, _float4(0.f, 256, 128.f, 0).XMVector());
+	}
 
-
-	//LightDesc.eLightType = tagLightDesc::TYPE_POINT;
-	//LightDesc.vDiffuse = _float4(1);
-	//LightDesc.vAmbient = _float4(1);
-	//LightDesc.vSpecular = _float4(1);
-	//LightDesc.vVector = _float4(5, 5, 5, 1);
-
-	//g_pGameInstance->Add_Light(LightDesc);
 
 	return S_OK;
 }

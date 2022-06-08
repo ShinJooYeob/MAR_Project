@@ -57,8 +57,28 @@ _int CStage2_SpwanEyePot::Update(_double fDeltaTime)
 	{
 		if (m_SpwanPassedTime < 10)
 		{
+
+		//LightPosLuminece: X: 129.000000, Y : 257.000000, Z : 371.000000
+
+
+
 			static _uint iChecker = 0;
 			m_SpwanPassedTime += fDeltaTime;
+
+			_float EasedPosZ = (g_pGameInstance->Easing(TYPE_SinInOut, -128, 371, (_float)m_SpwanPassedTime, 10.f));
+			_float EasedPosX = (g_pGameInstance->Easing(TYPE_SinInOut, 0, 128, (_float)m_SpwanPassedTime, 10.f));
+
+			if (m_SpwanPassedTime > 10.f)
+			{
+				m_SpwanPassedTime = 10;
+				EasedPosZ = 371.f;
+				EasedPosX = 128.f;
+			}
+
+
+			g_pGameInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0)->vVector.x = EasedPosX;;
+			g_pGameInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0)->vVector.z = EasedPosZ;;
+
 
 			if (iChecker ==0 && m_SpwanPassedTime > 2.)
 			{

@@ -208,6 +208,7 @@ _int CPlayer::LateUpdate(_double fDeltaTime)
 	}
 
 	m_vOldPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+	g_pGameInstance->Set_TargetPostion(PLV_PLAYER, m_vOldPos);
 	return _int();
 }
 
@@ -235,8 +236,8 @@ _int CPlayer::Render()
 	{
 		for (_uint j = 0; j < AI_TEXTURE_TYPE_MAX; j++)
 			FAILED_CHECK(m_pModel->Bind_OnShader(m_pShaderCom, i, j, MODLETEXTYPE(j)));
-
-		if (i <= 1 )
+		//FAILED_CHECK(m_pModel->Render(m_pShaderCom, 3, i, "g_BoneMatrices"));
+		if (i <= 1)
 		{
 			FAILED_CHECK(m_pModel->Render(m_pShaderCom, 3, i, "g_BoneMatrices"));
 		}
@@ -1167,7 +1168,7 @@ HRESULT CPlayer::Renew_Player(_float3 Position , _float3 ReturnLookAt)
 	m_pTransformCom->Set_MoveSpeed(PlayerMoveSpeed);
 	m_pTransformCom->Scaled_All(_float3(m_fSmallScale));
 	m_pTransformCom->Set_MoveSpeed(PlayerMoveSpeed * m_fSmallScale);
-	FAILED_CHECK(g_pGameInstance->EasingDiffuseLightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0, XMVectorSet(0.6f, 0.6f, 1, 1), m_fSmallVisualTime));
+	FAILED_CHECK(g_pGameInstance->EasingDiffuseLightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0, XMVectorSet(0.2745098039215f, 0.f, 0.647058823521f, 1), m_fSmallVisualTime));
 
 	m_vDashDir = _float3(0);
 	m_fDashPower = 0;
@@ -1545,7 +1546,7 @@ HRESULT CPlayer::Ready_ParticleDesc()
 	/////////4///////////////////////////////////////////////////////////////
 	tDesc = PARTICLEDESC();
 
-	tDesc.eParticleTypeID = Particle_Ball;
+	tDesc.eParticleTypeID = Particle_Map;
 
 	tDesc.FollowingTarget = m_pTransformCom;
 
@@ -1586,7 +1587,7 @@ HRESULT CPlayer::Ready_ParticleDesc()
 	tDesc.AlphaBlendON = false;
 
 	tDesc.m_fAlphaTestValue = 0.1f;
-	tDesc.m_iPassIndex = 3;
+	tDesc.m_iPassIndex = 19;
 
 
 	m_vecParticleDesc.push_back(tDesc);
@@ -1849,7 +1850,7 @@ HRESULT CPlayer::TrappedbyFlower_Update(_double fDeltaTime, CGameInstance * pIns
 			}
 
 			m_fSmallVisualTime = (1 - m_fSmallScale) / (1 - PlayerSmallingSize);
-			FAILED_CHECK(pInstance->EasingDiffuseLightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0, XMVectorSet(0.6f, 0.6f, 1, 1), m_fSmallVisualTime));
+			FAILED_CHECK(pInstance->EasingDiffuseLightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0, XMVectorSet(0.2745098039215f, 0.f, 0.647058823521f, 1), m_fSmallVisualTime));
 
 			m_pTransformCom->Scaled_All(_float3(m_fSmallScale));
 			m_pTransformCom->Set_MoveSpeed(PlayerMoveSpeed * m_fSmallScale);
@@ -1884,7 +1885,7 @@ HRESULT CPlayer::TrappedbyFlower_Update(_double fDeltaTime, CGameInstance * pIns
 		{
 			m_fSmallVisualTime -= _float(fDeltaTime);
 			if (m_fSmallVisualTime < 0) m_fSmallVisualTime = 0;
-			FAILED_CHECK(pInstance->EasingDiffuseLightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0, XMVectorSet(0.6f, 0.6f, 1, 1), m_fSmallVisualTime));
+			FAILED_CHECK(pInstance->EasingDiffuseLightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0, XMVectorSet(0.2745098039215f, 0.f, 0.647058823521f, 1), m_fSmallVisualTime));
 
 		}
 	}
@@ -1931,7 +1932,7 @@ HRESULT CPlayer::Smalling_Update(_double fDeltaTime, CGameInstance* pInstance)
 				}
 
 				m_fSmallVisualTime = (1 - m_fSmallScale) / (1 - PlayerSmallingSize);
-				FAILED_CHECK(pInstance->EasingDiffuseLightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0, XMVectorSet(0.6f, 0.6f, 1, 1), m_fSmallVisualTime));
+				FAILED_CHECK(pInstance->EasingDiffuseLightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0, XMVectorSet(0.2745098039215f, 0.f, 0.647058823521f, 1), m_fSmallVisualTime));
 
 				m_pTransformCom->Scaled_All(_float3(m_fSmallScale));
 				m_pTransformCom->Set_MoveSpeed(PlayerMoveSpeed * m_fSmallScale);

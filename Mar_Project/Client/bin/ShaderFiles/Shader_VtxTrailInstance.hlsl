@@ -240,7 +240,7 @@ PS_OUT PS_MAIN_INST_DISORT(PS_IN In)
 		discard;
 
 
-	float2 PosToUv = float2(In.vPosition.x/1280, In.vPosition.y / 780);
+	float2 PosToUv = float2(In.vPosition.x/1280, In.vPosition.y / 720);
 
 	vector Noise = g_NoiseTexture.Sample(DefaultSampler, In.vTexUV + g_fTime);
 

@@ -256,6 +256,12 @@ HRESULT CMovableColum::Update_Turning(_double fDeltaTime)
 	m_pTransformCom->Rotation_CW(XMVectorSet(0, 1, 0, 0), XMConvertToRadians(EasedAngle));
 	
 
+	 _Matrix LightPos= XMMatrixTranslation(128.f, 0.f, 0) * XMMatrixRotationY(XMConvertToRadians(EasedAngle)) *
+		 XMMatrixTranslation(128.f, 256.f, 128.f);
+
+
+	 g_pGameInstance->Relocate_LightDesc(tagLightDesc::TYPE_DIRECTIONAL, 0, LightPos.r[3]);
+
 	return S_OK;
 }
 

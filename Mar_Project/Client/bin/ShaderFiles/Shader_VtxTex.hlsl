@@ -481,7 +481,7 @@ PS_OUT PS_illusion(PS_IN In)
 	//	discard;
 
 
-	float2 PosToUv = float2(In.vPosition.x / 1280, In.vPosition.y / 780);
+	float2 PosToUv = float2(In.vPosition.x / 1280, In.vPosition.y / 720);
 
 
 	float2 TargetUV = float2(PosToUv.x + (0.5f - (BlurDesc.x))*0.15625f, PosToUv.y + (0.5f - (BlurDesc.y))*0.25f);

@@ -164,6 +164,7 @@ _int CGrunt::Update(_double fDeltaTime)
 
 		if (PlayRate > 0.4105263 && m_iSpwanMeshRend == 1)
 		{
+			m_pSubTransformCom->Set_IsOwnerDead(true);
 			m_iSpwanMeshRend = 0;
 		}
 		else if (PlayRate > 0.95)
