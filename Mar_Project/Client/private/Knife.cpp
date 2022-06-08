@@ -80,7 +80,7 @@ HRESULT CKnife::Initialize_Clone(void * pArg)
 	//m_pSwordTrailCom->Set_Color(_float4(0.4392156862f, 0.75686274f, 1, 1.f));
 	m_pSwordTrailCom->Set_Color(_float4(0, 0.84705882f, 1, 1.f));
 
-	GetSingle(CUtilityMgr)->RandomFloat3(0, 1);
+	GetSingle(CUtilityMgr)->RandomFloat3(0.5f, 1);
 	m_pSwordTrailCom->Set_PassIndex(0);
 	m_pSwordTrailCom->Set_TextureIndex(1);
 	return S_OK;
@@ -105,7 +105,7 @@ _int CKnife::Update(_double fDeltaTime)
 		{
 			m_TrailColorChageTime = 0;
 			m_SourColor = m_TargetColor;
-			m_TargetColor = GetSingle(CUtilityMgr)->RandomFloat3(0, 1);
+			m_TargetColor = GetSingle(CUtilityMgr)->RandomFloat3(0.5f, 1);
 		}
 		m_pSwordTrailCom->Set_Color(_float4(g_pGameInstance->Easing_Vector(TYPE_Linear, m_SourColor, m_TargetColor,(_float) m_TrailColorChageTime, 1), 1));
 

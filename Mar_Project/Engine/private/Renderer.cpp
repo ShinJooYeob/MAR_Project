@@ -23,7 +23,7 @@ CRenderer::CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	Safe_AddRef(m_pGraphicDevice);
 
 }
-#define ShadowMapQuality 8
+#define ShadowMapQuality 1
 
 HRESULT CRenderer::Initialize_Prototype(void * pArg)
 {
@@ -45,6 +45,9 @@ HRESULT CRenderer::Initialize_Prototype(void * pArg)
 
 	/* For.Target_Depth */
 	FAILED_CHECK(m_pRenderTargetMgr->Add_RenderTarget(TEXT("Target_Depth"), (_uint)Viewport.Width, (_uint)Viewport.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(1.f, 0.f, 0.f, 1.f)));
+
+	/* For.Target_Depth */
+	FAILED_CHECK(m_pRenderTargetMgr->Add_RenderTarget(TEXT("Target_Emissive"), (_uint)Viewport.Width, (_uint)Viewport.Height, DXGI_FORMAT_R16G16B16A16_UNORM, _float4(0.f, 0.f, 0.f, 0.f)));
 
 	/* For.Target_Specular */
 	FAILED_CHECK(m_pRenderTargetMgr->Add_RenderTarget(TEXT("Target_MtrlSpecularMap"), (_uint)Viewport.Width, (_uint)Viewport.Height, DXGI_FORMAT_B8G8R8A8_UNORM, _float4(0.f, 0.f, 1.f, 0.f)));
@@ -86,6 +89,7 @@ HRESULT CRenderer::Initialize_Prototype(void * pArg)
 	FAILED_CHECK(m_pRenderTargetMgr->Add_MRT(TEXT("MRT_Deferred"), TEXT("Target_Normal")));
 	FAILED_CHECK(m_pRenderTargetMgr->Add_MRT(TEXT("MRT_Deferred"), TEXT("Target_Depth")));
 	FAILED_CHECK(m_pRenderTargetMgr->Add_MRT(TEXT("MRT_Deferred"), TEXT("Target_MtrlSpecularMap")));
+	FAILED_CHECK(m_pRenderTargetMgr->Add_MRT(TEXT("MRT_Deferred"), TEXT("Target_Emissive")));
 	
 
 	/* For.MRT_LightAcc : 빛을 그릴때 바인드 */
@@ -151,6 +155,7 @@ HRESULT CRenderer::Initialize_Prototype(void * pArg)
 	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_Normal"), 50, 150, 100, 100));
 	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_Depth"), 50, 250, 100, 100));
 	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_MtrlSpecularMap"), 50, 350, 100, 100));
+	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_Emissive"), 50, 450, 100, 100));
 
 	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_Shade"), 150, 50, 100, 100));
 	FAILED_CHECK(m_pRenderTargetMgr->Ready_DebugDesc(TEXT("Target_Specular"), 150, 150, 100, 100));
@@ -288,6 +293,7 @@ HRESULT CRenderer::Render_RenderGroup()
 	FAILED_CHECK(Render_Priority());
 	FAILED_CHECK(Render_NonAlpha());
 	FAILED_CHECK(Render_PriorityAlpha());
+	FAILED_CHECK(Render_SwordTrail_Light());
 	FAILED_CHECK(m_pRenderTargetMgr->End(TEXT("MRT_Deferred")));
 
 	FAILED_CHECK(Render_BlurShadow());
@@ -303,6 +309,7 @@ HRESULT CRenderer::Render_RenderGroup()
 
 
 	FAILED_CHECK(Render_NonAlpha_NoDeferrd());
+	FAILED_CHECK(Render_SwordTrail_NoLight());
 
 	FAILED_CHECK(Render_Alpha());
 	FAILED_CHECK(Render_AfterObj());
@@ -469,6 +476,7 @@ HRESULT CRenderer::Render_NonAlpha()
 	}
 
 	m_RenderObjectList[RENDER_NONBLEND].clear();
+
 	return S_OK;
 }
 
@@ -486,6 +494,38 @@ HRESULT CRenderer::Render_PriorityAlpha()
 	m_RenderObjectList[RENDER_PRIORITYBLEND].clear();
 	return S_OK;
 
+	return S_OK;
+}
+
+HRESULT CRenderer::Render_SwordTrail_NoLight()
+{
+	for (auto& pComponent : m_TrailObjectList)
+	{
+		if (nullptr != pComponent)
+		{
+			if (pComponent->Get_IsDistortion())
+				pComponent->Render();
+		}
+
+		Safe_Release(pComponent);
+	}
+
+	m_TrailObjectList.clear();
+	return S_OK;
+}
+
+HRESULT CRenderer::Render_SwordTrail_Light()
+{
+
+	for (auto& pComponent : m_TrailObjectList)
+	{
+		if (nullptr != pComponent)
+		{
+			if (!pComponent->Get_IsDistortion())
+				pComponent->Render();
+		}
+
+	}
 	return S_OK;
 }
 
@@ -717,7 +757,9 @@ HRESULT CRenderer::Render_BlurLuminence()
 	XMStoreFloat4x4(&ProjMatrixInv, XMMatrixTranspose(XMMatrixInverse(nullptr, pPipeLineMgr->Get_Transform_Matrix(PLM_PROJ))));
 
 	FAILED_CHECK(m_pShader->Set_Texture("g_LinerTexture", m_pRenderTargetMgr->Get_SRV(TEXT("Target_AfterDefferred"))));
+	FAILED_CHECK(m_pShader->Set_Texture("g_TargetTexture", m_pRenderTargetMgr->Get_SRV(TEXT("Target_Emissive"))));
 
+	
 	FAILED_CHECK(m_pShader->Set_RawValue("g_fBlurLuminence", &m_BlurLuminence, sizeof(_float)));
 
 	FAILED_CHECK(m_pVIBuffer->Render(m_pShader, 10));
@@ -938,15 +980,15 @@ HRESULT CRenderer::Render_NonAlpha_NoDeferrd()
 	m_RenderObjectList[RENDER_NONBLEND_NOLIGHT].clear();
 
 
-	for (auto& pComponent : m_TrailObjectList)
-	{
-		if (nullptr != pComponent)
-			pComponent->Render();
+	//for (auto& pComponent : m_TrailObjectList)
+	//{
+	//	if (nullptr != pComponent)
+	//		pComponent->Render();
 
-		Safe_Release(pComponent);
-	}
+	//	Safe_Release(pComponent);
+	//}
 
-	m_TrailObjectList.clear();
+	//m_TrailObjectList.clear();
 
 	return S_OK;
 

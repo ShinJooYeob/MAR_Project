@@ -122,12 +122,12 @@ _int CHiddenPad::Render()
 
 
 	FAILED_CHECK(m_pTransformCom->Bind_OnShader_ApplyPivot(m_pShaderCom, "g_WorldMatrix"));
-
+	FAILED_CHECK(GetSingle(CUtilityMgr)->BindOnShader_DissolveTexture(m_pShaderCom, "g_BurnRampTexture", "g_NoiseTexture"));
 
 	FAILED_CHECK(__super::SetUp_ConstTable(m_pShaderCom));
 
 
-	_float VisualValue = m_pPlayer->Get_SmallVisualTime();
+	_float VisualValue = 1.f- m_pPlayer->Get_SmallVisualTime();
 
 	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_fVisualValue", &(VisualValue), sizeof(_float)));
 

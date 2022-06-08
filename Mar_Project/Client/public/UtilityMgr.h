@@ -52,6 +52,7 @@ public:
 
 	HRESULT Start_InstanceParticle(_uint eNowSceneNum, _float3 vPosition, _uint iParticleDescIndex = 0);
 
+	HRESULT BindOnShader_DissolveTexture(CShader* pShader, const char* szEadgeRampTexTag, const char* szNoiseTextureTag);
 
 
 	HRESULT Set_MonsterBlurPos(_float3 vPos);
@@ -69,6 +70,7 @@ private:
 	ID3D11DeviceContext*	m_pDeviceContext = nullptr;
 	class CMainApp*			m_pMainApp = nullptr;
 	CRenderer*				m_pRenderer = nullptr;
+	CTexture*				m_pTextureCom= nullptr;
 
 	class CFadeEffect*			m_pFadeEffect = nullptr;
 	class CRadialBlurMonster*		m_pMonsterRadial = nullptr;

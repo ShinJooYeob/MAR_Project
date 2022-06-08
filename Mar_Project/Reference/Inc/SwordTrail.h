@@ -43,9 +43,10 @@ public:
 	void Set_TrailTurnOn(_bool bBool, _float3 tSourPoint, _float3 tDestPoint);
 	void Set_Color(_float4 vColor) { m_tDesc.vColor = vColor; };
 	void Set_TextureIndex(_uint iIndex) { m_tDesc.iTextureIndex = iIndex; };
-	void Set_PassIndex(_uint iIndex) { m_tDesc.iPassIndex= iIndex; };
+	void Set_PassIndex(_uint iIndex) { m_tDesc.iPassIndex = iIndex; };
+	_bool Get_IsDistortion() {	return (m_tDesc.iPassIndex == 2);};
 
-
+	
 private:
 	class CVIBuffer_Point_Instance*	m_pVIBuffer = nullptr;
 	class CShader*					m_pShader   = nullptr;

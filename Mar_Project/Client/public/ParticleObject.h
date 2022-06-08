@@ -341,3 +341,42 @@ public:
 END
 
 #pragma endregion
+
+
+
+
+#pragma region BallParticle
+
+BEGIN(Client)
+
+///////////구 형태 파티클///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class CParticleeObj_MapParticle final : public CParticleObject
+{
+private:
+	explicit CParticleeObj_MapParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
+	explicit CParticleeObj_MapParticle(const CParticleeObj_MapParticle& rhs);
+	virtual ~CParticleeObj_MapParticle() = default;
+
+private:
+
+	virtual void Reset_Velocity(_float3& fAttVlocity)override;
+	virtual void Update_Position_by_Velocity(PARTICLEATT* tParticleAtt, _double fTimeDelta)override;
+
+
+	virtual HRESULT Initialize_Child_Clone() override;
+	//	virtual void ResetParticle(PARTICLEATT* attribute);
+
+	virtual _int Update(_double fTimeDelta)override;
+	virtual _int LateUpdate(_double fTimeDelta)override;
+	// 랜더는 부모 것 사용
+
+
+public:
+
+	static CParticleeObj_MapParticle* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, void* pArg = nullptr);
+	virtual CGameObject * Clone(void * pArg) override;
+};
+END
+
+#pragma endregion

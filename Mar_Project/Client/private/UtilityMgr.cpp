@@ -31,6 +31,16 @@ HRESULT CUtilityMgr::Initialize_UtilityMgr(ID3D11Device * pDevice, ID3D11DeviceC
 	FAILED_CHECK(g_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Texture_ScreenEffectUI),
 		CTexture::Create(m_pDevice, m_pDeviceContext, L"ScreenEffectUI.txt")));
 
+
+	CTexture* pTexture = nullptr;
+	FAILED_CHECK(g_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Texture_DissolveEffect),
+		pTexture = CTexture::Create(m_pDevice, m_pDeviceContext, L"Dissolve.txt")));
+	NULL_CHECK_RETURN(pTexture, E_FAIL);
+	
+	 m_pTextureCom = (CTexture*)(pTexture->Clone());
+	 NULL_CHECK_RETURN(m_pTextureCom, E_FAIL);
+
+
 	FAILED_CHECK(g_pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_ScreenEffectUI), CFadeEffect::Create(m_pDevice, m_pDeviceContext)));
 	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENEID::SCENE_STATIC, TAG_LAY(Layer_ScreenEffect), TAG_OP(Prototype_ScreenEffectUI)));
 	m_pFadeEffect = (CFadeEffect*)g_pGameInstance->Get_GameObject_By_LayerLastIndex(SCENEID::SCENE_STATIC, TAG_LAY(Layer_ScreenEffect));
@@ -160,8 +170,11 @@ HRESULT CUtilityMgr::Create_ParticleObject(_uint eSceneID, PARTICLEDESC tParticl
 	case Client::Particle_Spread:
 		FAILED_CHECK(GetSingle(CGameInstance)->Add_GameObject_To_Layer(eSceneID, TAG_LAY(Layer_Particle), TEXT("ProtoType_GameObject_Object_particle_Spread"), &tParticleDesc));
 		break;
+	case Client::Particle_Map:
+		FAILED_CHECK(GetSingle(CGameInstance)->Add_GameObject_To_Layer(eSceneID, TAG_LAY(Layer_Particle), TEXT("ProtoType_GameObject_Object_particle_Map"), &tParticleDesc));
+		break;
 
-
+		
 		
 		/*
 		case Client::Particle_Fountain:
@@ -257,6 +270,16 @@ HRESULT CUtilityMgr::Start_InstanceParticle(_uint eNowSceneNum, _float3 vPositio
 	m_vecInstanceParticleDesc[iParticleDescIndex].vWorldPosition = vPosition;
 
 	return g_pGameInstance->Add_GameObject_To_Layer(eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_Instance_Particle_Ball),&m_vecInstanceParticleDesc[iParticleDescIndex]);;
+}
+
+HRESULT CUtilityMgr::BindOnShader_DissolveTexture(CShader * pShader, const char * szEadgeRampTexTag, const char * szNoiseTextureTag)
+{
+	NULL_CHECK_RETURN(pShader, E_FAIL);
+
+	FAILED_CHECK(m_pTextureCom->Bind_OnShader(pShader, szEadgeRampTexTag, 0));
+	FAILED_CHECK(m_pTextureCom->Bind_OnShader(pShader, szNoiseTextureTag, 1));
+	
+	return S_OK;
 }
 
 
@@ -371,7 +394,8 @@ HRESULT CUtilityMgr::Ready_InstanceParticleDesc()
 void CUtilityMgr::Free()
 {
 	Safe_Release(m_pRenderer);
-
+	Safe_Release(m_pTextureCom);
+	
 	Safe_Release(m_pDevice);
 	Safe_Release(m_pDeviceContext);
 }

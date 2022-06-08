@@ -21,6 +21,7 @@ texture2D			g_NormalTexture;
 
 texture2D			g_BackBufferTexture;
 texture2D			g_NoiseTexture;
+texture2D			g_BurnRampTexture;
 
 
 
@@ -173,6 +174,7 @@ struct PS_OUT
 	vector		vNormal : SV_TARGET1;
 	vector		vDepth : SV_TARGET2;
 	vector		vSpecular : SV_TARGET3;
+	vector		vEmissive : SV_TARGET4;
 };
 
 struct PS_OUT_NODEFERRED
@@ -237,8 +239,30 @@ PS_OUT PS_MAIN_HIDDENPAD(PS_IN In)
 
 	float3x3	WorldMatrix = float3x3(In.vTangent.xyz, In.vBinormal.xyz, In.vNormal.xyz);
 
-	if ((vDiffuse.r + vDiffuse.g + vDiffuse.b) / 3 > g_fVisualValue)
+
+
+
+	vector		NoiseDesc = g_NoiseTexture.Sample(DefaultSampler, In.vTexUV) - g_fVisualValue;
+
+	if (NoiseDesc.r < 0)
 		discard;
+
+	if (NoiseDesc.r < 0.15 && g_fVisualValue > 0 && g_fVisualValue < 1)
+	{
+		vector		BurnRampDesc = pow(g_BurnRampTexture.Sample(DefaultSampler, float2(NoiseDesc.r *(1 / 0.15), 0)),1.5f);
+
+		vDiffuse =BurnRampDesc;
+		//Out.vEmissive = max((max(BurnRampDesc.r, BurnRampDesc.g), BurnRampDesc.b) - 0.15f, 0);
+		Out.vEmissive = 1.f;
+		//o.Emission = tex2D(_BurnRamp, float2(test *(1 / _BurnSize), 0));
+		//o.Albedo *= o.Emission;
+	}
+	
+
+
+
+	//if ((vDiffuse.r + vDiffuse.g + vDiffuse.b) / 3 > g_fVisualValue)
+	//	discard;
 
 	Out.vDiffuse = vDiffuse;
 	Out.vNormal = vector(vNormal.xyz * 0.5f + 0.5f, 0.f);
@@ -383,7 +407,7 @@ PS_OUT_NODEFERRED PS_Distortion_Ball_NoColor(PS_IN In)
 
 	vector BackBuffer = g_BackBufferTexture.Sample(DefaultSampler, TargetUV);
 
-	Out.vDiffuse =pow( BackBuffer,1.f/2.2f);
+	Out.vDiffuse =pow( BackBuffer,1.f/1.5f);
 	//Out.vDiffuse.a = (Alpha - 0.45f) * 2.f;
 
 	/*if (Alpha < 0.1)
@@ -397,6 +421,27 @@ PS_OUT_NODEFERRED PS_Distortion_Ball_NoColor(PS_IN In)
 
 
 
+PS_OUT PS_Emissive(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	vector		vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
+	vector		vNormalDesc = g_NormalTexture.Sample(DefaultSampler, In.vTexUV);
+
+	float3		vNormal = vNormalDesc.xyz * 2.f - 1.f;
+
+	float3x3	WorldMatrix = float3x3(In.vTangent.xyz, In.vBinormal.xyz, In.vNormal.xyz);
+
+	vNormal = mul(vNormal, WorldMatrix);
+
+	Out.vDiffuse = vDiffuse;
+	Out.vNormal = vector(vNormal.xyz * 0.5f + 0.5f, 0.f);
+	Out.vDepth = vector(In.vProjPos.w / 300.0f, In.vProjPos.z / In.vProjPos.w, 0.f, 0.f);
+	Out.vSpecular = g_SpecularTexture.Sample(DefaultSampler, In.vTexUV);
+	Out.vEmissive = 1.f;
+
+	return Out;
+}
 
 
 
@@ -549,6 +594,28 @@ technique11		DefaultTechnique
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_Distortion_Ball_NoColor();
 	}
+
+	pass Distortion_Emissive		//14
+	{
+		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(ZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_None);
+
+		VertexShader = compile vs_5_0 VS_MAIN_DEFAULT();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_Emissive();
+	}
+	pass Distortion_Emissive_CullNone		//15
+	{
+		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(ZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_ccw);
+
+		VertexShader = compile vs_5_0 VS_MAIN_DEFAULT();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_Emissive();
+	}
+
 
 
 	

@@ -47,6 +47,7 @@ private:
 
 	HRESULT Ready_Layer_TriggerCollider(const _tchar* pLayerTag);
 
+	HRESULT Ready_MapParticle();
 
 private:
 	class CCamera_Main*				m_pMainCam = nullptr;

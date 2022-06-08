@@ -30,6 +30,7 @@ HRESULT CRoseObj::Initialize_Clone(void * pArg)
 	{
 		_float3 vPos = *(_float3*)pArg;
 		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, vPos);
+		m_pTransformCom->Scaled_All(_float3(0.5f));
 	}
 
 
@@ -205,7 +206,7 @@ _int CRoseObj::Render()
 		for (_uint j = 0; j < AI_TEXTURE_TYPE_MAX; j++)
 			FAILED_CHECK(m_pModel->Bind_OnShader(m_pShaderCom, i, j, MODLETEXTYPE(j)));
 
-		FAILED_CHECK(m_pModel->Render(m_pShaderCom, 2, i));
+		FAILED_CHECK(m_pModel->Render(m_pShaderCom, 15, i));
 	}
 
 

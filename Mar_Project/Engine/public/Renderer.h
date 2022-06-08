@@ -69,6 +69,8 @@ private:
 
 	HRESULT Render_NonAlpha();
 	HRESULT Render_PriorityAlpha();
+	HRESULT Render_SwordTrail_Light();
+	HRESULT Render_SwordTrail_NoLight();
 
 	HRESULT Render_BlurShadow();
 	HRESULT Render_Lights();

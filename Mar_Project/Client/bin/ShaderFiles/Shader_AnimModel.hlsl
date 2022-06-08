@@ -240,6 +240,7 @@ struct PS_OUT
 	vector		vNormal : SV_TARGET1;
 	vector		vDepth : SV_TARGET2;
 	vector		vSpecular : SV_TARGET3;
+	vector		vEmissive : SV_TARGET4;
 };
 struct PS_OUT_NODEFERRED
 {

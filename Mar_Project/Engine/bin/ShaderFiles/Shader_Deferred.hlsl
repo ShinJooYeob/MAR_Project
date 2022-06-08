@@ -437,8 +437,10 @@ PS_OUT_AfterDeferred PS_DOWNSCALING_Luminence(PS_IN In)
 	PS_OUT_AfterDeferred		Out = (PS_OUT_AfterDeferred)0;
 
 	vector LinerDesc = g_LinerTexture.Sample(DefaultSampler, In.vTexUV);
+	vector EmissiveDesc = g_TargetTexture.Sample(DefaultSampler, In.vTexUV);
+	
 	float Lumi	= dot(LinerDesc.xyz, float3(0.2125f, 0.7154f, 0.0721f));
-	if (Lumi < g_fBlurLuminence) discard;
+	if (EmissiveDesc.r == 0 && Lumi < g_fBlurLuminence) discard;
 	//Out.vColor = Lumi;
 	
 	Out.vColor = LinerDesc;

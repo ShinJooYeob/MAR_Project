@@ -60,6 +60,7 @@ enum ParticleID
 	Particle_Fixed_LookFree,
 	//Particle_Fountain,
 	Particle_Spread,
+	Particle_Map,
 
 	Particle_End
 };
@@ -74,12 +75,13 @@ typedef struct tagParticleDesc
 	const _tchar* szTextureProtoTypeTag = nullptr;
 	const _tchar* szTextureLayerTag = nullptr;
 	_uint		iSimilarLayerNum = 1;
+	_uint	 TextureChageFrequency = 0;
+	_float2	 vTextureXYNum = _float2(1, 1);
+	_int	iTextureFigureNum = -1;
 
 	const _tchar* szNoiseTextureLayerTag = nullptr;
 	_uint		iNoiseTextureIndex = 0;
 
-	_uint	 TextureChageFrequency = 0;
-	_float2	 vTextureXYNum = _float2(1, 1);
 
 	_float	TotalParticleTime = 0;
 	_float	EachParticleLifeTime = 0;

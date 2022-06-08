@@ -920,7 +920,8 @@ enum COMPONENTPROTOTYPEID
 			Prototype_Texture_DefaultUI,
 			Prototype_Texture_InstanceParticleTex,
 	Prototype_Texture_ScreenEffectUI,
-	Prototype_Texture_PlayerEffect,
+			Prototype_Texture_PlayerEffect,
+			Prototype_Texture_DissolveEffect,
 	Prototype_Texture_GamePlayScene,
 	Prototype_Texture_LoadingScene,
 	Prototype_Texture_LobyScene,
@@ -1647,6 +1648,9 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 		break;
 	case Prototype_Texture_PlayerEffect:
 		return TEXT("Prototype_Texture_PlayerEffect");
+		break;
+	case Prototype_Texture_DissolveEffect:
+		return TEXT("Prototype_Texture_DissolveEffect");
 		break;
 	case Prototype_Texture_ScreenEffectUI:
 		return TEXT("Prototype_Texture_ScreenEffectUI");

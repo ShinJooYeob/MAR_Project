@@ -283,6 +283,14 @@ struct PS_OUT
 {
 	vector		vColor : SV_TARGET0;
 };
+struct PS_OUT_Emissive
+{
+	vector		vColor : SV_TARGET0;
+	vector		vNormal : SV_TARGET1;
+	vector		vDepth : SV_TARGET2;
+	vector		vSpecular : SV_TARGET3;
+	vector		vEmissive : SV_TARGET4;
+};
 
 PS_OUT PS_MAIN_RECT(PS_IN In)
 {
@@ -666,6 +674,19 @@ PS_OUT PS_MAIN_NoiseFireEffect(PS_IN_Noise In)
 }
 
 
+PS_OUT_Emissive PS_MAIN_PARTICLE_Emissive(PS_IN In)
+{
+	PS_OUT_Emissive		Out = (PS_OUT_Emissive)0;
+
+	Out.vColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV) * g_vColor;//vector(1.f, 0.f, 0.f, 1.f);rgba
+
+	if (Out.vColor.a < g_fAlphaTestValue)
+		discard;
+
+	Out.vEmissive = 1;
+
+	return Out;
+}
 
 
 
@@ -865,5 +886,15 @@ technique11		DefaultTechnique
 		VertexShader = compile vs_5_0 VS_MAIN_Noise();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN_NoiseFireEffect();
+	}
+	pass ParticleRect_Emissive			//19
+	{
+		SetBlendState(ParticleBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(ZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_ccw);
+
+		VertexShader = compile vs_5_0 VS_MAIN_PARTICLE();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_PARTICLE_Emissive();
 	}
 }

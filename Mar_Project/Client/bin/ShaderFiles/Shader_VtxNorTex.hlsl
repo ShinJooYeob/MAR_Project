@@ -111,7 +111,7 @@ struct PS_OUT
 	vector		vNormal : SV_TARGET1;
 	vector		vDepth : SV_TARGET2;	
 	vector		vSpecular : SV_TARGET3;
-
+	vector		vEmissive : SV_TARGET4;
 };
 
 
@@ -141,13 +141,18 @@ PS_OUT PS_MAIN_TERRAIN_DIRECTIONAL(PS_IN In)
 
 
 
-		float  FogShaderRate = 1 - saturate(  max((2.f - In.vWorldPos.y), 0) / 3.f);
+		float  FogShaderRate = 1 - min(  max((2.8f - In.vWorldPos.y), 0) / 2.8f,1);
+
 		Out.vDiffuse = vMtrlDiffuse;
+
+		Out.vDiffuse.a *= FogShaderRate;
+
+		if (Out.vDiffuse.a == 0.0f)
+			discard;
 
 
 		Out.vSpecular = vector((Out.vDiffuse.r + Out.vDiffuse.g + Out.vDiffuse.b) * 0.34f, 0.167f, 0.f,1);
 		
-		Out.vDiffuse.a *= FogShaderRate;
 		Out.vNormal = vector(In.vWorldNormal.xyz * 0.5f + 0.5f, 0.f);
 		Out.vDepth = vector(In.vProjPos.w / 300.0f, In.vProjPos.z / In.vProjPos.w, 0.f, 0.f);
 
@@ -185,9 +190,14 @@ PS_OUT PS_MAIN_TERRAIN_POINT(PS_IN In)
 		vMtrlDiffuse = vMtrlDiffuse * (1.f - vFilterColor.g) + vDestMtrlDiffuse3 * (vFilterColor.g);
 		vMtrlDiffuse = vMtrlDiffuse * (1.f - vFilterColor.b) + vDestMtrlDiffuse4 * (vFilterColor.b);
 
-		float  FogShaderRate = 1 - saturate(max((3.f - In.vWorldPos.y), 0) / 3.f);
+		float  FogShaderRate = 1 - min(max((2.8f - In.vWorldPos.y), 0) / 2.8f, 1);
+
 		Out.vDiffuse = vMtrlDiffuse;
 		Out.vDiffuse.a *= FogShaderRate;
+
+		if (Out.vDiffuse.a == 0.0f)
+			discard;
+
 
 		Out.vNormal = vector(In.vWorldNormal.xyz * 0.5f + 0.5f, 0.f);
 		Out.vDepth = vector(In.vProjPos.w / 300.0f, In.vProjPos.z / In.vProjPos.w, 0.f, 0.f);

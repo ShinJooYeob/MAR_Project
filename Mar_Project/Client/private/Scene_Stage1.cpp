@@ -52,6 +52,9 @@ HRESULT CScene_Stage1::Initialize()
 
 	FAILED_CHECK(Ready_Layer_TriggerCollider(TAG_LAY(Layer_TriggerCollider)));
 
+
+	FAILED_CHECK(Ready_MapParticle());
+
 	
 
 
@@ -540,6 +543,127 @@ HRESULT CScene_Stage1::Ready_Layer_TriggerCollider(const _tchar * pLayerTag)
 
 
 	
+
+	return S_OK;
+}
+
+HRESULT CScene_Stage1::Ready_MapParticle()
+{	
+	CTransform* pPlayerTransform = (CTransform*)g_pGameInstance->Get_Commponent_By_LayerIndex(SCENE_STAGE1, TAG_LAY(Layer_Player), TAG_COM(Com_Transform));
+	
+	NULL_CHECK_RETURN(pPlayerTransform, E_FAIL);
+
+
+
+	/////////0//////////////////
+	PARTICLEDESC tDesc;
+
+	tDesc.eParticleTypeID = Particle_Map;
+
+	tDesc.FollowingTarget = pPlayerTransform;
+
+	tDesc.szTextureProtoTypeTag = TAG_CP(Prototype_Texture_PlayerEffect);
+	tDesc.szTextureLayerTag = L"ButterFly";
+	tDesc.iSimilarLayerNum = 12;
+
+	tDesc.TextureChageFrequency = 20;
+	tDesc.vTextureXYNum = _float2(8, 2);
+	tDesc.iTextureFigureNum = 13;
+
+	tDesc.TotalParticleTime = 999999999.f;
+	tDesc.EachParticleLifeTime = 3.4f;
+	tDesc.MaxParticleCount = 30;
+
+	tDesc.SizeChageFrequency = 0;
+	tDesc.ParticleSize = _float3(0.5, 0.5, 0.5);
+	tDesc.ParticleSize2 = _float3(0.5, 0.5, 0.5);
+
+	tDesc.ColorChageFrequency = 0;
+	tDesc.TargetColor = _float4(1.f, 1.f, 1.f, 1.f);
+	tDesc.TargetColor2 = _float4(1.f, 1.f, 1.f, 1.f);
+
+
+	tDesc.Particle_Power = 5;
+	tDesc.PowerRandomRange = _float2(0.5f, 1.5f);
+
+	tDesc.vUp = _float3(0, 1, 0);
+
+	tDesc.MaxBoundaryRadius = 9999999.f;
+
+	tDesc.m_bIsUI = false;
+	tDesc.m_bUIDepth = 0;
+
+	tDesc.ParticleStartRandomPosMin = _float3(-10.0f, -5.f, -10.f);
+	tDesc.ParticleStartRandomPosMax = _float3(10.f, 20.f, 10.f);
+
+	tDesc.DepthTestON = true;
+	tDesc.AlphaBlendON = false;
+
+	tDesc.m_fAlphaTestValue = 0.1f;
+	tDesc.m_iPassIndex = 19;
+
+	GetSingle(CUtilityMgr)->Create_ParticleObject(SCENE_STAGE1, tDesc);
+
+	/////1////
+
+	/////////0//////////////////
+	 tDesc = PARTICLEDESC();
+
+	tDesc.eParticleTypeID = Particle_Map;
+
+	tDesc.FollowingTarget = pPlayerTransform;
+
+	tDesc.szTextureProtoTypeTag = TAG_CP(Prototype_Texture_PlayerEffect);
+	tDesc.szTextureLayerTag = L"EmptyCircle";
+	tDesc.iSimilarLayerNum = 1;
+
+	tDesc.TextureChageFrequency = 30;
+	tDesc.vTextureXYNum = _float2(1, 1);
+	//tDesc.iTextureFigureNum = 1;
+
+	tDesc.TotalParticleTime = 999999999.f;
+	tDesc.EachParticleLifeTime = 6.8f;
+	tDesc.MaxParticleCount = 30;
+
+	tDesc.SizeChageFrequency = 20;
+	tDesc.ParticleSize = _float3(0.05f);
+	tDesc.ParticleSize2 = _float3(0.08f);
+
+	tDesc.ColorChageFrequency = 0;
+	tDesc.TargetColor = _float4(1.f, 0.9725490f, 0.215686274509f, 1.f);
+	tDesc.TargetColor2 = _float4(1.f, 1.f, 1.f, 1.f);
+
+
+	tDesc.Particle_Power = 2;
+	tDesc.PowerRandomRange = _float2(0.5f, 1.5f);
+
+	tDesc.vUp = _float3(0, 1, 0);
+
+	tDesc.MaxBoundaryRadius = 9999999.f;
+
+	tDesc.m_bIsUI = false;
+	tDesc.m_bUIDepth = 0;
+
+	tDesc.ParticleStartRandomPosMin = _float3(-10.0f, -5.f, -10.f);
+	tDesc.ParticleStartRandomPosMax = _float3(10.f, 20.f, 10.f);
+
+	tDesc.DepthTestON = true;
+	tDesc.AlphaBlendON = false;
+
+	tDesc.m_fAlphaTestValue = 0.1f;
+	tDesc.m_iPassIndex = 19;
+
+	GetSingle(CUtilityMgr)->Create_ParticleObject(SCENE_STAGE1, tDesc);
+
+	tDesc.TargetColor = _float4(0.2156862745098f, 1.f, 0.454901960784313f, 1.f);
+	GetSingle(CUtilityMgr)->Create_ParticleObject(SCENE_STAGE1, tDesc);
+
+	tDesc.TargetColor = _float4(0.2156862745098f, 1.f, 1.f, 1.f);
+	GetSingle(CUtilityMgr)->Create_ParticleObject(SCENE_STAGE1, tDesc);
+
+	tDesc.TargetColor = _float4(1.f, 0.18431372549019f, 0.3764705882352f, 1.f);
+	GetSingle(CUtilityMgr)->Create_ParticleObject(SCENE_STAGE1, tDesc);
+
 
 	return S_OK;
 }

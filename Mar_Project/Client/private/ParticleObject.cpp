@@ -310,7 +310,12 @@ void CParticleObject::Update_SizeChange(PARTICLEATT * tParticleAtt, _double fTim
 
 void CParticleObject::Update_TextureChange(PARTICLEATT * tParticleAtt, _double fTimeDelta)
 {
-	_uint iTotalTextureNum= _uint(m_ParticleDesc.vTextureXYNum.x * m_ParticleDesc.vTextureXYNum.y);
+	_uint iTotalTextureNum = m_ParticleDesc.iTextureFigureNum;
+
+	if (m_ParticleDesc.iTextureFigureNum < 0)
+		iTotalTextureNum = _uint(m_ParticleDesc.vTextureXYNum.x * m_ParticleDesc.vTextureXYNum.y);
+
+
 
 	if (m_ParticleDesc.TextureChageFrequency)
 	{
@@ -1039,3 +1044,88 @@ CGameObject * CParticleeObj_Spread::Clone(void * pArg)
 
 
 
+
+#pragma region BallParticle
+CParticleeObj_MapParticle::CParticleeObj_MapParticle(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
+	:CParticleObject(pDevice, pDeviceContext)
+{
+}
+
+CParticleeObj_MapParticle::CParticleeObj_MapParticle(const CParticleeObj_MapParticle & rhs)
+	: CParticleObject(rhs)
+{
+}
+
+void CParticleeObj_MapParticle::Reset_Velocity(_float3 & fAttVlocity)
+{
+	_float3 RandomVelocity = GetSingle(CUtilityMgr)->RandomFloat3(_float3(-5, -5, -5), _float3(5, 5, 5));
+
+	if (m_ParticleDesc.m_bIsUI)	RandomVelocity.z = 0;
+
+	fAttVlocity = RandomVelocity.Get_Nomalize();
+}
+
+void CParticleeObj_MapParticle::Update_Position_by_Velocity(PARTICLEATT * tParticleAtt, _double fTimeDelta)
+{
+	tParticleAtt->_position = tParticleAtt->_position.XMVector() + (tParticleAtt->_velocity.XMVector() * tParticleAtt->_force * _float(fTimeDelta));
+}
+
+HRESULT CParticleeObj_MapParticle::Initialize_Child_Clone()
+{
+	m_ParticleList.clear();
+
+	PARTICLEATT part;
+
+
+	for (_uint i = 0; i < m_ParticleDesc.MaxParticleCount; i++)
+	{
+		ResetParticle(&part);
+		m_ParticleList.push_front(part);
+	}
+
+
+	return S_OK;
+}
+
+_int CParticleeObj_MapParticle::Update(_double fTimeDelta)
+{
+	if (0 > __super::Update(fTimeDelta)) return -1;
+	return _int();
+}
+
+_int CParticleeObj_MapParticle::LateUpdate(_double fTimeDelta)
+{
+
+	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+
+	return _int();
+}
+
+CParticleeObj_MapParticle * CParticleeObj_MapParticle::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, void * pArg)
+{
+	CParticleeObj_MapParticle* pInstance = new CParticleeObj_MapParticle(pDevice, pDeviceContext);
+
+	if (FAILED(pInstance->Initialize_Prototype(pArg)))
+	{
+		MSGBOX("Fail to Create CParticleeObj_MapParticle");
+		Safe_Release(pInstance);
+
+	}
+
+
+	return pInstance;
+}
+
+CGameObject * CParticleeObj_MapParticle::Clone(void * pArg)
+{
+	CParticleeObj_MapParticle* pInstance = new CParticleeObj_MapParticle(*this);
+
+	if (FAILED(pInstance->Initialize_Clone(pArg)))
+	{
+		MSGBOX("Fail to Create CParticleeObj_MapParticle");
+		Safe_Release(pInstance);
+	}
+
+	return pInstance;
+}
+#pragma endregion

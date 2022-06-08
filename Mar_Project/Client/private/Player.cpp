@@ -1355,6 +1355,7 @@ HRESULT CPlayer::Ready_ParticleDesc()
 
 	tDesc.TextureChageFrequency = 1;
 	tDesc.vTextureXYNum = _float2(8, 2);
+	tDesc.iTextureFigureNum = 13;
 
 	tDesc.TotalParticleTime = 0.5f;
 	tDesc.EachParticleLifeTime = 0.34f;

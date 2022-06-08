@@ -306,6 +306,7 @@ HRESULT CMainApp::Ready_Static_Component_Prototype()
 	FAILED_CHECK(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Texture_PlayerEffect),
 		CTexture::Create(m_pDevice, m_pDeviceContext, L"PlayerEffect.txt")));
 
+
 	FAILED_CHECK(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Texture_LoadingScene),
 		CTexture::Create(m_pDevice, m_pDeviceContext, L"UI_Loading.txt")));
 
@@ -363,6 +364,7 @@ HRESULT CMainApp::Ready_Static_GameObject_Prototype()
 	FAILED_CHECK(m_pGameInstance->Add_GameObject_Prototype(TEXT("ProtoType_GameObject_Object_particle_Fixed"), CParticleeObj_Fixed::Create(m_pDevice, m_pDeviceContext)));
 	FAILED_CHECK(m_pGameInstance->Add_GameObject_Prototype(TEXT("ProtoType_GameObject_Object_particle_Fixed_LookFree"), CParticleeObj_Fixed_LookFree::Create(m_pDevice, m_pDeviceContext)));
 	FAILED_CHECK(m_pGameInstance->Add_GameObject_Prototype(TEXT("ProtoType_GameObject_Object_particle_Spread"), CParticleeObj_Spread::Create(m_pDevice, m_pDeviceContext)));
+	FAILED_CHECK(m_pGameInstance->Add_GameObject_Prototype(TEXT("ProtoType_GameObject_Object_particle_Map"), CParticleeObj_MapParticle::Create(m_pDevice, m_pDeviceContext)));
 	
 	//FAILED_CHECK(m_pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_UILoading), CLoadingUI::Create(m_pDevice, m_pDeviceContext)));
 	//FAILED_CHECK(m_pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_UILoading), CLoadingUI::Create(m_pDevice, m_pDeviceContext)));
