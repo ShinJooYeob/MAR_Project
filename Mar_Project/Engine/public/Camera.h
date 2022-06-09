@@ -37,7 +37,7 @@ public:
 	CTransform*	 Get_Camera_Transform() { return m_pTransform; };
 
 public:
-	HRESULT Set_ViewMatrix();
+	virtual HRESULT Set_ViewMatrix();
 	HRESULT Set_ProjectMatrix(_bool bIsOrtho = false);
 
 

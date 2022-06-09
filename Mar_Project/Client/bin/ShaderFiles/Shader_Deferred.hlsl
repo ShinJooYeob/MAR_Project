@@ -224,6 +224,7 @@ struct PS_OUT_LIGHT
 {
 	vector		vShade : SV_TARGET0;
 	vector		vSpecular : SV_TARGET1;
+	vector		vEmissive : SV_TARGET2;
 };
 
 
@@ -297,7 +298,7 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
 	
 	Out.vSpecular = (g_vLightSpecular * pow(vMtrlSpecularMap.r,1/1.2f)) * pow(saturate(dot(normalize(vReflect) * -1.f, normalize(vLook))), pow(1 / vMtrlSpecularMap.g,2));
 	Out.vSpecular.a = 0.f;
-
+	Out.vEmissive = vMtrlSpecularMap.b;
 
 	return Out;	
 }
@@ -328,11 +329,16 @@ PS_OUT_LIGHT PS_MAIN_POINT(PS_IN In)
 	vector		vLightDir = vWorldPos - g_vLightPos;
 	float		fDistance = length(vLightDir);
 
+	//Out.vEmissive = max((g_fLightRange * 0.25f) - fDistance, 0);
+		
+	
+
 	float		fAtt = max(g_fLightRange - fDistance, 0.f) / g_fLightRange;
+	Out.vEmissive = pow(fAtt,2.2f);
 
 	Out.vShade = (g_vLightDiffuse * saturate(dot(normalize(vLightDir) * -1.f, vNormal)) + (g_vLightAmbient *  saturate(vMtrlSpecularMap.b + 0.2f))) * fAtt;
 	//Out.vShade = 0.5f;
-
+	 
 	Out.vShade.a = 1.f;
 
 	vector		vReflect = reflect(normalize(vLightDir), vNormal);
@@ -340,7 +346,7 @@ PS_OUT_LIGHT PS_MAIN_POINT(PS_IN In)
 
 	vector		vLook = vWorldPos - g_vCamPosition;
 
-	Out.vSpecular = (g_vLightSpecular * vMtrlSpecularMap.g) * pow(saturate(dot(normalize(vReflect) * -1.f, normalize(vLook))), vMtrlSpecularMap.r * 30) * fAtt;
+	Out.vSpecular = (g_vLightSpecular * pow(vMtrlSpecularMap.r, 1 / 1.2f)) * pow(saturate(dot(normalize(vReflect) * -1.f, normalize(vLook))), pow(1 / vMtrlSpecularMap.g, 2)) * fAtt;
 	Out.vSpecular.a = 0.f;
 
 	return Out;
@@ -386,6 +392,7 @@ PS_OUT_AfterDeferred PS_MAIN_FOGBLEND(PS_IN In)
 	vector		vSpecularDesc = g_SpecularTexture.Sample(DefaultSampler, In.vTexUV);
 	vector		vShadowMapDesc = g_ShadowMapTexture.Sample(DefaultSampler, In.vTexUV);
 	vector		vDepthDesc = g_DepthTexture.Sample(DefaultSampler, In.vTexUV);
+	vector		vEmissiveDesc = g_TargetTexture.Sample(DefaultSampler, In.vTexUV);
 
 
 	Out.vColor = vDiffuseDesc * vShadeDesc + vSpecularDesc;
@@ -401,14 +408,13 @@ PS_OUT_AfterDeferred PS_MAIN_FOGBLEND(PS_IN In)
 
 	if (vDepthDesc.g > 0)
 	{
-		Out.vColor *= (1 - vShadowMapDesc) *min(pow(saturate((64.f - fViewZ) / 64.f), 2.2f) + 0.31f - min(vShadowMapDesc.r, 0.3f),1);
+		Out.vColor *= (1 - vShadowMapDesc) *min(pow(saturate((64.f - fViewZ) / 64.f), 2.2f) + 0.31f - min(vShadowMapDesc.r, 0.3f) + (vEmissiveDesc.r), 1);
 
 
 	}
 	else
 	{
-		Out.vColor *= 0.1f;
-
+		Out.vColor *= min((vEmissiveDesc.r) + 0.1f, 1);
 	}
 
 	Out.vColor2 = Out.vColor;
@@ -696,6 +702,7 @@ BlendState	Blending_One
 {
 	BlendEnable[0] = true;
 	BlendEnable[1] = true;
+	BlendEnable[2] = true;
 
 	BlendOp = Add;
 	SrcBlend = one;

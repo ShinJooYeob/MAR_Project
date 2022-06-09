@@ -64,17 +64,35 @@ _int CEyepot::Update(_double fDeltaTime)
 
 	if (m_bDeathAnimStart)
 	{
-		if (m_pModel->Get_PlayRate() > 0.95)
+		if (m_bDeathDissolveStart)
 		{
-			Set_IsDead();
-			return 0;
+			m_fDissolveTime += (_float)fDeltaTime;
+			if (m_fDissolveTime > 5.f)
+				Set_IsDead();
+		}
+		else
+		{
+
+			if (m_pModel->Get_PlayRate() < 0.95)
+			{
+
+				m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
+				FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime, m_bIsOnScreen));
+
+			}
+			else
+			{
+				m_bDeathDissolveStart = true;
+				m_fDissolveTime = 0;
+				return 0;
+			}
 		}
 	}
 	else if (!m_bIsDmgAnimUpdated[2])
 	{
 		if (m_bStartPos)
 		{
-			if (m_PatternDelayTime > 4 &&(!m_bIsPatternFinished || Distance_BetweenPlayer(m_pTransformCom) < 15))
+			if (m_PatternDelayTime > 4 && (!m_bIsPatternFinished || Distance_BetweenPlayer(m_pTransformCom) < 15))
 			{
 				Update_Pattern(fDeltaTime);
 			}
@@ -95,11 +113,11 @@ _int CEyepot::Update(_double fDeltaTime)
 			{
 				if (!m_bIsPatternFinished)
 				{
-						m_pModel->Change_AnimIndex_ReturnTo_Must(24, 0, 0.15, true);
-						m_bIsPatternFinished = true;
-						m_PatternPassedTime = 0;
-						m_PatternDelayTime = 0;
-				
+					m_pModel->Change_AnimIndex_ReturnTo_Must(24, 0, 0.15, true);
+					m_bIsPatternFinished = true;
+					m_PatternPassedTime = 0;
+					m_PatternDelayTime = 0;
+
 				}
 				else
 				{
@@ -116,60 +134,61 @@ _int CEyepot::Update(_double fDeltaTime)
 			}
 		}
 
-	}
 
-	if (m_bStartPos)
-		Update_DmgCalculate(fDeltaTime);
 
-	m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
-	_uint NowAnimIndex = m_pModel->Get_NowAnimIndex();
+		if (m_bStartPos)
+			Update_DmgCalculate(fDeltaTime);
 
-	if (NowAnimIndex >= 8 && NowAnimIndex <= 12)
-	{
-		FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime * 1.8f, m_bIsOnScreen));
+		m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
+		_uint NowAnimIndex = m_pModel->Get_NowAnimIndex();
 
-	}
-	else
-	{
-		FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime, m_bIsOnScreen));
-	}
-
-	if (m_bIsOnScreen)
-	{
-
-		for (_uint i = 0; i < 3; i++)
-			m_pColliderCom->Update_Transform(i, m_pTransformCom->Get_WorldMatrix());
-
-		for (_uint i = 0; i < 2; i++)
+		if (NowAnimIndex >= 8 && NowAnimIndex <= 12)
 		{
-			_Matrix			TransformMatrix = XMLoadFloat4x4(m_ArrCollisionAttach[i].pUpdatedNodeMat) * XMLoadFloat4x4(m_ArrCollisionAttach[i].pDefaultPivotMat);
-
-			TransformMatrix.r[0] = XMVector3Normalize(TransformMatrix.r[0]);
-			TransformMatrix.r[1] = XMVector3Normalize(TransformMatrix.r[1]);
-			TransformMatrix.r[2] = XMVector3Normalize(TransformMatrix.r[2]);
-
-
-			TransformMatrix = TransformMatrix* m_pTransformCom->Get_WorldMatrix();
-			m_pColliderCom->Update_Transform(i+ 3, TransformMatrix);
+			FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime * 1.8f, m_bIsOnScreen));
 
 		}
-		
-	}
-	if (!m_bIsPatternFinished && (m_ePattern == 0 || m_ePattern == 2))
-	{
-		g_pGameInstance->Add_CollisionGroup(CollisionType_MonsterWeapon, this, m_pColliderCom);
+		else
+		{
+			FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime, m_bIsOnScreen));
+		}
 
-	}
-	else
-	{
-		g_pGameInstance->Add_CollisionGroup(CollisionType_Monster, this, m_pColliderCom);
+		if (m_bIsOnScreen)
+		{
 
-	}
+			for (_uint i = 0; i < 3; i++)
+				m_pColliderCom->Update_Transform(i, m_pTransformCom->Get_WorldMatrix());
+
+			for (_uint i = 0; i < 2; i++)
+			{
+				_Matrix			TransformMatrix = XMLoadFloat4x4(m_ArrCollisionAttach[i].pUpdatedNodeMat) * XMLoadFloat4x4(m_ArrCollisionAttach[i].pDefaultPivotMat);
+
+				TransformMatrix.r[0] = XMVector3Normalize(TransformMatrix.r[0]);
+				TransformMatrix.r[1] = XMVector3Normalize(TransformMatrix.r[1]);
+				TransformMatrix.r[2] = XMVector3Normalize(TransformMatrix.r[2]);
+
+
+				TransformMatrix = TransformMatrix* m_pTransformCom->Get_WorldMatrix();
+				m_pColliderCom->Update_Transform(i + 3, TransformMatrix);
+
+			}
+
+		}
+		if (!m_bIsPatternFinished && (m_ePattern == 0 || m_ePattern == 2))
+		{
+			g_pGameInstance->Add_CollisionGroup(CollisionType_MonsterWeapon, this, m_pColliderCom);
+
+		}
+		else
+		{
+			g_pGameInstance->Add_CollisionGroup(CollisionType_Monster, this, m_pColliderCom);
+
+		}
 #ifdef _DEBUG
-	FAILED_CHECK(m_pRendererCom->Add_DebugGroup(m_pColliderCom));
+		FAILED_CHECK(m_pRendererCom->Add_DebugGroup(m_pColliderCom));
 #endif // _DEBUG
-	
-	m_pSubTransformCom->Set_MatrixState(CTransform::STATE_POS, m_pColliderCom->Get_ColliderPosition(4));
+
+		m_pSubTransformCom->Set_MatrixState(CTransform::STATE_POS, m_pColliderCom->Get_ColliderPosition(4));
+	}
 	return _int();
 }
 
@@ -193,28 +212,70 @@ _int CEyepot::Render()
 	if (__super::Render() < 0)
 		return -1;
 
-
-	NULL_CHECK_RETURN(m_pModel, E_FAIL);
-
-
-	FAILED_CHECK(m_pTransformCom->Bind_OnShader(m_pShaderCom, "g_WorldMatrix"));
-
-	CGameInstance* pInstance = GetSingle(CGameInstance);
-
-	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ViewMatrix", &pInstance->Get_Transform_Float4x4_TP(PLM_VIEW), sizeof(_float4x4)));
-	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ProjMatrix", &pInstance->Get_Transform_Float4x4_TP(PLM_PROJ), sizeof(_float4x4)));
-
-
-	_uint NumMaterial = m_pModel->Get_NumMaterial();
-
-
-	for (_uint i = 0; i < NumMaterial; i++)
+	if (m_bDeathDissolveStart)
 	{
-		for (_uint j = 0; j < AI_TEXTURE_TYPE_MAX; j++)
-			FAILED_CHECK(m_pModel->Bind_OnShader(m_pShaderCom, i, j, MODLETEXTYPE(j)));
+		NULL_CHECK_RETURN(m_pModel, E_FAIL);
 
-		FAILED_CHECK(m_pModel->Render(m_pShaderCom, 0, i, "g_BoneMatrices"));
+
+		FAILED_CHECK(m_pTransformCom->Bind_OnShader(m_pShaderCom, "g_WorldMatrix"));
+
+		CGameInstance* pInstance = GetSingle(CGameInstance);
+
+		FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ViewMatrix", &pInstance->Get_Transform_Float4x4_TP(PLM_VIEW), sizeof(_float4x4)));
+		FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ProjMatrix", &pInstance->Get_Transform_Float4x4_TP(PLM_PROJ), sizeof(_float4x4)));
+
+
+		_uint NumMaterial = m_pModel->Get_NumMaterial();
+
+
+
+		FAILED_CHECK(GetSingle(CUtilityMgr)->BindOnShader_DissolveTexture(m_pShaderCom, "g_BurnRampTexture", "g_NoiseTexture"));
+
+		_float VisualValue = 1 - (_float(5.f - m_fDissolveTime) / 5.f);
+
+
+		FAILED_CHECK(m_pShaderCom->Set_RawValue("g_fVisualValue", &(VisualValue), sizeof(_float)));
+
+
+		for (_uint i = 0; i < NumMaterial; i++)
+		{
+			for (_uint j = 0; j < AI_TEXTURE_TYPE_MAX; j++)
+				FAILED_CHECK(m_pModel->Bind_OnShader(m_pShaderCom, i, j, MODLETEXTYPE(j)));
+
+			FAILED_CHECK(m_pModel->Render(m_pShaderCom, 12, i, "g_BoneMatrices"));
+		}
+
+
 	}
+	else
+	{
+
+		NULL_CHECK_RETURN(m_pModel, E_FAIL);
+
+
+		FAILED_CHECK(m_pTransformCom->Bind_OnShader(m_pShaderCom, "g_WorldMatrix"));
+
+		CGameInstance* pInstance = GetSingle(CGameInstance);
+
+		FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ViewMatrix", &pInstance->Get_Transform_Float4x4_TP(PLM_VIEW), sizeof(_float4x4)));
+		FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ProjMatrix", &pInstance->Get_Transform_Float4x4_TP(PLM_PROJ), sizeof(_float4x4)));
+
+
+		_uint NumMaterial = m_pModel->Get_NumMaterial();
+
+
+		for (_uint i = 0; i < NumMaterial; i++)
+		{
+			for (_uint j = 0; j < AI_TEXTURE_TYPE_MAX; j++)
+				FAILED_CHECK(m_pModel->Bind_OnShader(m_pShaderCom, i, j, MODLETEXTYPE(j)));
+
+			FAILED_CHECK(m_pModel->Render(m_pShaderCom, 0, i, "g_BoneMatrices"));
+		}
+
+
+	}
+
+
 	return _int();
 }
 
@@ -378,7 +439,6 @@ _int CEyepot::Update_Pattern(_double fDeltaTime)
 	if (m_bIsPatternFinished)
 	{
 		m_ePattern += 1;
-		m_ePattern = 1;
 		if (m_ePattern > 2) m_ePattern = 0;
 		m_bIsPatternFinished = false;
 		m_PatternPassedTime = 0;

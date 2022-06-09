@@ -50,6 +50,8 @@ private:
 	_bool				m_bIsFarPattern = false;
 
 	_bool				m_bDeathAnimStart = false;
+	_bool				m_bDeathDissolveStart = false;
+	_float				m_fDissolveTime = 0;
 	_bool				m_bStartSprout = false;
 
 	PARTICLEDESC		m_tParticleDesc;

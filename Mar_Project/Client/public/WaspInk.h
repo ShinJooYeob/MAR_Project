@@ -43,9 +43,14 @@ private:
 	_uint				m_SpwanKinds = INT_MAX;
 	_float3				m_SpwanMovingPos[5];
 
+
+
 	_bool				m_bIsDmgAnimUpdated[3];
 
 	_bool				m_bDeadAnimStart = false;
+
+	_bool				m_bDeathDissolveStart = false;
+	_float				m_fDissolveTime = 0;
 
 private:
 	HRESULT SetUp_Components();

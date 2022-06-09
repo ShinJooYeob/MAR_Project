@@ -25,7 +25,7 @@ HRESULT CScene_Stage1::Initialize()
 		return E_FAIL;
 
 
-	GetSingle(CUtilityMgr)->DistFogRendOn(false);
+	GetSingle(CUtilityMgr)->DistFogRendOn(true);
 
 
 	FAILED_CHECK(Ready_Light());
@@ -91,7 +91,7 @@ _int CScene_Stage1::Update(_double fDeltaTime)
 	if (GetKeyState(VK_RETURN) & 0x8000)
 	{
 		FAILED_CHECK(GetSingle(CUtilityMgr)->Clear_RenderGroup_forSceneChange());
-		FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Loading::Create(m_pDevice, m_pDeviceContext, SCENEID::SCENE_BOSS), SCENEID::SCENE_LOADING));
+		FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Loading::Create(m_pDevice, m_pDeviceContext, SCENEID::SCENE_STAGE2), SCENEID::SCENE_LOADING));
 	}
 
 
@@ -167,6 +167,8 @@ HRESULT CScene_Stage1::Ready_Light()
 	{
 		g_pGameInstance->Relocate_LightDesc(tagLightDesc::TYPE_DIRECTIONAL, 0, _float4(0, 256, -128, 0).XMVector());
 	}
+
+
 
 
 

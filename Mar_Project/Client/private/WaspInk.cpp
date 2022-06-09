@@ -111,119 +111,141 @@ _int CWaspInk::Update(_double fDeltaTime)
 	//m_pTransformCom->Set_MoveSpeed(4.8f);
 	if (m_bDeadAnimStart)
 	{
-		if (m_pModel->Get_PlayRate() > 0.5)
+		if (m_bDeathDissolveStart)
 		{
-			Set_IsDead();
-			return 0;
-		}
-	}
-	else if (m_bSpwanAnimFinished)
-	{
-
-
-		if (!m_bIsPatternFinished || Distance_BetweenPlayer(m_pTransformCom) < 15)
-		{
-			Update_Pattern(fDeltaTime);
+			m_fDissolveTime += (_float)fDeltaTime;
+			if (m_fDissolveTime > 3.f)
+				Set_IsDead();
 		}
 		else
 		{
-			if (!m_pModel->Get_IsUntillPlay() && !m_pModel->Get_IsHavetoBlockAnimChange())
+			if (m_pModel->Get_PlayRate() < 0.5)
 			{
-				m_pModel->Change_AnimIndex(2);
-				FAILED_CHECK(__super::Update_WanderAround(m_pTransformCom, fDeltaTime, 0.2f));
+
+				m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
+				FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime, m_bIsOnScreen));
+
+			}
+			else
+			{
+				m_bDeathDissolveStart = true;
+				m_fDissolveTime = 0;
+				return 0;
 			}
 		}
+
 	}
 	else
 	{
-		m_SpwanAnimPassedTime += fDeltaTime;
-
-
-		if (m_SpwanAnimPassedTime < 2)
-		{
-			_float3 EasedPos = g_pGameInstance->Easing_Vector(TYPE_ExpoInOut, m_SpwanMovingPos[0], m_SpwanMovingPos[1], (_float)m_SpwanAnimPassedTime, 2);
-			m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, EasedPos);
-
-			_Vector NewLook = XMVectorLerp(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK),
-				XMVector3Normalize(m_SpwanMovingPos[1].XMVector() - m_SpwanMovingPos[0].XMVector()), 0.1f);
-
-			m_pTransformCom->LookDir(NewLook);
-		}
-		else if (m_SpwanAnimPassedTime < 4)
+		if (m_bSpwanAnimFinished)
 		{
 
-			_float3 EasedPos = g_pGameInstance->Easing_Vector(TYPE_ExpoInOut, m_SpwanMovingPos[1], m_SpwanMovingPos[2], (_float)m_SpwanAnimPassedTime - 2, 2);
-			m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, EasedPos);
 
-			_Vector NewLook = XMVectorLerp(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK),
-				XMVector3Normalize(m_SpwanMovingPos[2].XMVector() - m_SpwanMovingPos[1].XMVector()), 0.1f);
-
-			m_pTransformCom->LookDir(NewLook);
-
-		}
-		else if (m_SpwanAnimPassedTime < 6)
-		{
-
-			_float3 EasedPos = g_pGameInstance->Easing_Vector(TYPE_ExpoInOut, m_SpwanMovingPos[2], m_SpwanMovingPos[3], (_float)m_SpwanAnimPassedTime - 4, 2);
-			m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, EasedPos);
-			_Vector NewLook = XMVectorLerp(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK),
-				XMVector3Normalize(m_SpwanMovingPos[3].XMVector() - m_SpwanMovingPos[2].XMVector()), 0.1f);
-
-			m_pTransformCom->LookDir(NewLook);
-		}
-		else if (m_SpwanAnimPassedTime < 10)
-		{
-			_float3 EasedPos = g_pGameInstance->Easing_Vector(TYPE_ExpoIn, m_SpwanMovingPos[3], m_SpwanMovingPos[4], (_float)m_SpwanAnimPassedTime - 6, 4);
-			m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, EasedPos);
-
-
-			_Vector NewLook = XMVectorLerp(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK),
-				XMVector3Normalize(m_SpwanMovingPos[4].XMVector() - m_SpwanMovingPos[3].XMVector()), 0.1f);
-
-			m_pTransformCom->LookDir(NewLook);
-		}
-		else if(m_SpwanAnimPassedTime < 13)
-		{
-			if (!m_SpwanAnimCount)
+			if (!m_bIsPatternFinished || Distance_BetweenPlayer(m_pTransformCom) < 15)
 			{
-				m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, m_SpwanMovingPos[4]);
-				_float3 NewLook = GetSingle(CUtilityMgr)->RandomFloat3(-9999.f, 9999.f);
-				NewLook.y = 0;
-				m_pTransformCom->LookDir(NewLook.XMVector());
-				__super::SetUp_WanderLook(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK));
-				m_pModel->Change_AnimIndex(10);
-				m_SpwanAnimCount++;
+				Update_Pattern(fDeltaTime);
+			}
+			else
+			{
+				if (!m_pModel->Get_IsUntillPlay() && !m_pModel->Get_IsHavetoBlockAnimChange())
+				{
+					m_pModel->Change_AnimIndex(2);
+					FAILED_CHECK(__super::Update_WanderAround(m_pTransformCom, fDeltaTime, 0.2f));
+				}
 			}
 		}
 		else
 		{
-			m_bSpwanAnimFinished = true;
+			m_SpwanAnimPassedTime += fDeltaTime;
 
+
+			if (m_SpwanAnimPassedTime < 2)
+			{
+				_float3 EasedPos = g_pGameInstance->Easing_Vector(TYPE_ExpoInOut, m_SpwanMovingPos[0], m_SpwanMovingPos[1], (_float)m_SpwanAnimPassedTime, 2);
+				m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, EasedPos);
+
+				_Vector NewLook = XMVectorLerp(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK),
+					XMVector3Normalize(m_SpwanMovingPos[1].XMVector() - m_SpwanMovingPos[0].XMVector()), 0.1f);
+
+				m_pTransformCom->LookDir(NewLook);
+			}
+			else if (m_SpwanAnimPassedTime < 4)
+			{
+
+				_float3 EasedPos = g_pGameInstance->Easing_Vector(TYPE_ExpoInOut, m_SpwanMovingPos[1], m_SpwanMovingPos[2], (_float)m_SpwanAnimPassedTime - 2, 2);
+				m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, EasedPos);
+
+				_Vector NewLook = XMVectorLerp(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK),
+					XMVector3Normalize(m_SpwanMovingPos[2].XMVector() - m_SpwanMovingPos[1].XMVector()), 0.1f);
+
+				m_pTransformCom->LookDir(NewLook);
+
+			}
+			else if (m_SpwanAnimPassedTime < 6)
+			{
+
+				_float3 EasedPos = g_pGameInstance->Easing_Vector(TYPE_ExpoInOut, m_SpwanMovingPos[2], m_SpwanMovingPos[3], (_float)m_SpwanAnimPassedTime - 4, 2);
+				m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, EasedPos);
+				_Vector NewLook = XMVectorLerp(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK),
+					XMVector3Normalize(m_SpwanMovingPos[3].XMVector() - m_SpwanMovingPos[2].XMVector()), 0.1f);
+
+				m_pTransformCom->LookDir(NewLook);
+			}
+			else if (m_SpwanAnimPassedTime < 10)
+			{
+				_float3 EasedPos = g_pGameInstance->Easing_Vector(TYPE_ExpoIn, m_SpwanMovingPos[3], m_SpwanMovingPos[4], (_float)m_SpwanAnimPassedTime - 6, 4);
+				m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, EasedPos);
+
+
+				_Vector NewLook = XMVectorLerp(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK),
+					XMVector3Normalize(m_SpwanMovingPos[4].XMVector() - m_SpwanMovingPos[3].XMVector()), 0.1f);
+
+				m_pTransformCom->LookDir(NewLook);
+			}
+			else if (m_SpwanAnimPassedTime < 13)
+			{
+				if (!m_SpwanAnimCount)
+				{
+					m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, m_SpwanMovingPos[4]);
+					_float3 NewLook = GetSingle(CUtilityMgr)->RandomFloat3(-9999.f, 9999.f);
+					NewLook.y = 0;
+					m_pTransformCom->LookDir(NewLook.XMVector());
+					__super::SetUp_WanderLook(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK));
+					m_pModel->Change_AnimIndex(10);
+					m_SpwanAnimCount++;
+				}
+			}
+			else
+			{
+				m_bSpwanAnimFinished = true;
+
+			}
 		}
-	}
 
 
-	Update_DmgCalculate(fDeltaTime);
+		Update_DmgCalculate(fDeltaTime);
 
-	m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
+		m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
 
-	FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime, m_bIsOnScreen));
+		FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime, m_bIsOnScreen));
 
-	if (m_bIsOnScreen)
-	{
-		for (_uint i = 0; i < m_pColliderCom->Get_NumColliderBuffer(); i++)
-			m_pColliderCom->Update_Transform(i, m_pTransformCom->Get_WorldMatrix());
-	}
+		if (m_bIsOnScreen)
+		{
+			for (_uint i = 0; i < m_pColliderCom->Get_NumColliderBuffer(); i++)
+				m_pColliderCom->Update_Transform(i, m_pTransformCom->Get_WorldMatrix());
+		}
 
-	if (m_bIsPatternFinished)
-		g_pGameInstance->Add_CollisionGroup(CollisionType_Monster, this, m_pColliderCom);
-	else
-		g_pGameInstance->Add_CollisionGroup(CollisionType_MonsterWeapon, this, m_pColliderCom);
+		if (m_bIsPatternFinished)
+			g_pGameInstance->Add_CollisionGroup(CollisionType_Monster, this, m_pColliderCom);
+		else
+			g_pGameInstance->Add_CollisionGroup(CollisionType_MonsterWeapon, this, m_pColliderCom);
 #ifdef _DEBUG
-	FAILED_CHECK(m_pRendererCom->Add_DebugGroup(m_pColliderCom));
+		FAILED_CHECK(m_pRendererCom->Add_DebugGroup(m_pColliderCom));
 #endif // _DEBUG
 
 
+
+	}
 	return _int();
 }
 
@@ -247,34 +269,72 @@ _int CWaspInk::Render()
 		return -1;
 
 
-	NULL_CHECK_RETURN(m_pModel, E_FAIL);
-
-
-	FAILED_CHECK(m_pTransformCom->Bind_OnShader(m_pShaderCom, "g_WorldMatrix"));
-
-	CGameInstance* pInstance = GetSingle(CGameInstance);
-
-	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ViewMatrix", &pInstance->Get_Transform_Float4x4_TP(PLM_VIEW), sizeof(_float4x4)));
-	FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ProjMatrix", &pInstance->Get_Transform_Float4x4_TP(PLM_PROJ), sizeof(_float4x4)));
-
-
-	_uint NumMaterial = m_pModel->Get_NumMaterial();
-
-
-	for (_uint i = 0; i < NumMaterial; i++)
+	if (m_bDeathDissolveStart)
 	{
-		for (_uint j = 0; j < AI_TEXTURE_TYPE_MAX; j++)
-			FAILED_CHECK(m_pModel->Bind_OnShader(m_pShaderCom, i, j, MODLETEXTYPE(j)));
+		NULL_CHECK_RETURN(m_pModel, E_FAIL);
 
-		if (i % 2)
-		{
-			FAILED_CHECK(m_pModel->Render(m_pShaderCom, 4, i, "g_BoneMatrices"));
-		}
-		else
-		{
-			FAILED_CHECK(m_pModel->Render(m_pShaderCom, 0, i, "g_BoneMatrices"));
 
+		FAILED_CHECK(m_pTransformCom->Bind_OnShader(m_pShaderCom, "g_WorldMatrix"));
+
+		CGameInstance* pInstance = GetSingle(CGameInstance);
+
+		FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ViewMatrix", &pInstance->Get_Transform_Float4x4_TP(PLM_VIEW), sizeof(_float4x4)));
+		FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ProjMatrix", &pInstance->Get_Transform_Float4x4_TP(PLM_PROJ), sizeof(_float4x4)));
+
+
+		_uint NumMaterial = m_pModel->Get_NumMaterial();
+
+
+
+		FAILED_CHECK(GetSingle(CUtilityMgr)->BindOnShader_DissolveTexture(m_pShaderCom, "g_BurnRampTexture", "g_NoiseTexture"));
+
+		_float VisualValue = 1 - (_float(3.f - m_fDissolveTime) / 3.f);
+
+
+		FAILED_CHECK(m_pShaderCom->Set_RawValue("g_fVisualValue", &(VisualValue), sizeof(_float)));
+
+
+		for (_uint i = 0; i < NumMaterial; i++)
+		{
+			for (_uint j = 0; j < AI_TEXTURE_TYPE_MAX; j++)
+				FAILED_CHECK(m_pModel->Bind_OnShader(m_pShaderCom, i, j, MODLETEXTYPE(j)));
+
+			FAILED_CHECK(m_pModel->Render(m_pShaderCom, 12, i, "g_BoneMatrices"));
 		}
+	}
+	else
+	{
+
+		NULL_CHECK_RETURN(m_pModel, E_FAIL);
+
+
+		FAILED_CHECK(m_pTransformCom->Bind_OnShader(m_pShaderCom, "g_WorldMatrix"));
+
+		CGameInstance* pInstance = GetSingle(CGameInstance);
+
+		FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ViewMatrix", &pInstance->Get_Transform_Float4x4_TP(PLM_VIEW), sizeof(_float4x4)));
+		FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ProjMatrix", &pInstance->Get_Transform_Float4x4_TP(PLM_PROJ), sizeof(_float4x4)));
+
+
+		_uint NumMaterial = m_pModel->Get_NumMaterial();
+
+
+		for (_uint i = 0; i < NumMaterial; i++)
+		{
+			for (_uint j = 0; j < AI_TEXTURE_TYPE_MAX; j++)
+				FAILED_CHECK(m_pModel->Bind_OnShader(m_pShaderCom, i, j, MODLETEXTYPE(j)));
+
+			if (i % 2)
+			{
+				FAILED_CHECK(m_pModel->Render(m_pShaderCom, 4, i, "g_BoneMatrices"));
+			}
+			else
+			{
+				FAILED_CHECK(m_pModel->Render(m_pShaderCom, 0, i, "g_BoneMatrices"));
+
+			}
+		}
+
 	}
 	return _int();
 }

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "..\Public\Camera_Main.h"
+#include "Terrain.h"
 
 
 _uint CALLBACK CameraEffectThread(void* _Prameter)
@@ -194,11 +195,48 @@ HRESULT CCamera_Main::Progress_Shaking_Thread(_bool * _IsClientQuit, CRITICAL_SE
 	LeaveCriticalSection(_CriSec);
 
 	return S_OK;
+}
+
+HRESULT CCamera_Main::Set_Cam_Over_Terrain()
+{
+	CGameInstance* pInstance = GetSingle(CGameInstance);
+
+	CTerrain* pTerrain = (CTerrain*)(pInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Terrain)));
+	if (!pTerrain) return S_FALSE;
+	_bool bIsOn = false;
+	_uint eNowTile = Tile_End;
+	_float3 CaculatedPos = pTerrain->PutOnTerrain_IgnoreTile(&bIsOn, m_pTransform->Get_MatrixState(CTransform::STATE_POS) - XMVectorSet(0,0.5f,0,0), m_vOldPos.XMVector() - XMVectorSet(0, 0.5f, 0, 0), nullptr, &eNowTile);
+
+	if (bIsOn)
+	{
+		_float3 vPos = m_pTransform->Get_MatrixState(CTransform::STATE_POS);
+		vPos.y -= 0.5f;
+		_float len  = vPos.Get_Distance(CaculatedPos.XMVector());
+
+		CTransform* pPlayerTransform = (CTransform*)(pInstance->Get_Commponent_By_LayerIndex(SCENE_STATIC,TAG_LAY(Layer_Player) ,TAG_COM(Com_Transform)));
+		NULL_CHECK_RETURN(pPlayerTransform, E_FAIL);
+		_float3 TargetPos = CaculatedPos.XMVector()+ XMVector3Normalize(pPlayerTransform->Get_MatrixState(CTransform::STATE_POS) - CaculatedPos.XMVector())* len;
+
+		TargetPos.y += 0.5f;
+
+		m_pTransform->Set_MatrixState(CTransform::STATE_POS, TargetPos);
+
+	}
 
 
+	return S_OK;
+}
+
+HRESULT CCamera_Main::Set_ViewMatrix()
+{
+	FAILED_CHECK(Set_Cam_Over_Terrain() );
+	CGameInstance* pIsntance = GetSingle(CGameInstance);
+	pIsntance->Set_Transform(PLM_VIEW, m_pTransform->Get_InverseWorldMatrix());
+	pIsntance->Set_TargetPostion(PLV_CAMERA, *((_float4*)(m_pTransform->Get_WorldFloat4x4().m[3])));
+	pIsntance->Set_TargetPostion(PLV_CAMLOOK, *((_float4*)(m_pTransform->Get_WorldFloat4x4().m[2])));
 
 
-
+	m_vOldPos = m_pTransform->Get_MatrixState_Float3(CTransform::STATE_POS);
 	return S_OK;
 }
 

@@ -144,6 +144,37 @@ HRESULT CScene_Stage2::Ready_Light()
 		g_pGameInstance->Relocate_LightDesc(tagLightDesc::TYPE_DIRECTIONAL, 0, _float4(0, 256, -128, 0).XMVector());
 	}
 
+	 
+	{
+
+		//LIGHTDESC LightDesc;
+
+		//LightDesc.eLightType = tagLightDesc::TYPE_POINT;
+		//LightDesc.vDiffuse = _float4(1.f, 0.f, 0.f, 1.f);
+		//LightDesc.vAmbient = _float4(1.0f);
+		//LightDesc.vSpecular = _float4(1);
+
+		//LightDesc.vVector = _float4(83.293f, 34.2f, 155.192f, 0);
+		//LightDesc.fRange = 2.3f;
+
+		//g_pGameInstance->Add_Light(LightDesc);
+
+
+		//LightDesc = LIGHTDESC();
+
+		//LightDesc.eLightType = tagLightDesc::TYPE_POINT;
+		//LightDesc.vDiffuse = _float4(1.f, 0.f, 0.f, 1.f);
+		//LightDesc.vAmbient = _float4(1.0f);
+		//LightDesc.vSpecular = _float4(1);
+
+		//LightDesc.vVector = _float4(101.482f, 34.2f ,154.974f, 0);
+		//LightDesc.fRange = 10;
+
+		//g_pGameInstance->Add_Light(LightDesc);
+		
+	}
+
+
 	return S_OK;
 }
 

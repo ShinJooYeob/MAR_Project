@@ -56,6 +56,10 @@ public:
 	HRESULT		Progress_Shaking_Thread(_bool* _IsClientQuit, CRITICAL_SECTION* _CriSec);
 	CameraEffectID Get_EffectID() { return m_eEffectID; }
 
+
+	HRESULT Set_Cam_Over_Terrain();
+	virtual HRESULT Set_ViewMatrix() override;
+
 private:
 	_bool				m_bIsStartedShaking = false;
 	CameraEffectID		m_eEffectID = CAM_EFT_END;

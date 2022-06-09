@@ -726,7 +726,7 @@ HRESULT CDollMaker::Adjust_AnimMovedTransform(_double fDeltatime)
 
 					g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_DollMakerBullet), &tDesc);
 
-					AmilazeTimer = GetSingle(CUtilityMgr)->RandomFloat(0.64f, 1.f);
+					AmilazeTimer = GetSingle(CUtilityMgr)->RandomFloat(1.f, 2.5f);
 				}
 
 			}

@@ -33,7 +33,8 @@ HRESULT CNormalBullet::Initialize_Clone(void * pArg)
 	/* For.Com_AABB */
 	ZeroMemory(&ColliderDesc, sizeof(COLLIDERDESC));
 
-	ColliderDesc.vScale = _float3(0.3f, 0.3f, 0.3f);
+	ColliderDesc.vScale = _float3(0.6f, 0.6f, 0.6f);
+	//ColliderDesc.vScale = _float3(0.3f, 0.3f, 0.3f);
 	ColliderDesc.vRotation = _float4(0.f, 0.f, 0.f, 1.f);
 	ColliderDesc.vPosition = _float4(0, 0, 0, 1);
 	FAILED_CHECK(m_pColliderCom->Add_ColliderBuffer(COLLIDER_SPHERE, &ColliderDesc));

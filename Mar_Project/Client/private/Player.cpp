@@ -4370,6 +4370,8 @@ HRESULT CPlayer::Set_Camera_On_Player(_double fDeltaTime)
 
 
 #define CamLerpLate 0.2f
+#define LowBreakpoint -50.f
+#define HighBreakpoint 60.f
 
 	if (m_bIsGiant)
 	{
@@ -4386,8 +4388,8 @@ HRESULT CPlayer::Set_Camera_On_Player(_double fDeltaTime)
 			{
 				m_CamDegreeAngle.x += _float(fDeltaTime) * 20 * MouseMove * 0.1f;
 
-				if (m_CamDegreeAngle.x < -20.f)m_CamDegreeAngle.x = -20.f;
-				else if (m_CamDegreeAngle.x > 60.f)m_CamDegreeAngle.x = 60.f;
+				if (m_CamDegreeAngle.x < LowBreakpoint)m_CamDegreeAngle.x = LowBreakpoint;
+				else if (m_CamDegreeAngle.x > HighBreakpoint)m_CamDegreeAngle.x = HighBreakpoint;
 			}
 
 
@@ -4425,8 +4427,8 @@ HRESULT CPlayer::Set_Camera_On_Player(_double fDeltaTime)
 			{
 				m_CamDegreeAngle.x += _float(fDeltaTime) * 20 * MouseMove * 0.1f;
 
-				if (m_CamDegreeAngle.x < -20.f)m_CamDegreeAngle.x = -20.f;
-				else if (m_CamDegreeAngle.x > 60.f)m_CamDegreeAngle.x = 60.f;
+				if (m_CamDegreeAngle.x < LowBreakpoint)m_CamDegreeAngle.x = LowBreakpoint;
+				else if (m_CamDegreeAngle.x > HighBreakpoint)m_CamDegreeAngle.x = HighBreakpoint;
 			}
 
 
@@ -4470,8 +4472,8 @@ HRESULT CPlayer::Set_Camera_On_Player(_double fDeltaTime)
 			{
 				m_CamDegreeAngle.x += _float(fDeltaTime) * 20 * MouseMove * 0.1f;
 
-				if (m_CamDegreeAngle.x < -20.f)m_CamDegreeAngle.x = -20.f;
-				else if (m_CamDegreeAngle.x > 60.f)m_CamDegreeAngle.x = 60.f;
+				if (m_CamDegreeAngle.x < LowBreakpoint)m_CamDegreeAngle.x = LowBreakpoint;
+				else if (m_CamDegreeAngle.x > HighBreakpoint)m_CamDegreeAngle.x = HighBreakpoint;
 			}
 
 			CTransform* pCamTransform = m_pMainCamera->Get_Camera_Transform();
@@ -4503,8 +4505,8 @@ HRESULT CPlayer::Set_Camera_On_Player(_double fDeltaTime)
 			{
 				m_CamDegreeAngle.x += _float(fDeltaTime) * 20 * MouseMove * 0.1f;
 
-				if (m_CamDegreeAngle.x < -20.f)m_CamDegreeAngle.x = -20.f;
-				else if (m_CamDegreeAngle.x > 60.f)m_CamDegreeAngle.x = 60.f;
+				if (m_CamDegreeAngle.x < LowBreakpoint)m_CamDegreeAngle.x = LowBreakpoint;
+				else if (m_CamDegreeAngle.x > HighBreakpoint)m_CamDegreeAngle.x = HighBreakpoint;
 			}
 
 			CTransform* pCamTransform = m_pMainCamera->Get_Camera_Transform();
@@ -4546,8 +4548,8 @@ HRESULT CPlayer::Set_Camera_On_Player(_double fDeltaTime)
 			{
 				m_CamDegreeAngle.x += _float(fDeltaTime) * 20 * MouseMove * 0.1f;
 
-				if (m_CamDegreeAngle.x < -20.f)m_CamDegreeAngle.x = -20.f;
-				else if (m_CamDegreeAngle.x > 60.f)m_CamDegreeAngle.x = 60.f;
+				if (m_CamDegreeAngle.x < LowBreakpoint)m_CamDegreeAngle.x = LowBreakpoint;
+				else if (m_CamDegreeAngle.x > HighBreakpoint)m_CamDegreeAngle.x = HighBreakpoint;
 			}
 
 
@@ -4583,8 +4585,8 @@ HRESULT CPlayer::Set_Camera_On_Player(_double fDeltaTime)
 			{
 				m_CamDegreeAngle.x += _float(fDeltaTime) * 20 * MouseMove * 0.1f;
 
-				if (m_CamDegreeAngle.x < -20.f)m_CamDegreeAngle.x = -20.f;
-				else if (m_CamDegreeAngle.x > 60.f)m_CamDegreeAngle.x = 60.f;
+				if (m_CamDegreeAngle.x < LowBreakpoint)m_CamDegreeAngle.x = LowBreakpoint;
+				else if (m_CamDegreeAngle.x > HighBreakpoint)m_CamDegreeAngle.x = HighBreakpoint;
 			}
 
 
@@ -4625,8 +4627,8 @@ HRESULT CPlayer::Set_Camera_On_Player(_double fDeltaTime)
 		{
 			m_CamDegreeAngle.x += _float(fDeltaTime) * 20 * MouseMove * 0.1f;
 
-			if (m_CamDegreeAngle.x < -20.f)m_CamDegreeAngle.x = -20.f;
-			else if (m_CamDegreeAngle.x > 60.f)m_CamDegreeAngle.x = 60.f;
+			if (m_CamDegreeAngle.x < LowBreakpoint)m_CamDegreeAngle.x = LowBreakpoint;
+			else if (m_CamDegreeAngle.x > HighBreakpoint)m_CamDegreeAngle.x = HighBreakpoint;
 		}
 
 
@@ -4685,8 +4687,8 @@ HRESULT CPlayer::Set_Camera_On_Player(_double fDeltaTime)
 			{
 				m_CamDegreeAngle.x += _float(fDeltaTime) * 20 * MouseMove * 0.1f;
 
-				if (m_CamDegreeAngle.x < -20.f)m_CamDegreeAngle.x = -20.f;
-				else if (m_CamDegreeAngle.x > 60.f)m_CamDegreeAngle.x = 60.f;
+				if (m_CamDegreeAngle.x < LowBreakpoint)m_CamDegreeAngle.x = LowBreakpoint;
+				else if (m_CamDegreeAngle.x > HighBreakpoint)m_CamDegreeAngle.x = HighBreakpoint;
 			}
 
 
