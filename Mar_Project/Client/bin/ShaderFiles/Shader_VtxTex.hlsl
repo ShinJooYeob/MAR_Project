@@ -689,6 +689,44 @@ PS_OUT_Emissive PS_MAIN_PARTICLE_Emissive(PS_IN In)
 }
 
 
+PS_OUT_Emissive PS_MAIN_PARTICLE_Emissive_REMOVEALPHA3(PS_IN In)
+{
+	PS_OUT_Emissive		Out = (PS_OUT_Emissive)0;
+
+	Out.vColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);//vector(1.f, 0.f, 0.f, 1.f);rgba
+	float Alpha = max(max(Out.vColor.r, Out.vColor.g), Out.vColor.b);
+
+	if (Alpha < g_fAlphaTestValue)
+		discard;
+
+	Out.vColor = (Out.vColor * 0.8 + g_vColor*0.2);
+	//Out.vColor = (Out.vColor * 0.8 + g_vColor*0.2);
+	//Out.vColor *= g_vColor;
+	Out.vColor.a = min(Alpha, g_vColor.a);
+
+	Out.vEmissive = 1;
+	return Out;
+}
+PS_OUT_Emissive PS_MAIN_PARTICLE_Emissive_EDGE(PS_IN In)
+{
+	PS_OUT_Emissive		Out = (PS_OUT_Emissive)0;
+
+	float2 Center = g_vUVPos + g_vUVSize *0.5f;
+
+	float Rate = saturate(length(In.vTexUV.xy - Center.xy) / (g_vUVSize.x * 0.5f));
+
+	Out.vColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);//vector(1.f, 0.f, 0.f, 1.f);rgba
+
+	if (Out.vColor.a < g_fAlphaTestValue)
+		discard;
+	float Alpha = Out.vColor.a;
+	Out.vColor *= (vector(0, 0, 0, 1) * (Rate)+(1 - Rate)* g_vColor);
+
+
+	Out.vColor.a = Alpha;
+	Out.vEmissive = 1;
+	return Out;
+}
 
 
 technique11		DefaultTechnique
@@ -887,7 +925,7 @@ technique11		DefaultTechnique
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN_NoiseFireEffect();
 	}
-	pass ParticleRect_Emissive			//19
+	pass ParticleRect_Emissive_Cut			//19
 	{
 		SetBlendState(ParticleBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 		SetDepthStencilState(ZTestAndWriteState, 0);
@@ -896,5 +934,25 @@ technique11		DefaultTechnique
 		VertexShader = compile vs_5_0 VS_MAIN_PARTICLE();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN_PARTICLE_Emissive();
+	}
+	pass ParticleRect_Emissive_RemoveAlphaCullModeNone		//20
+	{
+		SetBlendState(ParticleBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(ZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_None);
+
+		VertexShader = compile vs_5_0 VS_MAIN_PARTICLE();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_PARTICLE_Emissive_REMOVEALPHA3();
+	}
+	pass Particle_Emissive_Edge			//21
+	{
+		SetBlendState(ParticleBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(ZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_ccw);
+
+		VertexShader = compile vs_5_0 VS_MAIN_PARTICLE();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_PARTICLE_Emissive_EDGE();
 	}
 }

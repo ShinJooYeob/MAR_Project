@@ -595,6 +595,7 @@ HRESULT CHandyGirl::Ready_ParticleDesc()
 	tParticleDesc.MaxBoundaryRadius = 6;
 
 	tParticleDesc.m_bIsUI = false;
+	tParticleDesc.m_bIsBlur = true;
 	tParticleDesc.m_bUIDepth = 0;
 
 	tParticleDesc.ParticleStartRandomPosMin = _float3(-0.25f);
@@ -604,7 +605,7 @@ HRESULT CHandyGirl::Ready_ParticleDesc()
 	tParticleDesc.AlphaBlendON = false;
 
 	tParticleDesc.m_fAlphaTestValue = 0.1f;
-	tParticleDesc.m_iPassIndex = 3;
+	tParticleDesc.m_iPassIndex = 19;
 
 	m_vecParticleDesc.push_back(tParticleDesc);
 
@@ -644,6 +645,7 @@ HRESULT CHandyGirl::Ready_ParticleDesc()
 	tParticleDesc.MaxBoundaryRadius = 10;
 
 	tParticleDesc.m_bIsUI = false;
+	tParticleDesc.m_bIsBlur = true;
 	tParticleDesc.m_bUIDepth = 0;
 
 	tParticleDesc.ParticleStartRandomPosMin = _float3(0, 0.3f, 0);
@@ -653,7 +655,7 @@ HRESULT CHandyGirl::Ready_ParticleDesc()
 	tParticleDesc.AlphaBlendON = true;
 
 	tParticleDesc.m_fAlphaTestValue = 0.1f;
-	tParticleDesc.m_iPassIndex = 10;
+	tParticleDesc.m_iPassIndex = 21;
 
 	m_vecParticleDesc.push_back(tParticleDesc);
 
@@ -692,6 +694,7 @@ HRESULT CHandyGirl::Ready_ParticleDesc()
 	tParticleDesc.MaxBoundaryRadius = 10;
 
 	tParticleDesc.m_bIsUI = false;
+	tParticleDesc.m_bIsBlur = true;
 	tParticleDesc.m_bUIDepth = 0;
 
 	tParticleDesc.ParticleStartRandomPosMin = _float3(-2, 0.3f, -2);
@@ -701,7 +704,7 @@ HRESULT CHandyGirl::Ready_ParticleDesc()
 	tParticleDesc.AlphaBlendON = false;
 
 	tParticleDesc.m_fAlphaTestValue = 0.1f;
-	tParticleDesc.m_iPassIndex = 3;
+	tParticleDesc.m_iPassIndex = 19;
 
 	m_vecParticleDesc.push_back(tParticleDesc);
 
@@ -740,6 +743,7 @@ HRESULT CHandyGirl::Ready_ParticleDesc()
 	tParticleDesc.MaxBoundaryRadius = 10;
 
 	tParticleDesc.m_bIsUI = false;
+	tParticleDesc.m_bIsBlur = true;
 	tParticleDesc.m_bUIDepth = 0;
 
 	tParticleDesc.ParticleStartRandomPosMin = _float3(-0.25f);
@@ -749,7 +753,7 @@ HRESULT CHandyGirl::Ready_ParticleDesc()
 	tParticleDesc.AlphaBlendON = false;
 
 	tParticleDesc.m_fAlphaTestValue = 0.1f;
-	tParticleDesc.m_iPassIndex = 3;
+	tParticleDesc.m_iPassIndex = 19;
 
 	m_vecParticleDesc.push_back(tParticleDesc);
 
@@ -790,6 +794,7 @@ HRESULT CHandyGirl::Ready_ParticleDesc()
 	tParticleDesc.MaxBoundaryRadius = 20;
 
 	tParticleDesc.m_bIsUI = false;
+	tParticleDesc.m_bIsBlur = true;
 	tParticleDesc.m_bUIDepth = 0;
 
 	tParticleDesc.ParticleStartRandomPosMin = _float3(-0, 0, -0);
@@ -799,7 +804,7 @@ HRESULT CHandyGirl::Ready_ParticleDesc()
 	tParticleDesc.AlphaBlendON = false;
 
 	tParticleDesc.m_fAlphaTestValue = 0.1f;
-	tParticleDesc.m_iPassIndex = 9;
+	tParticleDesc.m_iPassIndex = 20;
 
 	m_vecParticleDesc.push_back(tParticleDesc);
 	return S_OK;

@@ -193,44 +193,138 @@ HRESULT CNormalBullet::Ready_ParticleDesc()
 {
 
 
-	m_tParticleDesc.eParticleTypeID = Particle_Fixed;
+	//m_tParticleDesc.eParticleTypeID = Particle_Fixed;
+
+	//m_tParticleDesc.FollowingTarget = m_pTransformCom;
+
+	//m_tParticleDesc.szTextureProtoTypeTag = TAG_CP(Prototype_Texture_PlayerEffect);
+	//m_tParticleDesc.szTextureLayerTag = L"Dust2";
+	//m_tParticleDesc.iSimilarLayerNum = 1;
+
+	//m_tParticleDesc.TextureChageFrequency = 8;
+	//m_tParticleDesc.vTextureXYNum = _float2(2, 2);
+	//
+	////m_tParticleDesc.TotalParticleTime = m_fTotalLifeTime;
+	//m_tParticleDesc.TotalParticleTime = 9999999999.f;
+	//m_tParticleDesc.EachParticleLifeTime = 0.64f;
+	//m_tParticleDesc.MaxParticleCount = 3;
+
+	//m_tParticleDesc.SizeChageFrequency = 1;
+	//m_tParticleDesc.ParticleSize = _float3(1.f);
+	//m_tParticleDesc.ParticleSize2 = _float3(3.f);
+
+	//m_tParticleDesc.ColorChageFrequency = 0;
+	//m_tParticleDesc.TargetColor = _float4(1.f, 1.f, 0, 1.f);
+	//m_tParticleDesc.TargetColor2 = _float4(1.f, 1.f, 1.f, 0.f);
+
+	//m_tParticleDesc.MaxBoundaryRadius = 1.;
+
+	//m_tParticleDesc.m_bIsUI = false;
+	//m_tParticleDesc.m_bUIDepth = 0;
+
+	//m_tParticleDesc.ParticleStartRandomPosMin = _float3(-0, 0, -0);
+
+	//m_tParticleDesc.DepthTestON = true;
+	//m_tParticleDesc.AlphaBlendON = true;
+
+	//m_tParticleDesc.m_fAlphaTestValue = 0.18f;
+	//m_tParticleDesc.m_iPassIndex = 5;
+
+	//GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_tParticleDesc);
+
+
+
+
+	//m_tParticleDesc.eParticleTypeID = Particle_Straight;
+	//m_tParticleDesc.FollowingTarget = m_pTransformCom;
+	//m_tParticleDesc.szTextureProtoTypeTag = TAG_CP(Prototype_Texture_PlayerEffect);
+	//m_tParticleDesc.szTextureLayerTag = L"Fire";
+	//m_tParticleDesc.iSimilarLayerNum = 1;
+	//m_tParticleDesc.szNoiseTextureLayerTag = L"Noise";
+	//m_tParticleDesc.iNoiseTextureIndex = 0;
+	//m_tParticleDesc.TextureChageFrequency = 1;
+
+
+	//m_tParticleDesc.vTextureXYNum = _float2(1, 1);
+	//m_tParticleDesc.TotalParticleTime = 99999999.f;
+	//m_tParticleDesc.EachParticleLifeTime = 0.6f;
+	//m_tParticleDesc.MaxParticleCount = 15;
+
+	//m_tParticleDesc.SizeChageFrequency = 0;
+	//m_tParticleDesc.ParticleSize = _float3(0.4f, 0.4f, 0.4f);
+	//m_tParticleDesc.ParticleSize2 = _float3(0.4f,0.4f,0.4f);
+
+	//m_tParticleDesc.ColorChageFrequency = 0;
+	//m_tParticleDesc.TargetColor = _float4(1.f, 1.f, 1.f, 1.f);
+	//m_tParticleDesc.TargetColor2 = _float4(1.f, 1.f, 1.f, 0.f);
+	//m_tParticleDesc.Particle_Power = 2.f;
+	//m_tParticleDesc.PowerRandomRange = _float2(1.f, 1.f);
+	//m_tParticleDesc.vUp = m_vTargetDir;
+	//m_tParticleDesc.MaxBoundaryRadius = 0.5f;
+	//m_tParticleDesc.m_bIsUI = false;
+	//m_tParticleDesc.m_bIsBlur = true;
+	//m_tParticleDesc.m_bUIDepth = 0;
+	//m_tParticleDesc.ParticleStartRandomPosMin = _float3(0.f);
+	//m_tParticleDesc.ParticleStartRandomPosMax = _float3(0.f);
+	//m_tParticleDesc.DepthTestON = true;
+	//m_tParticleDesc.AlphaBlendON = true;
+	//m_tParticleDesc.m_fAlphaTestValue = 0.1f;
+	//m_tParticleDesc.m_iPassIndex = 18;
+
+
+	//GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_tParticleDesc);
+
+
+
+	m_tParticleDesc = PARTICLEDESC();
+
+	m_tParticleDesc.eParticleTypeID = Particle_Straight;
 
 	m_tParticleDesc.FollowingTarget = m_pTransformCom;
 
 	m_tParticleDesc.szTextureProtoTypeTag = TAG_CP(Prototype_Texture_PlayerEffect);
-	m_tParticleDesc.szTextureLayerTag = L"Dust2";
-	m_tParticleDesc.iSimilarLayerNum = 1;
+	m_tParticleDesc.szTextureLayerTag = L"Explosion";
+	m_tParticleDesc.iSimilarLayerNum =1;
 
-	m_tParticleDesc.TextureChageFrequency = 8;
-	m_tParticleDesc.vTextureXYNum = _float2(2, 2);
-	
-	//m_tParticleDesc.TotalParticleTime = m_fTotalLifeTime;
-	m_tParticleDesc.TotalParticleTime = 9999999999.f;
-	m_tParticleDesc.EachParticleLifeTime = 0.64f;
-	m_tParticleDesc.MaxParticleCount = 3;
+	m_tParticleDesc.TextureChageFrequency = 1;
+	m_tParticleDesc.vTextureXYNum = _float2(5, 4);
+
+	m_tParticleDesc.TotalParticleTime = 99999.1f;
+	m_tParticleDesc.EachParticleLifeTime = 0.34f;
+
+	m_tParticleDesc.MaxParticleCount = 10;
 
 	m_tParticleDesc.SizeChageFrequency = 1;
-	m_tParticleDesc.ParticleSize = _float3(1.f);
-	m_tParticleDesc.ParticleSize2 = _float3(3.f);
+	m_tParticleDesc.ParticleSize = _float3(0.2f, 0.2f, 0.2f);
+	m_tParticleDesc.ParticleSize2 = _float3(0.4f, 0.4f, 0.4f);
 
 	m_tParticleDesc.ColorChageFrequency = 0;
-	m_tParticleDesc.TargetColor = _float4(1.f, 1.f, 0, 1.f);
-	m_tParticleDesc.TargetColor2 = _float4(1.f, 1.f, 1.f, 0.f);
+	m_tParticleDesc.TargetColor = _float4(1.f, 1.f, 1.f, 0.7f);
+	m_tParticleDesc.TargetColor2 = _float4(1.f, 1.f, 1.f, 1.f);
 
-	m_tParticleDesc.MaxBoundaryRadius = 1.;
+
+	m_tParticleDesc.Particle_Power = 1;
+	m_tParticleDesc.PowerRandomRange = _float2(0.5f, 1.0f);
+	
+	m_tParticleDesc.vUp = m_vTargetDir;
+
+	m_tParticleDesc.MaxBoundaryRadius = 0.1f;
 
 	m_tParticleDesc.m_bIsUI = false;
+	m_tParticleDesc.m_bIsBlur= true;
 	m_tParticleDesc.m_bUIDepth = 0;
 
-	m_tParticleDesc.ParticleStartRandomPosMin = _float3(-0, 0, -0);
+	m_tParticleDesc.ParticleStartRandomPosMin = _float3(-0.1f);
+	m_tParticleDesc.ParticleStartRandomPosMax = _float3(0.1f);
 
 	m_tParticleDesc.DepthTestON = true;
 	m_tParticleDesc.AlphaBlendON = true;
 
-	m_tParticleDesc.m_fAlphaTestValue = 0.18f;
-	m_tParticleDesc.m_iPassIndex = 5;
+	m_tParticleDesc.m_fAlphaTestValue = 0.1f;
+	m_tParticleDesc.m_iPassIndex = 19;
 
 	GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_tParticleDesc);
+
 
 	return S_OK;
 }

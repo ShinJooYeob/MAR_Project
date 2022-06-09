@@ -105,6 +105,7 @@ typedef struct tagParticleDesc
 	_float MaxBoundaryRadius = 10;
 
 	_bool   m_bIsUI = false;
+	_bool   m_bIsBlur = false;
 	_float  m_bUIDepth = 0;
 
 	_float3 ParticleStartRandomPosMin = _float3(-5.0f, -5.0f, -5.0f);

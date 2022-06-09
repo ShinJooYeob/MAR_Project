@@ -132,7 +132,8 @@ _int CParticleObject::LateUpdate(_double fTimeDelta)
 
 	if (m_ParticleDesc.m_bIsUI)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI, this);
-
+	else if (m_ParticleDesc.m_bIsBlur)
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_PRIORITYBLEND, this);
 	else
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_AFTEROBJ, this);
 
@@ -1096,7 +1097,7 @@ _int CParticleeObj_MapParticle::Update(_double fTimeDelta)
 _int CParticleeObj_MapParticle::LateUpdate(_double fTimeDelta)
 {
 
-	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_PRIORITYBLEND, this);
 
 	return _int();
 }

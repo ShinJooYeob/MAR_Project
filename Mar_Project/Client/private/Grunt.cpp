@@ -969,7 +969,8 @@ HRESULT CGrunt::SetUp_ParticleDesc()
 	tDesc.vUp = _float3(0, 1, 0);
 	tDesc.MaxBoundaryRadius = 10;
 	tDesc.m_bIsUI = false;
-	tDesc.m_bUIDepth = 0;
+	tDesc.m_bIsBlur = true;
+	tDesc.m_bUIDepth = 0; 
 	tDesc.ParticleStartRandomPosMin = _float3(-0.4f, 0.0f, -0.4f);
 	tDesc.ParticleStartRandomPosMax = _float3(0.4f, 0.2f, 0.4f);
 	tDesc.DepthTestON = true;

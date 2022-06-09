@@ -62,6 +62,7 @@ HRESULT CHorse::Initialize_Clone(void * pArg)
 	m_tParticleDesc.MaxBoundaryRadius = 20;
 
 	m_tParticleDesc.m_bIsUI = false;
+	m_tParticleDesc.m_bIsBlur = false;
 	m_tParticleDesc.m_bUIDepth = 0;
 
 	m_tParticleDesc.ParticleStartRandomPosMin = _float3(-0, 0, -0);

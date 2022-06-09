@@ -239,6 +239,7 @@ HRESULT CScrechedDust::Ready_ParticleDesc()
 	m_tParticleDesc.MaxBoundaryRadius = 6;
 
 	m_tParticleDesc.m_bIsUI = false;
+	m_tParticleDesc.m_bIsBlur = true;
 	m_tParticleDesc.m_bUIDepth = 0;
 
 	m_tParticleDesc.ParticleStartRandomPosMin = _float3(0);
@@ -248,7 +249,7 @@ HRESULT CScrechedDust::Ready_ParticleDesc()
 	m_tParticleDesc.AlphaBlendON = true;
 
 	m_tParticleDesc.m_fAlphaTestValue = 0.1f;
-	m_tParticleDesc.m_iPassIndex = 3;
+	m_tParticleDesc.m_iPassIndex = 19;
 
 
 	return S_OK;

@@ -190,6 +190,27 @@ _int CScene_Edit::LateUpdate(_double fDeltaTime)
 		
 		break;
 	case 2:
+	{
+		static _bool	 Show = true;
+
+		if (g_pGameInstance->Get_DIKeyState(DIK_Q) & DIS_Down)Show = !Show;
+
+		if (Show)
+		{
+
+			for (auto& Element : m_vecBatchedObject)
+			{
+				if (Element.pObject->LateUpdate(fDeltaTime) < 0)
+				{
+					__debugbreak();
+					return -1;
+				}
+			}
+			if (m_pCreatedTerrain != nullptr)
+				m_pCreatedTerrain->LateUpdate(fDeltaTime);
+
+		}
+	}
 		break;
 	case 3:
 	{
