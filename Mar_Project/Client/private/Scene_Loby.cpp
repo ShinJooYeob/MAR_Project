@@ -21,6 +21,7 @@ HRESULT CScene_Loby::Initialize()
 		return E_FAIL;
 
 
+	GetSingle(CUtilityMgr)->DistFogRendOn(false);
 
 	FAILED_CHECK(Ready_Light());
 	FAILED_CHECK(Ready_Camera(TAG_LAY(Layer_Camera_Main)));

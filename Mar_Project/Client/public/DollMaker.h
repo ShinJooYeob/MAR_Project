@@ -33,8 +33,6 @@ private:
 	CTransform*			m_pTransformCom = nullptr;
 	CCollider*			m_pColliderCom = nullptr;
 
-	_bool				m_bIsBerseked = false;
-	_bool				m_bIsJumping = false;
 
 	_uint				m_iOldAnimIndex = INT_MAX;
 	_uint				m_iAdjMovedIndex = 0;
@@ -47,6 +45,9 @@ private:
 	_uint				m_pHanddyIndex = 0;
 	_bool				m_bSummonHandy = false;
 
+	_bool				m_bSpwanAnimFinished = false;
+	_double				m_SpwanAnimPassedTime = 0;
+
 	_bool				m_bDeadAnimStart = false;
 	_double				m_DeadPassedTime = 0;
 	_uint				m_iDeadAnimChecker = 0;
@@ -57,7 +58,6 @@ private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_Weapon();
 
-	virtual HRESULT Set_Monster_On_Terrain(CTransform* pTransform, _double fDeltaTime)override;
 	HRESULT Adjust_AnimMovedTransform(_double fDeltatime);
 
 

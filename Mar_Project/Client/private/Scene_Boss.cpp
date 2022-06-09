@@ -22,6 +22,7 @@ HRESULT CScene_Boss::Initialize()
 	if (FAILED(__super::Initialize()))
 		return E_FAIL;
 
+	GetSingle(CUtilityMgr)->DistFogRendOn(true);
 
 
 	FAILED_CHECK(Ready_Light());
@@ -56,6 +57,65 @@ _int CScene_Boss::Update(_double fDeltaTime)
 
 	if (g_pGameInstance->Get_DIKeyState(DIK_J)&DIS_Down)
 		FAILED_CHECK(Ready_Layer_DollMaker(TAG_LAY(Layer_Monster)));
+	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_HOME)&DIS_Press)
+	{
+
+		LIGHTDESC* pLightDesc = g_pGameInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0);
+		pLightDesc->vVector.z += 1.f;
+
+		wstring ttDebugLog = L"LightPosLuminece : X: " + to_wstring(pLightDesc->vVector.x) + L",  Y: " + to_wstring(pLightDesc->vVector.y) + L",  Z: " + to_wstring(pLightDesc->vVector.z) + L"\n";
+		OutputDebugStringW(ttDebugLog.c_str());
+	}
+
+	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_END)&DIS_Press)
+	{
+
+		LIGHTDESC* pLightDesc = g_pGameInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0);
+		pLightDesc->vVector.z -= 1.f;
+
+		wstring ttDebugLog = L"LightPosLuminece : X: " + to_wstring(pLightDesc->vVector.x) + L",  Y: " + to_wstring(pLightDesc->vVector.y) + L",  Z: " + to_wstring(pLightDesc->vVector.z) + L"\n";
+		OutputDebugStringW(ttDebugLog.c_str());
+	}
+	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_DELETE)&DIS_Press)
+	{
+
+		LIGHTDESC* pLightDesc = g_pGameInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0);
+		pLightDesc->vVector.x -= 1.f;
+
+		wstring ttDebugLog = L"LightPosLuminece : X: " + to_wstring(pLightDesc->vVector.x) + L",  Y: " + to_wstring(pLightDesc->vVector.y) + L",  Z: " + to_wstring(pLightDesc->vVector.z) + L"\n";
+		OutputDebugStringW(ttDebugLog.c_str());
+	}
+
+	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_PGDN)&DIS_Press)
+	{
+
+		LIGHTDESC* pLightDesc = g_pGameInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0);
+		pLightDesc->vVector.x += 1.f;
+
+		wstring ttDebugLog = L"LightPosLuminece : X: " + to_wstring(pLightDesc->vVector.x) + L",  Y: " + to_wstring(pLightDesc->vVector.y) + L",  Z: " + to_wstring(pLightDesc->vVector.z) + L"\n";
+		OutputDebugStringW(ttDebugLog.c_str());
+	}
+
+	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_INSERT)&DIS_Press)
+	{
+
+		LIGHTDESC* pLightDesc = g_pGameInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0);
+		pLightDesc->vVector.y += 1.f;
+
+		wstring ttDebugLog = L"LightPosLuminece : X: " + to_wstring(pLightDesc->vVector.x) + L",  Y: " + to_wstring(pLightDesc->vVector.y) + L",  Z: " + to_wstring(pLightDesc->vVector.z) + L"\n";
+		OutputDebugStringW(ttDebugLog.c_str());
+	}
+
+	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_PGUP)&DIS_Press)
+	{
+
+		LIGHTDESC* pLightDesc = g_pGameInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0);
+		pLightDesc->vVector.y -= 1.f;
+
+		wstring ttDebugLog = L"LightPosLuminece : X: " + to_wstring(pLightDesc->vVector.x) + L",  Y: " + to_wstring(pLightDesc->vVector.y) + L",  Z: " + to_wstring(pLightDesc->vVector.z) + L"\n";
+		OutputDebugStringW(ttDebugLog.c_str());
+	}
+
 
 
 	return 0;
@@ -102,27 +162,30 @@ _int CScene_Boss::Change_to_NextScene()
 
 HRESULT CScene_Boss::Ready_Light()
 {
-	//LIGHTDESC LightDesc;
+
+//LightPosLuminece: X: -100.000000, Y : 122.000000, Z : -55.000000
+
+	const LIGHTDESC* pLightDesc = g_pGameInstance->Get_LightDesc(tagLightDesc::TYPE_DIRECTIONAL, 0);
+
+	if (pLightDesc == nullptr)
+	{
+
+		LIGHTDESC LightDesc;
+
+		LightDesc.eLightType = tagLightDesc::TYPE_DIRECTIONAL;
+		LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
+		LightDesc.vAmbient = _float4(1.0f);
+		LightDesc.vSpecular = _float4(1);
+		LightDesc.vVector = _float4(-100.f, 217.f, -55, 0);
+
+		g_pGameInstance->Add_Light(LightDesc);
+	}
+	else
+	{
+		g_pGameInstance->Relocate_LightDesc(tagLightDesc::TYPE_DIRECTIONAL, 0, _float4(-100.f, 217.f, -55, 0).XMVector());
+	}
 
 
-
-	//LightDesc.eLightType = tagLightDesc::TYPE_DIRECTIONAL;
-	//LightDesc.vDiffuse = _float4(1.f, 1.f,1.f,1.f);
-	//LightDesc.vAmbient = _float4(1);
-	//LightDesc.vSpecular = _float4(1);
-	//LightDesc.vVector = _float4(1, -1, 1, 0);
-
-	//g_pGameInstance->Add_Light(LightDesc);
-
-
-
-	//LightDesc.eLightType = tagLightDesc::TYPE_POINT;
-	//LightDesc.vDiffuse = _float4(1);
-	//LightDesc.vAmbient = _float4(1);
-	//LightDesc.vSpecular = _float4(1);
-	//LightDesc.vVector = _float4(5, 5, 5, 1);
-
-	//g_pGameInstance->Add_Light(LightDesc);
 
 	return S_OK;
 }
@@ -191,7 +254,7 @@ HRESULT CScene_Boss::Ready_Layer_Player(const _tchar * pLayerTag)
 	NULL_CHECK_RETURN(pPlayer, E_FAIL);
 
 	pPlayer->Set_NowSceneNum(SCENE_BOSS);
-	pPlayer->Renew_Player(_float3(50, 11, 50), _float3(85, 100, 78));
+	pPlayer->Renew_Player(_float3(45, 11, 57), _float3(85, 100, 78));
 	
 
 	return S_OK;
@@ -341,7 +404,7 @@ HRESULT CScene_Boss::Ready_Layer_TriggerCollider(const _tchar * pLayerTag)
 {
 	CStageBoss_SpwanBoss::SPWANTRIGGERDESC tSwpanDesc;
 
-	tSwpanDesc.vPosition = _float3(56.251f, 16.300f, 62.691f);
+	tSwpanDesc.vPosition = _float3(50.f, 16.300f, 60.f);
 
 	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_BOSS, pLayerTag, L"StageBoss_SpwanBoss", &tSwpanDesc));
 

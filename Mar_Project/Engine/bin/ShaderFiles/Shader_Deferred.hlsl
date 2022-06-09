@@ -244,25 +244,6 @@ PS_OUT_AfterDeferred PS_MAIN_EndProsseing(PS_IN In)
 
 	vector Hdr = max((g_TargetTexture.Sample(DefaultSampler, In.vTexUV) + LinerTex) - 0.004, 0);
 
-	vector		vDepthDesc = g_DepthTexture.Sample(DefaultSampler, In.vTexUV);
-	float		fViewZ = vDepthDesc.x * 300.f;
-	//vector		vWorldPos;
-
-	//vWorldPos.x = (In.vTexUV.x * 2.f - 1.f) * fViewZ;
-	//vWorldPos.y = (In.vTexUV.y * -2.f + 1.f) * fViewZ;
-	//vWorldPos.z = vDepthDesc.y * fViewZ; /* 0 ~ f */
-	//vWorldPos.w = 1.f * fViewZ;
-
-	///* 로컬위치 * 월드행렬 * 뷰행렬 */
-	//vWorldPos = mul(vWorldPos, g_ProjMatrixInv);
-	///* 로컬위치 * 월드행렬 */
-	//vWorldPos = mul(vWorldPos, g_ViewMatrixInv);
-
-
-
-
-
-	Hdr*=(pow(saturate((64.f - fViewZ) / 64.f), 2.2f) + 0.01f);
 
 	Out.vColor = (Hdr * (6.2f * Hdr + 0.5f)) / (Hdr * (6.2f * Hdr + 1.7f) + 0.06f);
 
@@ -379,19 +360,60 @@ PS_OUT_AfterDeferred PS_MAIN_BLEND(PS_IN In)
 
 
 
+	//Hdr *= (pow(saturate((64.f - fViewZ) / 64.f), 2.2f) + 0.01f);
+
 
 	if (Out.vColor.a == 0.0f)
 		discard;
 
 	if (vDepthDesc.g > 0)
 	{
-		Out.vColor *= (1 - vShadowMapDesc);
+			Out.vColor *= (1 - vShadowMapDesc);
+
+
 	}
 
 	Out.vColor2 = Out.vColor;
 	return Out;
 }
 
+PS_OUT_AfterDeferred PS_MAIN_FOGBLEND(PS_IN In)
+{
+	PS_OUT_AfterDeferred		Out = (PS_OUT_AfterDeferred)0;
+
+	vector		vDiffuseDesc = pow(g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV), 2.2f);
+	vector		vShadeDesc = g_ShadeTexture.Sample(DefaultSampler, In.vTexUV);
+	vector		vSpecularDesc = g_SpecularTexture.Sample(DefaultSampler, In.vTexUV);
+	vector		vShadowMapDesc = g_ShadowMapTexture.Sample(DefaultSampler, In.vTexUV);
+	vector		vDepthDesc = g_DepthTexture.Sample(DefaultSampler, In.vTexUV);
+
+
+	Out.vColor = vDiffuseDesc * vShadeDesc + vSpecularDesc;
+
+
+	float		fViewZ = vDepthDesc.x * 300.f;
+
+	//Hdr *= (pow(saturate((64.f - fViewZ) / 64.f), 2.2f) + 0.01f);
+
+
+	if (Out.vColor.a == 0.0f)
+		discard;
+
+	if (vDepthDesc.g > 0)
+	{
+		Out.vColor *= (1 - vShadowMapDesc) *min(pow(saturate((64.f - fViewZ) / 64.f), 2.2f) + 0.31f - min(vShadowMapDesc.r, 0.3f),1);
+
+
+	}
+	else
+	{
+		Out.vColor *= 0.1f;
+
+	}
+
+	Out.vColor2 = Out.vColor;
+	return Out;
+}
 
 PS_OUT_AfterDeferred PS_DOWNSCALING(PS_IN In)
 {
@@ -432,7 +454,7 @@ PS_OUT_AfterDeferred PS_DOWNSCALING(PS_IN In)
 	//0.000125
 	//if (CurrentDepth > ShadowDepth + 0.000125)
 	//if (CurrentDepth > ShadowDepth )
-	if (CurrentDepth > ShadowDepth + 0.00000025f)
+	if (CurrentDepth > ShadowDepth + 0.00000125f)
 	{
 		Out.vColor = vector(0.8f, 0.8f, 0.8f,1);
 	}
@@ -878,5 +900,16 @@ technique11		DefaultTechnique
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN_Shaft();
+	}
+
+	pass FogBlend// 17
+	{
+		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(NonZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_ccw);
+
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_FOGBLEND();
 	}
 }

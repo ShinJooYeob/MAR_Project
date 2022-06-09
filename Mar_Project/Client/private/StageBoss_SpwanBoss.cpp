@@ -37,7 +37,7 @@ HRESULT CStageBoss_SpwanBoss::Initialize_Clone(void * pArg)
 	FAILED_CHECK(SetUp_Components());
 
 	FAILED_CHECK(Load_ActionCam(L"StageBoss_CameAction_0"));
-	FAILED_CHECK(Load_ActionCam2(L"Stage2_CameAction_1"));
+	FAILED_CHECK(Load_ActionCam2(L"StageBoss_CameAction_1"));
 
 	
 	return S_OK;
@@ -55,11 +55,37 @@ _int CStageBoss_SpwanBoss::Update(_double fDeltaTime)
 	if (m_bSpwanStart)
 	{
 		
-		if (!m_iChecker)
+		if (m_iChecker == 0)
 		{
-			FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_BOSS, TAG_LAY(Layer_Monster), TAG_OP(Prototype_DollMaker), &_float3(85, 10, 78)));
-			m_iChecker++;
-		}
+				m_SpwanPassedTime+=fDeltaTime;
+
+				_float EasedPosX = (g_pGameInstance->Easing(TYPE_SinOut, -100.f, 288.f, (_float)m_SpwanPassedTime ,10.f));
+				_float EasedPosY = (g_pGameInstance->Easing(TYPE_SinInOut, 217.f, 125.f, (_float)m_SpwanPassedTime , 10.f));
+				_float EasedPosZ = (g_pGameInstance->Easing(TYPE_SinIn, -55.f, 196.f, (_float)m_SpwanPassedTime , 10.f));
+
+				if (m_SpwanPassedTime > 10.f)
+				{
+					m_SpwanPassedTime = 10;
+					EasedPosX = 288.f;
+					EasedPosY = 125.f;
+					EasedPosZ = 196.f;
+					g_pGameInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0)->vVector.x = EasedPosX;
+					g_pGameInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0)->vVector.y = EasedPosY;
+					g_pGameInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0)->vVector.z = EasedPosZ;
+
+					FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_BOSS, TAG_LAY(Layer_Monster), TAG_OP(Prototype_DollMaker), &_float3(85, 10, 78)));
+					m_iChecker++;
+				}
+
+
+				g_pGameInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0)->vVector.x = EasedPosX;;
+				g_pGameInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0)->vVector.y = EasedPosY;
+				g_pGameInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0)->vVector.z = EasedPosZ;;
+			//	g_pGameInstance->Relocate_LightDesc(tagLightDesc::TYPE_DIRECTIONAL, 0, _float4(-100.f, 122.f, -55, 0).XMVector());
+
+
+				//LightPosLuminece: X: 288.000000, Y : 125.000000, Z : 196.000000
+			}
 
 	}
 
@@ -158,6 +184,28 @@ void CStageBoss_SpwanBoss::CollisionTriger(_uint iMyColliderIndex, CGameObject *
 		m_SpwanPassedTime = 0;
 		m_iChecker = 0;
 		((CGamePlayUI*)(g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_UI_GamePlay))))->Set_DrawFightUI(true);
+
+
+		CCamera_Main* pCamera = (CCamera_Main*)g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Camera_Main));
+		NULL_CHECK_BREAK(pCamera);
+
+		CAMERAACTION tDesc;
+
+		tDesc.vecCamPos = m_vecEndCamPositions;
+		tDesc.vecLookAt = m_vecEndLookPostions;
+
+
+		CAMACTDESC Return;
+		Return.fDuration = 2.f;
+		Return.vPosition = pCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_POS);
+		tDesc.vecCamPos.push_back(Return);
+
+		Return.fDuration = 2.f;
+		Return.vPosition = Return.vPosition.XMVector() + (pCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_LOOK));
+		tDesc.vecLookAt.push_back(Return);
+
+		pCamera->CamActionStart(tDesc);
+
 
 	}
 	break;

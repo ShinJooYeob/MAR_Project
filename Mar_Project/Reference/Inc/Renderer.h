@@ -31,6 +31,8 @@ public:
 	HRESULT Render_RenderGroup();
 	HRESULT Clear_RenderGroup_forSceneChaging();
 
+public:
+	void DistFogRendOn(_bool bBool) { m_bDistFog = bBool; };
 
 
 private:
@@ -60,7 +62,7 @@ private:
 	ID3D11DepthStencilView*		m_LightDepthStencil = nullptr;
 	ID3D11DepthStencilView*		m_DownScaledDepthStencil[5] = { nullptr };
 	_float						m_BlurLuminence = 0.387f;
-
+	_bool						m_bDistFog = false;
 
 private:
 	HRESULT Render_Priority();

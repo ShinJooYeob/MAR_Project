@@ -49,6 +49,7 @@ private:
 
 	_double				m_SpwanPassedTime = 0;
 	_bool				m_bSpwanStart = false;
+	_bool				m_bLightRePosition = false;
 	_uint				m_iChecker = 0;
 
 	_float3				m_vTempPlayerPosition;

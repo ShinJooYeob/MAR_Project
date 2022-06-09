@@ -18,7 +18,7 @@ public:
 
 public:
 	void		SlowMotionStart(_float fTargetTime = 0.5f,_float TargetSpeed = 0.3f);
-
+	void		DistFogRendOn(_bool bBool) { m_pComRenderer->DistFogRendOn(bBool); };
 private:
 	ID3D11Device*			m_pDevice = nullptr;
 	ID3D11DeviceContext*	m_pDeviceContext = nullptr;

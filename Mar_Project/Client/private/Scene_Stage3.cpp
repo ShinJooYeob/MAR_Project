@@ -26,6 +26,7 @@ HRESULT CScene_Stage3::Initialize()
 	if (FAILED(__super::Initialize()))
 		return E_FAIL;
 
+	GetSingle(CUtilityMgr)->DistFogRendOn(true);
 
 
 	FAILED_CHECK(Ready_Light());

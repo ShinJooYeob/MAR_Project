@@ -81,6 +81,12 @@ struct VS_OUT_SHADOW
 	float4		vClipPosition : TEXCOORD1;
 };
 
+struct VS_OUT_SHADOW_Dissolve
+{
+	float4		vPosition : SV_POSITION;
+	float2		vTexUV : TEXCOORD0;
+	float4		vClipPosition : TEXCOORD1;
+};
 VS_OUT_SHADOW VS_Shadow(VS_IN In)
 {
 	
@@ -128,6 +134,32 @@ VS_OUT_SHADOW VS_Shadow_NoWeightW(VS_IN In)
 	Out.vPosition = mul(Out.vPosition, g_LightViewMatrix);
 	Out.vPosition = mul(Out.vPosition, g_LightProjMatrix);
 
+	Out.vClipPosition = Out.vPosition;
+	return Out;
+};
+
+VS_OUT_SHADOW_Dissolve VS_Shadow_NoWeightW_Dissolving(VS_IN In)
+{
+
+	VS_OUT_SHADOW_Dissolve			Out = (VS_OUT_SHADOW_Dissolve)0;
+
+	matrix			matWV, matWVP;
+
+
+	float		fWeightW = 1.f - (In.vBlendWeight.x + In.vBlendWeight.y + In.vBlendWeight.z);
+
+	matrix		BoneMatrix = g_BoneMatrices.BoneMatrices[In.vBlendIndex.x] * In.vBlendWeight.x +
+		g_BoneMatrices.BoneMatrices[In.vBlendIndex.y] * In.vBlendWeight.y +
+		g_BoneMatrices.BoneMatrices[In.vBlendIndex.z] * In.vBlendWeight.z +
+		g_BoneMatrices.BoneMatrices[In.vBlendIndex.w] * In.vBlendWeight.w;
+
+	vector		vLocalPosition = mul(vector(In.vModelDataPosition, 1.f), BoneMatrix);
+
+
+	Out.vPosition = mul(vLocalPosition, g_WorldMatrix);
+	Out.vPosition = mul(Out.vPosition, g_LightViewMatrix);
+	Out.vPosition = mul(Out.vPosition, g_LightProjMatrix);
+	Out.vTexUV = In.vTexUV;
 	Out.vClipPosition = Out.vPosition;
 	return Out;
 };
@@ -385,6 +417,12 @@ struct PS_IN_SHADOW
 	float4		vPosition : SV_POSITION;
 	float4		vClipPosition : TEXCOORD1;
 };
+struct PS_IN_SHADOW_Dissolving
+{
+	float4		vPosition : SV_POSITION;
+	float2		vTexUV : TEXCOORD0;
+	float4		vClipPosition : TEXCOORD1;
+};
 
 struct PS_OUT_SHADOW
 {
@@ -399,6 +437,35 @@ PS_OUT_SHADOW PS_Shadow(PS_IN_SHADOW In)
 	float Depth = In.vClipPosition.z / In.vClipPosition.w;
 
 	//Out.vDiffuse = float4(Depth.xxx, 1);
+
+
+	Out.vDiffuse = float4(Depth.x, In.vClipPosition.z, In.vClipPosition.w, 1);
+
+	return Out;
+}
+PS_OUT_SHADOW PS_Shadow_Dissolving(PS_IN_SHADOW_Dissolving In)
+{
+	PS_OUT_SHADOW		Out = (PS_OUT_SHADOW)0;
+
+	float Depth = In.vClipPosition.z / In.vClipPosition.w;
+
+	//Out.vDiffuse = float4(Depth.xxx, 1);
+
+	vector		NoiseDesc = g_NoiseTexture.Sample(DefaultSampler, In.vTexUV) - g_fVisualValue;
+
+	if (NoiseDesc.r < 0)
+		discard;
+
+	//if (NoiseDesc.r < 0.15 && g_fVisualValue > 0 && g_fVisualValue < 1)
+	//{
+	//	vector		BurnRampDesc = pow(g_BurnRampTexture.Sample(DefaultSampler, float2(NoiseDesc.r *(1 / 0.15), 0)), 1.5f);
+
+	//	vDiffuse = BurnRampDesc;
+	//	//Out.vEmissive = max((max(BurnRampDesc.r, BurnRampDesc.g), BurnRampDesc.b) - 0.15f, 0);
+	//	Out.vEmissive = 1.f;
+	//	//o.Emission = tex2D(_BurnRamp, float2(test *(1 / _BurnSize), 0));
+	//	//o.Albedo *= o.Emission;
+	//}
 
 
 	Out.vDiffuse = float4(Depth.x, In.vClipPosition.z, In.vClipPosition.w, 1);
@@ -551,5 +618,15 @@ technique11		DefaultTechnique
 		VertexShader = compile vs_5_0 VS_MAIN_ATTACHEDNOWEIGHTW();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN_DEFAULT_Dissolve();
+	}
+	pass ShadowMap_NoWeightW_Dissolving_CullNone //14
+	{
+		SetBlendState(NonBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(ZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_None);
+
+		VertexShader = compile vs_5_0 VS_Shadow_NoWeightW_Dissolving();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_Shadow_Dissolving();
 	}
 }

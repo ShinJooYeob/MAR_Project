@@ -17,10 +17,8 @@ HRESULT CScene_StageSelect::Initialize()
 
 	FAILED_CHECK(Ready_Layer_MainCamera(TAG_LAY(Layer_Camera_Main)));
 
-
-
 	GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeIn, 0.5, { 0,0,0,1 });
-
+	GetSingle(CUtilityMgr)->DistFogRendOn(false);
 	return S_OK;
 }
 

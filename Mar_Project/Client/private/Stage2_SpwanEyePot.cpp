@@ -55,118 +55,145 @@ _int CStage2_SpwanEyePot::Update(_double fDeltaTime)
 
 	if (m_bSpwanStart)
 	{
-		if (m_SpwanPassedTime < 10)
+		if (m_bLightRePosition)
 		{
-
-		//LightPosLuminece: X: 129.000000, Y : 257.000000, Z : 371.000000
-
-
-
 			static _uint iChecker = 0;
 			m_SpwanPassedTime += fDeltaTime;
 
-			_float EasedPosZ = (g_pGameInstance->Easing(TYPE_SinInOut, -128, 371, (_float)m_SpwanPassedTime, 10.f));
-			_float EasedPosX = (g_pGameInstance->Easing(TYPE_SinInOut, 0, 128, (_float)m_SpwanPassedTime, 10.f));
+			_float EasedPosX = (g_pGameInstance->Easing(TYPE_SinInOut, 128, 82.f, (_float)m_SpwanPassedTime - 12.f, 10.f));
+			_float EasedPosZ = (g_pGameInstance->Easing(TYPE_SinInOut, 371, -110.f, (_float)m_SpwanPassedTime - 12.f, 10.f));
 
-			if (m_SpwanPassedTime > 10.f)
+			if (m_SpwanPassedTime > 22.f)
 			{
 				m_SpwanPassedTime = 10;
-				EasedPosZ = 371.f;
-				EasedPosX = 128.f;
+				EasedPosX = 82.f;
+				EasedPosZ = -110.f;
+				g_pGameInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0)->vVector.x = EasedPosX;;
+				g_pGameInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0)->vVector.z = EasedPosZ;;
+				Set_IsDead();
+				return 0;
 			}
 
 
 			g_pGameInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0)->vVector.x = EasedPosX;;
 			g_pGameInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0)->vVector.z = EasedPosZ;;
-
-
-			if (iChecker ==0 && m_SpwanPassedTime > 2.)
-			{
-				GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 1.2f, _float4(0.1f));
-				iChecker++;
-
-			}
-			else if (iChecker == 1 && m_SpwanPassedTime > 2.8)
-			{
-				list<CGameObject*>* MonsterLayer = g_pGameInstance->Get_ObjectList_from_Layer(SCENE_STAGE2, TAG_LAY(Layer_Monster));
-
-				NULL_CHECK_RETURN(MonsterLayer, E_FAIL);
-
-				((CEyepot*)(MonsterLayer->back()))->Set_StartSprout();
-				iChecker++;
-			}
-	
-
-
-
 		}
 		else
 		{
-			static _uint iChecker = 0;
-			if (iChecker == 0)
+
+			if (m_SpwanPassedTime < 10)
 			{
-				((CGamePlayUI*)(g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_UI_GamePlay))))->Set_DrawFightUI(false);
 
-				list<CGameObject*>* MonsterLayer = g_pGameInstance->Get_ObjectList_from_Layer(SCENE_STAGE2, TAG_LAY(Layer_Monster));
-				NULL_CHECK_RETURN(MonsterLayer, E_FAIL);
-
-				if (MonsterLayer->size() == 0)
-				{
-					CCamera_Main* pCamera = (CCamera_Main*)g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Camera_Main));
-					NULL_CHECK_BREAK(pCamera);
-
-					CAMERAACTION tDesc;
-
-					tDesc.vecCamPos = m_vecEndCamPositions;
-					tDesc.vecLookAt = m_vecEndLookPostions;
+				//LightPosLuminece: X: 129.000000, Y : 257.000000, Z : 371.000000
 
 
-					CAMACTDESC Return;
-					Return.fDuration = 0.5f;
-					Return.vPosition = pCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_POS);
-					tDesc.vecCamPos.push_back(Return);
 
-					Return.fDuration = 0.5f;
-					Return.vPosition = Return.vPosition.XMVector() + (pCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_LOOK));
-					tDesc.vecLookAt.push_back(Return);
-
-					pCamera->CamActionStart(tDesc);
-
-					iChecker++;
-				}
-			}
-			else if (iChecker == 1 )
-			{
+				static _uint iChecker = 0;
 				m_SpwanPassedTime += fDeltaTime;
 
-				if (m_SpwanPassedTime > 12.)
+				_float EasedPosZ = (g_pGameInstance->Easing(TYPE_SinInOut, -128, 371, (_float)m_SpwanPassedTime, 10.f));
+				_float EasedPosX = (g_pGameInstance->Easing(TYPE_SinInOut, 0, 128, (_float)m_SpwanPassedTime, 10.f));
+
+				if (m_SpwanPassedTime > 10.f)
 				{
+					m_SpwanPassedTime = 10;
+					EasedPosZ = 371.f;
+					EasedPosX = 128.f;
+				}
 
-					list<CGameObject*>* ButtonLayer = g_pGameInstance->Get_ObjectList_from_Layer(SCENE_STAGE2, TAG_LAY(Layer_ButtonPad));
-					NULL_CHECK_RETURN(ButtonLayer, E_FAIL);
 
-					auto& iter = ButtonLayer->begin();
+				g_pGameInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0)->vVector.x = EasedPosX;;
+				g_pGameInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0)->vVector.z = EasedPosZ;;
 
-					for (_uint i = 0 ; i < 2; i++)
-					{
-						((CButtonPad*)(*iter))->Set_Visuable();
-						iter++;
-					}
 
+				if (iChecker == 0 && m_SpwanPassedTime > 2.)
+				{
+					GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 1.2f, _float4(0.1f));
 					iChecker++;
-					Set_IsDead();
+
+				}
+				else if (iChecker == 1 && m_SpwanPassedTime > 2.8)
+				{
+					list<CGameObject*>* MonsterLayer = g_pGameInstance->Get_ObjectList_from_Layer(SCENE_STAGE2, TAG_LAY(Layer_Monster));
+
+					NULL_CHECK_RETURN(MonsterLayer, E_FAIL);
+
+					((CEyepot*)(MonsterLayer->back()))->Set_StartSprout();
+					iChecker++;
+				}
+
+
+
+
+			}
+			else if (m_SpwanPassedTime < 12.f)
+			{
+				static _uint iChecker = 0;
+				if (iChecker == 0)
+				{
+					((CGamePlayUI*)(g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_UI_GamePlay))))->Set_DrawFightUI(false);
+
+					list<CGameObject*>* MonsterLayer = g_pGameInstance->Get_ObjectList_from_Layer(SCENE_STAGE2, TAG_LAY(Layer_Monster));
+					NULL_CHECK_RETURN(MonsterLayer, E_FAIL);
+
+					if (MonsterLayer->size() == 0)
+					{
+						CCamera_Main* pCamera = (CCamera_Main*)g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Camera_Main));
+						NULL_CHECK_BREAK(pCamera);
+
+						CAMERAACTION tDesc;
+
+						tDesc.vecCamPos = m_vecEndCamPositions;
+						tDesc.vecLookAt = m_vecEndLookPostions;
+
+
+						CAMACTDESC Return;
+						Return.fDuration = 0.5f;
+						Return.vPosition = pCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_POS);
+						tDesc.vecCamPos.push_back(Return);
+
+						Return.fDuration = 0.5f;
+						Return.vPosition = Return.vPosition.XMVector() + (pCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_LOOK));
+						tDesc.vecLookAt.push_back(Return);
+
+						pCamera->CamActionStart(tDesc);
+
+						iChecker++;
+					}
+				}
+				else if (iChecker == 1)
+				{
+					m_SpwanPassedTime += fDeltaTime;
+
+					if (m_SpwanPassedTime > 12.)
+					{
+
+						list<CGameObject*>* ButtonLayer = g_pGameInstance->Get_ObjectList_from_Layer(SCENE_STAGE2, TAG_LAY(Layer_ButtonPad));
+						NULL_CHECK_RETURN(ButtonLayer, E_FAIL);
+
+						auto& iter = ButtonLayer->begin();
+
+						for (_uint i = 0; i < 2; i++)
+						{
+							((CButtonPad*)(*iter))->Set_Visuable();
+							iter++;
+						}
+
+						iChecker++;
+						m_SpwanPassedTime = 12.f;
+					}
 				}
 			}
+
+
 		}
-
-
 	}
 
 
 	for (_uint i = 0; i < m_pColliderCom->Get_NumColliderBuffer(); i++)
 		m_pColliderCom->Update_Transform(i, m_pTransformCom->Get_WorldMatrix());
 
-	if (!m_bSpwanStart)
+	if (!m_bLightRePosition)
 	{
 		pInstance->Add_CollisionGroup(CollisionType_DynaicObject, this, m_pColliderCom);
 
@@ -222,31 +249,42 @@ void CStage2_SpwanEyePot::CollisionTriger(_uint iMyColliderIndex, CGameObject * 
 
 	case Engine::CollisionType_Player:
 	{
-		m_bSpwanStart = true;
-		m_pPlayer->Set_ReturnPos(_float3(75.830f, 23.670f, 77.509f), _float3(84.321f, 23.670f, 95.669f));
-		m_SpwanPassedTime = 0;
+		if (m_SpwanPassedTime < 10)
+		{
 
-		((CGamePlayUI*)(g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_UI_GamePlay))))->Set_DrawFightUI(true);
+			m_bSpwanStart = true;
+			m_pPlayer->Set_ReturnPos(_float3(75.830f, 23.670f, 77.509f), _float3(84.321f, 23.670f, 95.669f));
+			m_SpwanPassedTime = 0;
 
-		CCamera_Main* pCamera = (CCamera_Main*)g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Camera_Main));
-		NULL_CHECK_BREAK(pCamera);
+			((CGamePlayUI*)(g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_UI_GamePlay))))->Set_DrawFightUI(true);
 
-		CAMERAACTION tDesc;
+			CCamera_Main* pCamera = (CCamera_Main*)g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Camera_Main));
+			NULL_CHECK_BREAK(pCamera);
 
-		tDesc.vecCamPos = m_vecCamPositions;
-		tDesc.vecLookAt = m_vecLookPostions;
+			CAMERAACTION tDesc;
+
+			tDesc.vecCamPos = m_vecCamPositions;
+			tDesc.vecLookAt = m_vecLookPostions;
 
 
-		CAMACTDESC Return;
-		Return.fDuration = 0.5f;
-		Return.vPosition = pCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_POS);
-		tDesc.vecCamPos.push_back(Return);
+			CAMACTDESC Return;
+			Return.fDuration = 0.5f;
+			Return.vPosition = pCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_POS);
+			tDesc.vecCamPos.push_back(Return);
 
-		Return.fDuration = 0.5f;
-		Return.vPosition = Return.vPosition.XMVector() + (pCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_LOOK));
-		tDesc.vecLookAt.push_back(Return);
+			Return.fDuration = 0.5f;
+			Return.vPosition = Return.vPosition.XMVector() + (pCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_LOOK));
+			tDesc.vecLookAt.push_back(Return);
 
-		pCamera->CamActionStart(tDesc);
+			pCamera->CamActionStart(tDesc);
+
+			m_pTransformCom->Scaled_All(_float3(0.4f));
+			m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, _float3(161.611f, 54.45f, 68.017f));
+		}
+		else
+		{
+			m_bLightRePosition = true;
+		}
 
 	}
 	break;

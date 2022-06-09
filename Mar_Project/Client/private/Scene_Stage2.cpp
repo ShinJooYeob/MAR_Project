@@ -28,6 +28,8 @@ HRESULT CScene_Stage2::Initialize()
 		return E_FAIL;
 
 
+	GetSingle(CUtilityMgr)->DistFogRendOn(true);
+
 
 	FAILED_CHECK(Ready_Light());
 
@@ -70,65 +72,6 @@ _int CScene_Stage2::Update(_double fDeltaTime)
 	{
 		FAILED_CHECK(GetSingle(CUtilityMgr)->Clear_RenderGroup_forSceneChange());
 		FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Loading::Create(m_pDevice, m_pDeviceContext, SCENEID::SCENE_STAGE3), SCENEID::SCENE_LOADING));
-	}
-
-	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_HOME)&DIS_Press)
-	{
-
-		LIGHTDESC* pLightDesc = g_pGameInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0);
-		pLightDesc->vVector.z += 1.f;
-
-		wstring ttDebugLog = L"LightPosLuminece : X: " + to_wstring(pLightDesc->vVector.x) + L",  Y: " + to_wstring(pLightDesc->vVector.y) + L",  Z: " + to_wstring(pLightDesc->vVector.z) + L"\n";
-		OutputDebugStringW(ttDebugLog.c_str());
-	}
-
-	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_END)&DIS_Press)
-	{
-
-		LIGHTDESC* pLightDesc = g_pGameInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0);
-		pLightDesc->vVector.z -= 1.f;
-
-		wstring ttDebugLog = L"LightPosLuminece : X: " + to_wstring(pLightDesc->vVector.x) + L",  Y: " + to_wstring(pLightDesc->vVector.y) + L",  Z: " + to_wstring(pLightDesc->vVector.z) + L"\n";
-		OutputDebugStringW(ttDebugLog.c_str());
-	}
-	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_DELETE)&DIS_Press)
-	{
-
-		LIGHTDESC* pLightDesc = g_pGameInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0);
-		pLightDesc->vVector.x -= 1.f;
-
-		wstring ttDebugLog = L"LightPosLuminece : X: " + to_wstring(pLightDesc->vVector.x) + L",  Y: " + to_wstring(pLightDesc->vVector.y) + L",  Z: " + to_wstring(pLightDesc->vVector.z) + L"\n";
-		OutputDebugStringW(ttDebugLog.c_str());
-	}
-
-	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_PGDN)&DIS_Press)
-	{
-
-		LIGHTDESC* pLightDesc = g_pGameInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0);
-		pLightDesc->vVector.x += 1.f;
-
-		wstring ttDebugLog = L"LightPosLuminece : X: " + to_wstring(pLightDesc->vVector.x) + L",  Y: " + to_wstring(pLightDesc->vVector.y) + L",  Z: " + to_wstring(pLightDesc->vVector.z) + L"\n";
-		OutputDebugStringW(ttDebugLog.c_str());
-	}
-
-	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_INSERT)&DIS_Press)
-	{
-
-		LIGHTDESC* pLightDesc = g_pGameInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0);
-		pLightDesc->vVector.y += 1.f;
-
-		wstring ttDebugLog = L"LightPosLuminece : X: " + to_wstring(pLightDesc->vVector.x) + L",  Y: " + to_wstring(pLightDesc->vVector.y) + L",  Z: " + to_wstring(pLightDesc->vVector.z) + L"\n";
-		OutputDebugStringW(ttDebugLog.c_str());
-	}
-
-	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_PGUP)&DIS_Press)
-	{
-
-		LIGHTDESC* pLightDesc = g_pGameInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0);
-		pLightDesc->vVector.y -= 1.f;
-
-		wstring ttDebugLog = L"LightPosLuminece : X: " + to_wstring(pLightDesc->vVector.x) + L",  Y: " + to_wstring(pLightDesc->vVector.y) + L",  Z: " + to_wstring(pLightDesc->vVector.z) + L"\n";
-		OutputDebugStringW(ttDebugLog.c_str());
 	}
 
 

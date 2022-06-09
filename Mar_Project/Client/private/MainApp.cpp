@@ -82,6 +82,14 @@ _int CMainApp::Update(_double fDeltaTime)
 	}
 
 
+	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_COMMA)&DIS_Down)
+	{
+		if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_COMMA)&DIS_DoubleDown)
+			DistFogRendOn(true);
+
+		else
+			DistFogRendOn(false);
+	}
 
 	
 	return 0;

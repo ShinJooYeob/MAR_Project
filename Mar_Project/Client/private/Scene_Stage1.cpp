@@ -25,6 +25,8 @@ HRESULT CScene_Stage1::Initialize()
 		return E_FAIL;
 
 
+	GetSingle(CUtilityMgr)->DistFogRendOn(false);
+
 
 	FAILED_CHECK(Ready_Light());
 
@@ -89,7 +91,7 @@ _int CScene_Stage1::Update(_double fDeltaTime)
 	if (GetKeyState(VK_RETURN) & 0x8000)
 	{
 		FAILED_CHECK(GetSingle(CUtilityMgr)->Clear_RenderGroup_forSceneChange());
-		FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Loading::Create(m_pDevice, m_pDeviceContext, SCENEID::SCENE_STAGE2), SCENEID::SCENE_LOADING));
+		FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Loading::Create(m_pDevice, m_pDeviceContext, SCENEID::SCENE_BOSS), SCENEID::SCENE_LOADING));
 	}
 
 

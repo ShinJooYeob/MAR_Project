@@ -664,6 +664,9 @@ HRESULT CRenderer::Render_DeferredTexture()
 
 	FAILED_CHECK(m_pShader->Set_Texture("g_ShadowMapTexture", m_pRenderTargetMgr->Get_SRV(TEXT("Target_UpScaledBluredShadow"))));
 
+	_float4 PlayerPosition = pPipeLineMgr->Get_TargetPostion_float4(PLV_PLAYER);
+	FAILED_CHECK(m_pShader->Set_RawValue("g_vPlayerWorldPosition", &PlayerPosition, sizeof(_float4)));
+
 	
 	FAILED_CHECK(m_pShader->Set_RawValue("g_WorldMatrix", &m_WVPmat.WorldMatrix, sizeof(_float4x4)));
 	FAILED_CHECK(m_pShader->Set_RawValue("g_ViewMatrix", &m_WVPmat.ViewMatrix, sizeof(_float4x4)));
@@ -672,7 +675,14 @@ HRESULT CRenderer::Render_DeferredTexture()
 	//FAILED_CHECK(m_pShader->Set_RawValue("g_LightViewMatrix", &m_LightWVPmat.ViewMatrix, sizeof(_float4x4)));
 	//FAILED_CHECK(m_pShader->Set_RawValue("g_LightProjMatrix", &m_LightWVPmat.ProjMatrix, sizeof(_float4x4)));
 
-	FAILED_CHECK(m_pVIBuffer->Render(m_pShader, 3));
+	if (m_bDistFog)
+	{
+		FAILED_CHECK(m_pVIBuffer->Render(m_pShader, 17));
+	}
+	else
+	{
+		FAILED_CHECK(m_pVIBuffer->Render(m_pShader, 3));
+	}
 
 	return S_OK;
 }
@@ -713,20 +723,6 @@ HRESULT CRenderer::Render_PostProcessing()
 
 
 	FAILED_CHECK(m_pShader->Set_Texture("g_DepthTexture", m_pRenderTargetMgr->Get_SRV(TEXT("Target_Depth"))));
-
-
-	CPipeLineMgr*		pPipeLineMgr = GetSingle(CPipeLineMgr);
-
-	_float4x4		ViewMatrixInv, ProjMatrixInv;
-
-	XMStoreFloat4x4(&ViewMatrixInv, XMMatrixTranspose(XMMatrixInverse(nullptr, pPipeLineMgr->Get_Transform_Matrix(PLM_VIEW))));
-	XMStoreFloat4x4(&ProjMatrixInv, XMMatrixTranspose(XMMatrixInverse(nullptr, pPipeLineMgr->Get_Transform_Matrix(PLM_PROJ))));
-
-	FAILED_CHECK(m_pShader->Set_RawValue("g_ViewMatrixInv", &ViewMatrixInv, sizeof(_float4x4)));
-	FAILED_CHECK(m_pShader->Set_RawValue("g_ProjMatrixInv", &ProjMatrixInv, sizeof(_float4x4)));
-
-	_float4 PlayerPosition = pPipeLineMgr->Get_TargetPostion_float4(PLV_PLAYER);
-	FAILED_CHECK(m_pShader->Set_RawValue("g_vPlayerWorldPosition", &PlayerPosition, sizeof(_float4)));
 
 
 	FAILED_CHECK(m_pVIBuffer->Render(m_pShader, 9));

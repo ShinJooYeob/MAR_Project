@@ -139,6 +139,12 @@ void CUtilityMgr::SlowMotionStart(_float fTargetTime, _float TargetSpeed)
 	m_pMainApp->SlowMotionStart(fTargetTime, TargetSpeed);
 }
 
+void CUtilityMgr::DistFogRendOn(_bool bBool)
+{
+	NULL_CHECK_BREAK(m_pMainApp);
+	m_pMainApp->DistFogRendOn(bBool);
+}
+
 HRESULT CUtilityMgr::Create_ParticleObject(_uint eSceneID, PARTICLEDESC tParticleDesc)
 {
 

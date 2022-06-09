@@ -53,42 +53,11 @@ _int CEyepot::Update(_double fDeltaTime)
 	if (__super::Update(fDeltaTime) < 0)return -1;
 	m_pColliderCom->Update_ConflictPassedTime(fDeltaTime);
 
-	//static float testFloat = 1.;
-	//if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
-	//m_pModel->Change_AnimIndex(1); //=>0.5
-	//if (g_pGameInstance->Get_DIKeyState(DIK_2)&DIS_Down)
-	//m_pModel->Change_AnimIndex(3); //=> 5.5
 
-	////FAILED_CHECK(__super::Update_WanderAround(m_pTransformCom, fDeltaTime, 0.05f));
-
-	//if (m_pInstance->Get_DIKeyState(DIK_UP) & DIS_Down)
-	//{
-	//testFloat += 0.1f;
-	//m_pTransformCom->Set_MoveSpeed(testFloat);
+	if (g_pGameInstance->Get_DIKeyState(DIK_O)&DIS_Down)
+		Add_Dmg_to_Monster(1000);
 
 
-	//string ttszLog = "Monster Speed: " + to_string(testFloat) + "\n";
-	//wstring ttDebugLog;
-	//ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-
-	//OutputDebugStringW(ttDebugLog.c_str());
-	//}
-	//else if (m_pInstance->Get_DIKeyState(DIK_DOWN) & DIS_Down)
-	//{
-	//testFloat -= 0.1f;
-	//m_pTransformCom->Set_MoveSpeed(testFloat);
-
-	//string ttszLog = "Monster Speed: " + to_string(testFloat) + "\n";
-	//wstring ttDebugLog;
-	//ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-
-	//OutputDebugStringW(ttDebugLog.c_str());
-
-	//}
-	//
-
-	if (g_pGameInstance->Get_DIKeyState(DIK_C)&DIS_Down)
-		Add_Dmg_to_Monster(1);
 
 
 	_uint AnimIndex = m_pModel->Get_NowAnimIndex();
@@ -298,6 +267,7 @@ _int CEyepot::Update_DmgCalculate(_double fDeltaTime)
 			ZeroMemory(m_bIsDmgAnimUpdated, sizeof(_bool) * 3);
 			m_fDmgAmount = 0;
 			m_DmgPassedTime = 0;
+			m_pSubTransformCom->Set_IsOwnerDead(true);
 
 		}
 		return 0;
