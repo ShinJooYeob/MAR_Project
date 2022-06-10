@@ -43,6 +43,7 @@ private:
 
 private:
 	_double				m_fStartTimer = 0;
+	_double				m_fParticleTimer = 0;
 
 	_float				m_RandHeight = 0;
 	_bool				m_bGonnabeDie = false;

@@ -81,6 +81,15 @@ _int CMainApp::Update(_double fDeltaTime)
 
 	}
 
+	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_PERIOD)&DIS_Down)
+	{
+		GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeFlickeringIn, 10.f, _float4(0, 0, 0, 1.f));
+	}
+	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_SLASH)&DIS_Down)
+	{
+		GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeIn, 1.f, _float4(0, 0, 0, 1));
+	}
+
 
 	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_COMMA)&DIS_Down)
 	{

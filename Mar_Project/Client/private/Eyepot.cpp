@@ -142,7 +142,7 @@ _int CEyepot::Update(_double fDeltaTime)
 		m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
 		_uint NowAnimIndex = m_pModel->Get_NowAnimIndex();
 
-		if (NowAnimIndex >= 8 && NowAnimIndex <= 12)
+		if ((NowAnimIndex >= 8 && NowAnimIndex <= 12)|| NowAnimIndex == 7)
 		{
 			FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime * 1.8f, m_bIsOnScreen));
 
@@ -421,10 +421,12 @@ HRESULT CEyepot::Set_Monster_On_Terrain(CTransform * pTransform, _double fDeltaT
 		m_LevitationTime = 0;
 		pTransform->Set_MatrixState(CTransform::STATE_POS, CaculatedPos);
 
-		if (m_bIsJumping)
+		if (m_bIsJumping && m_pModel->Get_NowAnimIndex() == 6)
 		{
-			m_bIsJumping = false;
-			m_pModel->Change_AnimIndex_ReturnTo_Must(7, 2, 0.15, true);
+			m_bIsJumping = false; 
+			m_tParticleDesc2.FixedTarget = CaculatedPos;
+			GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_tParticleDesc2);
+			m_pModel->Change_AnimIndex_ReturnTo_Must(7, 2, 0.08f, true);
 
 		}
 	}
@@ -867,6 +869,53 @@ HRESULT CEyepot::Ready_ParticleDesc()
 
 	m_tParticleDesc.m_fAlphaTestValue = 0.18f;
 	m_tParticleDesc.m_iPassIndex = 5;
+
+
+	
+
+	m_tParticleDesc2.eParticleTypeID = Particle_Spread;
+
+	m_tParticleDesc2.FollowingTarget = nullptr;
+
+	m_tParticleDesc2.szTextureProtoTypeTag = TAG_CP(Prototype_Texture_PlayerEffect);
+	m_tParticleDesc2.szTextureLayerTag = L"Dust4";
+	m_tParticleDesc2.iSimilarLayerNum = 1;
+
+	m_tParticleDesc2.TextureChageFrequency = 1;
+	m_tParticleDesc2.vTextureXYNum = _float2(5, 4);
+
+	m_tParticleDesc2.TotalParticleTime = 0.1f;
+	m_tParticleDesc2.EachParticleLifeTime = 0.6f;
+	m_tParticleDesc2.MaxParticleCount = 25;
+
+	m_tParticleDesc2.SizeChageFrequency = 1;
+	m_tParticleDesc2.ParticleSize = _float3(4.0f);
+	m_tParticleDesc2.ParticleSize2 = _float3(3.5f);
+
+	m_tParticleDesc2.ColorChageFrequency = 1;
+	m_tParticleDesc2.TargetColor = _float4(0.5f, 0.5f, 0.5f, 1.f);
+	m_tParticleDesc2.TargetColor2 = _float4(0.f, 0.f,0.f, 0.1f);
+
+
+	m_tParticleDesc2.Particle_Power = 15;
+	m_tParticleDesc2.PowerRandomRange = _float2(0.8f, 1.f);
+	m_tParticleDesc2.SubPowerRandomRange = _float2(5.f, 6.f);
+
+	m_tParticleDesc2.vUp = _float3(0,1,0);
+
+	m_tParticleDesc2.MaxBoundaryRadius = 999999.f;
+
+	m_tParticleDesc2.m_bIsUI = false;
+	m_tParticleDesc2.m_bUIDepth = 0;
+
+	m_tParticleDesc2.ParticleStartRandomPosMin = _float3(0);
+	m_tParticleDesc2.ParticleStartRandomPosMax = _float3(0);
+
+	m_tParticleDesc2.DepthTestON = true;
+	m_tParticleDesc2.AlphaBlendON = true;
+
+	m_tParticleDesc2.m_fAlphaTestValue = 0.1f;
+	m_tParticleDesc2.m_iPassIndex = 3;
 
 
 	return S_OK;

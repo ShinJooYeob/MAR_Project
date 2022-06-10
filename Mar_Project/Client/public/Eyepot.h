@@ -55,6 +55,7 @@ private:
 	_bool				m_bStartSprout = false;
 
 	PARTICLEDESC		m_tParticleDesc;
+	PARTICLEDESC		m_tParticleDesc2;
 
 
 	ATTACHBONEMATRIX_PTR  m_ArrCollisionAttach[2];

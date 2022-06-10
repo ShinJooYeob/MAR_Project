@@ -161,8 +161,9 @@ void CTransform::LookAt(_fVector vTarget)
 
 	if (XMVector3Equal(vLook, _float3(0, 1, 0).XMVector()))
 	{
-		__debugbreak();
-		MSGBOX("Can't Cross With Same Vector");
+		//__debugbreak();
+		//MSGBOX("Can't Cross With Same Vector");
+		OutputDebugStringW(L"Can't Cross With Same Vector");
 
 		vRight = XMVector3Normalize(XMVector3Cross(_float3(0.0000001f, 1, 0).XMVector(), vLook));
 		XMStoreFloat3((_float3*)(m_WorldMatrix.m[STATE_RIGHT]), vRight * matScale.r[STATE_RIGHT]);
@@ -188,8 +189,9 @@ void CTransform::LookDir(_fVector vTargetLook)
 
 	if (XMVector3Equal(vLook, _float3(0, 1, 0).XMVector()))
 	{
-		__debugbreak();
-		MSGBOX("Can't Cross With Same Vector");
+		//__debugbreak();
+		//MSGBOX("Can't Cross With Same Vector");
+		OutputDebugStringW(L"Can't Cross With Same Vector");
 
 		vRight = XMVector3Normalize(XMVector3Cross(_float3(0.0000001f, 1, 0).XMVector(), vLook));
 		XMStoreFloat3((_float3*)(m_WorldMatrix.m[STATE_RIGHT]), vRight * matScale.r[STATE_RIGHT]);

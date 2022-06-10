@@ -11,6 +11,7 @@ enum SCENEID
 	SCENE_STAGE2,
 	SCENE_STAGE3,
 	SCENE_BOSS,
+	SCENE_ENDING,
 
 	SCENE_EDIT,
 	SCENE_END
@@ -43,8 +44,10 @@ enum OBJECTPROTOTYPEID
 
 	Prototype_SkyBox,
 	Prototype_PlayerLoby,
+	Prototype_PlayerEnding,
 	Prototype_Player,
 	Prototype_PlayerTornado,
+	Prototype_DirTornado,
 	Prototype_PlayerCircleTornado,
 
 	Prototype_WeaponKnife,
@@ -60,6 +63,7 @@ enum OBJECTPROTOTYPEID
 	Prototype_Eyepot,
 	Prototype_WaspArrow,
 	Prototype_WaspInk,
+	Prototype_Alice_Asylum,
 
 	Prototype_Scythe,
 	Prototype_EntireCard,
@@ -128,8 +132,15 @@ static const _tchar* Tag_Object_Prototype(OBJECTPROTOTYPEID eTag)
 {
 	switch (eTag)
 	{
-		
-
+	case Prototype_PlayerEnding:
+		return TEXT("Prototype_PlayerEnding");
+		break;
+	case Prototype_Alice_Asylum:
+		return TEXT("Prototype_Alice_Asylum");
+		break;
+	case Prototype_DirTornado:
+		return TEXT("Prototype_DirTornado");
+		break;
 	case Prototype_DollMakerBullet:
 		return TEXT("Prototype_DollMakerBullet");
 		break;
@@ -837,13 +848,34 @@ enum COMPONENTPROTOTYPEID
 		
 		Prototype_Mesh_BallMesh,
 
-		
+
+		//AsylumBed_Insane
+		//AsylumCabinetA_Normal
+		//AsylumCabinetB_Normal
+		//AsylumDrawers_Normal
+		//AsylumSheets_Normal
+		//AsylumWallPadded_Door
+		//AsylumWallPadded_Doorway
+		//AsylumWallPadded_Wall
+		//AsylumWallPadded_WindowWall
+
+		Prototype_Mesh_AsylumBed_Insane,
+		Prototype_Mesh_AsylumCabinetA_Normal,
+		Prototype_Mesh_AsylumCabinetB_Normal,
+		Prototype_Mesh_AsylumDrawers_Normal,
+		Prototype_Mesh_AsylumSheets_Normal,
+		Prototype_Mesh_AsylumWallPadded_Door,
+		Prototype_Mesh_AsylumWallPadded_Doorway,
+		Prototype_Mesh_AsylumWallPadded_Wall,
+		Prototype_Mesh_AsylumWallPadded_WindowWall,
+
 
 
 
 
 	Prototype_Mesh_Player,
-	Prototype_Mesh_PlayerLoby,
+		Prototype_Mesh_PlayerLoby,
+		Prototype_Mesh_PlayerEnding,
 	Prototype_Mesh_Executor,
 		Prototype_Mesh_Grunt,
 		Prototype_Mesh_GruntSwpanMesh,
@@ -1455,6 +1487,61 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 		break;
 
 		
+			
+			
+			
+			
+			
+			
+			
+			
+
+	case Prototype_Mesh_AsylumBed_Insane:
+		return TEXT("Prototype_Mesh_AsylumBed_Insane");
+		break;
+	case Prototype_Mesh_AsylumCabinetA_Normal:
+		return TEXT("Prototype_Mesh_AsylumCabinetA_Normal");
+		break;
+	case Prototype_Mesh_AsylumCabinetB_Normal:
+		return TEXT("Prototype_Mesh_AsylumCabinetB_Normal");
+		break;
+	case Prototype_Mesh_AsylumDrawers_Normal:
+		return TEXT("Prototype_Mesh_AsylumDrawers_Normal");
+		break;
+	case Prototype_Mesh_AsylumSheets_Normal:
+		return TEXT("Prototype_Mesh_AsylumSheets_Normal");
+		break;
+	case Prototype_Mesh_AsylumWallPadded_Door:
+		return TEXT("Prototype_Mesh_AsylumWallPadded_Door");
+		break;
+	case Prototype_Mesh_AsylumWallPadded_Doorway:
+		return TEXT("Prototype_Mesh_AsylumWallPadded_Doorway");
+		break;
+	case Prototype_Mesh_AsylumWallPadded_Wall:
+		return TEXT("Prototype_Mesh_AsylumWallPadded_Wall");
+		break;
+	case Prototype_Mesh_AsylumWallPadded_WindowWall:
+		return TEXT("Prototype_Mesh_AsylumWallPadded_WindowWall");
+		break;
+
+
+
+
+		//////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
 		
 
 	case Prototype_Mesh_Player:
@@ -1639,7 +1726,10 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 		return TEXT("Prototype_Mesh_CannonBall");
 		break;
 
-
+	case Prototype_Mesh_PlayerEnding:
+		return TEXT("Prototype_Mesh_PlayerEnding");
+		break;
+		
 		/////////////////≈ÿΩ∫√≥////////////////////////////////////////////////////////
 
 

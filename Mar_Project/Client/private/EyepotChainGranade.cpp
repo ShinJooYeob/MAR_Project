@@ -3,6 +3,7 @@
 #include "Terrain.h"
 #include "Player.h"
 #include "CircleTornado.h"
+#include "DirTornadoSwirl.h"
 
 
 
@@ -65,6 +66,9 @@ HRESULT CEyepotChainGranade::Initialize_Clone(void * pArg)
 
 
 	FAILED_CHECK(Ready_ParticleDesc());
+	m_fParticleTimer = 1.f;
+	m_vOldPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+
 	return S_OK;
 }
 
@@ -89,7 +93,18 @@ _int CEyepotChainGranade::Update(_double fDeltaTime)
 	else
 	{
 
+
+
 		m_fStartTimer += fDeltaTime;
+		m_fParticleTimer += fDeltaTime;
+
+		if (m_fParticleTimer > 0.2f)
+		{
+
+			GetSingle(CUtilityMgr)->Start_InstanceParticle(m_eNowSceneNum, m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 5);
+			m_fParticleTimer = 0;
+		}
+
 		if (m_tDesc.MeshKinds)
 		{
 			m_pTransformCom->MovetoDir(m_tDesc.MoveDir.XMVector(), fDeltaTime);
@@ -215,6 +230,16 @@ _int CEyepotChainGranade::Update(_double fDeltaTime)
 			}
 
 		}
+
+		CDirTornadoSwirl::DIRSWIRLDESC tDirDesc;
+		tDirDesc.vRotateDir = XMVector3Normalize(m_pTransformCom->Get_MatrixState(CTransform::STATE_POS) - m_vOldPos.XMVector());
+		tDirDesc.vLookDir = -m_tDesc.MoveDir.XMVector();
+		tDirDesc.fScale = 0.7f;
+		tDirDesc.vPosition = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+
+		tDirDesc.vColor = _float4(0.231372549019f, GetSingle(CUtilityMgr)->RandomFloat(0.705882352941f, 0.90196078431372f), 1.f, 1);
+
+		g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_DirTornado), &tDirDesc);
 
 	}
 

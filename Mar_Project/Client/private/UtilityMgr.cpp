@@ -243,6 +243,16 @@ HRESULT CUtilityMgr::Start_ScreenEffect(ScreenEffectID eEffectType, _double Effe
 		
 	}
 	break;
+
+	case Client::CUtilityMgr::ScreenEffect_FadeFlickeringIn:
+	{
+		if (m_pFadeEffect->Start_FadeEffect(CFadeEffect::FadeID_FlikeringIn, EffectDuration, AdditionalParameter))
+			m_pFadeEffect->Chage_TextureIndex();
+
+	}
+	
+
+	break;
 	case Client::CUtilityMgr::ScreenEffect_CamShaking:
 	{
 		CCamera_Main* pMainCam = (CCamera_Main*)g_pGameInstance->Get_GameObject_By_LayerLastIndex(SCENE_STATIC, TAG_LAY(Layer_Camera_Main));
@@ -343,8 +353,8 @@ HRESULT CUtilityMgr::Ready_InstanceParticleDesc()
 	tDesc.vTargetColor = _float4(1,1,1, 0.2f);
 
 	tDesc.SizeChangingEndRate = 0.7f;
-	tDesc.vStartSize = _float3(0.01f, 0.2f, 1);
-	tDesc.vTargetSize = _float3(0.01f);
+	tDesc.vStartSize = _float3(0.02f, 0.4f, 1);
+	tDesc.vTargetSize = _float3(0.015f);
 	m_vecInstanceParticleDesc.push_back(tDesc);
 
 
@@ -357,8 +367,8 @@ HRESULT CUtilityMgr::Ready_InstanceParticleDesc()
 	tDesc.vTargetColor = _float4(1, 1, 1, 0.2f);
 
 	tDesc.SizeChangingEndRate = 0.7f;
-	tDesc.vStartSize = _float3(0.01f, 0.2f, 1);
-	tDesc.vTargetSize = _float3(0.01f);
+	tDesc.vStartSize = _float3(0.02f, 0.4f, 1);
+	tDesc.vTargetSize = _float3(0.015f);
 	m_vecInstanceParticleDesc.push_back(tDesc);
 
 
@@ -388,10 +398,22 @@ HRESULT CUtilityMgr::Ready_InstanceParticleDesc()
 	tDesc.vTargetColor = _float4(1, 1, 1, 0.2f);
 
 	tDesc.SizeChangingEndRate = 0.7f;
-	tDesc.vStartSize = _float3(0.01f, 0.2f, 1);
-	tDesc.vTargetSize = _float3(0.01f);
+	tDesc.vStartSize = _float3(0.02f, 0.4f, 1);
+	tDesc.vTargetSize = _float3(0.015f);
 	m_vecInstanceParticleDesc.push_back(tDesc);
 
+
+
+	//5
+	tDesc.ColorChangeFrequency = 1;
+	tDesc.vStartColor = _float4(1, 0.64313725f, 0.141176470f, 1);
+	//tDesc.vTargetColor = _float4(0.7333333f, 0.31372549f, 0.f, 0.2f);
+	tDesc.vTargetColor = _float4(1, 1, 1, 0.2f);
+
+	tDesc.SizeChangingEndRate = 0.7f;
+	tDesc.vStartSize = _float3(0.02f, 0.4f, 1);
+	tDesc.vTargetSize = _float3(0.015f);
+	m_vecInstanceParticleDesc.push_back(tDesc);
 
 
 	return S_OK;

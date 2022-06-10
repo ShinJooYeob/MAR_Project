@@ -244,12 +244,12 @@ HRESULT CScene_Stage2::Ready_Layer_Player(const _tchar * pLayerTag)
 	pPlayer->Set_NowSceneNum(SCENE_STAGE2);
 
 	/*ÂşÀÜ ¾Õ¿¡*/
-	//pPlayer->Renew_Player(_float3(68.85f, 19.66f, 102.472f), _float3(69.106f, 19.66f, 97.17f));
+	pPlayer->Renew_Player(_float3(68.85f, 19.66f, 102.472f), _float3(69.106f, 19.66f, 97.17f));
 
 	//pPlayer->Renew_Player(_float3(187.1f, 25.16f, 175), _float3(200.1f, 25.16f, 175));
 	
 	/*¿ø·¡ À§Ä¡*/
-	pPlayer->Renew_Player(_float3(70, 25.16f, 168), _float3(80, 25.16f, 168));
+	//pPlayer->Renew_Player(_float3(70, 25.16f, 168), _float3(80, 25.16f, 168));
 
 	return S_OK;
 }

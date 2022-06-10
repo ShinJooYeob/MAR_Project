@@ -13,6 +13,7 @@ public:
 		FadeID_FadeOut,
 		FadeID_FadeInOut,
 		FadeID_FadeOutIn,
+		FadeID_FlikeringIn,
 		FadeID_End,
 	};
 
@@ -50,6 +51,7 @@ protected:
 	FadeID				m_eKindsFade = FadeID_End;
 	_double				m_PassedTime = FLT_MAX;
 	_double				m_TotalTime = 0;
+	_float				m_fAlphaTestValue = 0.1f;
 	_float4				m_vTargetColor = _float4(0,0,0,0);
 
 protected:

@@ -58,15 +58,6 @@
     <Filter Include="02.Scene\03.Scene_Gameplay">
       <UniqueIdentifier>{6c098263-0780-437e-aab4-7b46404ad0c3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.Scene\03.Scene_Gameplay\Scene_Stage1">
-      <UniqueIdentifier>{35e6df60-beb8-4ad4-9ce1-66b4579a3c8f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.Scene\03.Scene_Gameplay\Scene_Stage2">
-      <UniqueIdentifier>{8fb49357-b233-4b49-b7fe-bb5283fd5dbd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.Scene\03.Scene_Gameplay\Scene_Stage3">
-      <UniqueIdentifier>{47af3df8-c050-4cb8-a98f-61ab8b1e0757}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.Scene\02.Scene_StageSelect">
       <UniqueIdentifier>{145c5e13-96c0-44f7-9b0c-4e9a3c0d8ed2}</UniqueIdentifier>
     </Filter>
@@ -208,9 +199,6 @@
     <Filter Include="01.GameObject\03.Monster\06.DollMaker">
       <UniqueIdentifier>{e1a2fc06-ee7e-4f49-8ab3-dc8e3fd75ff6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.Scene\03.Scene_Gameplay\Scene_Boss">
-      <UniqueIdentifier>{9c3f6788-5264-4916-bfa9-e72a81ed94dc}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.GameObject\03.Monster\06.DollMaker\06.Handy">
       <UniqueIdentifier>{c2e5afb3-f0c3-423d-9016-d2a496ecff8d}</UniqueIdentifier>
     </Filter>
@@ -330,6 +318,24 @@
     </Filter>
     <Filter Include="01.GameObject\03.Monster\99.MonsterWeapon\02.EyePot">
       <UniqueIdentifier>{10db04e3-58c3-42d7-b567-3a7d702b7df2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.Scene\03.Scene_Gameplay\01.Scene_Stage1">
+      <UniqueIdentifier>{35e6df60-beb8-4ad4-9ce1-66b4579a3c8f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.Scene\03.Scene_Gameplay\02.Scene_Stage2">
+      <UniqueIdentifier>{8fb49357-b233-4b49-b7fe-bb5283fd5dbd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.Scene\03.Scene_Gameplay\03.Scene_Stage3">
+      <UniqueIdentifier>{47af3df8-c050-4cb8-a98f-61ab8b1e0757}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.Scene\03.Scene_Gameplay\05.Scene_Ending">
+      <UniqueIdentifier>{74353270-f2e4-4f1f-8f8d-be186b2bdc6a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.Scene\03.Scene_Gameplay\04.Scene_Boss">
+      <UniqueIdentifier>{9c3f6788-5264-4916-bfa9-e72a81ed94dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\03.Monster\07.EndingAlice">
+      <UniqueIdentifier>{403467a7-ed4b-4561-b8e5-1346a465c862}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -496,7 +502,7 @@
       <Filter>01.GameObject\99.UI\UsedUI\LoadingUI</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Scene_Stage1.h">
-      <Filter>02.Scene\03.Scene_Gameplay\Scene_Stage1</Filter>
+      <Filter>02.Scene\03.Scene_Gameplay\01.Scene_Stage1</Filter>
     </ClInclude>
     <ClInclude Include="..\public\BreakableObj.h">
       <Filter>01.GameObject\07.MapObject\01.DynamicObj\05.BreakableObj</Filter>
@@ -544,7 +550,7 @@
       <Filter>01.GameObject\03.Monster\06.DollMaker</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Scene_Boss.h">
-      <Filter>02.Scene\03.Scene_Gameplay\Scene_Boss</Filter>
+      <Filter>02.Scene\03.Scene_Gameplay\04.Scene_Boss</Filter>
     </ClInclude>
     <ClInclude Include="..\public\HandyBoy.h">
       <Filter>01.GameObject\03.Monster\06.DollMaker\06.Handy</Filter>
@@ -553,10 +559,10 @@
       <Filter>01.GameObject\03.Monster\06.DollMaker\06.Handy</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Scene_Stage3.h">
-      <Filter>02.Scene\03.Scene_Gameplay\Scene_Stage3</Filter>
+      <Filter>02.Scene\03.Scene_Gameplay\03.Scene_Stage3</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Scene_Stage2.h">
-      <Filter>02.Scene\03.Scene_Gameplay\Scene_Stage2</Filter>
+      <Filter>02.Scene\03.Scene_Gameplay\02.Scene_Stage2</Filter>
     </ClInclude>
     <ClInclude Include="..\public\EscalatorPad.h">
       <Filter>01.GameObject\07.MapObject\01.DynamicObj\08.EscalatorPad</Filter>
@@ -683,6 +689,15 @@
     </ClInclude>
     <ClInclude Include="..\public\Eyepot.h">
       <Filter>01.GameObject\03.Monster\04.Eyepot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\DirTornadoSwirl.h">
+      <Filter>01.GameObject\00.Player\EffectMesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Scene_Ending.h">
+      <Filter>02.Scene\03.Scene_Gameplay\05.Scene_Ending</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\EndingAlice.h">
+      <Filter>01.GameObject\03.Monster\07.EndingAlice</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -828,7 +843,7 @@
       <Filter>01.GameObject\99.UI\UsedUI\LoadingUI</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Scene_Stage1.cpp">
-      <Filter>02.Scene\03.Scene_Gameplay\Scene_Stage1</Filter>
+      <Filter>02.Scene\03.Scene_Gameplay\01.Scene_Stage1</Filter>
     </ClCompile>
     <ClCompile Include="..\private\BreakableObj.cpp">
       <Filter>01.GameObject\07.MapObject\01.DynamicObj\05.BreakableObj</Filter>
@@ -876,7 +891,7 @@
       <Filter>01.GameObject\03.Monster\06.DollMaker</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Scene_Boss.cpp">
-      <Filter>02.Scene\03.Scene_Gameplay\Scene_Boss</Filter>
+      <Filter>02.Scene\03.Scene_Gameplay\04.Scene_Boss</Filter>
     </ClCompile>
     <ClCompile Include="..\private\HandyBoy.cpp">
       <Filter>01.GameObject\03.Monster\06.DollMaker\06.Handy</Filter>
@@ -885,10 +900,10 @@
       <Filter>01.GameObject\03.Monster\06.DollMaker\06.Handy</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Scene_Stage3.cpp">
-      <Filter>02.Scene\03.Scene_Gameplay\Scene_Stage3</Filter>
+      <Filter>02.Scene\03.Scene_Gameplay\03.Scene_Stage3</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Scene_Stage2.cpp">
-      <Filter>02.Scene\03.Scene_Gameplay\Scene_Stage2</Filter>
+      <Filter>02.Scene\03.Scene_Gameplay\02.Scene_Stage2</Filter>
     </ClCompile>
     <ClCompile Include="..\private\EscalatorPad.cpp">
       <Filter>01.GameObject\07.MapObject\01.DynamicObj\08.EscalatorPad</Filter>
@@ -1012,6 +1027,15 @@
     </ClCompile>
     <ClCompile Include="..\private\EyepotChainGranade.cpp">
       <Filter>01.GameObject\03.Monster\99.MonsterWeapon\02.EyePot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\DirTornadoSwirl.cpp">
+      <Filter>01.GameObject\00.Player\EffectMesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Scene_Ending.cpp">
+      <Filter>02.Scene\03.Scene_Gameplay\05.Scene_Ending</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\EndingAlice.cpp">
+      <Filter>01.GameObject\03.Monster\07.EndingAlice</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -486,6 +486,10 @@ HRESULT CTerrain::Ready_FilterMap()
 	case SCENE_BOSS:
 		strcpy_s(FileName, "Filter_1.bmp");
 		break;
+
+	case SCENE_ENDING:
+		strcpy_s(FileName, "Filter_3.bmp");
+		break;
 	case SCENE_EDIT:
 		break;
 	case SCENE_END:

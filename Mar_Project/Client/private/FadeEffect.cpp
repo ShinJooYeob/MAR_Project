@@ -39,7 +39,9 @@ HRESULT CFadeEffect::Initialize_Clone(void * pArg)
 	m_fDepth = -FLT_MAX;
 
 	m_bNeedToDraw = true;
+	//m_PassIndex = 22;
 	m_PassIndex = 7;
+	
 	m_iTextureLayerIndex = 0;
 
 	return S_OK;
@@ -59,13 +61,14 @@ _int CFadeEffect::Update(_double fDeltaTime)
 	{
 		m_PassedTime += fDeltaTime;
 
-		_float EasedAlpha = g_pGameInstance->Easing(TYPE_Linear, m_vTargetColor.w, 0, (_float)m_PassedTime, (_float)m_TotalTime);
+		_float EasedAlpha = g_pGameInstance->Easing(TYPE_SinOut, m_vTargetColor.w, 0, (_float)m_PassedTime, (_float)m_TotalTime);
 
 		if (m_PassedTime > m_TotalTime)
 		{
 			EasedAlpha = 0;
 			m_bNeedToDraw = false;
 		}
+
 
 		m_vColor.w = EasedAlpha;
 	}
@@ -81,6 +84,7 @@ _int CFadeEffect::Update(_double fDeltaTime)
 			EasedAlpha = 1;
 		}
 
+
 		m_vColor.w = EasedAlpha;
 	}
 		break;
@@ -92,7 +96,7 @@ _int CFadeEffect::Update(_double fDeltaTime)
 
 		if (m_PassedTime > m_TotalTime)
 		{
-			EasedAlpha = 0;
+			EasedAlpha = 1;
 		}
 
 		m_vColor.w = EasedAlpha;
@@ -108,12 +112,34 @@ _int CFadeEffect::Update(_double fDeltaTime)
 		if (m_PassedTime > m_TotalTime)
 		{
 			m_bNeedToDraw = false;
-			EasedAlpha = 1;
+			EasedAlpha = 0;
 		}
 
 		m_vColor.w = EasedAlpha;
 	}
 		break;
+
+	case Client::CFadeEffect::FadeID_FlikeringIn:
+	{
+		m_PassedTime += fDeltaTime;
+
+		_float EasedAlpha = g_pGameInstance->Easing(TYPE_BounceIn, 0, m_vTargetColor.w, (_float)m_PassedTime, (_float)m_TotalTime);
+		m_vColor.w = 1;
+
+
+		if (m_PassedTime > m_TotalTime*0.8f)
+			m_vColor.w = g_pGameInstance->Easing(TYPE_SinOut, 1, 0, (_float)m_PassedTime - (_float)m_TotalTime*0.8f, (_float)m_TotalTime * 0.2f);
+
+		if (m_PassedTime > m_TotalTime)
+		{
+			m_bNeedToDraw = false;
+			EasedAlpha = 0;
+			m_vColor.w = 0;
+		}
+
+		m_fAlphaTestValue = EasedAlpha;
+	}
+	break;
 	default:
 		break;
 	}
@@ -150,6 +176,8 @@ _int CFadeEffect::Render()
 		FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ViewMatrix", &XMMatrixIdentity(), sizeof(_float4x4)));
 		FAILED_CHECK(m_pShaderCom->Set_RawValue("g_ProjMatrix", &m_ProjMatrix, sizeof(_float4x4)));
 		FAILED_CHECK(m_pShaderCom->Set_RawValue("g_vColor", &m_vColor, sizeof(_float4)));
+		FAILED_CHECK(m_pShaderCom->Set_RawValue("g_fAlphaTestValue", &m_fAlphaTestValue, sizeof(_float)));
+		
 		FAILED_CHECK(m_pTextureCom->Bind_OnShader(m_pShaderCom, "g_DiffuseTexture", m_iTextureLayerIndex));
 		FAILED_CHECK(m_pVIBufferCom->Render(m_pShaderCom, m_PassIndex));
 
@@ -176,11 +204,23 @@ _bool CFadeEffect::Start_FadeEffect(FadeID eFadeType, _double Duration, _float4 
 	m_TotalTime = Duration;
 	m_vColor = m_vTargetColor = TargetColor;
 
+
 	m_vTargetColor.x = min(max(m_vTargetColor.x, 0), 1);
 	m_vTargetColor.y = min(max(m_vTargetColor.y, 0), 1);
 	m_vTargetColor.z = min(max(m_vTargetColor.z, 0), 1);
 	m_vTargetColor.w = min(max(m_vTargetColor.w, 0), 1);
 
+
+	if (m_eKindsFade == CFadeEffect::FadeID_FlikeringIn)
+	{
+		m_PassIndex = 22;
+	}
+	else
+	{
+		m_fAlphaTestValue = 0.1f;
+
+		m_PassIndex = 7;
+	}
 
 	return true;
 }
