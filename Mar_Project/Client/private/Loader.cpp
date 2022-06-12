@@ -1274,7 +1274,7 @@ HRESULT CLoader::Load_Scene_Ending(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 
 	_Matrix			TransformMatrix;
 
-	TransformMatrix = XMMatrixScaling(0.00015f, 0.00015f, 0.00015f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
+	TransformMatrix = XMMatrixScaling(0.00013f, 0.00013f, 0.00013f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_ENDING, TAG_CP(Prototype_Mesh_PlayerEnding),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Alice_Asylum", "Alice_Asylum.FBX", TransformMatrix)));
 		//CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Grunt", "Grunt.FBX", TransformMatrix)));
@@ -1324,16 +1324,25 @@ HRESULT CLoader::Load_Scene_Ending(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 
 
 	RELEASE_INSTANCE(CGameInstance);
+
+
+
+
 	EnterCriticalSection(_CriSec);
-	m_iLoadingMaxCount = 1;
+	m_iLoadingMaxCount = 99999999;
 	m_iLoadingProgressCount = 0;
 	LeaveCriticalSection(_CriSec);
+
+	for (int i = 0; i < m_iLoadingMaxCount; ++i)
+	{
+		EnterCriticalSection(_CriSec);
+		m_iLoadingProgressCount = i;
+		LeaveCriticalSection(_CriSec);
+	}
 
 	EnterCriticalSection(_CriSec);
 	m_bIsLoadingFinished = true;
 	LeaveCriticalSection(_CriSec);
-
-
 	return S_OK;
 }
 

@@ -5,6 +5,7 @@
 #include "StaticMapObject.h"
 #include "Camera_Main.h"
 #include "StageBoss_SpwanBoss.h"
+#include "EndingAlice.h"
 
 
 
@@ -36,7 +37,6 @@ HRESULT CScene_Ending::Initialize()
 	FAILED_CHECK(Ready_Layer_UI(TAG_LAY(Layer_UI_GamePlay)));
 
 
-	FAILED_CHECK(Ready_Layer_EndingAlice(L"EndingAlice"));
 	
 	
 
@@ -48,6 +48,8 @@ HRESULT CScene_Ending::Initialize()
 
 	FAILED_CHECK(Ready_Layer_TriggerCollider(TAG_LAY(Layer_TriggerCollider)));
 	
+	FAILED_CHECK(Load_ActionCam(L"StageEnd_CameAction_0"));
+
 	m_bStartChecker = false;
 	
 
@@ -60,71 +62,61 @@ _int CScene_Ending::Update(_double fDeltaTime)
 		return -1;
 
 	if (!m_bStartChecker)
-
 	{
 		m_bStartChecker = true;
 		GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeFlickeringIn, 10.f, _float4(0, 0, 0, 1.f));
+		m_iChecker = 0;
+
+
+		CCamera_Main* pCamera = (CCamera_Main*)g_pGameInstance->Get_GameObject_By_LayerIndex(SCENE_ENDING, TAG_LAY(Layer_Camera_Main));
+		NULL_CHECK_BREAK(pCamera);
+
+		CAMERAACTION tDesc;
+
+		tDesc.vecCamPos = m_vecCamPositions;
+		tDesc.vecLookAt = m_vecLookPostions;
+
+
+		pCamera->CamActionStart(tDesc);
+
 	}
-
-
-	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_HOME)&DIS_Press)
+	else
 	{
+		m_fTimer += fDeltaTime;
 
-		LIGHTDESC* pLightDesc = g_pGameInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0);
-		pLightDesc->vVector.z += 1.f;
+		if (!m_iChecker &&  m_fTimer > 25.)
+		{
 
-		wstring ttDebugLog = L"LightPosLuminece : X: " + to_wstring(pLightDesc->vVector.x) + L",  Y: " + to_wstring(pLightDesc->vVector.y) + L",  Z: " + to_wstring(pLightDesc->vVector.z) + L"\n";
-		OutputDebugStringW(ttDebugLog.c_str());
+			FAILED_CHECK(Ready_Layer_EndingAlice(L"EndingAlice"));
+			m_iChecker++;
+		}
+		else if (m_iChecker == 1 && m_fTimer > 27)
+		{
+			CEndingAlice* pAlice =(CEndingAlice*) g_pGameInstance->Get_GameObject_By_LayerLastIndex(SCENE_ENDING, L"EndingAlice");
+			NULL_CHECK_BREAK(pAlice);
+
+			pAlice->StartEndingMoving();
+
+			m_iChecker++;
+
+		}
+		else if (m_iChecker == 2 && m_fTimer > 45)
+		{
+			GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeOut, 2.f, _float4(0, 0, 0, 1.f));
+			m_iChecker++;
+
+		}
+		else if (m_iChecker == 3 && m_fTimer > 47)
+		{
+			FAILED_CHECK(GetSingle(CUtilityMgr)->Clear_RenderGroup_forSceneChange());
+			FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Loading::Create(m_pDevice, m_pDeviceContext, SCENEID::SCENE_LOBY), SCENEID::SCENE_LOADING));
+			m_iChecker++;
+			return 0;
+		}
+
+
 	}
 
-	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_END)&DIS_Press)
-	{
-
-		LIGHTDESC* pLightDesc = g_pGameInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0);
-		pLightDesc->vVector.z -= 1.f;
-
-		wstring ttDebugLog = L"LightPosLuminece : X: " + to_wstring(pLightDesc->vVector.x) + L",  Y: " + to_wstring(pLightDesc->vVector.y) + L",  Z: " + to_wstring(pLightDesc->vVector.z) + L"\n";
-		OutputDebugStringW(ttDebugLog.c_str());
-	}
-	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_DELETE)&DIS_Press)
-	{
-
-		LIGHTDESC* pLightDesc = g_pGameInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0);
-		pLightDesc->vVector.x -= 1.f;
-
-		wstring ttDebugLog = L"LightPosLuminece : X: " + to_wstring(pLightDesc->vVector.x) + L",  Y: " + to_wstring(pLightDesc->vVector.y) + L",  Z: " + to_wstring(pLightDesc->vVector.z) + L"\n";
-		OutputDebugStringW(ttDebugLog.c_str());
-	}
-
-	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_PGDN)&DIS_Press)
-	{
-
-		LIGHTDESC* pLightDesc = g_pGameInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0);
-		pLightDesc->vVector.x += 1.f;
-
-		wstring ttDebugLog = L"LightPosLuminece : X: " + to_wstring(pLightDesc->vVector.x) + L",  Y: " + to_wstring(pLightDesc->vVector.y) + L",  Z: " + to_wstring(pLightDesc->vVector.z) + L"\n";
-		OutputDebugStringW(ttDebugLog.c_str());
-	}
-
-	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_INSERT)&DIS_Press)
-	{
-
-		LIGHTDESC* pLightDesc = g_pGameInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0);
-		pLightDesc->vVector.y += 1.f;
-
-		wstring ttDebugLog = L"LightPosLuminece : X: " + to_wstring(pLightDesc->vVector.x) + L",  Y: " + to_wstring(pLightDesc->vVector.y) + L",  Z: " + to_wstring(pLightDesc->vVector.z) + L"\n";
-		OutputDebugStringW(ttDebugLog.c_str());
-	}
-
-	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_PGUP)&DIS_Press)
-	{
-
-		LIGHTDESC* pLightDesc = g_pGameInstance->Get_LightDesc(LIGHTDESC::TYPE_DIRECTIONAL, 0);
-		pLightDesc->vVector.y -= 1.f;
-
-		wstring ttDebugLog = L"LightPosLuminece : X: " + to_wstring(pLightDesc->vVector.x) + L",  Y: " + to_wstring(pLightDesc->vVector.y) + L",  Z: " + to_wstring(pLightDesc->vVector.z) + L"\n";
-		OutputDebugStringW(ttDebugLog.c_str());
-	}
 
 
 	return 0;
@@ -234,6 +226,12 @@ HRESULT CScene_Ending::Ready_Layer_MainCamera(const _tchar * pLayerTag)
 	else 
 	{
 		m_pMainCam->Set_NowSceneNum(SCENE_ENDING);
+		CTransform* pCamTransform =m_pMainCam->Get_Camera_Transform();
+		NULL_CHECK_RETURN(pCamTransform, E_FAIL);
+
+		pCamTransform->Set_MatrixState(CTransform::STATE_POS, _float3(22.041f, 21.5f, 22.178f));
+		pCamTransform->LookAt(XMVectorSet(21.f, 25.f, 22.178f, 1));
+		m_pMainCam->Set_ViewMatrix();
 	}
 	
 	return S_OK;
@@ -265,7 +263,7 @@ HRESULT CScene_Ending::Ready_Layer_Player(const _tchar * pLayerTag)
 	pPlayer->Set_NowSceneNum(SCENE_ENDING);
 	pPlayer->Set_PlayerPosition(_float3(16, 20, 16));
 
-	//pPlayer->Set_IsDead();
+	pPlayer->Set_IsDead();
 	
 	return S_OK;
 }
@@ -399,6 +397,75 @@ HRESULT CScene_Ending::Ready_Layer_StaticMapObj(const _tchar * pLayerTag)
 HRESULT CScene_Ending::Ready_Layer_TriggerCollider(const _tchar * pLayerTag)
 {
 
+
+	return S_OK;
+}
+
+HRESULT CScene_Ending::Load_ActionCam(const _tchar * szPath)
+{
+
+	{
+		{
+			m_vecCamPositions.clear();
+			m_vecLookPostions.clear();
+		}
+
+
+
+		//../bin/Resources/Data/Map/
+		_tchar szFullPath[MAX_PATH] = L"../bin/Resources/Data/CameraAction/";
+		//_tchar wFileName[MAX_PATH] = L"";
+
+		//MultiByteToWideChar(CP_UTF8, 0, szPath, -1, wFileName, sizeof(wFileName));
+		//WideCharToMultiByte(CP_UTF8, 0, fd.name, -1, szFilename, sizeof(szFilename), NULL, NULL);
+		lstrcat(szFullPath, szPath);
+
+		//HANDLE hFile = CreateFileW(szFullPath, GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+
+
+		HANDLE hFile = ::CreateFileW(szFullPath, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, 0, NULL);
+
+
+		if (INVALID_HANDLE_VALUE == hFile)
+			return E_FAIL;
+
+		DWORD	dwByte = 0;
+
+		CGameInstance* pInstance = g_pGameInstance;
+
+		_uint iCount = 0;
+		ReadFile(hFile, &(iCount), sizeof(_uint), &dwByte, nullptr);
+
+		CAMACTDESC tDesc;
+
+		for (_uint i = 0; i < iCount; i++)
+		{
+			ReadFile(hFile, &(tDesc.fDuration), sizeof(_float), &dwByte, nullptr);
+			ReadFile(hFile, &(tDesc.vPosition), sizeof(_float3), &dwByte, nullptr);
+
+			m_vecCamPositions.push_back(tDesc);
+
+		}
+
+
+		iCount = 0;
+		ReadFile(hFile, &(iCount), sizeof(_uint), &dwByte, nullptr);
+
+		for (_uint i = 0; i < iCount; i++)
+		{
+			ReadFile(hFile, &(tDesc.fDuration), sizeof(_float), &dwByte, nullptr);
+			ReadFile(hFile, &(tDesc.vPosition), sizeof(_float3), &dwByte, nullptr);
+
+			m_vecLookPostions.push_back(tDesc);
+		}
+
+
+		CloseHandle(hFile);
+
+
+	}
+
+	return S_OK;
 
 	return S_OK;
 }

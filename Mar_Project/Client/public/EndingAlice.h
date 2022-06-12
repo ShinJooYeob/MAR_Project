@@ -22,6 +22,7 @@ public:
 	virtual _int Render()override;
 	virtual _int LightRender()override;
 
+	void StartEndingMoving();
 
 private:
 	CShader*			m_pShaderCom = nullptr;

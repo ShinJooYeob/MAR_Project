@@ -38,6 +38,14 @@ private:
 private:
 	class CCamera_Main*				m_pMainCam = nullptr;
 	_bool			m_bStartChecker = false;
+	_double			m_fTimer = 0;
+	_uint			m_iChecker = 0;
+
+
+	vector<CAMACTDESC>		 m_vecCamPositions;
+	vector<CAMACTDESC>		 m_vecLookPostions;
+	HRESULT Load_ActionCam(const _tchar* szPath);
+
 public:
 	static CScene_Ending* Create(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext);
 	virtual void Free() override;

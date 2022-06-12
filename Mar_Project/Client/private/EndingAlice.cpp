@@ -22,7 +22,23 @@ HRESULT CEndingAlice::Initialize_Prototype(void * pArg)
 
 HRESULT CEndingAlice::Initialize_Clone(void * pArg)
 {
-	FAILED_CHECK(__super::Initialize_Clone(pArg));
+	//FAILED_CHECK(__super::Initialize_Clone(pArg));
+
+
+	m_pInstance = g_pGameInstance;
+
+	m_bIsPatternFinished = false;
+	m_ePattern = 0;
+	m_PatternPassedTime = 0;
+
+	m_DmgPassedTime = 0;
+	m_fDmgAmount = 0;
+
+	m_vLookDir;
+	m_LevitationTime = 0;
+	m_bIsAddForceActived = false;
+
+	//iWanderCount = 0;
 
 	FAILED_CHECK(SetUp_Components());
 
@@ -50,16 +66,6 @@ _int CEndingAlice::Update(_double fDeltaTime)
 {
 	if (__super::Update(fDeltaTime) < 0)return -1;
 
-	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_9)&DIS_Down)
-	{
-		m_bSpwanAnimStart = true;
-		m_SpwanPassedTime = 0;
-		m_pModel->Change_AnimIndex(1);
-	}
-	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_0)&DIS_Down)
-	{
-		FAILED_CHECK(m_pModel->Change_AnimIndex(1));
-	}
 
 	if (m_bSpwanAnimStart)
 	{
@@ -67,25 +73,31 @@ _int CEndingAlice::Update(_double fDeltaTime)
 
 		_float3 EasedPos;
 
-		if (m_SpwanPassedTime < 4.f)
+		if (m_SpwanPassedTime < 8.f)
 		{
-			EasedPos = g_pGameInstance->Easing_Vector(TYPE_Linear, _float3(21.631f, 20.f, 20), _float3(17.725f, 20.f, 12), (_float)m_SpwanPassedTime, 4.f);
-			if (m_SpwanPassedTime > 3.85f)m_pModel->Change_AnimIndex(0);
+			EasedPos = g_pGameInstance->Easing_Vector(TYPE_Linear, _float3(21.631f, 20.f, 20), _float3(17.725f, 20.f, 12), (_float)m_SpwanPassedTime, 8.f);
+
+
+			
+
+			m_pTransformCom->LookDir(XMVector3Normalize(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK)) * 0.95f + XMVector3Normalize(XMVectorSet(17.725f, 20.f, 9.4f, 0) - EasedPos.XMVector())*0.5f);
+
+			if (m_SpwanPassedTime > 7.85f) m_pModel->Change_AnimIndex(0,0.5f);
 		}
-		else if (m_SpwanPassedTime < 5.f)
+		else if (m_SpwanPassedTime < 10.f)
 		{
 			EasedPos = _float3(17.725f, 20.f, 12);
 
-			if (m_SpwanPassedTime > 4.85f)m_pModel->Change_AnimIndex(1);
+			if (m_SpwanPassedTime > 9.85f)m_pModel->Change_AnimIndex(1, 0.5f);
 		}
-		else if (m_SpwanPassedTime < 7.f)
+		else if (m_SpwanPassedTime < 14.f)
 		{
-			EasedPos = g_pGameInstance->Easing_Vector(TYPE_Linear, _float3(17.725f, 20.f, 12), _float3(17.725f, 20.f, 9.4f), (_float)m_SpwanPassedTime - 5, 2.f);
+			EasedPos = g_pGameInstance->Easing_Vector(TYPE_Linear, _float3(17.725f, 20.f, 12), _float3(17.725f, 20.f, 9.4f), (_float)m_SpwanPassedTime - 10, 4.f);
 		}
 		else
 		{
 			EasedPos = _float3(17.725f, 20.f, 9.4f);
-			m_pModel->Change_AnimIndex(0);
+			m_pModel->Change_AnimIndex(0,0.5f);
 		}
 
 		m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, EasedPos);
@@ -159,6 +171,13 @@ _int CEndingAlice::LightRender()
 	return _int();
 }
 
+void CEndingAlice::StartEndingMoving()
+{
+	m_bSpwanAnimStart = true;
+	m_SpwanPassedTime = 0;
+	m_pModel->Change_AnimIndex(1,0.5f);
+}
+
 
 
 HRESULT CEndingAlice::SetUp_Components()
@@ -215,7 +234,7 @@ HRESULT CEndingAlice::Set_Monster_On_Terrain(CTransform * pTransform, _double fD
 
 HRESULT CEndingAlice::Adjust_AnimMovedTransform(_double fDeltatime)
 {
-	if (!m_bSpwanAnimFinished) return S_FALSE;
+	if (!m_bSpwanAnimStart) return S_FALSE;
 
 	_uint iNowAnimIndex = m_pModel->Get_NowAnimIndex();
 	_double PlayRate = m_pModel->Get_PlayRate();
