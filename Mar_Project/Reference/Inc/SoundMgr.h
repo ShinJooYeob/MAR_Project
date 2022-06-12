@@ -20,7 +20,7 @@ public:
 	_int  Channel_VolumeDown(CHANNELID eID, _float _vol);
 	_int  Channel_Pause(CHANNELID eID);
 
-	HRESULT PlaySound(TCHAR* pSoundKey, CHANNELID eID, _float fLouderMultiple = 1.f);
+	HRESULT PlaySound(TCHAR* pSoundKey, CHANNELID eID, _float4x4 WorldMatrix, _float fLouderMultiple = 1.f);
 	HRESULT PlayBGM(TCHAR* pSoundKey, _float fLouderMultiple = 1.f);
 
 	void Stop_ChannelSound(CHANNELID eID);
@@ -33,6 +33,7 @@ private:
 	_double	m_fPassedTimeArr[32];
 	_float	m_VolumeArr[CHANNEL_MAXCHANNEL];
 	_bool	m_PauseArr[CHANNEL_MAXCHANNEL];
+	SOUNDDESC m_tSoundDesc[CHANNEL_MAXCHANNEL];
 	//FMOD_BOOL m_bool;
 
 private:
@@ -46,6 +47,7 @@ private:
 	// 사운드 ,채널 객체 및 장치를 관리하는 객체 
 	FMOD_SYSTEM* m_pSystem;
 	const _uint		m_iNumOfEachChannel;
+	class CPipeLineMgr*		m_pPipeLineMgr= nullptr;
 public:
 	virtual void Free() override;
 };

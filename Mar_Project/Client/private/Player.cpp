@@ -89,7 +89,7 @@ _int CPlayer::Update(_double fDeltaTime)
 
 	if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
 	{	
-		GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[5]);
+		g_pGameInstance->PlaySoundW(L"beat.wav", CHANNEL_OBJECT, m_pTransformCom->Get_WorldMatrix(), 0.3f);
 
 	}
 	//if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)

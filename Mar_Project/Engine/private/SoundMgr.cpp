@@ -1,8 +1,10 @@
 
 #include "..\Public\SoundMgr.h"
-
+#include "PipeLineMgr.h"
 
 IMPLEMENT_SINGLETON(CSoundMgr)
+
+#define FMOD_VelocityVector _float3(0.f,0.f,0.f)
 
 CSoundMgr::CSoundMgr()
 	:m_iNumOfEachChannel(_uint(31 / (CHANNEL_MAXCHANNEL - 1)))
@@ -20,15 +22,43 @@ HRESULT CSoundMgr::Initialize_FMOD()
 		m_VolumeArr[i] = SOUND_DEFAULT;
 	}
 
+
+	FMOD_System_Set3DNumListeners(m_pSystem, 1);
+	FMOD_System_Set3DSettings(m_pSystem, 1, 1, 1);
+
+
+
+
 	ZeroMemory(m_PauseArr, sizeof(_bool)*CHANNEL_MAXCHANNEL);
 	ZeroMemory(m_fPassedTimeArr, sizeof(_double) * 32);
+
+	m_pPipeLineMgr = GetSingle(CPipeLineMgr);
+	NULL_CHECK_RETURN(m_pPipeLineMgr, E_FAIL);
+	Safe_AddRef(m_pPipeLineMgr);
+
+	FMOD_System_Update(m_pSystem);
 
 	return LoadSoundFile();
 }
 
 HRESULT CSoundMgr::Update_FMOD(_double fTimeDelta)
 {
+	FMOD_3D_ATTRIBUTES listener;
+	_float4x4 ViewMat = m_pPipeLineMgr->Get_Transform_Float4x4(PLM_VIEW);
+	listener = ViewMat.Get_FModValue_ByInverseMatrix(FMOD_VelocityVector);
+	
+
+	// FMOD로 보낸다 (0 = 리스너는 하나)
+	FMOD_System_Set3DListenerAttributes(m_pSystem, 0, &listener.position, &listener.velocity, &listener.forward, &listener.up);
+
+	//FMOD_Channel_Set3DAttributes()
+
 	FMOD_System_Update(m_pSystem);
+
+	//FMOD_RESULT F_API FMOD_System_Set3DNumListeners(FMOD_SYSTEM *system, int numlisteners);
+	//FMOD_RESULT F_API FMOD_System_Get3DNumListeners(FMOD_SYSTEM *system, int *numlisteners);
+	//FMOD_RESULT F_API FMOD_System_Set3DListenerAttributes(FMOD_SYSTEM *system, int listener, const FMOD_VECTOR *pos, const FMOD_VECTOR *vel, const FMOD_VECTOR *forward, const FMOD_VECTOR *up);
+	//FMOD_RESULT F_API FMOD_System_Get3DListenerAttributes
 
 	FMOD_BOOL bPlay = FALSE;
 
@@ -39,9 +69,21 @@ HRESULT CSoundMgr::Update_FMOD(_double fTimeDelta)
 			if (FMOD_Channel_IsPlaying(m_pChannelArr[i], &bPlay))
 				m_fPassedTimeArr[i] = 0;
 			else
+			{
+				_float fLength = m_tSoundDesc[i].vPosition.Get_Distance(XMVectorSet(listener.position.x, listener.position.y, listener.position.z, 0));
+
+				
+
+				FMOD_Channel_SetVolume(m_pChannelArr[i],( 1 - max(min(fLength, m_tSoundDesc[i].vMinMax.y) - m_tSoundDesc[i].vMinMax.x, 0) / (m_tSoundDesc[i].vMinMax.y - m_tSoundDesc[i].vMinMax.x)));
+				
+			
+
 				m_fPassedTimeArr[i] += fTimeDelta;
+			}
 		}
 	}
+
+	FMOD_System_Update(m_pSystem);
 
 	return S_OK;
 }
@@ -119,7 +161,7 @@ int CSoundMgr::Channel_Pause(CHANNELID eID)
 
 
 
-HRESULT CSoundMgr::PlaySound(TCHAR * pSoundKey, CHANNELID eID, _float fLouderMultiple)
+HRESULT CSoundMgr::PlaySound(TCHAR * pSoundKey, CHANNELID eID, _float4x4 WorldMatrix ,_float fLouderMultiple)
 {
 	if (eID == CHANNEL_BGM)
 		return E_FAIL;
@@ -150,6 +192,18 @@ HRESULT CSoundMgr::PlaySound(TCHAR * pSoundKey, CHANNELID eID, _float fLouderMul
 			FMOD_Channel_SetVolume(m_pChannelArr[i], m_VolumeArr[eID]* fLouderMultiple);
 			m_fPassedTimeArr[i] = 0.1f;
 
+			FMOD_3D_ATTRIBUTES SoundEvent;
+			SoundEvent = WorldMatrix.Get_FModValue_ByMatrix(FMOD_VelocityVector);
+			// FMOD로 보낸다 (0 = 리스너는 하나)
+
+			SOUNDDESC tDesc;
+			m_tSoundDesc[i].fTargetSound = fLouderMultiple;
+			m_tSoundDesc[i].vMinMax = _float2(1,5);
+			m_tSoundDesc[i].vPosition = *(_float3*)(WorldMatrix.m[3]);
+
+			FMOD_Channel_Set3DAttributes(m_pChannelArr[i], &SoundEvent.position, &SoundEvent.velocity);
+			FMOD_Channel_Set3DMinMaxDistance(m_pChannelArr[i], 1.f, 5.f);
+
 
 			FMOD_System_Update(m_pSystem);
 			return S_OK;
@@ -172,6 +226,14 @@ HRESULT CSoundMgr::PlaySound(TCHAR * pSoundKey, CHANNELID eID, _float fLouderMul
 	FMOD_Channel_SetVolume(m_pChannelArr[fOldSoundIndx], m_VolumeArr[eID] * fLouderMultiple);
 
 	m_fPassedTimeArr[fOldSoundIndx]  = 0.1f;
+
+
+	FMOD_3D_ATTRIBUTES SoundEvent;
+	SoundEvent = WorldMatrix.Get_FModValue_ByMatrix(FMOD_VelocityVector);
+	// FMOD로 보낸다 (0 = 리스너는 하나)
+	FMOD_Channel_Set3DAttributes(m_pChannelArr[fOldSoundIndx], &SoundEvent.position, &SoundEvent.velocity);
+	FMOD_Channel_Set3DMinMaxDistance(m_pChannelArr[fOldSoundIndx], 1.f, 5.f);
+
 	FMOD_System_Update(m_pSystem);
 	return S_OK;
 
@@ -275,6 +337,8 @@ HRESULT CSoundMgr::LoadSoundFile()
 
 void CSoundMgr::Free()
 {
+	Safe_Release(m_pPipeLineMgr);
+
 	for (auto& Mypair : m_mapSound)
 	{
 		delete[] Mypair.first;

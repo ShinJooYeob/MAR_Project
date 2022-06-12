@@ -108,6 +108,65 @@ namespace Engine
 		XMMATRIX Multiply(const FXMMATRIX& _XMatrix)
 		{	return XMMatrixMultiply(this->XMatrix(), _XMatrix);	}
 
+
+
+		FMOD_3D_ATTRIBUTES Get_FModValue_ByInverseMatrix(XMFLOAT3 vVelocity = XMFLOAT3(0,0,0))
+		{
+			FMOD_3D_ATTRIBUTES out;
+
+			ZeroMemory(&out, sizeof(FMOD_3D_ATTRIBUTES));
+
+			_float4x4 TempMat = this->InverseXMatrix();
+
+			out.up.x = TempMat._21;
+			out.up.y = TempMat._22;
+			out.up.z = TempMat._23;
+
+			out.forward.x = TempMat._31;
+			out.forward.y = TempMat._32;
+			out.forward.z = TempMat._33;
+
+			out.position.x = TempMat._41;
+			out.position.y = TempMat._42;
+			out.position.z = TempMat._43;
+
+			out.velocity.x = vVelocity.x;
+			out.velocity.y = vVelocity.y;
+			out.velocity.z = vVelocity.z;
+			
+			return out;
+
+		}
+
+		FMOD_3D_ATTRIBUTES Get_FModValue_ByMatrix(XMFLOAT3 vVelocity = XMFLOAT3(0, 0, 0))
+		{
+			FMOD_3D_ATTRIBUTES out;
+
+			ZeroMemory(&out, sizeof(FMOD_3D_ATTRIBUTES));
+
+			_float4x4 TempMat = this->XMatrix();
+	
+			out.up.x = TempMat._21;
+			out.up.y = TempMat._22;
+			out.up.z = TempMat._23;
+
+			out.forward.x = TempMat._31;
+			out.forward.y = TempMat._32;
+			out.forward.z = TempMat._33;
+
+			out.position.x = TempMat._41;
+			out.position.y = TempMat._42;
+			out.position.z = TempMat._43;
+
+			out.velocity.x = vVelocity.x;
+			out.velocity.y = vVelocity.y;
+			out.velocity.z = vVelocity.z;
+
+
+			return out;
+
+		}
+
 	};
 	struct tagMyFloat4 : public XMFLOAT4
 	{
@@ -169,6 +228,7 @@ namespace Engine
 		{
 			return XMVector4Transform(this->XMVector(), _XMatrix);
 		}
+
 
 	};
 	struct tagMyFloat3 : public XMFLOAT3
