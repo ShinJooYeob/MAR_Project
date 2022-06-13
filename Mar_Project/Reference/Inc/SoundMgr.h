@@ -20,8 +20,8 @@ public:
 	_int  Channel_VolumeDown(CHANNELID eID, _float _vol);
 	_int  Channel_Pause(CHANNELID eID);
 
-	HRESULT PlaySound(TCHAR* pSoundKey, CHANNELID eID, _float4x4 WorldMatrix, _float fLouderMultiple = 1.f);
-	HRESULT PlayBGM(TCHAR* pSoundKey, _float fLouderMultiple = 1.f);
+	HRESULT PlaySound(const _tchar* pSoundKey, CHANNELID eID, SOUNDDESC* tSoundDesc, SOUNDDESC** pOutDesc);
+	HRESULT PlayBGM(const _tchar* pSoundKey, _float fLouderMultiple = 1.f);
 
 	void Stop_ChannelSound(CHANNELID eID);
 	void Stop_AllChannel();
@@ -33,7 +33,9 @@ private:
 	_double	m_fPassedTimeArr[32];
 	_float	m_VolumeArr[CHANNEL_MAXCHANNEL];
 	_bool	m_PauseArr[CHANNEL_MAXCHANNEL];
-	SOUNDDESC m_tSoundDesc[CHANNEL_MAXCHANNEL];
+	SOUNDDESC m_tSoundDesc[32];
+	_float3 m_ListenerPosition;
+
 	//FMOD_BOOL m_bool;
 
 private:
@@ -48,6 +50,7 @@ private:
 	FMOD_SYSTEM* m_pSystem;
 	const _uint		m_iNumOfEachChannel;
 	class CPipeLineMgr*		m_pPipeLineMgr= nullptr;
+	class CEasingMgr*		m_pEasingMgr = nullptr;
 public:
 	virtual void Free() override;
 };

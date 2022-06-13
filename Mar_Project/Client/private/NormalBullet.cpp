@@ -49,6 +49,22 @@ HRESULT CNormalBullet::Initialize_Clone(void * pArg)
 
 	m_szNameTag = L"Layer_NormalBullet";
 
+
+	{
+		SOUNDDESC tSoundDesc;
+
+		tSoundDesc.pTransform = m_pTransformCom;
+		tSoundDesc.vMinMax = _float2(5, 40);
+		tSoundDesc.fTargetSound = 1.f;
+		wstring SoundTrack = L"";
+
+		SoundTrack = L"Weapon_pepperg_projectile0" + to_wstring(rand() % 4 + 1) + L".ogg";
+
+		g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_EFFECT, &tSoundDesc);
+
+
+	}
+
 	return S_OK;
 }
 

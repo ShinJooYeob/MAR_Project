@@ -4,7 +4,8 @@
 #include "BreakableObj.h"
 #include "Terrain.h"
 
-
+#define MinSoundRange 5
+#define MaxSoundRange 40
 
 CGrenadeBullet::CGrenadeBullet(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
 	:CBullet(pDevice,pDeviceContext)
@@ -55,11 +56,31 @@ HRESULT CGrenadeBullet::Initialize_Clone(void * pArg)
 
 	FAILED_CHECK(Ready_ParticleDesc());
 
+
+	{
+		SOUNDDESC tSoundDesc;
+
+		tSoundDesc.pTransform = m_pTransformCom;
+		tSoundDesc.vMinMax = _float2(MinSoundRange, MaxSoundRange);
+		tSoundDesc.fTargetSound = 0.7f;
+		tSoundDesc.iIdentificationNumber = 3;
+		tSoundDesc.bFollowTransform = true;
+		wstring SoundTrack = L"";
+
+		SoundTrack = L"MapObject_tank_flame_loop.ogg";
+
+		FAILED_CHECK(g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_EFFECT, &tSoundDesc, &m_pSoundDesc));
+
+
+	}
+
+
 	return S_OK;
 }
 
 void CGrenadeBullet::Set_IsDead()
 {
+
 	m_pTransformCom->Set_IsOwnerDead();
 	m_bIsDead = true;
 }
@@ -134,6 +155,24 @@ _int CGrenadeBullet::Update(_double fDeltaTime)
 
 		if (m_fLifeTime > m_fTotalLifeTime && !m_bDeadAnimStart)
 		{
+			if (m_pSoundDesc && m_pSoundDesc->iIdentificationNumber == 3)
+				m_pSoundDesc->bStopSoundNow = true;
+			{
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+				tSoundDesc.vMinMax = _float2(MinSoundRange, MaxSoundRange);
+
+				tSoundDesc.fTargetSound = 1.f;
+				wstring SoundTrack = L"";
+
+
+				SoundTrack = L"Weapon_teacannon_explode0" + to_wstring(rand() % 2 + 1) + L".ogg";;
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_EFFECT, &tSoundDesc);
+			}
+
+
 			m_bDeadAnimStart = true;
 			m_DeadAnimPassedTime = 0;
 		}
@@ -245,6 +284,23 @@ void CGrenadeBullet::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConf
 			m_bIsHit = true;
 			if (!m_bDeadAnimStart)
 			{
+				if (m_pSoundDesc && m_pSoundDesc->iIdentificationNumber == 3)
+					m_pSoundDesc->bStopSoundNow = true;
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+					tSoundDesc.vMinMax = _float2(MinSoundRange, MaxSoundRange);
+					tSoundDesc.fTargetSound = 1.f;
+					wstring SoundTrack = L"";
+
+
+					SoundTrack = L"Weapon_teacannon_explode0" + to_wstring(rand() % 2 + 1) + L".ogg";;
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_EFFECT, &tSoundDesc);
+				}
+
+
 				m_bDeadAnimStart = true;
 				m_DeadAnimPassedTime = 0;
 			}
@@ -259,6 +315,23 @@ void CGrenadeBullet::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConf
 			m_bIsHit = true;
 			if (!m_bDeadAnimStart)
 			{
+				if (m_pSoundDesc && m_pSoundDesc->iIdentificationNumber == 3)
+					m_pSoundDesc->bStopSoundNow = true;
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+					tSoundDesc.vMinMax = _float2(MinSoundRange, MaxSoundRange);
+					tSoundDesc.fTargetSound = 1.f;
+					wstring SoundTrack = L"";
+
+
+					SoundTrack = L"Weapon_teacannon_explode0" + to_wstring(rand() % 2 + 1) + L".ogg";;
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_EFFECT, &tSoundDesc);
+				}
+
+
 				m_bDeadAnimStart = true;
 				m_DeadAnimPassedTime = 0;
 			}
@@ -291,6 +364,24 @@ HRESULT CGrenadeBullet::Set_Player_On_Terrain()
 
 	if (eNowTile == Tile_None || eNowTile == Tile_DynamicNoneTile || bIsOn)
 	{
+		if (m_pSoundDesc && m_pSoundDesc->iIdentificationNumber == 3)
+			m_pSoundDesc->bStopSoundNow = true;
+		{
+			SOUNDDESC tSoundDesc;
+
+			tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+			tSoundDesc.vMinMax = _float2(MinSoundRange, MaxSoundRange);
+
+			tSoundDesc.fTargetSound = 1.f;
+			wstring SoundTrack = L"";
+
+
+			SoundTrack = L"Weapon_teacannon_explode0" + to_wstring(rand() % 2 + 1) + L".ogg";;
+
+			g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_EFFECT, &tSoundDesc);
+		}
+
+
 		m_bDeadAnimStart = true;
 		m_DeadAnimPassedTime = 0;
 	}

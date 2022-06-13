@@ -89,7 +89,19 @@ _int CPlayer::Update(_double fDeltaTime)
 
 	if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
 	{	
-		g_pGameInstance->PlaySoundW(L"beat.wav", CHANNEL_OBJECT, m_pTransformCom->Get_WorldMatrix(), 0.3f);
+
+		Eat_Protain();
+
+
+
+		//SOUNDDESC tSoundDesc;
+
+		//tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+		//tSoundDesc.vMinMax = _float2(3, 10);
+		//tSoundDesc.fTargetSound = 0.5f;
+
+
+		//g_pGameInstance->PlaySoundW(L"beat.wav", CHANNEL_OBJECT, &tSoundDesc);
 
 	}
 	//if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
@@ -98,7 +110,10 @@ _int CPlayer::Update(_double fDeltaTime)
 	//	Eat_Protain();
 	//}
 
-
+	if (g_pGameInstance->Get_DIKeyState(DIK_2)&DIS_Down)
+	{
+		Set_GettingBigger(false);
+	}
 
 
 
@@ -296,6 +311,21 @@ void CPlayer::Add_Dmg_to_Player(_uint iDmgAmount)
 
 	if (m_bIsAttached || m_bSlide )return;
 
+	
+
+	{
+		SOUNDDESC tSoundDesc;
+
+		tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+		tSoundDesc.vMinMax = _float2(3, 10);
+		tSoundDesc.fTargetSound = 0.5f;
+		wstring SoundTrack = L"";
+
+		SoundTrack = L"Player_damaged0" + to_wstring(rand() % 9 + 1) + L".ogg";
+
+		g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+	}
+
 	switch (m_eNowWeapon)
 	{
 	case Client::CPlayer::Weapon_None:
@@ -470,7 +500,7 @@ void CPlayer::Heal_to_Player(_uint iDmgAmount)
 
 void CPlayer::Change_Weapon(_uint WeaponIndex)
 {
-
+	if(m_pUmbSoundDesc) m_pUmbSoundDesc->bStopSoundNow = true;
 
 	switch (WeaponIndex)
 	{
@@ -730,6 +760,20 @@ void CPlayer::Set_PlayerDeadAnimStart()
 
 	);
 
+
+	{
+		SOUNDDESC tSoundDesc;
+
+		tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+		tSoundDesc.vMinMax = _float2(3, 10);
+		tSoundDesc.fTargetSound = 0.5f;
+		wstring SoundTrack = L"";
+
+		SoundTrack = L"Player_death_combat0" + to_wstring(rand() % 4 + 1) + L".ogg";
+
+		g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+	}
+
 	m_pModel->Change_AnimIndex_ReturnTo_Must(37, 37, 0.15f, true);
 	m_bAliceDeathAnimStart = true;
 	m_DeathAnimPassedTime = 0;
@@ -763,6 +807,28 @@ void CPlayer::Set_UmbrellaReflected(_bool bBool, _float3 vPosition, _float3 vLoo
 	m_vecWeapon[m_iWeaponModelIndex]->Set_AttackAble(false);
 	m_pModel->Change_AnimIndex_ReturnTo_Must(Weapon_Umbrella + 4, Weapon_Umbrella + 1, 0, true);
 	m_pModel->Add_Time_To_NowAnimPlayAcc(0.15);
+
+
+	{
+		SOUNDDESC tSoundDesc;
+
+		tSoundDesc.vPosition = vPosition;
+		tSoundDesc.vMinMax = _float2(1, 10);
+		tSoundDesc.fTargetSound = 0.5f;
+		tSoundDesc.bFollowTransform = true;
+		wstring SoundTrack = L"";
+
+		//SoundTrack = L"MapObject_mushroom_wind0" + to_wstring(rand() % 5 + 1) + L".ogg";
+		SoundTrack = L"Player_umb_deflect.ogg";
+
+		g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+	}
+
+
+
+
+
+
 }
 
 HRESULT CPlayer::Update_EattingProtein(_double fDeltatime)
@@ -853,19 +919,157 @@ HRESULT CPlayer::Update_EattingProtein(_double fDeltatime)
 		g_pGameInstance->Add_GameObject_To_Layer(SCENE_STATIC, TAG_LAY(Layer_StaticMapObj), TAG_OP(Prototype_EatableProtein), &tWeaponDesc);
 		m_iProteinChecker++;
 	}
-	else if (m_iProteinChecker == 3 && m_ProteinPassedTime > 6.5f)
+	else if (m_iProteinChecker == 3 && m_ProteinPassedTime > 1.6f)
+	{
+		{
+			SOUNDDESC tSoundDesc;
+
+			tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+			tSoundDesc.vMinMax = _float2(10000000.f, 10000000.f);
+			tSoundDesc.fTargetSound = 0.20f;
+			wstring SoundTrack = L"";
+
+			SoundTrack = L"MapObject_doowmcom_move0" + to_wstring(rand() % 2 + 7) + L".ogg";
+			//SoundTrack = L"c2_boatride_shark.ogg";
+
+			g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+		}
+		m_iProteinChecker++;
+
+
+	}
+	else if (m_iProteinChecker == 4 && m_ProteinPassedTime > 2.1f)
+	{
+		{
+			SOUNDDESC tSoundDesc;
+
+			tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+			tSoundDesc.vMinMax = _float2(10000000.f, 10000000.f);
+			tSoundDesc.fTargetSound = 0.20f;
+			wstring SoundTrack = L"";
+
+			SoundTrack = L"MapObject_doowmcom_move0" + to_wstring(rand() % 2 + 7) + L".ogg";
+			//SoundTrack = L"c2_boatride_shark.ogg";
+
+			g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+		}
+		m_iProteinChecker++;
+
+
+	}
+	else if (m_iProteinChecker == 5 && m_ProteinPassedTime > 2.6f)
+	{
+		{
+			SOUNDDESC tSoundDesc;
+
+			tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+			tSoundDesc.vMinMax = _float2(10000000.f, 10000000.f);
+			tSoundDesc.fTargetSound = 0.20f;
+			wstring SoundTrack = L"";
+
+			SoundTrack = L"MapObject_doowmcom_move0" + to_wstring(rand() % 2 + 7) + L".ogg";
+			//SoundTrack = L"c2_boatride_shark.ogg";
+
+			g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+		}
+		m_iProteinChecker++;
+
+
+	}
+	else if (m_iProteinChecker == 6 && m_ProteinPassedTime > 3.1f)
+	{
+		{
+			SOUNDDESC tSoundDesc;
+
+			tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+			tSoundDesc.vMinMax = _float2(10000000.f, 10000000.f);
+			tSoundDesc.fTargetSound = 0.20f;
+			wstring SoundTrack = L"";
+
+			SoundTrack = L"MapObject_doowmcom_move0" + to_wstring(rand() % 2 + 7) + L".ogg";
+			//SoundTrack = L"c2_boatride_shark.ogg";
+
+			g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+		}
+		m_iProteinChecker++;
+
+
+	}
+	else if (m_iProteinChecker == 7 && m_ProteinPassedTime > 3.6f)
+	{
+		{
+			SOUNDDESC tSoundDesc;
+
+			tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+			tSoundDesc.vMinMax = _float2(10000000.f, 10000000.f);
+			tSoundDesc.fTargetSound = 0.20f;
+			wstring SoundTrack = L"";
+
+			SoundTrack = L"MapObject_doowmcom_move0" + to_wstring(rand() % 2 + 7) + L".ogg";
+			//SoundTrack = L"c2_boatride_shark.ogg";
+
+			g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+		}
+		{
+			SOUNDDESC tSoundDesc;
+
+			tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+			tSoundDesc.vMinMax = _float2(10000000.f, 10000000.f);
+			tSoundDesc.fTargetSound = 0.20f;
+			wstring SoundTrack = L"";
+
+			SoundTrack = L"Burp_sound_effect.mp3";
+			//SoundTrack = L"c2_boatride_shark.ogg";
+
+			FAILED_CHECK(g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc));
+		}
+
+		m_iProteinChecker++;
+
+
+	}
+
+
+	else if (m_iProteinChecker == 8 && m_ProteinPassedTime > 6.5f)
 	{
 		GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeOutIn, 1, _float4(0, 0, 0, 1));
+
+
 		m_iProteinChecker++;
 
 	}
-	else if (m_iProteinChecker == 4 && m_ProteinPassedTime > 7.f)
+	else if (m_iProteinChecker == 9 && m_ProteinPassedTime > 6.75f)
 	{
+
+		{
+			SOUNDDESC tSoundDesc;
+
+			tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+			tSoundDesc.vMinMax = _float2(10000000.f, 10000000.f);
+			tSoundDesc.fTargetSound = 1.f;
+			wstring SoundTrack = L"";
+
+			SoundTrack = L"MapObject_Rock_Big_Fall_02.ogg";
+			//SoundTrack = L"c2_boatride_shark.ogg";
+
+			g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+		}
+		m_iProteinChecker++;
+
+	}
+	else if (m_iProteinChecker == 10 && m_ProteinPassedTime > 7.f)
+	{
+
+
+		GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 2.25f, _float4(0.8f));
 
 		Set_GettingBigger(true);
 
 		m_pModel->Set_BlockAnim(false);
 		m_bEattingProteinStart = false;
+
+
+
 		m_iProteinChecker++;
 	}
 
@@ -1211,6 +1415,15 @@ HRESULT CPlayer::Renew_Player(_float3 Position , _float3 ReturnLookAt)
 	m_GiantingPassedTime = FLT_MAX;
 	m_bIsVenting = false;
 
+	SOUNDDESC tSoundDesc;
+
+	tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+	tSoundDesc.vMinMax = _float2(3, 10);
+	tSoundDesc.fTargetSound = 0.5f;
+
+
+	g_pGameInstance->PlaySoundW(L"Player_death_respawn.ogg", CHANNEL_PLAYER, &tSoundDesc);
+
 	return S_OK;
 }
 
@@ -1319,6 +1532,20 @@ void CPlayer::Set_GettingBigger(_bool bBool)
 
 		m_bGettingBigger = false;
 		m_GiantingPassedTime = 0;
+
+		{
+			SOUNDDESC tSoundDesc;
+
+			tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+			tSoundDesc.vMinMax = _float2(10000000.f, 10000000.f);
+			tSoundDesc.fTargetSound = 1.f;
+			wstring SoundTrack = L"";
+
+			//SoundTrack = L"Player_giant_step0" + to_wstring(rand() % 3 + 1) + L".ogg";
+			SoundTrack = L"MapObject_cat_dissappear01.ogg";
+
+			g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+		}
 	}
 
 }
@@ -1855,9 +2082,56 @@ HRESULT CPlayer::TrappedbyFlower_Update(_double fDeltaTime, CGameInstance * pIns
 			m_pTransformCom->Scaled_All(_float3(m_fSmallScale));
 			m_pTransformCom->Set_MoveSpeed(PlayerMoveSpeed * m_fSmallScale);
 		}
+		else
+		{
+			m_fSmallPassedTime += _float(fDeltaTime);
+
+			if (m_fSmallPassedTime > 2.3f)
+			{
+				m_fSmallPassedTime = 0.3f;
+
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+				tSoundDesc.vMinMax = _float2(3, 10);
+				tSoundDesc.fTargetSound = 0.5f;
+				wstring SoundTrack = L"";
+
+				SoundTrack = L"Player_hiccup0" + to_wstring(rand() % 4 + 1) + L".ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+			}
+		}
 
 		if ((pInstance->Get_DIKeyState(DIK_SPACE) & DIS_Down) || (pInstance->Get_DIKeyState(DIK_LSHIFT) & DIS_Down))
 		{
+			{
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+				tSoundDesc.vMinMax = _float2(3, 10);
+				tSoundDesc.fTargetSound = 0.5f;
+				wstring SoundTrack = L"";
+
+				SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+			}
+			
+			{
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+				tSoundDesc.vMinMax = _float2(3, 10);
+				tSoundDesc.fTargetSound = 0.5f;
+				wstring SoundTrack = L"";
+
+				SoundTrack = L"MapObject_shrinkflower_pop.ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+			}
+
+
 			m_fSmallPassedTime = 0;
 			m_bTrappedbyFlower = false;
 		}
@@ -1906,6 +2180,20 @@ HRESULT CPlayer::Smalling_Update(_double fDeltaTime, CGameInstance* pInstance)
 
 			if (!m_pModel->Get_IsHavetoBlockAnimChange())
 			{
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+					tSoundDesc.vMinMax = _float2(3, 10);
+					tSoundDesc.fTargetSound = 0.5f;
+					wstring SoundTrack = L"";
+
+					SoundTrack = L"Player_shrink0" + to_wstring(rand() % 3 + 1) + L".ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+				}
+
+
 				m_fSmallPassedTime = 0;
 				m_pModel->Change_AnimIndex_ReturnTo(9, 0, 0.15, true);
 			}
@@ -1914,6 +2202,19 @@ HRESULT CPlayer::Smalling_Update(_double fDeltaTime, CGameInstance* pInstance)
 		{
 			if (!m_pModel->Get_IsHavetoBlockAnimChange())
 			{
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+					tSoundDesc.vMinMax = _float2(3, 10);
+					tSoundDesc.fTargetSound = 0.5f;
+					wstring SoundTrack = L"";
+
+					SoundTrack = L"Player_unshrink0" + to_wstring(rand() % 2 + 1) + L".ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+				}
+
 				m_fSmallPassedTime = 0;
 				m_pModel->Change_AnimIndex_ReturnTo(9, 0, 0.15, true);
 			}
@@ -1937,7 +2238,26 @@ HRESULT CPlayer::Smalling_Update(_double fDeltaTime, CGameInstance* pInstance)
 				m_pTransformCom->Scaled_All(_float3(m_fSmallScale));
 				m_pTransformCom->Set_MoveSpeed(PlayerMoveSpeed * m_fSmallScale);
 			}
+			else
+			{
+				m_fSmallPassedTime += _float(fDeltaTime);
 
+				if (m_fSmallPassedTime > 2.3f)
+				{
+					m_fSmallPassedTime = 0.3f;
+
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+					tSoundDesc.vMinMax = _float2(3, 10);
+					tSoundDesc.fTargetSound = 0.5f;
+					wstring SoundTrack = L"";
+
+					SoundTrack = L"Player_hiccup0" + to_wstring(rand() % 4 + 1) + L".ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+				}
+			}
 		}
 	}
 
@@ -2017,6 +2337,11 @@ HRESULT CPlayer::Move_Update(_double fDeltaTime, CGameInstance* pInstance)
 
 HRESULT CPlayer::Jump_Update(_double fDeltaTime, CGameInstance* pInstance)
 {
+
+	static SOUNDDESC* tJumWindSoundDesc = nullptr;
+	if (tJumWindSoundDesc != nullptr && tJumWindSoundDesc->iIdentificationNumber == 1)
+		tJumWindSoundDesc->bFollowTransform = false;
+
 	if (!m_pModel->Get_IsHavetoBlockAnimChange())
 	{
 		if (m_iJumpCount < 3 && !m_fDashPassedTime && pInstance->Get_DIKeyState(DIK_SPACE) & DIS_Down)
@@ -2024,6 +2349,27 @@ HRESULT CPlayer::Jump_Update(_double fDeltaTime, CGameInstance* pInstance)
 			Add_JumpForce(PlayerMaxJumpPower * m_fSmallScale);
 
 			_uint iJumpIndex = (m_iJumpCount) ? 1: 0;
+
+			{
+				if (tJumWindSoundDesc)tJumWindSoundDesc->bStopSoundNow = true;
+
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+				tSoundDesc.vMinMax = _float2(3, 10);
+				tSoundDesc.fTargetSound = 0.5f;
+				wstring SoundTrack = L"";
+				if (m_iJumpCount)
+				{
+					SoundTrack = L"Player_jump_double0" + to_wstring(rand() % 3 + 1) + L".ogg";
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_EFFECT, &tSoundDesc);
+				}
+
+				SoundTrack = L"Player_jump0" + to_wstring(rand() % 6 + 1) + L".ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+			}
+
 			m_pModel->Change_AnimIndex_UntilTo(15 + iJumpIndex * 5, 17 + iJumpIndex * 5, 0.08);
 
 			if (m_iJumpCount)
@@ -2061,8 +2407,29 @@ HRESULT CPlayer::Jump_Update(_double fDeltaTime, CGameInstance* pInstance)
 			static _double particleTimeInterver = 0;
 			particleTimeInterver += fDeltaTime;
 
-			if (particleTimeInterver > 0.2)
+			if (particleTimeInterver > 0.25)
 			{
+				{
+					if (tJumWindSoundDesc == nullptr || tJumWindSoundDesc->iIdentificationNumber != 1)
+					{
+						SOUNDDESC tSoundDesc;
+
+						tSoundDesc.pTransform = m_pTransformCom;
+						tSoundDesc.vMinMax = _float2(1, 10);
+						tSoundDesc.fTargetSound = 0.12f;
+						tSoundDesc.iIdentificationNumber = 1;
+						tSoundDesc.bFollowTransform = true;
+						wstring SoundTrack = L"";
+
+						//SoundTrack = L"MapObject_mushroom_wind0" + to_wstring(rand() % 5 + 1) + L".ogg";
+						SoundTrack = L"london_l5_wooddoor_wind.ogg";
+
+						g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc, &tJumWindSoundDesc);
+					}
+					tJumWindSoundDesc->bFollowTransform = true;
+
+				}
+
 
 				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[2]);
 				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[4]);
@@ -2126,6 +2493,20 @@ HRESULT CPlayer::Dash_Update(_double fDeltaTime, CGameInstance* pInstance, _floa
 			break;
 		default:
 			break;
+		}
+
+
+		{
+			SOUNDDESC tSoundDesc;
+
+			tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+			tSoundDesc.vMinMax = _float2(5.f, 15.f);
+			tSoundDesc.fTargetSound = 0.25f;
+			wstring SoundTrack = L"";
+
+			SoundTrack = L"Player_dodge_out.ogg";
+
+			g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
 		}
 
 
@@ -2264,6 +2645,12 @@ HRESULT CPlayer::Plant_ClockBomb(_double fDeltaTime, CGameInstance * pInstance)
 
 HRESULT CPlayer::Lunch_Bullet(_double fDeltaTime, CGameInstance * pInstance)
 {
+
+	static SOUNDDESC* tGrindSoundDesc = nullptr;
+	if (tGrindSoundDesc != nullptr && tGrindSoundDesc->iIdentificationNumber == 2)
+		tGrindSoundDesc->bStopSoundNow = true;
+
+
 	
 	if (!m_bNeedToGrinderCooling  && pInstance->Get_DIMouseButtonState(CInput_Device::MBS_LBUTTON) & DIS_Press)
 	{
@@ -2271,14 +2658,62 @@ HRESULT CPlayer::Lunch_Bullet(_double fDeltaTime, CGameInstance * pInstance)
 		m_pModel->Change_AnimIndex(Weapon_Grinder + 8,0.15, true);
 		m_vecWeapon[m_iWeaponModelIndex]->Get_WeaponModel()->Change_AnimIndex(1,0.15);
 
+		if (tGrindSoundDesc == nullptr || tGrindSoundDesc->iIdentificationNumber != 2)
+		{
 
+			SOUNDDESC tSoundDesc;
+
+			tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+			tSoundDesc.vMinMax = _float2(3, 10);
+			tSoundDesc.fTargetSound = 0.25f;
+			tSoundDesc.iIdentificationNumber = 2;
+			tSoundDesc.bStopSoundNow = false;
+			wstring SoundTrack = L"";
+
+			SoundTrack = L"Weapon_pepperg_grind.ogg";
+			g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc, &tGrindSoundDesc);
+		}
+		tGrindSoundDesc->bStopSoundNow = false;
 
 		m_BulletNormalInterver -=fDeltaTime;
+
 		if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_LBUTTON) & DIS_Up)
 		{
 			m_vecWeapon[m_iWeaponModelIndex]->Get_WeaponModel()->Change_AnimIndex_ReturnTo_Must(3, 0,0.15,true);
 
 			m_BulletNormalInterver = 0;
+
+			if (tGrindSoundDesc != nullptr && !tGrindSoundDesc->bStopSoundNow && tGrindSoundDesc->iIdentificationNumber == 2)
+			{
+				tGrindSoundDesc->bStopSoundNow = true;
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+					tSoundDesc.vMinMax = _float2(3, 10);
+					tSoundDesc.fTargetSound = 0.075f;
+					wstring SoundTrack = L"";
+		
+					SoundTrack = L"Weapon_pepperg_endfire0" + to_wstring(rand() % 3 + 1) + L".ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+				} 
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = m_pTransformCom;
+					tSoundDesc.vMinMax = _float2(3, 10);
+					tSoundDesc.fTargetSound = 0.25f;
+					wstring SoundTrack = L"";
+
+					SoundTrack = L"Weapon_pepperg_off.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+
+				}
+
+			}
+
 		}
 
 		if (m_BulletNormalInterver < 0)
@@ -2294,6 +2729,8 @@ HRESULT CPlayer::Lunch_Bullet(_double fDeltaTime, CGameInstance * pInstance)
 			//_float3 vBulletDir = XMVector3Normalize(XMVector3TransformNormal(XMVectorSet(0, 0, 300, 0) - PlayerInVewSpace, pCamTransform->Get_WorldMatrix()));
 			//_float3 vBulletDir = XMVector3Normalize(vPlayerLook + XMVectorSet(0, -m_CamDegreeAngle.z * 0.1f, 0 , 0));
 
+
+
 			CTransform* pCamTransform = m_pMainCamera->Get_Camera_Transform();
 
 			
@@ -2306,6 +2743,20 @@ HRESULT CPlayer::Lunch_Bullet(_double fDeltaTime, CGameInstance * pInstance)
 
 			pInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Bullet), TAG_OP(Prototype_Bullet_Normal),	&vBulletDir);
 
+			{
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+				tSoundDesc.vMinMax = _float2(3, 10);
+				tSoundDesc.fTargetSound = 0.15f;
+				wstring SoundTrack = L"";
+
+				SoundTrack = L"Weapon_pepperg_fire0" + to_wstring(rand() % 6 + 1) + L".ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+
+
+			}
 			
 			 m_BulletNormalInterver = GetSingle(CUtilityMgr)->RandomFloat(0.15f, 0.2f);
 			 m_fGrinderCoolTime += m_BulletNormalInterver*PlayerGrinderCoolTime*0.8;
@@ -2316,13 +2767,93 @@ HRESULT CPlayer::Lunch_Bullet(_double fDeltaTime, CGameInstance * pInstance)
 				 m_vecWeapon[m_iWeaponModelIndex]->Get_WeaponModel()->Change_AnimIndex_ReturnTo_Must(3, 0, 0.15, true);
 				 m_fGrinderCoolTime = PlayerGrinderCoolTime;
 				 m_bNeedToGrinderCooling = true;
+
+				 if (tGrindSoundDesc != nullptr&& !tGrindSoundDesc->bStopSoundNow &&tGrindSoundDesc->iIdentificationNumber == 2)
+				 {
+					 tGrindSoundDesc->bStopSoundNow = true;
+					 {
+						 SOUNDDESC tSoundDesc;
+
+						 tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+						 tSoundDesc.vMinMax = _float2(3, 10);
+						 tSoundDesc.fTargetSound = 0.075f;
+						 wstring SoundTrack = L"";
+
+						 SoundTrack = L"Weapon_pepperg_endfire0" + to_wstring(rand() % 3 + 1) + L".ogg";
+
+						 g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+
+
+					 }
+					 {
+						 SOUNDDESC tSoundDesc;
+
+						 tSoundDesc.pTransform = m_pTransformCom;
+						 tSoundDesc.vMinMax = _float2(3, 10);
+						 tSoundDesc.fTargetSound = 0.25f;
+						 wstring SoundTrack = L"";
+
+						 SoundTrack = L"Weapon_pepperg_off.ogg";
+
+						 g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+						 
+					 }
+					 {
+						 SOUNDDESC tSoundDesc;
+
+						 tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+						 tSoundDesc.vMinMax = _float2(3, 10);
+						 tSoundDesc.fTargetSound = 0.25f;
+						 wstring SoundTrack = L"";
+
+						 SoundTrack = L"Weapon_pepperg_noammo.ogg";
+
+						 g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+						 
+
+					 }
+				 }
+
 			 }
 		}
 	}
 	else
 	{
+		if (tGrindSoundDesc != nullptr && !tGrindSoundDesc->bStopSoundNow && tGrindSoundDesc->iIdentificationNumber == 2)
+		{
+			tGrindSoundDesc->bStopSoundNow = true;
+
+			{
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+				tSoundDesc.vMinMax = _float2(3, 10);
+				tSoundDesc.fTargetSound = 0.075f;
+				wstring SoundTrack = L"";
+
+				SoundTrack = L"Weapon_pepperg_endfire0" + to_wstring(rand() % 3 + 1) + L".ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+			}
+			{
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.pTransform = m_pTransformCom;
+				tSoundDesc.vMinMax = _float2(3, 10);
+				tSoundDesc.fTargetSound = 0.25f;
+				wstring SoundTrack = L"";
+
+				SoundTrack = L"Weapon_pepperg_off.ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+
+			}
+		}
+
 		if (m_pModel->Get_NowAnimIndex() == Weapon_Grinder + 8)
 		{
+
+
 			m_pModel->Change_AnimIndex(Weapon_Grinder + 3);
 
 		}
@@ -2403,6 +2934,12 @@ HRESULT CPlayer::Move_Update_Horse(_double fDeltaTime, CGameInstance * pInstance
 
 HRESULT CPlayer::Jump_Update_Horse(_double fDeltaTime, CGameInstance * pInstance)
 {
+
+	static SOUNDDESC* tJumWindSoundDesc = nullptr;
+	if (tJumWindSoundDesc != nullptr && tJumWindSoundDesc->iIdentificationNumber == 1)
+		tJumWindSoundDesc->bFollowTransform = false;
+
+
 	if (!m_pModel->Get_IsHavetoBlockAnimChange())
 	{
 		if (m_iJumpCount < 3 && !m_fDashPassedTime&& pInstance->Get_DIKeyState(DIK_SPACE) & DIS_Down)
@@ -2410,6 +2947,26 @@ HRESULT CPlayer::Jump_Update_Horse(_double fDeltaTime, CGameInstance * pInstance
 			Add_JumpForce(PlayerMaxJumpPower * m_fSmallScale);
 
 			_uint iJumpIndex = (m_iJumpCount) ? 1 : 0;
+			{
+				if (tJumWindSoundDesc)tJumWindSoundDesc->bStopSoundNow = true;
+
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+				tSoundDesc.vMinMax = _float2(3, 10);
+				tSoundDesc.fTargetSound = 0.5f;
+				wstring SoundTrack = L"";
+				if (m_iJumpCount)
+				{
+					SoundTrack = L"Player_jump_double0" + to_wstring(rand() % 3 + 1) + L".ogg";
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_EFFECT, &tSoundDesc);
+				}
+
+				SoundTrack = L"Player_jump0" + to_wstring(rand() % 6 + 1) + L".ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+			}
+
 			m_pModel->Change_AnimIndex_UntilTo(15 + iJumpIndex * 5, 17 + iJumpIndex * 5, 0.08);
 
 
@@ -2448,8 +3005,29 @@ HRESULT CPlayer::Jump_Update_Horse(_double fDeltaTime, CGameInstance * pInstance
 			static _double particleTimeInterver = 0;
 			particleTimeInterver += fDeltaTime;
 
-			if (particleTimeInterver > 0.2)
+			if (particleTimeInterver > 0.25)
 			{
+				{
+					if (tJumWindSoundDesc == nullptr || tJumWindSoundDesc->iIdentificationNumber != 1)
+					{
+						SOUNDDESC tSoundDesc;
+
+						tSoundDesc.pTransform = m_pTransformCom;
+						tSoundDesc.vMinMax = _float2(1, 10);
+						tSoundDesc.fTargetSound = 0.12f;
+						tSoundDesc.iIdentificationNumber = 1;
+						tSoundDesc.bFollowTransform = true;
+						wstring SoundTrack = L"";
+
+						//SoundTrack = L"MapObject_mushroom_wind0" + to_wstring(rand() % 5 + 1) + L".ogg";
+						SoundTrack = L"london_l5_wooddoor_wind.ogg";
+
+						g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc, &tJumWindSoundDesc);
+					}
+					tJumWindSoundDesc->bFollowTransform = true;
+
+				}
+
 
 				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[2]);
 				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[4]);
@@ -2597,6 +3175,23 @@ HRESULT CPlayer::Attack_Update_Horse(_double fDeltaTime, CGameInstance * pInstan
 				m_bAtkMoveMentChecker[0] = true;
 				Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 10);
 
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = m_pTransformCom;
+					tSoundDesc.vMinMax = _float2(1, 10);
+					tSoundDesc.fTargetSound = 0.35f;
+					tSoundDesc.iIdentificationNumber = 1;
+					tSoundDesc.bFollowTransform = true;
+					wstring SoundTrack = L"";
+
+					SoundTrack = L"Weapon_hobby_attack01_0" + to_wstring(rand() % 4 + 1) + L".ogg";
+					//SoundTrack = L"london_l5_wooddoor_wind.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+				}
+
+
 			}
 
 			m_vecWeapon[m_iWeaponModelIndex]->Set_AttackAble(true);
@@ -2616,6 +3211,23 @@ HRESULT CPlayer::Attack_Update_Horse(_double fDeltaTime, CGameInstance * pInstan
 				m_bAtkMoveMentChecker[0] = true;
 				Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 10);
 
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = m_pTransformCom;
+					tSoundDesc.vMinMax = _float2(1, 10);
+					tSoundDesc.fTargetSound = 0.35f;
+					tSoundDesc.iIdentificationNumber = 1;
+					tSoundDesc.bFollowTransform = true;
+					wstring SoundTrack = L"";
+
+					SoundTrack = L"Weapon_hobby_attack01_0" + to_wstring(rand() % 4 + 1) + L".ogg";
+					//SoundTrack = L"london_l5_wooddoor_wind.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+				}
+
+
 			}
 
 			m_vecWeapon[m_iWeaponModelIndex]->Set_AttackAble(true);
@@ -2632,6 +3244,23 @@ HRESULT CPlayer::Attack_Update_Horse(_double fDeltaTime, CGameInstance * pInstan
 			{
 				m_bAtkMoveMentChecker[0] = true;
 				Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 10);		
+
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = m_pTransformCom;
+					tSoundDesc.vMinMax = _float2(1, 10);
+					tSoundDesc.fTargetSound = 0.35f;
+					tSoundDesc.iIdentificationNumber = 1;
+					tSoundDesc.bFollowTransform = true;
+					wstring SoundTrack = L"";
+
+					SoundTrack = L"Weapon_hobby_attack01_0" + to_wstring(rand() % 4 + 1) + L".ogg";
+					//SoundTrack = L"london_l5_wooddoor_wind.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+				}
+
 
 			}
 
@@ -2652,7 +3281,29 @@ HRESULT CPlayer::Attack_Update_Horse(_double fDeltaTime, CGameInstance * pInstan
 			}
 
 			if (PlayRate > 0.5)
+			{
 				m_vecWeapon[m_iWeaponModelIndex]->Set_AttackAble(true);
+				if (!m_bAtkMoveMentChecker[1])
+				{
+					m_bAtkMoveMentChecker[1] = true;
+			
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = m_pTransformCom;
+					tSoundDesc.vMinMax = _float2(1, 10);
+					tSoundDesc.fTargetSound = 0.35f;
+					tSoundDesc.iIdentificationNumber = 1;
+					tSoundDesc.bFollowTransform = true;
+					wstring SoundTrack = L"";
+
+					SoundTrack = L"Weapon_hobby_attack02_0" + to_wstring(rand() % 4 + 1) + L".ogg";
+					//SoundTrack = L"london_l5_wooddoor_wind.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+				}
+
+
+			}
 		}
 		else
 		{
@@ -2866,6 +3517,10 @@ HRESULT CPlayer::Move_Update_Teapot(_double fDeltaTime, CGameInstance * pInstanc
 
 HRESULT CPlayer::Jump_Update_Teapot(_double fDeltaTime, CGameInstance * pInstance)
 {
+	static SOUNDDESC* tJumWindSoundDesc = nullptr;
+	if (tJumWindSoundDesc != nullptr && tJumWindSoundDesc->iIdentificationNumber == 1)
+		tJumWindSoundDesc->bFollowTransform = false;
+
 	if (!m_pModel->Get_IsHavetoBlockAnimChange())
 	{
 		if (m_iJumpCount < 3 && !m_fDashPassedTime && pInstance->Get_DIKeyState(DIK_SPACE) & DIS_Down)
@@ -2873,6 +3528,26 @@ HRESULT CPlayer::Jump_Update_Teapot(_double fDeltaTime, CGameInstance * pInstanc
 			Add_JumpForce(PlayerMaxJumpPower * m_fSmallScale);
 
 			_uint iJumpIndex = (m_iJumpCount) ? 1 : 0;
+			{
+				if (tJumWindSoundDesc)tJumWindSoundDesc->bStopSoundNow = true;
+
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+				tSoundDesc.vMinMax = _float2(3, 10);
+				tSoundDesc.fTargetSound = 0.5f;
+				wstring SoundTrack = L"";
+				if (m_iJumpCount)
+				{
+					SoundTrack = L"Player_jump_double0" + to_wstring(rand() % 3 + 1) + L".ogg";
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_EFFECT, &tSoundDesc);
+				}
+
+				SoundTrack = L"Player_jump0" + to_wstring(rand() % 6 + 1) + L".ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+			}
+
 			m_pModel->Change_AnimIndex_UntilTo(15 + iJumpIndex * 5, 17 + iJumpIndex * 5, 0.08);
 
 			if (m_iJumpCount )
@@ -2911,8 +3586,29 @@ HRESULT CPlayer::Jump_Update_Teapot(_double fDeltaTime, CGameInstance * pInstanc
 			static _double particleTimeInterver = 0;
 			particleTimeInterver += fDeltaTime;
 
-			if (particleTimeInterver > 0.2)
+			if (particleTimeInterver > 0.25)
 			{
+
+				{
+					if (tJumWindSoundDesc == nullptr || tJumWindSoundDesc->iIdentificationNumber != 1)
+					{
+						SOUNDDESC tSoundDesc;
+
+						tSoundDesc.pTransform = m_pTransformCom;
+						tSoundDesc.vMinMax = _float2(1, 10);
+						tSoundDesc.fTargetSound = 0.12f;
+						tSoundDesc.iIdentificationNumber = 1;
+						tSoundDesc.bFollowTransform = true;
+						wstring SoundTrack = L"";
+
+						//SoundTrack = L"MapObject_mushroom_wind0" + to_wstring(rand() % 5 + 1) + L".ogg";
+						SoundTrack = L"london_l5_wooddoor_wind.ogg";
+
+						g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc, &tJumWindSoundDesc);
+					}
+					tJumWindSoundDesc->bFollowTransform = true;
+
+				}
 
 				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[2]);
 				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[4]);
@@ -2988,6 +3684,20 @@ HRESULT CPlayer::Attack_Update_Teapot(_double fDeltaTime, CGameInstance * pInsta
 
 					FAILED_CHECK(pInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Bullet), TAG_OP(Prototype_Bullet_Grenade),&vBulletDir));
 
+
+					{
+						SOUNDDESC tSoundDesc;
+
+						tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+						tSoundDesc.vMinMax = _float2(3, 10);
+						tSoundDesc.fTargetSound = 0.25f;
+						wstring SoundTrack = L"";
+	
+
+						SoundTrack = L"Weapon_teacannon_fire0" + to_wstring(rand() % 2 + 1) + L".ogg";
+
+						g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+					}
 				}
 
 			}
@@ -3005,6 +3715,20 @@ HRESULT CPlayer::Attack_Update_Teapot(_double fDeltaTime, CGameInstance * pInsta
 
 
 					Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * -1, 25);
+
+					{
+						SOUNDDESC tSoundDesc;
+
+						tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+						tSoundDesc.vMinMax = _float2(3, 10);
+						tSoundDesc.fTargetSound = 0.25f;
+						wstring SoundTrack = L"";
+
+
+						SoundTrack = L"Weapon_teacannon_fire_charged01.ogg";
+
+						g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+					}
 				}
 
 			}
@@ -3030,12 +3754,68 @@ HRESULT CPlayer::Attack_Update_Teapot(_double fDeltaTime, CGameInstance * pInsta
 
 			if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_RBUTTON) & DIS_Press)
 			{
-				m_fCharedGauge += _float(fDeltaTime * 0.33f);
-				if (m_fCharedGauge > 1)m_fCharedGauge = 1;
 
+				static _double SoundTimer = 0;	
+				static _bool bSoundCharedTell = false;
+
+				if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_RBUTTON) & DIS_Down)
+				{
+					bSoundCharedTell = false;
+					SoundTimer = 0;
+				}
+
+				m_fCharedGauge += _float(fDeltaTime * 0.33f);
+				SoundTimer -= fDeltaTime;
+				if (m_fCharedGauge > 1)
+				{
+					 m_fCharedGauge = 1;
+					 if (!bSoundCharedTell)
+					 {
+						 bSoundCharedTell = true;
+
+
+						 {
+							 SOUNDDESC tSoundDesc;
+
+							 tSoundDesc.pTransform = m_pMainCamera->Get_Camera_Transform();
+							 tSoundDesc.vMinMax = _float2(0, 15.f);
+							 tSoundDesc.fTargetSound = 0.35f;
+							 tSoundDesc.bFollowTransform = true;
+							 wstring SoundTrack = L"";
+
+							 SoundTrack = L"Weapon_teacannon_charged_tell.ogg";
+
+							 FAILED_CHECK(g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_EFFECT, &tSoundDesc));
+
+
+						 }
+
+					 }
+				}
+
+				if (SoundTimer < 0 && !bSoundCharedTell)
+				{
+					{
+						SOUNDDESC tSoundDesc;
+
+						tSoundDesc.pTransform = m_pMainCamera->Get_Camera_Transform();
+						tSoundDesc.vMinMax = _float2(0, 10.f);
+						tSoundDesc.fTargetSound = 0.25f;
+						tSoundDesc.bFollowTransform = true;
+						wstring SoundTrack = L"";
+
+						SoundTrack = L"Weapon_teacannon_charge_a0" + to_wstring(rand() % 2 + 1) + L".ogg";
+
+						FAILED_CHECK(g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_EFFECT, &tSoundDesc));
+
+
+					}
+					SoundTimer = GetSingle(CUtilityMgr)->RandomFloat(0.25f, 0.4f);
+				}
 
 				if (m_fCharedGauge < 0.4f)
 				{
+				
 					m_vecWeapon[m_iWeaponModelIndex]->Get_WeaponModel()->Change_AnimIndex_ReturnTo_Must(1, 0, 0.15, true);
 
 
@@ -3121,7 +3901,8 @@ HRESULT CPlayer::Move_Update_Umbrella(_double fDeltaTime, CGameInstance * pInsta
 
 HRESULT CPlayer::Jump_Update_Umbrella(_double fDeltaTime, CGameInstance * pInstance)
 {
-	
+
+
 	m_LevitationTime += fDeltaTime;
 	_float fGravity = 0;
 	if (m_fJumpPower > 0)
@@ -3178,17 +3959,59 @@ HRESULT CPlayer::Jump_Update_Umbrella(_double fDeltaTime, CGameInstance * pInsta
 HRESULT CPlayer::Attack_Update_Umbrella(_double fDeltaTime, CGameInstance * pInstance)
 {
 
-	if (m_fUmbrellaIntro >= 1)
+	if (m_fUmbrellaIntro >= 0.5f)
 	{
 		if (m_bUmbrellaReflected)
 		{
 			m_ReflectPassedTime += fDeltaTime;
+			if (m_pUmbSoundDesc  && m_pUmbSoundDesc->iIdentificationNumber == 5) m_pUmbSoundDesc->bStopSoundNow = true;
 
-
-			if (m_ReflectPassedTime > 2)
+			if (m_ReflectPassedTime > 1)
 			{
 				m_vecWeapon[m_iWeaponModelIndex]->Set_AttackAble(true);
+
+				if(!m_pUmbSoundDesc || m_pUmbSoundDesc->iIdentificationNumber != 5)
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = m_pMainCamera->Get_Camera_Transform();
+					tSoundDesc.vMinMax = _float2(0, 10.f);
+					tSoundDesc.fTargetSound = 0.25f;
+					tSoundDesc.bStopSoundNow = false;
+					tSoundDesc.iIdentificationNumber = 5;
+					tSoundDesc.bFollowTransform = true;
+					wstring SoundTrack = L"";
+
+					SoundTrack = L"c1w2_gear_basicturn_loop03.ogg";
+
+					FAILED_CHECK(g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_EFFECT, &tSoundDesc,&m_pUmbSoundDesc));
+
+
+				}
+				m_pUmbSoundDesc->bStopSoundNow = false;
 			}
+
+		}
+		else
+		{
+			if (!m_pUmbSoundDesc || m_pUmbSoundDesc->iIdentificationNumber != 5)
+			{
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.pTransform = m_pMainCamera->Get_Camera_Transform();
+				tSoundDesc.vMinMax = _float2(0, 10.f);
+				tSoundDesc.fTargetSound = 0.25f;
+				tSoundDesc.bStopSoundNow = false;
+				tSoundDesc.iIdentificationNumber = 5;
+				tSoundDesc.bFollowTransform = true;
+				wstring SoundTrack = L"";
+
+				SoundTrack = L"c1w2_gear_basicturn_loop03.ogg";
+
+				FAILED_CHECK(g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_EFFECT, &tSoundDesc, &m_pUmbSoundDesc));
+			}
+			m_pUmbSoundDesc->bStopSoundNow = false;
+
 
 		}
 
@@ -3355,6 +4178,23 @@ HRESULT CPlayer::Move_Update_Giant(_double fDeltaTime, CGameInstance * pInstance
 				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_DustWind), &(tDesc));
 				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_DustWind), &(tDesc));
 
+
+
+
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = tDesc.vPosition;
+					tSoundDesc.vMinMax = _float2(10000000.f, 10000000.f);
+					tSoundDesc.fTargetSound = 1.f;
+					wstring SoundTrack = L"";
+
+					SoundTrack = L"Player_giant_step0" + to_wstring(rand() % 3 + 1) + L".ogg";
+					//SoundTrack = L"Player_umb_deflect.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+				}
+
 				m_iAdjMovedIndex++;
 			}
 			if (m_iAdjMovedIndex == 1 && PlayRate > 0.8)
@@ -3373,6 +4213,21 @@ HRESULT CPlayer::Move_Update_Giant(_double fDeltaTime, CGameInstance * pInstance
 				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_DustWind), &(tDesc));
 				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_DustWind), &(tDesc));
 				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_DustWind), &(tDesc));
+
+
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = tDesc.vPosition;
+					tSoundDesc.vMinMax = _float2(10000000.f, 10000000.f);
+					tSoundDesc.fTargetSound = 1.f;
+					wstring SoundTrack = L"";
+
+					SoundTrack = L"Player_giant_step0" + to_wstring(rand() % 3 + 1) + L".ogg";
+					//SoundTrack = L"Player_umb_deflect.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+				}
 
 				m_iAdjMovedIndex++;
 			}
@@ -3416,6 +4271,21 @@ HRESULT CPlayer::Move_Update_Giant(_double fDeltaTime, CGameInstance * pInstance
 						pInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_BreakablePiece), TAG_OP(Prototype_BreakablePiece), &TargetPos);
 
 					}
+				}
+
+
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = tDesc.vPosition;
+					tSoundDesc.vMinMax = _float2(10000000.f, 10000000.f);
+					tSoundDesc.fTargetSound = 1.f;
+					wstring SoundTrack = L"";
+
+					//SoundTrack = L"Player_giant_step0" + to_wstring(rand() % 3 + 1) + L".ogg";
+					SoundTrack = L"Player_giant_stomp.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
 				}
 
 				m_iAdjMovedIndex++;
@@ -3555,6 +4425,12 @@ HRESULT CPlayer::Move_Update_Knife(_double fDeltaTime, CGameInstance * pInstance
 
 HRESULT CPlayer::Jump_Update_Knife(_double fDeltaTime, CGameInstance * pInstance)
 {
+
+	static SOUNDDESC* tJumWindSoundDesc = nullptr;
+	if (tJumWindSoundDesc != nullptr && tJumWindSoundDesc->iIdentificationNumber == 1)
+		tJumWindSoundDesc->bFollowTransform = false;
+
+
 	if (!m_pModel->Get_IsHavetoBlockAnimChange())
 	{
 		if (m_iJumpCount < 3 && !m_fDashPassedTime && pInstance->Get_DIKeyState(DIK_SPACE) & DIS_Down)
@@ -3564,6 +4440,25 @@ HRESULT CPlayer::Jump_Update_Knife(_double fDeltaTime, CGameInstance * pInstance
 			_uint iJumpIndex = (m_iJumpCount) ? 1 : 0;
 			m_pModel->Change_AnimIndex_UntilTo(15 + iJumpIndex * 5, 17 + iJumpIndex * 5, 0.08);
 
+			{
+				if (tJumWindSoundDesc)tJumWindSoundDesc->bStopSoundNow = true;
+
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+				tSoundDesc.vMinMax = _float2(3, 10);
+				tSoundDesc.fTargetSound = 0.5f;
+				wstring SoundTrack = L"";
+				if (m_iJumpCount)
+				{
+					SoundTrack = L"Player_jump_double0" + to_wstring(rand() % 3 + 1) + L".ogg";
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_EFFECT, &tSoundDesc);
+				}
+
+				SoundTrack = L"Player_jump0" + to_wstring(rand() % 6 + 1) + L".ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+			}
 
 			if (m_iJumpCount )
 			{
@@ -3600,8 +4495,28 @@ HRESULT CPlayer::Jump_Update_Knife(_double fDeltaTime, CGameInstance * pInstance
 			static _double particleTimeInterver = 0;
 			particleTimeInterver += fDeltaTime;
 
-			if (particleTimeInterver > 0.2)
+			if (particleTimeInterver > 0.25)
 			{
+				{
+					if (tJumWindSoundDesc == nullptr || tJumWindSoundDesc->iIdentificationNumber != 1)
+					{
+						SOUNDDESC tSoundDesc;
+
+						tSoundDesc.pTransform = m_pTransformCom;
+						tSoundDesc.vMinMax = _float2(1, 10);
+						tSoundDesc.fTargetSound = 0.12f;
+						tSoundDesc.iIdentificationNumber = 1;
+						tSoundDesc.bFollowTransform = true;
+						wstring SoundTrack = L"";
+
+						//SoundTrack = L"MapObject_mushroom_wind0" + to_wstring(rand() % 5 + 1) + L".ogg";
+						SoundTrack = L"london_l5_wooddoor_wind.ogg";
+
+						g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc, &tJumWindSoundDesc);
+					}
+					tJumWindSoundDesc->bFollowTransform = true;
+
+				}
 
 				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[2]);
 				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[4]);
@@ -3705,6 +4620,8 @@ HRESULT CPlayer::Attack_Update_Knife(_double fDeltaTime, CGameInstance * pInstan
 				m_bIsAttackClicked = false;
 				ZeroMemory(m_bAtkMoveMentChecker, sizeof(_bool) * 3);
 
+
+
 			}
 			else if (iNowAnimIndex >= Weapon_Knife + 8 && iNowAnimIndex <= Weapon_Knife + 16 && iNowAnimIndex % 2 == Weapon_Knife % 2)
 			{
@@ -3715,6 +4632,9 @@ HRESULT CPlayer::Attack_Update_Knife(_double fDeltaTime, CGameInstance * pInstan
 					m_pModel->Change_AnimIndex(Weapon_Knife + 8 + m_iAttackCount * 2, 0.15, true);
 
 					ZeroMemory(m_bAtkMoveMentChecker, sizeof(_bool) * 3);
+
+
+
 
 					m_iAttackCount++;
 					if (m_iAttackCount > 5) m_iAttackCount = 5;
@@ -3766,7 +4686,27 @@ HRESULT CPlayer::Attack_Update_Knife(_double fDeltaTime, CGameInstance * pInstan
 			}
 
 			if (PlayRate > 0.4)
+			{
 				m_vecWeapon[m_iWeaponModelIndex]->Set_AttackAble(true);
+
+				if (!m_bAtkMoveMentChecker[1] && PlayRate < 0.8)
+				{
+					m_bAtkMoveMentChecker[1] = true;
+					{
+						SOUNDDESC tSoundDesc;
+
+						tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+						tSoundDesc.vMinMax = _float2(3, 10);
+						tSoundDesc.fTargetSound = 0.25f;
+						wstring SoundTrack = L"";
+
+
+						SoundTrack = L"Weapon_vorpal_slash0" + to_wstring(rand() % 7 + 1) + L".ogg";
+
+						g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+					}
+				}
+			}
 		}
 		else
 		{
@@ -3778,6 +4718,24 @@ HRESULT CPlayer::Attack_Update_Knife(_double fDeltaTime, CGameInstance * pInstan
 		if (PlayRate > 0.4)
 		{
 			m_vecWeapon[m_iWeaponModelIndex]->Set_AttackAble(true);
+			if (!m_bAtkMoveMentChecker[0] && PlayRate < 0.8)
+			{
+				m_bAtkMoveMentChecker[0] = true;
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+					tSoundDesc.vMinMax = _float2(3, 10);
+					tSoundDesc.fTargetSound = 0.25f;
+					wstring SoundTrack = L"";
+
+
+					SoundTrack = L"Weapon_vorpal_slash0" + to_wstring(rand() % 7 + 1) + L".ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+				}
+			}
+
 		}
 		else
 		{
@@ -3789,12 +4747,44 @@ HRESULT CPlayer::Attack_Update_Knife(_double fDeltaTime, CGameInstance * pInstan
 
 	case 3:
 
-		if (PlayRate > 0.6)
+		if (PlayRate > 0.1 && !m_bAtkMoveMentChecker[1])
+		{
+			m_bAtkMoveMentChecker[1] = true;
+
+			{
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+				tSoundDesc.vMinMax = _float2(3, 10);
+				tSoundDesc.fTargetSound = 0.25f;
+				wstring SoundTrack = L"";
+
+
+				SoundTrack = L"Weapon_vorpal_slash0" + to_wstring(rand() % 7 + 1) + L".ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+			}
+		}
+		else if (PlayRate > 0.6)
 		{
 			if (!m_bAtkMoveMentChecker[0])
 			{
 				m_bAtkMoveMentChecker[0] = true;
 				Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 10);
+
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+					tSoundDesc.vMinMax = _float2(3, 10);
+					tSoundDesc.fTargetSound = 0.25f;
+					wstring SoundTrack = L"";
+
+
+					SoundTrack = L"Weapon_vorpal_slash0" + to_wstring(rand() % 7 + 1) + L".ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+				}
 			}
 			m_vecWeapon[m_iWeaponModelIndex]->Set_AttackAble(true);
 		}
@@ -3812,24 +4802,67 @@ HRESULT CPlayer::Attack_Update_Knife(_double fDeltaTime, CGameInstance * pInstan
 			{
 				m_bAtkMoveMentChecker[0] = true;
 				Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 10);
+
+			
 			}
 			m_vecWeapon[m_iWeaponModelIndex]->Set_AttackAble(true);
+
+			if (PlayRate > 0.3 && !m_bAtkMoveMentChecker[1])
+			{
+				m_bAtkMoveMentChecker[1] = true;
+
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+					tSoundDesc.vMinMax = _float2(3, 10);
+					tSoundDesc.fTargetSound = 0.25f;
+					wstring SoundTrack = L"";
+
+
+					SoundTrack = L"Weapon_vorpal_slash0" + to_wstring(rand() % 7 + 1) + L".ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+				}
+			}
 		}
 		else
 		{
 			m_vecWeapon[m_iWeaponModelIndex]->Set_AttackAble(false);
+
+
+
 		}
 
 
 		break;
 	case 5:
+		if (PlayRate > 0.1 &&!m_bAtkMoveMentChecker[1])
+		{
+			m_bAtkMoveMentChecker[1] = true;
 
-		if (PlayRate > 0.28)
+			{
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+				tSoundDesc.vMinMax = _float2(3, 10);
+				tSoundDesc.fTargetSound = 0.25f;
+				wstring SoundTrack = L"";
+
+
+				SoundTrack = L"Weapon_vorpal_spin0" + to_wstring(rand() % 5 + 1) + L".ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_EFFECT, &tSoundDesc);
+			}
+		}
+		else if (PlayRate > 0.28)
 		{
 			if (!m_bAtkMoveMentChecker[0])
 			{
 				m_bAtkMoveMentChecker[0] = true;
 				Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 10);
+
+
 			}
 			m_vecWeapon[m_iWeaponModelIndex]->Set_AttackAble(true);
 		}
@@ -4028,12 +5061,37 @@ HRESULT CPlayer::Move_Update_Grinder(_double fDeltaTime, CGameInstance * pInstan
 
 HRESULT CPlayer::Jump_Update_Grinder(_double fDeltaTime, CGameInstance * pInstance)
 {
+
+	static SOUNDDESC* tJumWindSoundDesc = nullptr;
+	if (tJumWindSoundDesc != nullptr && tJumWindSoundDesc->iIdentificationNumber == 1)
+		tJumWindSoundDesc->bFollowTransform = false;
+
+
 	if (!m_pModel->Get_IsHavetoBlockAnimChange())
 	{
 		if (m_iJumpCount < 3 && !m_fDashPassedTime && pInstance->Get_DIKeyState(DIK_SPACE) & DIS_Down)
 		{
 			Add_JumpForce(PlayerMaxJumpPower * m_fSmallScale);
 			_uint iJumpIndex = (m_iJumpCount) ? 1 : 0;
+			{
+				if (tJumWindSoundDesc)tJumWindSoundDesc->bStopSoundNow = true;
+
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+				tSoundDesc.vMinMax = _float2(3, 10);
+				tSoundDesc.fTargetSound = 0.5f;
+				wstring SoundTrack = L"";
+				if (m_iJumpCount)
+				{
+					SoundTrack = L"Player_jump_double0" + to_wstring(rand() % 3 + 1) + L".ogg";
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_EFFECT, &tSoundDesc);
+				}
+
+				SoundTrack = L"Player_jump0" + to_wstring(rand() % 6 + 1) + L".ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+			}
 
 			m_pModel->Change_AnimIndex_UntilTo(15 + iJumpIndex * 5, 17 + iJumpIndex * 5, 0.08);
 
@@ -4073,8 +5131,28 @@ HRESULT CPlayer::Jump_Update_Grinder(_double fDeltaTime, CGameInstance * pInstan
 			static _double particleTimeInterver = 0;
 			particleTimeInterver += fDeltaTime;
 
-			if (particleTimeInterver > 0.2)
+			if (particleTimeInterver > 0.25)
 			{
+				{
+					if (tJumWindSoundDesc == nullptr || tJumWindSoundDesc->iIdentificationNumber != 1)
+					{
+						SOUNDDESC tSoundDesc;
+
+						tSoundDesc.pTransform = m_pTransformCom;
+						tSoundDesc.vMinMax = _float2(1, 10);
+						tSoundDesc.fTargetSound = 0.12f;
+						tSoundDesc.iIdentificationNumber = 1;
+						tSoundDesc.bFollowTransform = true;
+						wstring SoundTrack = L"";
+
+						//SoundTrack = L"MapObject_mushroom_wind0" + to_wstring(rand() % 5 + 1) + L".ogg";
+						SoundTrack = L"london_l5_wooddoor_wind.ogg";
+
+						g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc, &tJumWindSoundDesc);
+					}
+					tJumWindSoundDesc->bFollowTransform = true;
+
+				}
 
 				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[2]);
 				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[4]);
@@ -4107,6 +5185,7 @@ HRESULT CPlayer::Jump_Update_Grinder(_double fDeltaTime, CGameInstance * pInstan
 
 HRESULT CPlayer::Attack_Update_Grinder(_double fDeltaTime, CGameInstance * pInstance)
 {
+
 
 	if (pInstance->Get_DIMouseButtonState(CInput_Device::MBS_RBUTTON) & DIS_Press)
 	{
@@ -4170,6 +5249,21 @@ HRESULT CPlayer::Set_Player_On_Terrain()
 				{
 					m_pModel->Change_AnimIndex_ReturnTo(19, 0, 0, true);
 					Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 10);
+
+
+					{
+						SOUNDDESC tSoundDesc;
+
+						tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+						tSoundDesc.vMinMax = _float2(3, 10);
+						tSoundDesc.fTargetSound = 0.5f;
+						wstring SoundTrack = L"";
+
+						SoundTrack = L"Player_jumpland0" + to_wstring(rand() % 2 + 1) + L".ogg";
+
+						g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+					}
+
 				}
 			}
 
@@ -4213,6 +5307,20 @@ HRESULT CPlayer::Set_Player_On_Terrain_IgnoreTile()
 				{
 					m_pModel->Change_AnimIndex_ReturnTo(19, 0, 0, true);
 					Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 10);
+
+					{
+						SOUNDDESC tSoundDesc;
+
+						tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+						tSoundDesc.vMinMax = _float2(3, 10);
+						tSoundDesc.fTargetSound = 0.5f;
+						wstring SoundTrack = L"";
+
+						SoundTrack = L"Player_jumpland0" + to_wstring(rand() % 2 + 1) + L".ogg";
+
+						g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+					}
+
 				}
 			}
 
@@ -4282,6 +5390,20 @@ HRESULT CPlayer::Set_Player_On_Terrain_DontPutonJumpMovable()
 				{
 					m_pModel->Change_AnimIndex_ReturnTo(19, 0, 0, true);
 					Add_Force(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK), 10);
+
+					{
+						SOUNDDESC tSoundDesc;
+
+						tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+						tSoundDesc.vMinMax = _float2(3, 10);
+						tSoundDesc.fTargetSound = 0.5f;
+						wstring SoundTrack = L"";
+
+						SoundTrack = L"Player_jumpland0" + to_wstring(rand() % 2 + 1) + L".ogg";
+
+						g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+					}
+
 				}
 			}
 

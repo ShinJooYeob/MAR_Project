@@ -157,6 +157,37 @@ void CShrinkFlower::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConfl
 			m_pModel->Change_AnimIndex_UntilNReturn_Must(3, 4, 4, 0.15, true);
 			m_pPlayer->Set_PlayerPosition(m_pTransformCom->Get_MatrixState(CTransform::STATE_POS));
 			m_pPlayer->Set_TrappedFlower(true);
+
+
+			{
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+				tSoundDesc.vMinMax = _float2(5.f, 10.f);
+				tSoundDesc.fTargetSound = 0.25f;
+				wstring SoundTrack = L"";
+
+				SoundTrack = L"MapObject_shrinkflower_close.ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+			}
+
+
+			{
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+				tSoundDesc.vMinMax = _float2(5.f, 10.f);
+				tSoundDesc.fTargetSound = 0.25f;
+				wstring SoundTrack = L"";
+
+				SoundTrack = L"MapObject_shrinkflower_kiss.ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+			}
+
+
+
 			m_TrappedCoolTime = 0;
 		}
 		else
@@ -170,6 +201,21 @@ void CShrinkFlower::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConfl
 				Timer += g_fDeltaTime;
 				if (Timer > 0.3)
 				{
+
+					{
+						SOUNDDESC tSoundDesc;
+
+						tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+						tSoundDesc.vMinMax = _float2(5.f, 10.f);
+						tSoundDesc.fTargetSound = 0.25f;
+						wstring SoundTrack = L"";
+
+						SoundTrack = L"MapObject_shrinkflower_throb0" + to_wstring(rand()%2 + 1)  +L".ogg";
+
+						g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+					}
+
+
 					m_pPlayer->Heal_to_Player(1);
 					Timer = 0;
 				}

@@ -39,6 +39,10 @@ private:
 	_double				m_SpwanPassedTime = 0;
 	_double				m_ClockPassedTime = 0;
 
+	_uint				m_iSoundChecker = 0;
+
+	_float				m_TargetTimer = 0;
+
 	_double				m_LevitationTime = 0;
 	_bool				m_bIsOn = false;
 

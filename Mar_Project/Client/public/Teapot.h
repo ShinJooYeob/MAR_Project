@@ -28,6 +28,8 @@ private:
 	CModel*				m_pModel = nullptr;
 
 
+	SOUNDDESC*			m_pSoundDesc = nullptr;
+	_bool				m_bSoundOn = false;
 
 private:
 	HRESULT SetUp_Components();

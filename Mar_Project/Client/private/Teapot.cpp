@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "..\public\Teapot.h"
 #include "Player.h"
+#include "Camera_Main.h"
 
 
 
@@ -40,235 +41,67 @@ _int CTeapot::Update(_double fDeltaTime)
 	if (m_bIsDead) return 0;
 	
 
-/*
-
+	if (m_pModel->Get_NowAnimIndex() == 2)
 	{
-
-	//Pivot: -0.625000, 0.020000, -1.290000,
-		//Pivot: -0.640000, 0.020000, -1.260000,
-			//Rot: -193.979645, 9.009996, -129.319794,
-
-		static _float3 testFloat3 = _float3(-0.625000, 0.020000, -1.290000);
-		static _float3 RotFloat3 = _float3(-193.979645, 9.009996, -129.319794);
-		static _float value = 0.015f;
-		static _int kind = 0;
-
-		_Matrix tt = XMMatrixRotationX(XMConvertToRadians(RotFloat3.x))*
-			XMMatrixRotationY(XMConvertToRadians(RotFloat3.y))*
-			XMMatrixRotationZ(XMConvertToRadians(RotFloat3.z));
-
-		tt.r[3] = XMVectorSetW(testFloat3.XMVector(), 1);
-		m_pTransformCom->Set_Matrix(tt);
-
-		CGameInstance* m_pInstance = g_pGameInstance;
-		if (m_pInstance->Get_DIKeyState(DIK_UP) & DIS_Down)
+		if (!m_bSoundOn)
 		{
-			testFloat3.x -= value;
+			m_bSoundOn = true;
 
 
-			_Matrix tt = XMMatrixRotationX(XMConvertToRadians(RotFloat3.x))*
-				XMMatrixRotationY(XMConvertToRadians(RotFloat3.y))*
-				XMMatrixRotationZ(XMConvertToRadians(RotFloat3.z));
-
-			tt.r[3] = XMVectorSetW(testFloat3.XMVector(), 1);
-			m_pTransformCom->Set_Matrix(tt);
-			string ttszLog = "Pivot  : " + to_string(testFloat3.x) + " , " + to_string(testFloat3.y) + " , " + to_string(testFloat3.z) + " , " + "\n";
-
-			wstring ttDebugLog;
-			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-
-			OutputDebugStringW(ttDebugLog.c_str());
-		}
-
-		else if (m_pInstance->Get_DIKeyState(DIK_DOWN) & DIS_Down)
-		{
-			testFloat3.x += value;
-
-			_Matrix tt = XMMatrixRotationX(XMConvertToRadians(RotFloat3.x))*
-				XMMatrixRotationY(XMConvertToRadians(RotFloat3.y))*
-				XMMatrixRotationZ(XMConvertToRadians(RotFloat3.z));
-
-			tt.r[3] = XMVectorSetW(testFloat3.XMVector(), 1);
-			m_pTransformCom->Set_Matrix(tt);
-			string ttszLog = "Pivot  : " + to_string(testFloat3.x) + " , " + to_string(testFloat3.y) + " , " + to_string(testFloat3.z) + " , " + "\n";
-
-			wstring ttDebugLog;
-			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-
-			OutputDebugStringW(ttDebugLog.c_str());
-
-
-
-		}
-		else if (m_pInstance->Get_DIKeyState(DIK_LEFT) & DIS_Down)
-		{
-			testFloat3.z += value;
-
-			_Matrix tt = XMMatrixRotationX(XMConvertToRadians(RotFloat3.x))*
-				XMMatrixRotationY(XMConvertToRadians(RotFloat3.y))*
-				XMMatrixRotationZ(XMConvertToRadians(RotFloat3.z));
-
-			tt.r[3] = XMVectorSetW(testFloat3.XMVector(), 1);
-			m_pTransformCom->Set_Matrix(tt);
-			string ttszLog = "Pivot  : " + to_string(testFloat3.x) + " , " + to_string(testFloat3.y) + " , " + to_string(testFloat3.z) + " , " + "\n";
-
-			wstring ttDebugLog;
-			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-
-			OutputDebugStringW(ttDebugLog.c_str());
-
-
-
-		}
-
-		else if (m_pInstance->Get_DIKeyState(DIK_RIGHT) & DIS_Down)
-		{
-			testFloat3.z -= value;
-
-			_Matrix tt = XMMatrixRotationX(XMConvertToRadians(RotFloat3.x))*
-				XMMatrixRotationY(XMConvertToRadians(RotFloat3.y))*
-				XMMatrixRotationZ(XMConvertToRadians(RotFloat3.z));
-
-			tt.r[3] = XMVectorSetW(testFloat3.XMVector(), 1);
-			m_pTransformCom->Set_Matrix(tt);
-			string ttszLog = "Pivot  : " + to_string(testFloat3.x) + " , " + to_string(testFloat3.y) + " , " + to_string(testFloat3.z) + " , " + "\n";
-
-			wstring ttDebugLog;
-			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-
-			OutputDebugStringW(ttDebugLog.c_str());
-
-
-
-		}
-
-		else if (m_pInstance->Get_DIKeyState(DIK_DELETE) & DIS_Down)
-		{
-			testFloat3.y += value;
-			_Matrix tt = XMMatrixRotationX(XMConvertToRadians(RotFloat3.x))*
-				XMMatrixRotationY(XMConvertToRadians(RotFloat3.y))*
-				XMMatrixRotationZ(XMConvertToRadians(RotFloat3.z));
-
-			tt.r[3] = XMVectorSetW(testFloat3.XMVector(), 1);
-			m_pTransformCom->Set_Matrix(tt);
-			string ttszLog = "Pivot  : " + to_string(testFloat3.x) + " , " + to_string(testFloat3.y) + " , " + to_string(testFloat3.z) + " , " + "\n";
-
-			wstring ttDebugLog;
-			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-
-			OutputDebugStringW(ttDebugLog.c_str());
-
-
-
-		}
-
-		else if (m_pInstance->Get_DIKeyState(DIK_END) & DIS_Down)
-		{
-			testFloat3.y -= value;
-			_Matrix tt = XMMatrixRotationX(XMConvertToRadians(RotFloat3.x))*
-				XMMatrixRotationY(XMConvertToRadians(RotFloat3.y))*
-				XMMatrixRotationZ(XMConvertToRadians(RotFloat3.z));
-
-			tt.r[3] = XMVectorSetW(testFloat3.XMVector(), 1);
-			m_pTransformCom->Set_Matrix(tt);
-			string ttszLog = "Pivot  : " + to_string(testFloat3.x) + " , " + to_string(testFloat3.y) + " , " + to_string(testFloat3.z) + " , " + "\n";
-
-			wstring ttDebugLog;
-			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-
-			OutputDebugStringW(ttDebugLog.c_str());
-
-
-
-		}
-		else if (m_pInstance->Get_DIKeyState(DIK_PGUP) & DIS_Press)
-		{
-			switch (kind)
 			{
-			case 0:
-				RotFloat3.x += value;
-				break;
-			case 1:
-				RotFloat3.y += value;
-				break;
-			case 2:
-				RotFloat3.z += value;
-				break;
+				SOUNDDESC tSoundDesc;
 
-			default:
-				break;
+				tSoundDesc.pTransform = ((CCamera_Main*)(g_pGameInstance->Get_GameObject_By_LayerLastIndex(m_eNowSceneNum,TAG_LAY(Layer_Camera_Main))))->Get_Camera_Transform();
+				tSoundDesc.vMinMax = _float2(0, 10);
+				tSoundDesc.fTargetSound = 1.f;
+				tSoundDesc.iIdentificationNumber = 4;
+				tSoundDesc.bFollowTransform = true;
+				wstring SoundTrack = L"";
+
+				SoundTrack = L"Weapon_teacannon_charged_loop.ogg";
+
+				FAILED_CHECK(g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc, &m_pSoundDesc));
+
+
 			}
 
-			_Matrix tt = XMMatrixRotationX(XMConvertToRadians(RotFloat3.x))*
-				XMMatrixRotationY(XMConvertToRadians(RotFloat3.y))*
-				XMMatrixRotationZ(XMConvertToRadians(RotFloat3.z));
-
-			tt.r[3] = XMVectorSetW(testFloat3.XMVector(), 1);
-			m_pTransformCom->Set_Matrix(tt);
-
-			string ttszLog = "rot  : " + to_string(RotFloat3.x) + " , " + to_string(RotFloat3.y) + " , " + to_string(RotFloat3.z) + " , " + "\n";
-
-			wstring ttDebugLog;
-			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-
-			OutputDebugStringW(ttDebugLog.c_str());
-
-
 
 		}
-		else if (m_pInstance->Get_DIKeyState(DIK_PGDN) & DIS_Press)
+		else
 		{
-			switch (kind)
+			if (m_pSoundDesc != nullptr && m_pSoundDesc->iIdentificationNumber != 4)
 			{
-			case 0:
-				RotFloat3.x -= value;
-				break;
-			case 1:
-				RotFloat3.y -= value;
-				break;
-			case 2:
-				RotFloat3.z -= value;
-				break;
 
-			default:
-				break;
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = ((CCamera_Main*)(g_pGameInstance->Get_GameObject_By_LayerLastIndex(m_eNowSceneNum, TAG_LAY(Layer_Camera_Main))))->Get_Camera_Transform();
+					tSoundDesc.vMinMax = _float2(0, 10);
+					tSoundDesc.fTargetSound = 1.f;
+					tSoundDesc.iIdentificationNumber = 4;
+					tSoundDesc.bFollowTransform = true;
+					wstring SoundTrack = L"";
+
+					SoundTrack = L"Weapon_teacannon_charged_loop.ogg";
+
+					FAILED_CHECK(g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc, &m_pSoundDesc));
+
+
+				}
+
 			}
 
-			_Matrix tt = XMMatrixRotationX(XMConvertToRadians(RotFloat3.x))*
-				XMMatrixRotationY(XMConvertToRadians(RotFloat3.y))*
-				XMMatrixRotationZ(XMConvertToRadians(RotFloat3.z));
 
-			tt.r[3] = XMVectorSetW(testFloat3.XMVector(), 1);
-			m_pTransformCom->Set_Matrix(tt);
-
-			string ttszLog = "Rot  : " + to_string(RotFloat3.x) + " , " + to_string(RotFloat3.y) + " , " + to_string(RotFloat3.z) + " , " + "\n";
-
-			wstring ttDebugLog;
-			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-
-			OutputDebugStringW(ttDebugLog.c_str());
-
-
-
-		}
-		else if (m_pInstance->Get_DIKeyState(DIK_TAB) & DIS_Down)
-		{
-			kind++;
-			if (kind > 2)kind = 0;
-
-			string ttszLog = "kind  : " + to_string(kind) + "\n";
-
-			wstring ttDebugLog;
-			ttDebugLog.assign(ttszLog.begin(), ttszLog.end());
-
-			OutputDebugStringW(ttDebugLog.c_str());
 		}
 
 	}
-
-*/
-
-
+	else
+	{
+		if (m_pSoundDesc != nullptr && m_pSoundDesc->iIdentificationNumber == 4)
+		{
+			m_pSoundDesc->bStopSoundNow = true;
+		}
+	}
 
 
 

@@ -554,14 +554,14 @@ _int CGameInstance::Channel_Pause(CHANNELID eID)
 	return m_pSoundMgr->Channel_Pause(eID);
 }
 
-HRESULT CGameInstance::PlaySound(TCHAR * pSoundKey, CHANNELID eID, _float4x4 vWorldMatrix ,_float fLouderMultiple)
+HRESULT CGameInstance::PlaySound(const _tchar * pSoundKey, CHANNELID eID, SOUNDDESC* tSoundDesc, SOUNDDESC** pOutDesc)
 {
 	NULL_CHECK_MSG(m_pSoundMgr, L"Not Have m_pSoundMgr");
 
-	return m_pSoundMgr->PlaySound(pSoundKey, eID, vWorldMatrix, fLouderMultiple);
+	return m_pSoundMgr->PlaySound(pSoundKey, eID, tSoundDesc, pOutDesc);
 }
 
-HRESULT CGameInstance::PlayBGM(TCHAR * pSoundKey, _float fLouderMultiple)
+HRESULT CGameInstance::PlayBGM(const _tchar * pSoundKey, _float fLouderMultiple)
 {
 	NULL_CHECK_MSG(m_pSoundMgr, L"Not Have m_pSoundMgr");
 
@@ -686,6 +686,9 @@ void CGameInstance::Release_Engine()
 	if (0 != GetSingle(CThreadMgr)->DestroyInstance())
 		MSGBOX("Failed to Release Com ThreadMgr ");
 
+	if (0 != GetSingle(CSoundMgr)->DestroyInstance())
+		MSGBOX("Failed to Release Com CSoundMgr ");
+
 	if (0 != GetSingle(CEasingMgr)->DestroyInstance())
 		MSGBOX("Failed to Release Com EasingMgr ");
 
@@ -706,9 +709,6 @@ void CGameInstance::Release_Engine()
 
 	if (0 != GetSingle(CTimeMgr)->DestroyInstance())
 		MSGBOX("Failed to Release Com TimeMgr ");
-
-	if (0 != GetSingle(CSoundMgr)->DestroyInstance())
-		MSGBOX("Failed to Release Com CSoundMgr ");
 
 	if (0 != GetSingle(CPipeLineMgr)->DestroyInstance())
 		MSGBOX("Failed to Release CPipeLineMgr ");

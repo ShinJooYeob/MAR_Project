@@ -15,8 +15,8 @@ class CPlayer final : public CGameObject
 public:
 	enum eWeaponState
 	{
-		Weapon_None = 0, Weapon_Knife = 47, Weapon_Grinder = 73, Weapon_Horse = 89, Weapon_Teapot = 113, Weapon_Umbrella = 134, Weapon_Giant= 140, Weapon_End
-		//Weapon_None = 0, Weapon_Knife =88888888, Weapon_Grinder = 54665, Weapon_Horse = 47, Weapon_Teapot = 546645, Weapon_Umbrella = 165161, Weapon_Giant= 1161565, Weapon_End
+		//Weapon_None = 0, Weapon_Knife = 47, Weapon_Grinder = 73, Weapon_Horse = 89, Weapon_Teapot = 113, Weapon_Umbrella = 134, Weapon_Giant= 140, Weapon_End
+		Weapon_None = 0, Weapon_Knife =88888888, Weapon_Grinder = 54665, Weapon_Horse = 486466, Weapon_Teapot = 564456, Weapon_Umbrella = 546564, Weapon_Giant= 47, Weapon_End
 	};
 
 
@@ -143,6 +143,7 @@ private:
 
 	_double				m_fGrinderCoolTime = 0;
 	_bool				m_bNeedToGrinderCooling = false;
+	SOUNDDESC* m_pUmbSoundDesc = nullptr;
 
 
 	/*For AddForce*/
@@ -196,6 +197,8 @@ private:
 	_double			m_ProteinPassedTime = 0;
 	_uint			m_iProteinChecker = 0;
 	
+
+
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ConstTable();

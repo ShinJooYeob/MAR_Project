@@ -7,7 +7,9 @@
 #include "CircleTornado.h"
 
 
-
+#define CBSoundMin 5
+#define CBSoundMax 30
+#define CBTargetSound 0.35f
 
 CClockBomb::CClockBomb(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
 	:CWeapon(pDevice,pDeviceContext)
@@ -117,10 +119,40 @@ _int CClockBomb::Update(_double fDeltaTime)
 			{
 				m_bIsOn = true;
 				m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, CaculatedPos.XMVector() - XMVectorSet(0, 0.1f, 0, 0));
+
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = m_pColliderCom->Get_ColliderPosition();
+					tSoundDesc.vMinMax = _float2(CBSoundMin* 0.5f, CBSoundMax * 0.5f);
+					tSoundDesc.fTargetSound = CBTargetSound * 2.f;
+					wstring SoundTrack = L"";
+
+					//SoundTrack = L"Weapon_cb_explode0" + to_wstring(rand() % 4 + 1) + L".ogg";
+					SoundTrack = L"Weapon_cb_land.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_EFFECT, &tSoundDesc);
+				}
+
+
 			}
 			else if (m_bIsOn)
 			{
 				m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, CaculatedPos.XMVector() - XMVectorSet(0, 0.1f, 0, 0));
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = m_pColliderCom->Get_ColliderPosition();
+					tSoundDesc.vMinMax = _float2(CBSoundMin* 0.5f, CBSoundMax * 0.5f);
+					tSoundDesc.fTargetSound = CBTargetSound * 2.f;
+					wstring SoundTrack = L"";
+
+					//SoundTrack = L"Weapon_cb_explode0" + to_wstring(rand() % 4 + 1) + L".ogg";
+					SoundTrack = L"Weapon_cb_land.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_EFFECT, &tSoundDesc);
+				}
+
 			}
 
 
@@ -146,10 +178,40 @@ _int CClockBomb::Update(_double fDeltaTime)
 				{
 					m_bIsOn = true;
 					m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, CaculatedPos.XMVector() - XMVectorSet(0, 0.1f, 0, 0));
+
+					{
+						SOUNDDESC tSoundDesc;
+
+						tSoundDesc.vPosition = m_pColliderCom->Get_ColliderPosition();
+						tSoundDesc.vMinMax = _float2(CBSoundMin* 0.5f, CBSoundMax * 0.5f);
+						tSoundDesc.fTargetSound = CBTargetSound * 2.f;
+						wstring SoundTrack = L"";
+
+						//SoundTrack = L"Weapon_cb_explode0" + to_wstring(rand() % 4 + 1) + L".ogg";
+						SoundTrack = L"Weapon_cb_land.ogg";
+
+						g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_EFFECT, &tSoundDesc);
+					}
+
 				}
 				else if (m_bIsOn)
 				{
 					m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, CaculatedPos.XMVector() - XMVectorSet(0, 0.1f, 0, 0));
+
+					{
+						SOUNDDESC tSoundDesc;
+
+						tSoundDesc.vPosition = m_pColliderCom->Get_ColliderPosition();
+						tSoundDesc.vMinMax = _float2(CBSoundMin* 0.5f, CBSoundMax * 0.5f);
+						tSoundDesc.fTargetSound = CBTargetSound * 2.f;
+						wstring SoundTrack = L"";
+
+						//SoundTrack = L"Weapon_cb_explode0" + to_wstring(rand() % 4 + 1) + L".ogg";
+						SoundTrack = L"Weapon_cb_land.ogg";
+
+						g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_EFFECT, &tSoundDesc);
+					}
+
 				}
 
 			}
@@ -159,14 +221,174 @@ _int CClockBomb::Update(_double fDeltaTime)
 					m_pModel->Change_AnimIndex_ReturnTo_Must(5, 0, 0.15, true);
 
 
-
 				if (m_ClockPassedTime > 0)
 				{
+					m_TargetTimer -= (_float)fDeltaTime;
+
+
+
 					m_ClockPassedTime -= fDeltaTime;
 
 
 					if (m_ClockPassedTime < 2.5)
 						m_pModel->Change_AnimIndex(1, 0.15, true);
+
+					if (m_TargetTimer < 0)
+					{
+						{
+							SOUNDDESC tSoundDesc;
+
+							tSoundDesc.vPosition = m_pColliderCom->Get_ColliderPosition();
+							tSoundDesc.vMinMax = _float2(1000000000.f, 10000000001.f);
+							tSoundDesc.fTargetSound = 1.f;
+							wstring SoundTrack = L"";
+
+							//SoundTrack = L"Weapon_cb_explode0" + to_wstring(rand() % 4 + 1) + L".ogg";
+							SoundTrack = L"Weapon_cb_watch.ogg";
+
+							g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
+							m_TargetTimer = ((_float)m_ClockPassedTime) / 5.f + 0.1f;
+						}
+					}
+
+					switch (m_iSoundChecker)
+					{
+					case 0:
+					{
+						SOUNDDESC tSoundDesc;
+
+						tSoundDesc.vPosition = m_pColliderCom->Get_ColliderPosition();
+						tSoundDesc.vMinMax = _float2(CBSoundMin* 0.5f, CBSoundMax * 0.5f);
+						tSoundDesc.fTargetSound = CBTargetSound;
+						wstring SoundTrack = L"";
+
+						//SoundTrack = L"Weapon_cb_explode0" + to_wstring(rand() % 4 + 1) + L".ogg";
+						SoundTrack = L"Weapon_cb_tick_slow.ogg";
+
+						g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_EFFECT, &tSoundDesc);
+						m_iSoundChecker++;
+					}
+
+						break;
+
+					case 1:
+						if (m_ClockPassedTime < 4.0)
+						{
+							{
+								SOUNDDESC tSoundDesc;
+
+								tSoundDesc.vPosition = m_pColliderCom->Get_ColliderPosition();
+								tSoundDesc.vMinMax = _float2(CBSoundMin* 0.5f, CBSoundMax * 0.5f);
+								tSoundDesc.fTargetSound = CBTargetSound;
+								wstring SoundTrack = L"";
+
+								//SoundTrack = L"Weapon_cb_explode0" + to_wstring(rand() % 4 + 1) + L".ogg";
+								SoundTrack = L"Weapon_cb_tick_slow.ogg";
+
+								g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_EFFECT, &tSoundDesc);
+								m_iSoundChecker++;
+							}
+
+						}
+						break;
+
+					case 2:
+						if (m_ClockPassedTime < 3.0)
+						{
+							
+							{
+								SOUNDDESC tSoundDesc;
+
+								tSoundDesc.vPosition = m_pColliderCom->Get_ColliderPosition();
+								tSoundDesc.vMinMax = _float2(CBSoundMin* 0.5f, CBSoundMax * 0.75f);
+								tSoundDesc.fTargetSound = CBTargetSound;
+								wstring SoundTrack = L"";
+
+								//SoundTrack = L"Weapon_cb_explode0" + to_wstring(rand() % 4 + 1) + L".ogg";
+								SoundTrack = L"Weapon_cb_tick_warn.ogg";
+
+								g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_EFFECT, &tSoundDesc);
+							}
+
+							{
+								SOUNDDESC tSoundDesc;
+
+								tSoundDesc.vPosition = m_pColliderCom->Get_ColliderPosition();
+								tSoundDesc.vMinMax = _float2(CBSoundMin* 0.5f, CBSoundMax * 0.5f);
+								tSoundDesc.fTargetSound = CBTargetSound;
+								wstring SoundTrack = L"";
+
+								//SoundTrack = L"Weapon_cb_explode0" + to_wstring(rand() % 4 + 1) + L".ogg";
+								SoundTrack = L"Weapon_cb_tick_slow.ogg";
+
+								g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_EFFECT, &tSoundDesc);
+								m_iSoundChecker++;
+							}
+
+						}
+						break;
+
+					case 3:
+						if (m_ClockPassedTime < 2.0)
+						{
+							{
+								SOUNDDESC tSoundDesc;
+
+								tSoundDesc.vPosition = m_pColliderCom->Get_ColliderPosition();
+								tSoundDesc.vMinMax = _float2(CBSoundMin* 0.5f, CBSoundMax * 0.5f);
+								tSoundDesc.fTargetSound = CBTargetSound;
+								wstring SoundTrack = L"";
+
+								//SoundTrack = L"Weapon_cb_explode0" + to_wstring(rand() % 4 + 1) + L".ogg";
+								SoundTrack = L"Weapon_cb_tick_fast.ogg";
+
+								g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_EFFECT, &tSoundDesc);
+								m_iSoundChecker++;
+							}
+
+						}
+						break;
+
+					case 4:
+						if (m_ClockPassedTime < 1.0)
+						{
+							{
+								SOUNDDESC tSoundDesc;
+
+								tSoundDesc.vPosition = m_pColliderCom->Get_ColliderPosition();
+								tSoundDesc.vMinMax = _float2(CBSoundMin* 0.5f, CBSoundMax * 0.5f);
+								tSoundDesc.fTargetSound = CBTargetSound;
+								wstring SoundTrack = L"";
+
+								//SoundTrack = L"Weapon_cb_explode0" + to_wstring(rand() % 4 + 1) + L".ogg";
+								SoundTrack = L"Weapon_cb_tick_fast.ogg";
+
+								g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_EFFECT, &tSoundDesc);
+								m_iSoundChecker++;
+							}
+
+						}
+						break;
+
+
+					default:
+						break;
+					}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 					if (m_ClockPassedTime < 0)
@@ -193,6 +415,21 @@ _int CClockBomb::Update(_double fDeltaTime)
 						g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerCircleTornado), &tDesc);
 
 						m_bDeadBomb = true;
+
+						{
+							SOUNDDESC tSoundDesc;
+
+							tSoundDesc.vPosition = m_pColliderCom->Get_ColliderPosition();
+							tSoundDesc.vMinMax = _float2(CBSoundMin, CBSoundMax);
+							tSoundDesc.fTargetSound = CBTargetSound;
+							wstring SoundTrack = L"";
+
+							SoundTrack = L"Weapon_cb_explode0" + to_wstring(rand() % 4 + 1) + L".ogg";
+							//SoundTrack = L"london_l5_wooddoor_wind.ogg";
+
+							g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_EFFECT, &tSoundDesc);
+						}
+
 						m_DeadPassedTime = 0;
 					}
 
@@ -369,6 +606,21 @@ void CClockBomb::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflict
 					m_bDeadBomb = true;
 					m_DeadPassedTime = 0;
 
+					{
+						SOUNDDESC tSoundDesc;
+
+						tSoundDesc.vPosition = m_pColliderCom->Get_ColliderPosition();
+						tSoundDesc.vMinMax = _float2(CBSoundMin, CBSoundMax);
+						tSoundDesc.fTargetSound = CBTargetSound;
+						wstring SoundTrack = L"";
+
+						SoundTrack = L"Weapon_cb_explode0" + to_wstring(rand() % 4 + 1) + L".ogg";
+						//SoundTrack = L"london_l5_wooddoor_wind.ogg";
+
+						g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_EFFECT, &tSoundDesc);
+					}
+
+
 				}
 				else
 				{
@@ -403,6 +655,21 @@ void CClockBomb::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflict
 					g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerCircleTornado), &tDesc);
 					m_bDeadBomb = true;
 					m_DeadPassedTime = 0;
+
+					{
+						SOUNDDESC tSoundDesc;
+
+						tSoundDesc.vPosition = m_pColliderCom->Get_ColliderPosition();
+						tSoundDesc.vMinMax = _float2(CBSoundMin, CBSoundMax);
+						tSoundDesc.fTargetSound = CBTargetSound;
+						wstring SoundTrack = L"";
+
+						SoundTrack = L"Weapon_cb_explode0" + to_wstring(rand() % 4 + 1) + L".ogg";
+						//SoundTrack = L"london_l5_wooddoor_wind.ogg";
+
+						g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_EFFECT, &tSoundDesc);
+					}
+
 
 				}
 
@@ -457,6 +724,20 @@ void CClockBomb::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflict
 					m_bDeadBomb = true;
 					m_DeadPassedTime = 0;
 
+					{
+						SOUNDDESC tSoundDesc;
+
+						tSoundDesc.vPosition = m_pColliderCom->Get_ColliderPosition();
+						tSoundDesc.vMinMax = _float2(CBSoundMin, CBSoundMax);
+						tSoundDesc.fTargetSound = CBTargetSound;
+						wstring SoundTrack = L"";
+
+						SoundTrack = L"Weapon_cb_explode0" + to_wstring(rand() % 4 + 1) + L".ogg";
+						//SoundTrack = L"london_l5_wooddoor_wind.ogg";
+
+						g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_EFFECT, &tSoundDesc);
+					}
+
 
 				}
 				else
@@ -495,6 +776,20 @@ void CClockBomb::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflict
 
 					m_bDeadBomb = true;
 					m_DeadPassedTime = 0;
+
+					{
+						SOUNDDESC tSoundDesc;
+
+						tSoundDesc.vPosition = m_pColliderCom->Get_ColliderPosition();
+						tSoundDesc.vMinMax = _float2(CBSoundMin, CBSoundMax);
+						tSoundDesc.fTargetSound = CBTargetSound;
+						wstring SoundTrack = L"";
+
+						SoundTrack = L"Weapon_cb_explode0" + to_wstring(rand() % 4 + 1) + L".ogg";
+						//SoundTrack = L"london_l5_wooddoor_wind.ogg";
+
+						g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_EFFECT, &tSoundDesc);
+					}
 
 				}
 
@@ -624,6 +919,21 @@ HRESULT CClockBomb::Adjust_AnimMovedTransform(_double fDeltatime)
 				pGameObj->Set_DrawClockBombUI(true);
 				
 				m_bHavetoMaking = false;
+
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = m_pColliderCom->Get_ColliderPosition();
+					tSoundDesc.vMinMax = _float2(CBSoundMin* 0.5f, CBSoundMax * 0.5f);
+					tSoundDesc.fTargetSound = CBTargetSound * 1.5f;
+					wstring SoundTrack = L"";
+
+					//SoundTrack = L"Weapon_cb_explode0" + to_wstring(rand() % 4 + 1) + L".ogg";
+					SoundTrack = L"Weapon_cb_grow.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_EFFECT, &tSoundDesc);
+				}
+
 			}
 			
 			break;
@@ -643,6 +953,21 @@ HRESULT CClockBomb::Adjust_AnimMovedTransform(_double fDeltatime)
 				pGameObj->Set_DrawClockBombUI(true);
 
 				m_bHavetoMaking = false;
+
+
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = m_pColliderCom->Get_ColliderPosition();
+					tSoundDesc.vMinMax = _float2(CBSoundMin* 0.5f, CBSoundMax * 0.5f);
+					tSoundDesc.fTargetSound = CBTargetSound * 1.5f;
+					wstring SoundTrack = L"";
+
+					//SoundTrack = L"Weapon_cb_explode0" + to_wstring(rand() % 4 + 1) + L".ogg";
+					SoundTrack = L"Weapon_cb_grow.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_EFFECT, &tSoundDesc);
+				}
 			}
 			
 			break;

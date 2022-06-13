@@ -4,9 +4,14 @@ namespace Engine
 {
 	typedef struct tag3DSoundDesc
 	{
-		_float3			vPosition;
-		_float2			vMinMax;
-		_float			fTargetSound = 1.f;
+		class CTransform*		pTransform = nullptr;
+		_float3					vPosition;
+		_float2					vMinMax;
+		_float					fTargetSound = 1.f;
+		_bool					bStopSoundNow = false;
+		_bool					bFollowTransform = true;
+		_uint					iIdentificationNumber = 0;
+		
 	}SOUNDDESC;
 
 

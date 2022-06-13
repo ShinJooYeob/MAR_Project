@@ -31,7 +31,7 @@ private:
 	_double				m_DeadAnimPassedTime = 0;
 
 	_uint				m_iChecker = 0;
-
+	SOUNDDESC*			m_pSoundDesc = nullptr;
 	vector<PARTICLEDESC>		m_vecParticleDesc;
 private:
 	HRESULT Set_Player_On_Terrain();

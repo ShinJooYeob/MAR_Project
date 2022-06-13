@@ -1,10 +1,13 @@
 
 #include "..\Public\SoundMgr.h"
 #include "PipeLineMgr.h"
+#include "EasingMgr.h"
+#include "Transform.h"
 
 IMPLEMENT_SINGLETON(CSoundMgr)
 
 #define FMOD_VelocityVector _float3(0.f,0.f,0.f)
+#define SoundEasingType TYPE_Linear
 
 CSoundMgr::CSoundMgr()
 	:m_iNumOfEachChannel(_uint(31 / (CHANNEL_MAXCHANNEL - 1)))
@@ -36,6 +39,12 @@ HRESULT CSoundMgr::Initialize_FMOD()
 	NULL_CHECK_RETURN(m_pPipeLineMgr, E_FAIL);
 	Safe_AddRef(m_pPipeLineMgr);
 
+	m_pEasingMgr = GetSingle(CEasingMgr);
+	NULL_CHECK_RETURN(m_pEasingMgr, E_FAIL);
+	Safe_AddRef(m_pEasingMgr);
+
+	
+
 	FMOD_System_Update(m_pSystem);
 
 	return LoadSoundFile();
@@ -43,13 +52,8 @@ HRESULT CSoundMgr::Initialize_FMOD()
 
 HRESULT CSoundMgr::Update_FMOD(_double fTimeDelta)
 {
-	FMOD_3D_ATTRIBUTES listener;
-	_float4x4 ViewMat = m_pPipeLineMgr->Get_Transform_Float4x4(PLM_VIEW);
-	listener = ViewMat.Get_FModValue_ByInverseMatrix(FMOD_VelocityVector);
-	
+	m_ListenerPosition = m_pPipeLineMgr->Get_TargetPostion_float4(PLV_PLAYER);
 
-	// FMOD로 보낸다 (0 = 리스너는 하나)
-	FMOD_System_Set3DListenerAttributes(m_pSystem, 0, &listener.position, &listener.velocity, &listener.forward, &listener.up);
 
 	//FMOD_Channel_Set3DAttributes()
 
@@ -64,19 +68,35 @@ HRESULT CSoundMgr::Update_FMOD(_double fTimeDelta)
 
 	for (_uint i = 0; i< 32; i++)
 	{
+		_uint iChannel = i / m_iNumOfEachChannel;
+		if (i == 31) iChannel = CHANNEL_BGM;
+
 		if (m_fPassedTimeArr[i] != 0)
 		{
-			if (FMOD_Channel_IsPlaying(m_pChannelArr[i], &bPlay))
+			if (FMOD_Channel_IsPlaying(m_pChannelArr[i], &bPlay)|| m_tSoundDesc[i].bStopSoundNow || (m_tSoundDesc[i].pTransform != nullptr && m_tSoundDesc[i].pTransform->Get_IsOwnerDead()))
+			{
+
+				FMOD_Channel_Stop(m_pChannelArr[i]);
+
 				m_fPassedTimeArr[i] = 0;
+				ZeroMemory(&m_tSoundDesc[i],sizeof(SOUNDDESC));
+			}
 			else
 			{
-				_float fLength = m_tSoundDesc[i].vPosition.Get_Distance(XMVectorSet(listener.position.x, listener.position.y, listener.position.z, 0));
+				//bPauseNowPause = false;
+				//bDontFollowTransform = false;
+				if (m_tSoundDesc[i].pTransform != nullptr && m_tSoundDesc[i].bFollowTransform)
+					m_tSoundDesc[i].vPosition = m_tSoundDesc[i].pTransform->Get_MatrixState(CTransform::STATE_POS);
 
-				
+				_float fLength = m_tSoundDesc[i].vPosition.Get_Distance(m_ListenerPosition.XMVector());
 
-				FMOD_Channel_SetVolume(m_pChannelArr[i],( 1 - max(min(fLength, m_tSoundDesc[i].vMinMax.y) - m_tSoundDesc[i].vMinMax.x, 0) / (m_tSoundDesc[i].vMinMax.y - m_tSoundDesc[i].vMinMax.x)));
+				_float Volume = m_pEasingMgr->Easing(SoundEasingType, 1, 0, min(max(fLength - m_tSoundDesc[i].vMinMax.x, 0), m_tSoundDesc[i].vMinMax.y - m_tSoundDesc[i].vMinMax.x),
+					m_tSoundDesc[i].vMinMax.y - m_tSoundDesc[i].vMinMax.x);
+
+
+				FMOD_Channel_SetVolume(m_pChannelArr[i], Volume * m_tSoundDesc[i].fTargetSound * m_VolumeArr[iChannel]);
 				
-			
+				_float tt = (1 - (max(min(fLength, m_tSoundDesc[i].vMinMax.y) - m_tSoundDesc[i].vMinMax.x, 0.f) / (m_tSoundDesc[i].vMinMax.y - m_tSoundDesc[i].vMinMax.x)));
 
 				m_fPassedTimeArr[i] += fTimeDelta;
 			}
@@ -161,7 +181,7 @@ int CSoundMgr::Channel_Pause(CHANNELID eID)
 
 
 
-HRESULT CSoundMgr::PlaySound(TCHAR * pSoundKey, CHANNELID eID, _float4x4 WorldMatrix ,_float fLouderMultiple)
+HRESULT CSoundMgr::PlaySound(const _tchar * pSoundKey, CHANNELID eID, SOUNDDESC* tSoundDesc, SOUNDDESC** pOutDesc)
 {
 	if (eID == CHANNEL_BGM)
 		return E_FAIL;
@@ -189,22 +209,29 @@ HRESULT CSoundMgr::PlaySound(TCHAR * pSoundKey, CHANNELID eID, _float4x4 WorldMa
 			FMOD_System_PlaySound(m_pSystem, iter->second, nullptr, FALSE, &m_pChannelArr[i]);
 
 
-			FMOD_Channel_SetVolume(m_pChannelArr[i], m_VolumeArr[eID]* fLouderMultiple);
+			//FMOD_Channel_SetVolume(m_pChannelArr[i], m_VolumeArr[eID]* fLouderMultiple);
+
+			memcpy(&m_tSoundDesc[i] , tSoundDesc,sizeof(SOUNDDESC));
+
+			m_tSoundDesc[i].fTargetSound = max(min(m_tSoundDesc[i].fTargetSound, 1), 0);
+
+			if (m_tSoundDesc[i].pTransform != nullptr)
+				m_tSoundDesc[i].vPosition = m_tSoundDesc[i].pTransform->Get_MatrixState(CTransform::STATE_POS);
+
+			_float fLength = m_tSoundDesc[i].vPosition.Get_Distance(m_ListenerPosition.XMVector());
+
+			_float Volume = m_pEasingMgr->Easing(SoundEasingType, 1, 0, min(max(fLength - m_tSoundDesc[i].vMinMax.x, 0), m_tSoundDesc[i].vMinMax.y - m_tSoundDesc[i].vMinMax.x),
+				m_tSoundDesc[i].vMinMax.y - m_tSoundDesc[i].vMinMax.x);
+
+
+			FMOD_Channel_SetVolume(m_pChannelArr[i], Volume* m_tSoundDesc[i].fTargetSound * m_VolumeArr[eID]);
+
+		
+			if (pOutDesc != nullptr)
+				*pOutDesc = &m_tSoundDesc[i];
+
+
 			m_fPassedTimeArr[i] = 0.1f;
-
-			FMOD_3D_ATTRIBUTES SoundEvent;
-			SoundEvent = WorldMatrix.Get_FModValue_ByMatrix(FMOD_VelocityVector);
-			// FMOD로 보낸다 (0 = 리스너는 하나)
-
-			SOUNDDESC tDesc;
-			m_tSoundDesc[i].fTargetSound = fLouderMultiple;
-			m_tSoundDesc[i].vMinMax = _float2(1,5);
-			m_tSoundDesc[i].vPosition = *(_float3*)(WorldMatrix.m[3]);
-
-			FMOD_Channel_Set3DAttributes(m_pChannelArr[i], &SoundEvent.position, &SoundEvent.velocity);
-			FMOD_Channel_Set3DMinMaxDistance(m_pChannelArr[i], 1.f, 5.f);
-
-
 			FMOD_System_Update(m_pSystem);
 			return S_OK;
 		}
@@ -223,23 +250,33 @@ HRESULT CSoundMgr::PlaySound(TCHAR * pSoundKey, CHANNELID eID, _float4x4 WorldMa
 	FMOD_System_PlaySound(m_pSystem, iter->second, nullptr, FALSE, &m_pChannelArr[fOldSoundIndx]);
 
 
-	FMOD_Channel_SetVolume(m_pChannelArr[fOldSoundIndx], m_VolumeArr[eID] * fLouderMultiple);
+	//FMOD_Channel_SetVolume(m_pChannelArr[fOldSoundIndx], m_VolumeArr[eID] * fLouderMultiple);
+
+	memcpy(&m_tSoundDesc[fOldSoundIndx], tSoundDesc, sizeof(SOUNDDESC));
+
+	if (m_tSoundDesc[fOldSoundIndx].pTransform != nullptr)
+		m_tSoundDesc[fOldSoundIndx].vPosition = m_tSoundDesc[fOldSoundIndx].pTransform->Get_MatrixState(CTransform::STATE_POS);
+
+	_float fLength = m_tSoundDesc[fOldSoundIndx].vPosition.Get_Distance(m_ListenerPosition.XMVector());
+
+	_float Volume = m_pEasingMgr->Easing(SoundEasingType, 1, 0, min(max(fLength - m_tSoundDesc[fOldSoundIndx].vMinMax.x, 0), m_tSoundDesc[fOldSoundIndx].vMinMax.y - m_tSoundDesc[fOldSoundIndx].vMinMax.x),
+		m_tSoundDesc[fOldSoundIndx].vMinMax.y - m_tSoundDesc[fOldSoundIndx].vMinMax.x);
+
+
+	FMOD_Channel_SetVolume(m_pChannelArr[fOldSoundIndx], Volume* m_tSoundDesc[fOldSoundIndx].fTargetSound * m_VolumeArr[eID]);
+
+
+	if (pOutDesc != nullptr)
+		*pOutDesc = &m_tSoundDesc[fOldSoundIndx];
+
 
 	m_fPassedTimeArr[fOldSoundIndx]  = 0.1f;
-
-
-	FMOD_3D_ATTRIBUTES SoundEvent;
-	SoundEvent = WorldMatrix.Get_FModValue_ByMatrix(FMOD_VelocityVector);
-	// FMOD로 보낸다 (0 = 리스너는 하나)
-	FMOD_Channel_Set3DAttributes(m_pChannelArr[fOldSoundIndx], &SoundEvent.position, &SoundEvent.velocity);
-	FMOD_Channel_Set3DMinMaxDistance(m_pChannelArr[fOldSoundIndx], 1.f, 5.f);
-
 	FMOD_System_Update(m_pSystem);
 	return S_OK;
 
 }
 
-HRESULT CSoundMgr::PlayBGM(TCHAR * pSoundKey, _float fLouderMultiple)
+HRESULT CSoundMgr::PlayBGM(const _tchar * pSoundKey, _float fLouderMultiple)
 {
 	map<TCHAR*, FMOD_SOUND*>::iterator iter;
 	FMOD_Channel_Stop(m_pChannelArr[31]);
@@ -338,6 +375,8 @@ HRESULT CSoundMgr::LoadSoundFile()
 void CSoundMgr::Free()
 {
 	Safe_Release(m_pPipeLineMgr);
+	Safe_Release(m_pEasingMgr);
+	
 
 	for (auto& Mypair : m_mapSound)
 	{
