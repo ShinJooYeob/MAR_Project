@@ -14,6 +14,7 @@
 
 #include "TransparencyBall.h"
 
+#define FootStepSound 0.5f
 
 _uint CALLBACK Add_Force_Thread(void* _Prameter)
 {
@@ -172,8 +173,11 @@ _int CPlayer::LateUpdate(_double fDeltaTime)
 	if (__super::LateUpdate(fDeltaTime) < 0)
 		return -1;
 
+	static SOUNDDESC*	pSlideSoundDesc = nullptr;
+
 	if (g_pGameInstance->Get_DIKeyState(DIK_L)&DIS_Down)
 		m_bSlide = !m_bSlide;
+
 
 	if (!m_bSlide)
 	{
@@ -187,11 +191,31 @@ _int CPlayer::LateUpdate(_double fDeltaTime)
 		}
 		else
 		{
+
 			FAILED_CHECK(Set_Player_On_Terrain());
 		}
+
+		if (pSlideSoundDesc && pSlideSoundDesc->iIdentificationNumber == 6) pSlideSoundDesc->bStopSoundNow = true;
 	}
 	else 
 	{
+		if(!pSlideSoundDesc || pSlideSoundDesc->iIdentificationNumber != 6)
+		{
+			SOUNDDESC tSoundDesc;
+
+			tSoundDesc.pTransform = m_pTransformCom ;
+			tSoundDesc.vMinMax = _float2(3, 10);
+			tSoundDesc.fTargetSound = 0.25f;
+			tSoundDesc.iIdentificationNumber = 6;
+			tSoundDesc.bFollowTransform = true;
+			wstring SoundTrack = L"";
+
+			SoundTrack = L"Player_slide_loop.ogg";
+
+			g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc,&pSlideSoundDesc);
+		}
+
+
 		FAILED_CHECK(Set_Player_On_Slieder(fDeltaTime));
 	}
 	
@@ -2332,6 +2356,66 @@ HRESULT CPlayer::Move_Update(_double fDeltaTime, CGameInstance* pInstance)
 
 		}
 	}
+
+
+	static _uint				m_iOldAnimIndex = INT_MAX;
+	static _uint				m_iAdjMovedIndex = 0;
+
+	_uint iNowAnimIndex = m_pModel->Get_NowAnimIndex();
+	_double PlayRate = m_pModel->Get_PlayRate();
+
+
+	if (iNowAnimIndex != m_iOldAnimIndex || PlayRate > 0.95)
+		m_iAdjMovedIndex = 0;
+
+	if (PlayRate <= 0.95)
+	{
+		switch (iNowAnimIndex)
+		{
+		case 8:
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0)
+			{
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+					tSoundDesc.vMinMax = _float2(0, 5);
+					tSoundDesc.fTargetSound = FootStepSound;
+					wstring SoundTrack = L"";
+
+					SoundTrack = L"FootStep_rock0" + to_wstring(rand() % 9 + 1) + L".ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+				}
+
+				m_iAdjMovedIndex++;
+			}
+			else if (m_iAdjMovedIndex == 1 && PlayRate > 0.5f)
+			{
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+					tSoundDesc.vMinMax = _float2(0, 5);
+					tSoundDesc.fTargetSound = FootStepSound;
+					wstring SoundTrack = L"";
+
+					SoundTrack = L"FootStep_rock0" + to_wstring(rand() % 9 + 1) + L".ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+				}
+
+				m_iAdjMovedIndex++;
+			}
+
+			break;
+
+		}
+	}
+
+
+
+	m_iOldAnimIndex = iNowAnimIndex;
 	return S_OK;
 }
 
@@ -2929,6 +3013,68 @@ HRESULT CPlayer::Move_Update_Horse(_double fDeltaTime, CGameInstance * pInstance
 
 		}
 	}
+
+
+
+	static _uint				m_iOldAnimIndex = INT_MAX;
+	static _uint				m_iAdjMovedIndex = 0;
+
+	_uint iNowAnimIndex = m_pModel->Get_NowAnimIndex();
+	_double PlayRate = m_pModel->Get_PlayRate();
+
+
+	if (iNowAnimIndex != m_iOldAnimIndex || PlayRate > 0.95)
+		m_iAdjMovedIndex = 0;
+
+	if (PlayRate <= 0.95)
+	{
+		switch (iNowAnimIndex)
+		{
+		case Weapon_Horse + 2:
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0)
+			{
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+					tSoundDesc.vMinMax = _float2(0, 5);
+					tSoundDesc.fTargetSound = FootStepSound;
+					wstring SoundTrack = L"";
+
+					SoundTrack = L"FootStep_rock0" + to_wstring(rand() % 9 + 1) + L".ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+				}
+
+				m_iAdjMovedIndex++;
+			}
+			else if (m_iAdjMovedIndex == 1 && PlayRate > 0.5f)
+			{
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+					tSoundDesc.vMinMax = _float2(0, 5);
+					tSoundDesc.fTargetSound = FootStepSound;
+					wstring SoundTrack = L"";
+
+					SoundTrack = L"FootStep_rock0" + to_wstring(rand() % 9 + 1) + L".ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+				}
+
+				m_iAdjMovedIndex++;
+			}
+
+			break;
+
+		}
+	}
+
+
+
+	m_iOldAnimIndex = iNowAnimIndex;
+
 	return S_OK;
 }
 
@@ -3512,6 +3658,77 @@ HRESULT CPlayer::Move_Update_Teapot(_double fDeltaTime, CGameInstance * pInstanc
 			}
 		}
 	}
+
+
+
+	static _uint				m_iOldAnimIndex = INT_MAX;
+	static _uint				m_iAdjMovedIndex = 0;
+
+	_uint iNowAnimIndex = m_pModel->Get_NowAnimIndex();
+	_double PlayRate = m_pModel->Get_PlayRate();
+
+
+	if (iNowAnimIndex != m_iOldAnimIndex || PlayRate > 0.95)
+		m_iAdjMovedIndex = 0;
+
+	if (PlayRate <= 0.95)
+	{
+		switch (iNowAnimIndex)
+		{
+		case Weapon_Teapot + 2:
+		case Weapon_Teapot + 4:
+		case Weapon_Teapot + 5:
+		case Weapon_Teapot + 6:
+		case Weapon_Teapot + 7:
+		case Weapon_Teapot + 12:
+		case Weapon_Teapot + 13:
+		case Weapon_Teapot + 14:
+		case Weapon_Teapot + 15:
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0)
+			{
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+					tSoundDesc.vMinMax = _float2(0, 5 * (1 + m_fCharedGauge*2.f));
+					tSoundDesc.fTargetSound = FootStepSound * (1 + m_fCharedGauge*2.f);
+					wstring SoundTrack = L"";
+
+					SoundTrack = L"FootStep_rock0" + to_wstring(rand() % 9 + 1) + L".ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+				}
+
+				m_iAdjMovedIndex++;
+			}
+			else if (m_iAdjMovedIndex == 1 && PlayRate > 0.5f)
+			{
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+					tSoundDesc.vMinMax = _float2(0, 5 * (1 + m_fCharedGauge*2.f));
+					tSoundDesc.fTargetSound = FootStepSound * (1 + m_fCharedGauge*2.f);
+					wstring SoundTrack = L"";
+
+					SoundTrack = L"FootStep_rock0" + to_wstring(rand() % 9 + 1) + L".ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+				}
+
+				m_iAdjMovedIndex++;
+			}
+
+			break;
+
+
+		}
+	}
+
+
+
+	m_iOldAnimIndex = iNowAnimIndex;
+
 	return S_OK;
 }
 
@@ -4420,6 +4637,68 @@ HRESULT CPlayer::Move_Update_Knife(_double fDeltaTime, CGameInstance * pInstance
 
 		}
 	}
+
+
+	static _uint				m_iOldAnimIndex = INT_MAX;
+	static _uint				m_iAdjMovedIndex = 0;
+
+	_uint iNowAnimIndex = m_pModel->Get_NowAnimIndex();
+	_double PlayRate = m_pModel->Get_PlayRate();
+
+
+	if (iNowAnimIndex != m_iOldAnimIndex || PlayRate > 0.95)
+		m_iAdjMovedIndex = 0;
+
+	if (PlayRate <= 0.95)
+	{
+		switch (iNowAnimIndex)
+		{
+		case Weapon_Knife + 2:
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0)
+			{
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+					tSoundDesc.vMinMax = _float2(0, 5);
+					tSoundDesc.fTargetSound = FootStepSound;
+					wstring SoundTrack = L"";
+
+					SoundTrack = L"FootStep_rock0" + to_wstring(rand() % 9 + 1) + L".ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+				}
+
+				m_iAdjMovedIndex++;
+			}
+			else if (m_iAdjMovedIndex == 1 && PlayRate > 0.5f)
+			{
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+					tSoundDesc.vMinMax = _float2(0, 5);
+					tSoundDesc.fTargetSound = FootStepSound;
+					wstring SoundTrack = L"";
+
+					SoundTrack = L"FootStep_rock0" + to_wstring(rand() % 9 + 1) + L".ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+				}
+
+				m_iAdjMovedIndex++;
+			}
+
+			break;
+
+		}
+	}
+
+
+
+	m_iOldAnimIndex = iNowAnimIndex;
+
+
 	return S_OK;
 }
 
@@ -5056,6 +5335,72 @@ HRESULT CPlayer::Move_Update_Grinder(_double fDeltaTime, CGameInstance * pInstan
 			}
 		}
 	}
+
+
+	static _uint				m_iOldAnimIndex = INT_MAX;
+	static _uint				m_iAdjMovedIndex = 0;
+
+	_uint iNowAnimIndex = m_pModel->Get_NowAnimIndex();
+	_double PlayRate = m_pModel->Get_PlayRate();
+
+
+	if (iNowAnimIndex != m_iOldAnimIndex || PlayRate > 0.95)
+		m_iAdjMovedIndex = 0;
+
+	if (PlayRate <= 0.95)
+	{
+		switch (iNowAnimIndex)
+		{
+		case Weapon_Grinder + 2:
+		case Weapon_Grinder + 4:
+		case Weapon_Grinder + 5:
+		case Weapon_Grinder + 6:
+		case Weapon_Grinder + 7:
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0)
+			{
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+					tSoundDesc.vMinMax = _float2(0, 5);
+					tSoundDesc.fTargetSound = FootStepSound;
+					wstring SoundTrack = L"";
+
+					SoundTrack = L"FootStep_rock0" + to_wstring(rand() % 9 + 1) + L".ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+				}
+
+				m_iAdjMovedIndex++;
+			}
+			else if (m_iAdjMovedIndex == 1 && PlayRate > 0.5f)
+			{
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+					tSoundDesc.vMinMax = _float2(0, 5);
+					tSoundDesc.fTargetSound = FootStepSound;
+					wstring SoundTrack = L"";
+
+					SoundTrack = L"FootStep_rock0" + to_wstring(rand() % 9 + 1) + L".ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+				}
+
+				m_iAdjMovedIndex++;
+			}
+
+			break;
+
+		}
+	}
+
+
+
+	m_iOldAnimIndex = iNowAnimIndex;
+
+
 	return S_OK;
 }
 
@@ -5434,6 +5779,11 @@ HRESULT CPlayer::Set_Player_On_Slieder(_double fDeltatime)
 	_uint	eTile = Tile_None;
 
 	_float3 CaculatedPos = pTerrain->PutOnTerrain(&bIsOn, m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), m_vOldPos.XMVector(),&vPlaneSlideDir, &eTile);
+
+	
+
+
+
 
 	if (bIsOn)
 	{
