@@ -138,11 +138,41 @@ _int CExecutor::Update(_double fDeltaTime)
 			{
 				GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.2f, _float4(0.2f));
 
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+					tSoundDesc.vMinMax = _float2(5, 80);
+					tSoundDesc.fTargetSound = 0.5f + (_float)m_SpwanPassedTime * 0.1f;
+					wstring SoundTrack = L"";
+					SoundTrack = L"Executioner_step0" + to_wstring(rand() % 3 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+				}
+
+
 				iStartCounter++;
 			}
 			else if (iStartCounter == 1 && PlayRate > 0.84&& m_pModel->Get_NowAnimIndex() == 2)
 			{
 				GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.2f, _float4(0.2f));
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+					tSoundDesc.vMinMax = _float2(5, 80);
+					tSoundDesc.fTargetSound = 0.5f + (_float)m_SpwanPassedTime * 0.1f;
+					wstring SoundTrack = L"";
+					SoundTrack = L"Executioner_step0" + to_wstring(rand() % 3 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+				}
+
+
 				iStartCounter++;
 			}
 
@@ -160,11 +190,37 @@ _int CExecutor::Update(_double fDeltaTime)
 			if (m_SpwanPassedTime > 9 && !Jump)
 			{
 				Jump = true;
+
 				m_pModel->Change_AnimIndex_UntilNReturn_Must(16, 17, 17, 0.15, true);
 			}
+
+
+
+
 		}
 		else if (m_SpwanPassedTime < 11)
 		{
+			static _bool Sound = false;
+			if (!Sound)
+			//if (!Sound && m_pModel->Get_NowAnimIndex() == 16 && m_pModel->Get_PlayRate() > 0.8f)
+			{
+				Sound = true;
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+					tSoundDesc.vMinMax = _float2(5.f, 80.f);
+					tSoundDesc.fTargetSound = 0.35f;
+					wstring SoundTrack = L"";
+					SoundTrack = L"Executioner_swing02.ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+				}
+
+			}
+
 			_float3 EasedPos = g_pGameInstance->Easing_Vector(TYPE_ExpoOut, _float3(128, 24.28f, 244), _float3(128, 46.79f, 236.659f), (_float)m_SpwanPassedTime - 10, 1);
 			m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, EasedPos);
 		}
@@ -178,6 +234,8 @@ _int CExecutor::Update(_double fDeltaTime)
 			if (m_SpwanPassedTime > 11.35 && !Land)
 			{
 				Land = true;
+
+
 				m_pModel->Change_AnimIndex(18);
 			}
 		}
@@ -185,10 +243,36 @@ _int CExecutor::Update(_double fDeltaTime)
 		{
 			static _uint iChecker = 0;
 
-			if (m_pModel->Get_PlayRate() > 0.1568627 && !iChecker && m_pModel->Get_NowAnimIndex() == 18)
+			if (m_pModel->Get_PlayRate() > 0.08 && !iChecker && m_pModel->Get_NowAnimIndex() == 18)
+			//if (m_pModel->Get_PlayRate() > 0.1568627 && !iChecker && m_pModel->Get_NowAnimIndex() == 18)
 			{
 				iChecker++;
 				GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.5f, _float4(1.f));
+
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+					tSoundDesc.vMinMax = _float2(1000.f, 10000.f);
+					tSoundDesc.fTargetSound = 0.35f;
+					wstring SoundTrack = L"";
+					SoundTrack = L"Executioner_Stomp_01.ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+				}
+
+				CGameInstance* pInstance = g_pGameInstance;
+				CBreakedGazebo::BREAKEDGAZBODESC tDesc;
+				tDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+				for (_uint i = 0; i < 20; i++)
+				{
+					tDesc.MeshKinds = rand() % 2 + Prototype_QBattleTowerParticleA;
+					pInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_BreakedGazbo), &tDesc);
+				}
+
+
 			}
 			if (m_pModel->Get_PlayRate() > 0.95 && iChecker ==1 && m_pModel->Get_NowAnimIndex() == 18)
 			{
@@ -206,6 +290,59 @@ _int CExecutor::Update(_double fDeltaTime)
 		}
 		else
 		{
+			static _uint iSoundChecker = 0;
+			if (iSoundChecker == 0 && m_pModel->Get_NowAnimIndex() == 20 && m_pModel->Get_PlayRate()>0.45f )
+			{
+				iSoundChecker++;
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+					tSoundDesc.vMinMax = _float2(1000.f, 10000.f);
+					tSoundDesc.fTargetSound = 0.15f;
+					wstring SoundTrack = L"";
+					SoundTrack = L"Executioner_vox_laugh01_short.ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+				}
+			}
+			else 	if (iSoundChecker == 1 && m_pModel->Get_NowAnimIndex() == 21 && m_pModel->Get_PlayRate()>0.f)
+			{
+				iSoundChecker++;
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+					tSoundDesc.vMinMax = _float2(1000.f, 10000.f);
+					tSoundDesc.fTargetSound = 0.15f;
+					wstring SoundTrack = L"";
+					SoundTrack = L"Executioner_vox_laugh02.ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+				}
+			}
+			else if (iSoundChecker == 2 && m_pModel->Get_NowAnimIndex() == 22 && m_pModel->Get_PlayRate()>0.f)
+			{
+				iSoundChecker++;
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+					tSoundDesc.vMinMax = _float2(1000.f, 10000.f);
+					tSoundDesc.fTargetSound = 0.15f;
+					wstring SoundTrack = L"";
+					SoundTrack = L"Executioner_vox_laugh03.ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+				}
+			}
+
 			static _uint iChecker = 0;
 			if (!iChecker&& m_pModel->Get_NowAnimIndex() == 14 && m_pModel->Get_PlayRate() > 0.1230769)
 			{
@@ -1044,11 +1181,39 @@ HRESULT CExecutor::Adjust_AnimMovedTransform(_double fDeltatime)
 			if (m_iAdjMovedIndex == 0 && PlayRate > 0.4)
 			{
 				GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.1f, _float4(0.1f));
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+					tSoundDesc.vMinMax = _float2(5, 50);
+					tSoundDesc.fTargetSound = 0.75f;
+					wstring SoundTrack = L"";
+					SoundTrack = L"Executioner_step0" + to_wstring(rand() % 3 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+				}
+
+
 				m_iAdjMovedIndex++;
 			}
 			if (m_iAdjMovedIndex == 1 && PlayRate > 0.93)
 			{
 				GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.1f, _float4(0.1f));
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+					tSoundDesc.vMinMax = _float2(5, 50);
+					tSoundDesc.fTargetSound = 0.75f;
+					wstring SoundTrack = L"";
+					SoundTrack = L"Executioner_step0" + to_wstring(rand() % 3 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+				}
 				m_iAdjMovedIndex++;
 			}
 
@@ -1057,11 +1222,39 @@ HRESULT CExecutor::Adjust_AnimMovedTransform(_double fDeltatime)
 			if (m_iAdjMovedIndex == 0 && PlayRate > 0.34)
 			{
 				GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.1f, _float4(0.1f));
+				
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+					tSoundDesc.vMinMax = _float2(5, 35);
+					tSoundDesc.fTargetSound = 1.f;
+					wstring SoundTrack = L"";
+					SoundTrack = L"Executioner_step0" + to_wstring(rand() % 3 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+				}
 				m_iAdjMovedIndex++;
 			}
 			if (m_iAdjMovedIndex == 1 && PlayRate > 0.86)
 			{
 				GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.1f, _float4(0.1f));
+				
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+					tSoundDesc.vMinMax = _float2(5, 35);
+					tSoundDesc.fTargetSound = 1.f;
+					wstring SoundTrack = L"";
+					SoundTrack = L"Executioner_step0" + to_wstring(rand() % 3 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+				}
 				m_iAdjMovedIndex++;
 			}
 
