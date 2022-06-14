@@ -60,6 +60,7 @@ HRESULT CScrechedBlock::Initialize_Clone(void * pArg)
 
 	m_fStartTimer = 0;
 
+
 	return S_OK;
 }
 
@@ -196,6 +197,25 @@ _int CScrechedBlock::LightRender()
 	}
 
 	return _int();
+}
+
+void CScrechedBlock::Set_Spout()
+{
+	{ m_bIsSpout = true; m_fStartTimer = 0;
+
+	SOUNDDESC tSoundDesc;
+
+	tSoundDesc.pTransform = m_pTransformCom;
+	tSoundDesc.vMinMax = _float2(5, 35);
+	tSoundDesc.fTargetSound = 0.08f;
+	wstring SoundTrack = L"";
+	SoundTrack = L"Executioner_spin_destrcut0" + to_wstring(rand() % 12 + 1) + L".ogg";
+
+	//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+	g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
+
+	};
 }
 
 void CScrechedBlock::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedObj, CCollider * pConflictedCollider, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType)

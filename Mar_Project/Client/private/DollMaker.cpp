@@ -49,6 +49,22 @@ HRESULT CDollMaker::Initialize_Clone(void * pArg)
 	m_bIsPatternFinished = true;
 	m_bSpwanAnimFinished = false;
 	m_SpwanAnimPassedTime = 0;
+
+	{
+
+		SOUNDDESC tSoundDesc;
+		tSoundDesc.pTransform = m_pTransformCom;
+		tSoundDesc.vMinMax = _float2(0, 70);
+		tSoundDesc.fTargetSound = 0.5f;
+
+
+		wstring SoundTrack = L"";
+		SoundTrack = L"fire.ogg";
+
+		//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+		g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+	}
 	return S_OK;
 }
 
@@ -71,6 +87,43 @@ _int CDollMaker::Update(_double fDeltaTime)
 
 			if (m_DeadPassedTime < 6.5)
 			{
+				if (!m_DeathSoundChecker)
+				{
+					m_DeathSoundChecker++;
+					{
+
+						SOUNDDESC tSoundDesc;
+						tSoundDesc.pTransform = m_pTransformCom;
+						tSoundDesc.vMinMax = _float2(100, 100);
+						tSoundDesc.fTargetSound = 0.35f;
+
+
+						wstring SoundTrack = L"";
+						SoundTrack = L"DollMaker_deathcin01.ogg";
+
+						//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+						g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+					}
+					{
+
+						SOUNDDESC tSoundDesc;
+						tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+						tSoundDesc.vMinMax = _float2(100, 100);
+						tSoundDesc.fTargetSound = 1.f;
+
+
+						wstring SoundTrack = L"";
+						SoundTrack = L"DollMaker_deathcin_fall.ogg";
+
+						//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+						g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+					}
+
+				}
+
+
 				_float3 EasedPos;
 				if (m_DeadPassedTime < 3.25f)
 				{
@@ -117,6 +170,41 @@ _int CDollMaker::Update(_double fDeltaTime)
 				}
 				else if (m_DeadPassedTime < 4.25f)//다보이게 올라가
 				{
+					if (m_DeathSoundChecker == 1)
+					{
+						m_DeathSoundChecker++;
+						{
+
+							SOUNDDESC tSoundDesc;
+							tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+							tSoundDesc.vMinMax = _float2(100, 100);
+							tSoundDesc.fTargetSound = 0.75f;
+
+
+							wstring SoundTrack = L"";
+							SoundTrack = L"DollMaker_deathcin_fall.ogg";
+
+							//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+							g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+						}
+						{
+
+							SOUNDDESC tSoundDesc;
+							tSoundDesc.pTransform = m_pTransformCom;
+							tSoundDesc.vMinMax = _float2(100, 100);
+							tSoundDesc.fTargetSound = 0.35f;
+
+
+							wstring SoundTrack = L"";
+							SoundTrack = L"DollMaker_deathcin02.ogg";
+
+							//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+							g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+						}
+					}
+
 					if (m_iDeadAnimChecker == 1)
 					{
 						GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.5f, _float4(0.8f));
@@ -134,6 +222,27 @@ _int CDollMaker::Update(_double fDeltaTime)
 				}
 				else if (m_DeadPassedTime < 6.5f) // 완전히 내려가
 				{
+					if (m_DeathSoundChecker == 2)
+					{
+						m_DeathSoundChecker++;
+						{
+
+
+							SOUNDDESC tSoundDesc;
+							tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+							tSoundDesc.vMinMax = _float2(100, 100);
+							tSoundDesc.fTargetSound = 0.75f;
+
+
+							wstring SoundTrack = L"";
+							SoundTrack = L"DollMaker_deathcin_fall.ogg";
+
+							//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+							g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+						}
+					}
+
 					GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.1f, _float4(0.1f));
 
 
@@ -151,6 +260,28 @@ _int CDollMaker::Update(_double fDeltaTime)
 			}
 			else if (m_DeadPassedTime < 7.5)
 			{
+
+				if (m_DeathSoundChecker == 3)
+				{
+					m_DeathSoundChecker++;
+
+					{
+
+						SOUNDDESC tSoundDesc;
+						tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+						tSoundDesc.vMinMax = _float2(100, 100);
+						tSoundDesc.fTargetSound = 0.5f;
+
+
+						wstring SoundTrack = L"";
+						SoundTrack = L"DollMaker_deathcin03.ogg";
+
+						//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+						g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+					}
+				}
+
 				GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.1f, _float4(0.1f *  (7.5f - (_float)m_DeadPassedTime)));
 
 
@@ -185,12 +316,13 @@ _int CDollMaker::Update(_double fDeltaTime)
 				m_pTransformCom->LookAt(TargetAt);
 			}
 
-
+			static SOUNDDESC*	m_pBossNorSoundDesc = nullptr;
+			static _double	 m_pBossNorSoundTimer = 0;
 
 			if (m_PatternDelayTime > 0)
 			{
 				m_PatternDelayTime -= fDeltaTime;
-
+				m_pBossNorSoundTimer -= fDeltaTime;
 				if (m_fHP < m_fMaxHP * 0.8f && m_pHanddyIndex == 0)
 				{
 					m_PatternDelayTime = 4;
@@ -201,7 +333,7 @@ _int CDollMaker::Update(_double fDeltaTime)
 					}
 				}
 
-				if (m_fHP < m_fMaxHP * 0.6f && m_pHanddyIndex == 1)
+				else if (m_fHP < m_fMaxHP * 0.6f && m_pHanddyIndex == 1)
 				{
 					m_PatternDelayTime = 4;
 					if (!m_bSummonHandy)
@@ -210,9 +342,39 @@ _int CDollMaker::Update(_double fDeltaTime)
 						m_pModel->Change_AnimIndex_UntilNReturn_Must(14, 17, 0, 0.15, true);
 					}
 				}
+				else
+				{
+					if ((!m_pBossNorSoundDesc || m_pBossNorSoundDesc->iIdentificationNumber != 40) && m_pBossNorSoundTimer< 0)
+					{
+
+						m_pBossNorSoundTimer = (GetSingle(CUtilityMgr)->RandomFloat(1.5f, 2.f));
+						{
+
+
+							SOUNDDESC tSoundDesc;
+							tSoundDesc.vPosition = m_pColliderCom->Get_ColliderPosition(2);
+							tSoundDesc.vMinMax = _float2(0, 50);
+							tSoundDesc.fTargetSound = 0.35f;
+							tSoundDesc.iIdentificationNumber = 40;
+
+							wstring SoundTrack = L"";
+							SoundTrack = L"DollMaker_monster_warnlong0" + to_wstring(rand() % 4 + 1) + L".ogg";
+
+
+							//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+							g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc, &m_pBossNorSoundDesc);
+						}
+
+
+					}
+				}
 			}
 			else
 			{
+				m_pBossNorSoundTimer = 0;
+				//if (m_pBossNorSoundDesc && m_pBossNorSoundDesc->iIdentificationNumber == 40)
+				//	m_pBossNorSoundDesc->bStopSoundNow = true;
 				_uint iChecker = 1;
 
 				for (_uint i = 0; i < m_pHanddyIndex; i++)
@@ -668,15 +830,27 @@ HRESULT CDollMaker::SetUp_Weapon()
 
 
 
+	//CMonsterWeapon* pWeapon = nullptr;
+	//FAILED_CHECK(pInstance->Add_GameObject_Out_of_Manager((CGameObject**)&pWeapon, m_eNowSceneNum, TAG_OP(Prototype_HandyBoy), &_float3(71, 10, 60)));
+	//NULL_CHECK_RETURN(pWeapon, E_FAIL);
+	//m_vecWeapon.push_back(pWeapon);
+
+	//pWeapon = nullptr;
+	//FAILED_CHECK(pInstance->Add_GameObject_Out_of_Manager((CGameObject**)&pWeapon, m_eNowSceneNum, TAG_OP(Prototype_HandyGirl), &_float3(63, 10, 75)));
+	//NULL_CHECK_RETURN(pWeapon, E_FAIL);
+	//m_vecWeapon.push_back(pWeapon);
+
+	//Gril 먼저
 	CMonsterWeapon* pWeapon = nullptr;
-	FAILED_CHECK(pInstance->Add_GameObject_Out_of_Manager((CGameObject**)&pWeapon, m_eNowSceneNum, TAG_OP(Prototype_HandyBoy), &_float3(71, 10, 60)));
+	FAILED_CHECK(pInstance->Add_GameObject_Out_of_Manager((CGameObject**)&pWeapon, m_eNowSceneNum, TAG_OP(Prototype_HandyGirl), &_float3(63, 10, 75)));
 	NULL_CHECK_RETURN(pWeapon, E_FAIL);
 	m_vecWeapon.push_back(pWeapon);
 
 	pWeapon = nullptr;
-	FAILED_CHECK(pInstance->Add_GameObject_Out_of_Manager((CGameObject**)&pWeapon, m_eNowSceneNum, TAG_OP(Prototype_HandyGirl), &_float3(63, 10, 75)));
+	FAILED_CHECK(pInstance->Add_GameObject_Out_of_Manager((CGameObject**)&pWeapon, m_eNowSceneNum, TAG_OP(Prototype_HandyBoy), &_float3(71, 10, 60)));
 	NULL_CHECK_RETURN(pWeapon, E_FAIL);
 	m_vecWeapon.push_back(pWeapon);
+
 
 
 
@@ -698,12 +872,60 @@ HRESULT CDollMaker::Adjust_AnimMovedTransform(_double fDeltatime)
 		{
 		case 0:
 			break;
-	
+		case 1:
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.444444444444444f)
+			{
+				{
+
+
+					SOUNDDESC tSoundDesc;
+					tSoundDesc.vPosition = m_pColliderCom->Get_ColliderPosition(2);
+					tSoundDesc.vMinMax = _float2(0, 70);
+					tSoundDesc.fTargetSound = 0.35f;
+
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"DollMaker_pain01.ogg";
+
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+				}
+
+
+				m_iAdjMovedIndex++;
+			}
+			break;
 
 		case 2:
 		case 3:
 		{
 			static _double AmilazeTimer = 0;
+
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.0)
+			{
+
+				{
+
+
+					SOUNDDESC tSoundDesc;
+					tSoundDesc.vPosition = m_pColliderCom->Get_ColliderPosition(2);
+					tSoundDesc.vMinMax = _float2(0, 70);
+					tSoundDesc.fTargetSound = 0.35f;
+
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"DollMaker_common_grabfail0" + to_wstring(rand() % 3 + 1) + L".ogg";
+
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+				}
+
+				m_iAdjMovedIndex++;
+			}
 
 			if (PlayRate < 0.0001f)
 			{
@@ -726,16 +948,109 @@ HRESULT CDollMaker::Adjust_AnimMovedTransform(_double fDeltatime)
 
 					g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_DollMakerBullet), &tDesc);
 
+
+
+					{
+						SOUNDDESC tSoundDesc;
+						tSoundDesc.vPosition = m_pColliderCom->Get_ColliderPosition(2);
+						tSoundDesc.vMinMax = _float2(0, 50);
+						tSoundDesc.fTargetSound = 0.65f;
+
+
+						wstring SoundTrack = L"";
+						SoundTrack = L"DollMaker_orijectile_shoot0" + to_wstring(rand() % 3 + 1) + L".ogg";
+
+
+						//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+						g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+					}
+
 					AmilazeTimer = GetSingle(CUtilityMgr)->RandomFloat(1.f, 2.5f);
+
 				}
 
 			}
 		}
 			break;
+		case 4:
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.2375f)
+			{
+				{
 
+
+					SOUNDDESC tSoundDesc;
+					tSoundDesc.vPosition = m_pColliderCom->Get_ColliderPosition(2);
+					tSoundDesc.vMinMax = _float2(0, 70);
+					tSoundDesc.fTargetSound = 0.35f;
+
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"DollMaker_projectile_in.ogg";
+
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+				}
+
+
+				m_iAdjMovedIndex++;
+			}
+			break;
+		case 5:
+
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.375f)
+			{
+				{
+
+
+					SOUNDDESC tSoundDesc;
+					tSoundDesc.vPosition = m_pColliderCom->Get_ColliderPosition(2);
+					tSoundDesc.vMinMax = _float2(0, 70);
+					tSoundDesc.fTargetSound = 0.35f;
+
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"DollMaker_pain01.ogg";
+
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+				}
+
+				
+				m_iAdjMovedIndex++;
+			}
+
+			break;
 		case 6:
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.0)
+			{
 
-			if (m_iAdjMovedIndex == 0 && PlayRate > 0.45)
+				{
+
+
+					SOUNDDESC tSoundDesc;
+					tSoundDesc.vPosition = m_pColliderCom->Get_ColliderPosition(2);
+					tSoundDesc.vMinMax = _float2(0, 70);
+					tSoundDesc.fTargetSound = 0.35f;
+
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"DollMaker_common_grabfail0"+to_wstring(rand()%3 + 1)+L".ogg";
+
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+				}
+
+				m_iAdjMovedIndex++;
+			}
+
+			if (m_iAdjMovedIndex == 1 && PlayRate > 0.45)
 			{
 				GetSingle(CUtilityMgr)->Set_MonsterBlurOn(true);
 				m_iAdjMovedIndex++;
@@ -752,8 +1067,28 @@ HRESULT CDollMaker::Adjust_AnimMovedTransform(_double fDeltatime)
 		{
 			GetSingle(CUtilityMgr)->Set_MonsterBlurPos(m_pColliderCom->Get_ColliderPosition(2));
 
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.)
+			{
+				{
 
-			if (m_iAdjMovedIndex == 0 && PlayRate > 0.3)
+
+					SOUNDDESC tSoundDesc;
+					tSoundDesc.vPosition = m_pColliderCom->Get_ColliderPosition(2);
+					tSoundDesc.vMinMax = _float2(0, 70);
+					tSoundDesc.fTargetSound = 0.35f;
+
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"DollMaker_monster_breathin.ogg";
+
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+				}
+				m_iAdjMovedIndex++;
+			}
+			if (m_iAdjMovedIndex == 1 && PlayRate > 0.3)
 			{
 
 				CHyperVoice::CIRCLETORNADODESC tDesc;
@@ -767,6 +1102,23 @@ HRESULT CDollMaker::Adjust_AnimMovedTransform(_double fDeltatime)
 
 
 
+				{
+
+
+					SOUNDDESC tSoundDesc;
+					tSoundDesc.vPosition = m_pColliderCom->Get_ColliderPosition(2);
+					tSoundDesc.vMinMax = _float2(0, 70);
+					tSoundDesc.fTargetSound = 0.35f;
+
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"DollMaker_monster_effort02.ogg";
+
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+				}
 
 				FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_HyperVoice), &tDesc));
 
@@ -776,11 +1128,54 @@ HRESULT CDollMaker::Adjust_AnimMovedTransform(_double fDeltatime)
 			}
 		}
 			break;
+		case 8:
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.225)
+			{
+
+				{
+
+
+					SOUNDDESC tSoundDesc;
+					tSoundDesc.vPosition = m_pColliderCom->Get_ColliderPosition(2);
+					tSoundDesc.vMinMax = _float2(0, 70);
+					tSoundDesc.fTargetSound = 0.35f;
+
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"DollMaker_projectile_in.ogg";
+
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+				}
+
+				m_iAdjMovedIndex++;
+			}
+
+			break;
 
 		case 10:
 			if (PlayRate > 0.85 && m_pHanddyIndex == 0)
 			{
 				m_pHanddyIndex = 1;
+				{
+					SOUNDDESC tSoundDesc;
+					tSoundDesc.vPosition = m_pColliderCom->Get_ColliderPosition(2);
+					tSoundDesc.vMinMax = _float2(0, 50);
+					tSoundDesc.fTargetSound = 0.35f;
+
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"DollMaker_pain_boy.ogg";
+
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+				}
+
+
 				((CHandyBoy*)(m_vecWeapon[0]))->Enter_Hand();
 				m_bSummonHandy = false;
 			}
@@ -790,9 +1185,72 @@ HRESULT CDollMaker::Adjust_AnimMovedTransform(_double fDeltatime)
 			if (PlayRate > 0.85 && m_pHanddyIndex == 1)
 			{
 				m_pHanddyIndex = 2;
+
+				{
+					SOUNDDESC tSoundDesc;
+					tSoundDesc.vPosition = m_pColliderCom->Get_ColliderPosition(2);
+					tSoundDesc.vMinMax = _float2(0, 50);
+					tSoundDesc.fTargetSound = 0.35f;
+
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"DollMaker_pain_girl.ogg";
+
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+				}
+
+
 				((CHandyGirl*)(m_vecWeapon[1]))->Enter_Hand();
 				m_bSummonHandy = false;
 
+			}
+			break;
+		case 19:
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.0)
+			{
+				m_iAdjMovedIndex++;
+				{
+
+
+					SOUNDDESC tSoundDesc;
+					tSoundDesc.vPosition = m_pColliderCom->Get_ColliderPosition(2);
+					tSoundDesc.vMinMax = _float2(0, 50);
+					tSoundDesc.fTargetSound = 0.35f;
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"DollMaker_deathcin0" + to_wstring(rand() % 2 + 2) + L".ogg";
+
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
+				}
+			}
+			break;
+
+		case 20:
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.0)
+			{
+				m_iAdjMovedIndex++;
+				{
+
+
+					SOUNDDESC tSoundDesc;
+					tSoundDesc.vPosition = m_pColliderCom->Get_ColliderPosition(2);
+					tSoundDesc.vMinMax = _float2(0, 50);
+					tSoundDesc.fTargetSound = 0.35f;
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"DollMaker_deathcin0" + to_wstring(rand() % 2 + 2) + L".ogg";
+
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
+				}
 			}
 			break;
 

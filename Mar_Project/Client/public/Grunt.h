@@ -59,6 +59,10 @@ private:
 
 	_uint				m_iOldAnimIndex = INT_MAX;
 	_uint				m_iAdjMovedIndex = 0;
+
+	SOUNDDESC*			m_FireSoundDesc = nullptr;
+
+	_uint				m_DeathChecker = 0;
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ParticleDesc();

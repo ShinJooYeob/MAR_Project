@@ -96,6 +96,42 @@ _int CStage1_SpwanGrunt::Update(_double fDeltaTime)
 
 				m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, _float3(163.5f, 2.9f, 151.58f));
 				m_pTransformCom->Scaled_All(EasedScale);
+
+				static _uint iSoundChecker = 0;
+				if(!iSoundChecker)
+				{
+					iSoundChecker++;
+
+					{
+
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+					tSoundDesc.vMinMax = _float2(5, 35);
+					tSoundDesc.fTargetSound = 0.75f;
+					wstring SoundTrack = L"";
+					SoundTrack = L"MapObject_br_doom03.ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+					}
+					//{
+					//	
+
+					//	SOUNDDESC tSoundDesc;
+
+					//	tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+					//	tSoundDesc.vMinMax = _float2(5, 35);
+					//	tSoundDesc.fTargetSound = 0.35f;
+					//	wstring SoundTrack = L"";
+					//	SoundTrack = L"MapObject_slowmo_warning02.ogg";
+
+					//	//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					//	g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+					//}
+				}
 			}
 			else if (m_SpwanPassedTime > GruntSwpanTiming - 2.0)
 			{
@@ -106,6 +142,27 @@ _int CStage1_SpwanGrunt::Update(_double fDeltaTime)
 					, _float(m_SpwanPassedTime - (GruntSwpanTiming - 2.0)), 0.5);
 
 				m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, EasedPos);
+
+				static _uint iSoundChecker = 0;
+				if (!iSoundChecker)
+				{
+					iSoundChecker++;
+
+					{
+
+						SOUNDDESC tSoundDesc;
+
+						tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+						tSoundDesc.vMinMax = _float2(5, 35);
+						tSoundDesc.fTargetSound = 0.35f;
+						wstring SoundTrack = L"";
+						SoundTrack = L"MapObject_memory_fragment_touch.ogg";
+
+						//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+						g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+					}
+				}
 
 			}
 

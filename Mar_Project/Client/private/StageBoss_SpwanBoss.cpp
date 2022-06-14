@@ -59,6 +59,35 @@ _int CStageBoss_SpwanBoss::Update(_double fDeltaTime)
 		{
 				m_SpwanPassedTime+=fDeltaTime;
 
+				static _double SoundTime = 0;
+
+				SoundTime -= fDeltaTime;
+
+				if (SoundTime < 0 && m_SpwanPassedTime < 9.f)
+				{
+					SoundTime = GetSingle(CUtilityMgr)->RandomFloat(0.65f, 1.f);
+
+
+					{
+
+
+						SOUNDDESC tSoundDesc;
+						tSoundDesc.vPosition = _float3(85, 10, 78);
+						tSoundDesc.vMinMax = _float2(0, 70);
+						tSoundDesc.fTargetSound = (9.f- (_float)m_SpwanPassedTime) / 9.f + 0.1f;
+
+
+						wstring SoundTrack = L"";
+						SoundTrack = L"DollMaker_laughing0" + to_wstring(rand() % 12 + 1) + L".ogg";
+
+						//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+						g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+					}
+
+
+				}
+
 				_float EasedPosX = (g_pGameInstance->Easing(TYPE_SinOut, -100.f, 288.f, (_float)m_SpwanPassedTime ,10.f));
 				_float EasedPosY = (g_pGameInstance->Easing(TYPE_SinInOut, 217.f, 125.f, (_float)m_SpwanPassedTime , 10.f));
 				_float EasedPosZ = (g_pGameInstance->Easing(TYPE_SinIn, -55.f, 196.f, (_float)m_SpwanPassedTime , 10.f));

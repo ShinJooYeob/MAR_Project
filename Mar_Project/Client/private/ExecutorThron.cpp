@@ -48,6 +48,19 @@ HRESULT CExecutorThron::Initialize_Clone(void * pArg)
 	CUtilityMgr* pUtilMgr = GetSingle(CUtilityMgr);
 	m_fTurningTime = 0;
 	//m_vRotAxis = m_vSpoutDir;
+
+	SOUNDDESC tSoundDesc;
+
+	tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+	tSoundDesc.vMinMax = _float2(5, 35);
+	tSoundDesc.fTargetSound = 0.08f;
+	wstring SoundTrack = L"";
+	SoundTrack = L"Executioner_spin_destrcut0" + to_wstring(rand() % 12 + 1) + L".ogg";
+
+	//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+	g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
+
 	return S_OK;
 }
 

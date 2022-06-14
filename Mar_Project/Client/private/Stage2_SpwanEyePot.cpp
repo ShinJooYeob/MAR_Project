@@ -109,6 +109,28 @@ _int CStage2_SpwanEyePot::Update(_double fDeltaTime)
 				if (iChecker == 0 && m_SpwanPassedTime > 2.)
 				{
 					GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 1.2f, _float4(0.1f));
+					{
+
+						list<CGameObject*>* MonsterLayer = g_pGameInstance->Get_ObjectList_from_Layer(SCENE_STAGE2, TAG_LAY(Layer_Monster));
+
+						NULL_CHECK_RETURN(MonsterLayer, E_FAIL);
+
+						
+
+						SOUNDDESC tSoundDesc;
+
+						tSoundDesc.vPosition = ((CTransform*)(((CEyepot*)(MonsterLayer->back()))->Get_Component(TAG_COM(Com_Transform))))->Get_MatrixState_Float3(CTransform::STATE_POS);
+						tSoundDesc.vMinMax = _float2(0, 50.f);
+						tSoundDesc.fTargetSound = 0.5f;
+
+						wstring SoundTrack = L"";
+						SoundTrack = L"MapObject_Rock_Big_Fall_02.ogg";
+
+						//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+						g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
+					}
+
 					iChecker++;
 
 				}
@@ -252,6 +274,9 @@ void CStage2_SpwanEyePot::CollisionTriger(_uint iMyColliderIndex, CGameObject * 
 		if (m_SpwanPassedTime < 10)
 		{
 
+
+
+
 			m_bSpwanStart = true;
 			m_pPlayer->Set_ReturnPos(_float3(75.830f, 23.670f, 77.509f), _float3(84.321f, 23.670f, 95.669f));
 			m_SpwanPassedTime = 0;
@@ -280,6 +305,10 @@ void CStage2_SpwanEyePot::CollisionTriger(_uint iMyColliderIndex, CGameObject * 
 
 			m_pTransformCom->Scaled_All(_float3(0.4f));
 			m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, _float3(161.611f, 54.45f, 68.017f));
+
+
+
+
 		}
 		else
 		{

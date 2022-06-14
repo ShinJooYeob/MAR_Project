@@ -3,7 +3,9 @@
 #include "Terrain.h"
 #include "EyepotChainGranade.h"
 
-
+#define FootSetpSoud 0.35f
+#define FootSetpSoudMin 0.f
+#define FootSetpSoudMax 25.f
 
 CEyepot::CEyepot(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext)
 	:CMonster(pDevice,pDeviceContext)
@@ -54,13 +56,65 @@ _int CEyepot::Update(_double fDeltaTime)
 	m_pColliderCom->Update_ConflictPassedTime(fDeltaTime);
 
 
+	if (m_bStartPos)
+		Update_DmgCalculate(fDeltaTime);
+
+
+	if (g_pGameInstance->Get_DIKeyState(DIK_5)&DIS_Down)
+		Add_Dmg_to_Monster(2);
+
 	if (g_pGameInstance->Get_DIKeyState(DIK_O)&DIS_Down)
 		Add_Dmg_to_Monster(1000);
 
 
-
-
 	_uint AnimIndex = m_pModel->Get_NowAnimIndex();
+
+	static _double iSteamSoudTimer = 0;
+	iSteamSoudTimer -= fDeltaTime;
+	if (iSteamSoudTimer < 0)
+	{
+
+		iSteamSoudTimer = 0.1f;
+		if(m_pModel->Get_NowAnimIndex() == 9 || m_pModel->Get_NowAnimIndex() == 10)
+		{
+
+			SOUNDDESC tSoundDesc;
+
+			tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+			tSoundDesc.vMinMax = _float2(0, 25);
+			tSoundDesc.fTargetSound = 0.35f;
+
+			wstring SoundTrack = L"";
+
+			SoundTrack = L"Eyepot_tellb0" + to_wstring(rand() % 2 + 1) + L".ogg";
+
+			//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+			g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+
+			if (!m_pSteamSoundDesc || m_pSteamSoundDesc->iIdentificationNumber != 30)
+			{
+				{
+
+					SOUNDDESC tSoundDesc;
+					tSoundDesc.pTransform = m_pTransformCom;
+					tSoundDesc.vMinMax = _float2(0, 25);
+					tSoundDesc.fTargetSound = 0.1f;
+					tSoundDesc.iIdentificationNumber = 30;
+
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"c1_steamloop0" + to_wstring(rand() % 4 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc, &m_pSteamSoundDesc);
+				}
+			}
+
+		}
+	}
+
 
 	if (m_bDeathAnimStart)
 	{
@@ -79,6 +133,7 @@ _int CEyepot::Update(_double fDeltaTime)
 				m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
 				FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime, m_bIsOnScreen));
 
+				FAILED_CHECK(Adjust_AnimMovedTransform(fDeltaTime));
 			}
 			else
 			{
@@ -88,56 +143,58 @@ _int CEyepot::Update(_double fDeltaTime)
 			}
 		}
 	}
-	else if (!m_bIsDmgAnimUpdated[2])
+	else 
 	{
-		if (m_bStartPos)
+		if (!m_bIsDmgAnimUpdated[2])
 		{
-			if (m_PatternDelayTime > 4 && (!m_bIsPatternFinished || Distance_BetweenPlayer(m_pTransformCom) < 15))
-			{
-				Update_Pattern(fDeltaTime);
-			}
-			else
-			{
-				m_PatternDelayTime += fDeltaTime;
 
-				if (!m_pModel->Get_IsUntillPlay() && !m_pModel->Get_IsHavetoBlockAnimChange())
-				{
-					m_pModel->Change_AnimIndex(1);
-					FAILED_CHECK(__super::Update_WanderAround(m_pTransformCom, fDeltaTime, 0.05f));
-				}
-			}
-		}
-		else//스타트 패턴
-		{
-			if (m_bStartSprout)
+			if (m_bStartPos)
 			{
-				if (!m_bIsPatternFinished)
+				if (m_PatternDelayTime > 4 && (!m_bIsPatternFinished || Distance_BetweenPlayer(m_pTransformCom) < 15))
 				{
-					m_pModel->Change_AnimIndex_ReturnTo_Must(24, 0, 0.15, true);
-					m_bIsPatternFinished = true;
-					m_PatternPassedTime = 0;
-					m_PatternDelayTime = 0;
-
+					Update_Pattern(fDeltaTime);
 				}
 				else
 				{
-					m_PatternPassedTime += fDeltaTime;
+					m_PatternDelayTime += fDeltaTime;
 
-					if (m_PatternPassedTime > 5.)
+					if (!m_pModel->Get_IsUntillPlay() && !m_pModel->Get_IsHavetoBlockAnimChange())
 					{
+						m_pModel->Change_AnimIndex(1);
+						FAILED_CHECK(__super::Update_WanderAround(m_pTransformCom, fDeltaTime, 0.05f));
+					}
+				}
+			}
+			else//스타트 패턴
+			{
+				if (m_bStartSprout)
+				{
+					if (!m_bIsPatternFinished)
+					{
+						m_pModel->Change_AnimIndex_ReturnTo_Must(24, 0, 0.15, true);
+						m_bIsPatternFinished = true;
 						m_PatternPassedTime = 0;
-						m_bStartPos = true;
+						m_PatternDelayTime = 0;
+
+					}
+					else
+					{
+						m_PatternPassedTime += fDeltaTime;
+
+						if (m_PatternPassedTime > 5.)
+						{
+							m_PatternPassedTime = 0;
+							m_bStartPos = true;
+						}
+
 					}
 
 				}
-
 			}
+
+
 		}
 
-
-
-		if (m_bStartPos)
-			Update_DmgCalculate(fDeltaTime);
 
 		m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
 		_uint NowAnimIndex = m_pModel->Get_NowAnimIndex();
@@ -151,6 +208,8 @@ _int CEyepot::Update(_double fDeltaTime)
 		{
 			FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime, m_bIsOnScreen));
 		}
+
+		FAILED_CHECK(Adjust_AnimMovedTransform(fDeltaTime));
 
 		if (m_bIsOnScreen)
 		{
@@ -300,6 +359,8 @@ _int CEyepot::LightRender()
 
 _int CEyepot::Update_DmgCalculate(_double fDeltaTime)
 {
+
+	if (m_bDeathAnimStart)return 0;
 	if (m_fHP <= 0)
 	{
 		if (!m_bDeathAnimStart)
@@ -311,6 +372,7 @@ _int CEyepot::Update_DmgCalculate(_double fDeltaTime)
 
 			m_bDeathAnimStart = true;
 			m_pModel->Change_AnimIndex(23, 0.15, true);
+			if (m_pSteamSoundDesc && m_pSteamSoundDesc->iIdentificationNumber == 30)m_pSteamSoundDesc->bStopSoundNow = true;
 		}
 
 		return 0;
@@ -347,6 +409,10 @@ _int CEyepot::Update_DmgCalculate(_double fDeltaTime)
 		m_PatternPassedTime = 0;
 		m_pTransformCom->Set_MoveSpeed(1.5f);
 		m_bIsDmgAnimUpdated[0] = true;
+
+
+
+		if (m_pSteamSoundDesc && m_pSteamSoundDesc->iIdentificationNumber == 30)m_pSteamSoundDesc->bStopSoundNow = true;
 	}
 	else if (!m_bIsDmgAnimUpdated[1] && m_fMaxHP * 0.15 < m_fDmgAmount)
 	{
@@ -357,6 +423,9 @@ _int CEyepot::Update_DmgCalculate(_double fDeltaTime)
 		m_pTransformCom->Set_MoveSpeed(1.5f);
 		Add_Force(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK)* -1, 10);
 		m_bIsDmgAnimUpdated[1] = true;
+
+
+		if (m_pSteamSoundDesc && m_pSteamSoundDesc->iIdentificationNumber == 30)m_pSteamSoundDesc->bStopSoundNow = true;
 	}
 	else if (!m_bIsDmgAnimUpdated[2] && m_fMaxHP * 0.2 < m_fDmgAmount)
 	{
@@ -368,6 +437,7 @@ _int CEyepot::Update_DmgCalculate(_double fDeltaTime)
 		m_bIsDmgAnimUpdated[2] = true;
 		m_DmgPassedTime = 5;
 
+		if (m_pSteamSoundDesc && m_pSteamSoundDesc->iIdentificationNumber == 30)m_pSteamSoundDesc->bStopSoundNow = true;
 	}
 
 	return _int();
@@ -427,6 +497,40 @@ HRESULT CEyepot::Set_Monster_On_Terrain(CTransform * pTransform, _double fDeltaT
 			m_tParticleDesc2.FixedTarget = CaculatedPos;
 			GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_tParticleDesc2);
 			m_pModel->Change_AnimIndex_ReturnTo_Must(7, 2, 0.08f, true);
+
+			{
+
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+				tSoundDesc.vMinMax = _float2(0, 35);
+				tSoundDesc.fTargetSound = 0.5f;
+
+				wstring SoundTrack = L"";
+				SoundTrack = L"Eyepot_deathfall02.ogg";
+
+				//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+			}
+
+			{
+
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+				tSoundDesc.vMinMax = _float2(0, 35);
+				tSoundDesc.fTargetSound = 0.5f;
+
+				wstring SoundTrack = L"";
+
+				SoundTrack = L"MapObject_hatterbuild_jumpland0" + to_wstring(rand() % 3 + 1) + L".ogg";
+				//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+			}
+
+
 
 		}
 	}
@@ -555,6 +659,55 @@ _int CEyepot::Update_Pattern(_double fDeltaTime)
 				{
 					m_pSubTransformCom->Set_IsOwnerDead(false);
 					GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_tParticleDesc);
+					{
+
+						SOUNDDESC tSoundDesc;
+
+						tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+						tSoundDesc.vMinMax = _float2(0, 25);
+						tSoundDesc.fTargetSound = 0.35f;
+
+						wstring SoundTrack = L"";
+						SoundTrack = L"Eyepot_tella_steam.ogg";
+
+						//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+						g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+					}
+					{
+
+						SOUNDDESC tSoundDesc;
+
+						tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+						tSoundDesc.vMinMax = _float2(0, 25);
+						tSoundDesc.fTargetSound = 0.35f;
+
+						wstring SoundTrack = L"";
+						SoundTrack = L"Eyepot_tella02.ogg";
+
+						//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+						g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+					}
+
+					{
+
+						SOUNDDESC tSoundDesc;
+						tSoundDesc.pTransform = m_pTransformCom;
+						tSoundDesc.vMinMax = _float2(0, 25);
+						tSoundDesc.fTargetSound = 0.1f;
+						tSoundDesc.iIdentificationNumber = 30;
+
+
+						wstring SoundTrack = L"";
+						SoundTrack = L"c1_steamloop0" + to_wstring(rand() % 4 + 1) + L".ogg";
+
+						//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+						g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc,&m_pSteamSoundDesc);
+					}
+					
+
 					iChecker++;
 				}
 
@@ -568,6 +721,7 @@ _int CEyepot::Update_Pattern(_double fDeltaTime)
 				if (iChecker == 1&& m_pModel->Get_NowAnimIndex() == 11 && m_pModel->Get_PlayRate() > 0.7)
 				{
 					m_pSubTransformCom->Set_IsOwnerDead(true);
+					if (m_pSteamSoundDesc && m_pSteamSoundDesc->iIdentificationNumber == 30)m_pSteamSoundDesc->bStopSoundNow = true;
 
 					CEyepotChainGranade::ECGDESC tDesc;
 
@@ -577,6 +731,24 @@ _int CEyepot::Update_Pattern(_double fDeltaTime)
 					tDesc.MoveDir = XMVector3Normalize(XMVectorSetY(m_pColliderCom->Get_ColliderPosition(3).XMVector() - m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0));
 					g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), L"ProtoType_EyepotChainGranade", &tDesc);
 				
+					{
+
+						SOUNDDESC tSoundDesc;
+
+						tSoundDesc.pTransform = nullptr;
+						tSoundDesc.vPosition = tDesc.vPosition;
+						tSoundDesc.vMinMax = _float2(0, 35);
+						tSoundDesc.fTargetSound = 1.f;
+
+						wstring SoundTrack = L"";
+						SoundTrack = L"Eyepot_projectile_explode0" + to_wstring(rand() % 2 + 1) + L".ogg";
+
+						//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+						g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
+					}
+
+
 					iChecker++;
 				}
 
@@ -689,6 +861,36 @@ void CEyepot::Add_Dmg_to_Monster(_float iDmgAmount)
 		m_pTransformCom->Set_MoveSpeed(1.5f);
 		m_bIsDmgAnimUpdated[2] = true;
 	
+
+		{
+
+			SOUNDDESC tSoundDesc;
+
+			tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+			tSoundDesc.vMinMax = _float2(0, 25);
+			tSoundDesc.fTargetSound = 0.35f;
+
+			wstring SoundTrack = L"";
+			SoundTrack = L"Eyepot_paincreak0" + to_wstring(rand() % 5 + 1) + L".ogg";
+
+			//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+			g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+		}
+		{
+
+			SOUNDDESC tSoundDesc;
+			tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+			tSoundDesc.vMinMax = _float2(0, 25);
+			tSoundDesc.fTargetSound = 0.5f;
+
+
+			wstring SoundTrack = L"";
+			SoundTrack = L"Eyepot_melee_impact0" + to_wstring(rand() % 3 + 1) + L".ogg";
+
+			//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+			g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+		}
 
 		m_fHP -= iDmgAmount;
 		m_fDmgAmount += iDmgAmount;
@@ -917,6 +1119,725 @@ HRESULT CEyepot::Ready_ParticleDesc()
 	m_tParticleDesc2.m_fAlphaTestValue = 0.1f;
 	m_tParticleDesc2.m_iPassIndex = 3;
 
+
+	return S_OK;
+}
+
+HRESULT CEyepot::Adjust_AnimMovedTransform(_double fDeltatime)
+{
+
+	_uint iNowAnimIndex = m_pModel->Get_NowAnimIndex();
+	_double PlayRate = m_pModel->Get_PlayRate();
+
+
+	if (iNowAnimIndex != m_iOldAnimIndex || PlayRate > 0.95)
+		m_iAdjMovedIndex = 0;
+
+	if (PlayRate <= 0.95)
+	{
+		switch (iNowAnimIndex)
+		{
+		case 1:
+
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0)
+			{
+				{
+
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = m_pTransformCom;
+					tSoundDesc.bFollowTransform = true;
+					tSoundDesc.vMinMax = _float2(FootSetpSoudMin, FootSetpSoudMax);
+					tSoundDesc.fTargetSound = FootSetpSoud;
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"Eyepot_step0" + to_wstring(rand() % 10 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
+				}
+
+
+				m_iAdjMovedIndex++;
+			}
+			else if (m_iAdjMovedIndex == 1 && PlayRate > 0.409090909090)
+			{
+
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = m_pTransformCom;
+					tSoundDesc.bFollowTransform = true;
+					tSoundDesc.vMinMax = _float2(FootSetpSoudMin, FootSetpSoudMax);
+					tSoundDesc.fTargetSound = FootSetpSoud;
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"Eyepot_step0" + to_wstring(rand() % 10 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
+				}
+
+
+				m_iAdjMovedIndex++;
+			}
+			else if (m_iAdjMovedIndex == 2 && PlayRate > 0.68181818181818)
+			{
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = m_pTransformCom;
+					tSoundDesc.bFollowTransform = true;
+					tSoundDesc.vMinMax = _float2(FootSetpSoudMin, FootSetpSoudMax);
+					tSoundDesc.fTargetSound = FootSetpSoud;
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"Eyepot_step0" + to_wstring(rand() % 10 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
+				}
+
+				m_iAdjMovedIndex++;
+
+			}
+			else if (m_iAdjMovedIndex == 3 && PlayRate > 0.93333333333333)
+			{
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = m_pTransformCom;
+					tSoundDesc.bFollowTransform = true;
+					tSoundDesc.vMinMax = _float2(FootSetpSoudMin, FootSetpSoudMax);
+					tSoundDesc.fTargetSound = FootSetpSoud;
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"Eyepot_step0" + to_wstring(rand() % 10 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
+				}
+
+
+				m_iAdjMovedIndex++;
+			}
+			break;
+
+		case 3:
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0)
+			{
+
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = m_pTransformCom;
+					tSoundDesc.bFollowTransform = true;
+					tSoundDesc.vMinMax = _float2(FootSetpSoudMin, FootSetpSoudMax);
+					tSoundDesc.fTargetSound = FootSetpSoud;
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"Eyepot_step0" + to_wstring(rand() % 10 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
+				}
+
+
+				m_iAdjMovedIndex++;
+			}
+
+			if (m_iAdjMovedIndex == 1 && PlayRate > 0.166666666666)
+			{
+
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = m_pTransformCom;
+					tSoundDesc.bFollowTransform = true;
+					tSoundDesc.vMinMax = _float2(FootSetpSoudMin, FootSetpSoudMax);
+					tSoundDesc.fTargetSound = FootSetpSoud;
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"Eyepot_step0" + to_wstring(rand() % 10 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
+				}
+
+
+				m_iAdjMovedIndex++;
+			}
+			if (m_iAdjMovedIndex == 2 && PlayRate > 0.444444444444)
+			{
+
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = m_pTransformCom;
+					tSoundDesc.bFollowTransform = true;
+					tSoundDesc.vMinMax = _float2(FootSetpSoudMin, FootSetpSoudMax);
+					tSoundDesc.fTargetSound = FootSetpSoud;
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"Eyepot_step0" + to_wstring(rand() % 10 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
+				}
+
+
+				m_iAdjMovedIndex++;
+			}
+
+			if (m_iAdjMovedIndex == 3 && PlayRate > 0.611111111111)
+			{
+
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = m_pTransformCom;
+					tSoundDesc.bFollowTransform = true;
+					tSoundDesc.vMinMax = _float2(FootSetpSoudMin, FootSetpSoudMax);
+					tSoundDesc.fTargetSound = FootSetpSoud;
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"Eyepot_step0" + to_wstring(rand() % 10 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
+				}
+
+
+				m_iAdjMovedIndex++;
+			}
+
+			if (m_iAdjMovedIndex == 4 && PlayRate > 0.777777777777)
+			{
+
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = m_pTransformCom;
+					tSoundDesc.bFollowTransform = true;
+					tSoundDesc.vMinMax = _float2(FootSetpSoudMin, FootSetpSoudMax);
+					tSoundDesc.fTargetSound = FootSetpSoud;
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"Eyepot_step0" + to_wstring(rand() % 10 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
+				}
+
+
+				m_iAdjMovedIndex++;
+			}
+
+			if (m_iAdjMovedIndex == 5 && PlayRate > 0.888888888888)
+			{
+
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = m_pTransformCom;
+					tSoundDesc.bFollowTransform = true;
+					tSoundDesc.vMinMax = _float2(FootSetpSoudMin, FootSetpSoudMax);
+					tSoundDesc.fTargetSound = FootSetpSoud;
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"Eyepot_step0" + to_wstring(rand() % 10 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
+				}
+
+
+				m_iAdjMovedIndex++;
+			}
+			break;
+
+		case 4:
+
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.85714285)
+			{
+				{
+
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = m_pTransformCom;
+					tSoundDesc.bFollowTransform = true;
+					tSoundDesc.vMinMax = _float2(FootSetpSoudMin, FootSetpSoudMax);
+					tSoundDesc.fTargetSound = FootSetpSoud * 2.f;
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"Eyepot_step0" + to_wstring(rand() % 10 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
+				}
+
+
+				m_iAdjMovedIndex++;
+			}
+	
+			break;
+
+		case 7:
+
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.615384615384)
+			{
+				{
+
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = m_pTransformCom;
+					tSoundDesc.bFollowTransform = true;
+					tSoundDesc.vMinMax = _float2(FootSetpSoudMin, FootSetpSoudMax);
+					tSoundDesc.fTargetSound = FootSetpSoud;
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"Eyepot_step0" + to_wstring(rand() % 10 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
+				}
+
+
+				m_iAdjMovedIndex++;
+			}
+	
+			break;
+
+		case 9:
+
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.5625)
+			{
+				{
+
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = m_pTransformCom;
+					tSoundDesc.bFollowTransform = true;
+					tSoundDesc.vMinMax = _float2(FootSetpSoudMin, FootSetpSoudMax);
+					tSoundDesc.fTargetSound = FootSetpSoud *2.f;
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"Eyepot_step0" + to_wstring(rand() % 10 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
+				}
+
+
+				m_iAdjMovedIndex++;
+			}
+			else if (m_iAdjMovedIndex == 1 && PlayRate > 0.875)
+			{
+				{
+
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = m_pTransformCom;
+					tSoundDesc.bFollowTransform = true;
+					tSoundDesc.vMinMax = _float2(FootSetpSoudMin, FootSetpSoudMax);
+					tSoundDesc.fTargetSound = FootSetpSoud*2.f;
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"Eyepot_step0" + to_wstring(rand() % 10 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
+				}
+
+
+				m_iAdjMovedIndex++;
+			}
+
+			
+
+			break;
+
+
+		case 14:
+
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.4)
+			{
+				{
+
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = m_pTransformCom;
+					tSoundDesc.bFollowTransform = true;
+					tSoundDesc.vMinMax = _float2(FootSetpSoudMin, FootSetpSoudMax);
+					tSoundDesc.fTargetSound = FootSetpSoud;
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"Eyepot_step0" + to_wstring(rand() % 10 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
+				}
+
+
+				m_iAdjMovedIndex++;
+			}
+
+			break;
+		case 15:
+
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.1153846)
+			{
+				{
+
+					SOUNDDESC tSoundDesc;
+					tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+					tSoundDesc.vMinMax = _float2(0, 25);
+					tSoundDesc.fTargetSound = 0.5f;
+
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"Eyepot_melee_impact0" + to_wstring(rand() % 3 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+				}
+				m_iAdjMovedIndex++;
+			}
+
+			break;
+		case 16:
+
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.1)
+			{
+				{
+
+					SOUNDDESC tSoundDesc;
+					tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+					tSoundDesc.vMinMax = _float2(0, 25);
+					tSoundDesc.fTargetSound = 0.5f;
+
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"Eyepot_melee_impact0" + to_wstring(rand() % 3 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+				}
+				m_iAdjMovedIndex++;
+			}
+
+
+			if (m_iAdjMovedIndex == 1 && PlayRate > 0.425)
+			{
+				{
+
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = m_pTransformCom;
+					tSoundDesc.bFollowTransform = true;
+					tSoundDesc.vMinMax = _float2(FootSetpSoudMin, FootSetpSoudMax);
+					tSoundDesc.fTargetSound = FootSetpSoud;
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"Eyepot_step0" + to_wstring(rand() % 10 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
+				}
+
+
+				m_iAdjMovedIndex++;
+			}
+
+			break;
+
+
+		case 21:
+
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.53333333333)
+			{
+				{
+
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = m_pTransformCom;
+					tSoundDesc.bFollowTransform = true;
+					tSoundDesc.vMinMax = _float2(FootSetpSoudMin, FootSetpSoudMax);
+					tSoundDesc.fTargetSound = FootSetpSoud;
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"Eyepot_step0" + to_wstring(rand() % 10 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
+				}
+
+
+				m_iAdjMovedIndex++;
+			}
+			else if (m_iAdjMovedIndex == 1 && PlayRate > 0.6666666666)
+			{
+
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = m_pTransformCom;
+					tSoundDesc.bFollowTransform = true;
+					tSoundDesc.vMinMax = _float2(FootSetpSoudMin, FootSetpSoudMax);
+					tSoundDesc.fTargetSound = FootSetpSoud;
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"Eyepot_step0" + to_wstring(rand() % 10 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
+				}
+
+
+				m_iAdjMovedIndex++;
+			}
+			else if (m_iAdjMovedIndex == 2 && PlayRate > 0.8)
+			{
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = m_pTransformCom;
+					tSoundDesc.bFollowTransform = true;
+					tSoundDesc.vMinMax = _float2(FootSetpSoudMin, FootSetpSoudMax);
+					tSoundDesc.fTargetSound = FootSetpSoud;
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"Eyepot_step0" + to_wstring(rand() % 10 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
+				}
+
+				m_iAdjMovedIndex++;
+
+			}
+			break;
+
+
+		case 22:
+
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.2105263157894)
+			{
+				{
+
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = m_pTransformCom;
+					tSoundDesc.bFollowTransform = true;
+					tSoundDesc.vMinMax = _float2(FootSetpSoudMin, FootSetpSoudMax);
+					tSoundDesc.fTargetSound = FootSetpSoud;
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"Eyepot_step0" + to_wstring(rand() % 10 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
+				}
+
+
+				m_iAdjMovedIndex++;
+			}
+			else if (m_iAdjMovedIndex == 1 && PlayRate > 0.29824561403508)
+			{
+
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = m_pTransformCom;
+					tSoundDesc.bFollowTransform = true;
+					tSoundDesc.vMinMax = _float2(FootSetpSoudMin, FootSetpSoudMax);
+					tSoundDesc.fTargetSound = FootSetpSoud;
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"Eyepot_step0" + to_wstring(rand() % 10 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
+				}
+
+
+				m_iAdjMovedIndex++;
+			}
+			else if (m_iAdjMovedIndex == 2 && PlayRate > 0.45614035087719)
+			{
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = m_pTransformCom;
+					tSoundDesc.bFollowTransform = true;
+					tSoundDesc.vMinMax = _float2(FootSetpSoudMin, FootSetpSoudMax);
+					tSoundDesc.fTargetSound = FootSetpSoud;
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"Eyepot_step0" + to_wstring(rand() % 10 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
+				}
+
+				m_iAdjMovedIndex++;
+
+			}
+			break;
+
+
+		case 23:
+
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.f)
+			{
+				{
+
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = m_pTransformCom;
+					tSoundDesc.bFollowTransform = true;
+					tSoundDesc.vMinMax = _float2(FootSetpSoudMin, FootSetpSoudMax);
+					tSoundDesc.fTargetSound = FootSetpSoud;
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"Eyepot_deathcreak01.ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+				}
+
+
+				m_iAdjMovedIndex++;
+			}
+			else if (m_iAdjMovedIndex == 1 && PlayRate > 0.588235294117647)
+			{
+
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = m_pTransformCom;
+					tSoundDesc.bFollowTransform = true;
+					tSoundDesc.vMinMax = _float2(FootSetpSoudMin, FootSetpSoudMax);
+					tSoundDesc.fTargetSound = 0.5f;
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"Eyepot_deathtwo01.ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+				}
+
+
+				m_iAdjMovedIndex++;
+			}
+			break;
+
+
+		case 24:
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.0)
+			{
+
+				m_iAdjMovedIndex++;
+			}
+			else if (m_iAdjMovedIndex == 1 && PlayRate > 0.6153846153846)
+			{
+				{
+
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = m_pTransformCom;
+					tSoundDesc.bFollowTransform = true;
+					tSoundDesc.vMinMax = _float2(FootSetpSoudMin, FootSetpSoudMax);
+					tSoundDesc.fTargetSound = FootSetpSoud;
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"Eyepot_step0" + to_wstring(rand() % 10 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
+				}
+
+
+				m_iAdjMovedIndex++;
+			}
+			else if (m_iAdjMovedIndex == 2 && PlayRate > 0.666666666666666)
+			{
+
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = m_pTransformCom;
+					tSoundDesc.bFollowTransform = true;
+					tSoundDesc.vMinMax = _float2(FootSetpSoudMin, FootSetpSoudMax);
+					tSoundDesc.fTargetSound = FootSetpSoud;
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"Eyepot_step0" + to_wstring(rand() % 10 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
+				}
+
+
+				m_iAdjMovedIndex++;
+			}
+			else if (m_iAdjMovedIndex == 3 && PlayRate > 0.717948717948)
+			{
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = m_pTransformCom;
+					tSoundDesc.bFollowTransform = true;
+					tSoundDesc.vMinMax = _float2(FootSetpSoudMin, FootSetpSoudMax);
+					tSoundDesc.fTargetSound = FootSetpSoud;
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"Eyepot_step0" + to_wstring(rand() % 10 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
+				}
+
+				m_iAdjMovedIndex++;
+
+			}
+			break;
+
+		}
+	}
+
+
+
+
+	m_iOldAnimIndex = iNowAnimIndex;
+	return S_OK;
 
 	return S_OK;
 }

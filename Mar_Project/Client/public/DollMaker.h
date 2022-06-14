@@ -53,7 +53,7 @@ private:
 	_uint				m_iDeadAnimChecker = 0;
 	_float3				m_vDeadStartLookAt;
 
-
+	_uint				m_DeathSoundChecker = 0;
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_Weapon();

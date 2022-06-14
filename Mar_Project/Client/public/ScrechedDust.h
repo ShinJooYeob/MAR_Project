@@ -49,6 +49,8 @@ private:
 
 	_float3				m_vRotAxis;
 
+	SOUNDDESC*			m_pSounDesc = nullptr;
+
 	BREAKEDGAZBODESC		m_tDesc;
 	PARTICLEDESC		m_tParticleDesc;
 

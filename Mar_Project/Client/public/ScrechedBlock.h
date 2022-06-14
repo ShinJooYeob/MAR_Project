@@ -31,7 +31,7 @@ public:
 	virtual _int LightRender()override;
 
 
-	void Set_Spout() { m_bIsSpout = true; m_fStartTimer = 0; };
+	void Set_Spout();
 
 	virtual void CollisionTriger(_uint iMyColliderIndex, CGameObject* pConflictedObj, CCollider* pConflictedCollider, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType) override;
 

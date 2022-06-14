@@ -55,6 +55,21 @@ HRESULT CChainExplosion::Initialize_Clone(void * pArg)
 	pUtil->Start_InstanceParticle(m_eNowSceneNum, m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0);
 	pUtil->Start_InstanceParticle(m_eNowSceneNum, m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 0);
 
+
+
+	{
+		SOUNDDESC tSoundDesc;
+
+		tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+		tSoundDesc.vMinMax = _float2(5, 20);
+		tSoundDesc.fTargetSound = 0.5f;
+		wstring SoundTrack = L"";
+		SoundTrack = L"Grunt_grunt_flames0" + to_wstring(rand() % 2 + 1) + L".ogg";
+
+		//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+		g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+	}
 	return S_OK;
 }
 

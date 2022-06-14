@@ -54,9 +54,14 @@ private:
 	_float				m_fDissolveTime = 0;
 	_bool				m_bStartSprout = false;
 
+
+	_uint				m_iOldAnimIndex = INT_MAX;
+	_uint				m_iAdjMovedIndex = 0;
+
 	PARTICLEDESC		m_tParticleDesc;
 	PARTICLEDESC		m_tParticleDesc2;
 
+	SOUNDDESC*			m_pSteamSoundDesc = nullptr;
 
 	ATTACHBONEMATRIX_PTR  m_ArrCollisionAttach[2];
 private:
@@ -65,6 +70,7 @@ private:
 	HRESULT DashPatternWander(_double fDeltaTime);
 	HRESULT Ready_ParticleDesc();
 
+	HRESULT Adjust_AnimMovedTransform(_double fDeltatime);
 public:
 	static CEyepot* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, void* pArg = nullptr);
 	virtual CGameObject* Clone(void* pArg);

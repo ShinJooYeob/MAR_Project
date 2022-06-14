@@ -52,10 +52,18 @@ private:
 	_bool				m_bDeathDissolveStart = false;
 	_float				m_fDissolveTime = 0;
 
+	_uint				m_iOldAnimIndex = INT_MAX;
+	_uint				m_iAdjMovedIndex = 0;
+
+	_float				m_fTargetSound = 0.55f;
+	SOUNDDESC*			m_pBuzzSoundDesc = nullptr;
 private:
 	HRESULT SetUp_Components();
 
 	HRESULT NearPatternWander(_double fDeltaTime);
+	HRESULT Adjust_AnimMovedTransform(_double fDeltatime);
+
+
 
 public:
 	static CWaspInk* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, void* pArg = nullptr);

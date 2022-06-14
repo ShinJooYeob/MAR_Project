@@ -43,6 +43,25 @@ HRESULT CHyperVoice::Initialize_Clone(void * pArg)
 	m_PassedTime = 0;
 	m_iRand = rand();
 
+
+
+	{
+
+
+		SOUNDDESC tSoundDesc;
+		tSoundDesc.pTransform = m_pTransformCom;
+		tSoundDesc.vMinMax = _float2(0, 35);
+		tSoundDesc.fTargetSound = 0.75f;
+
+
+		wstring SoundTrack = L"";
+		SoundTrack = L"DollMaker_hands_girl_fs_scrape_b.ogg";
+
+
+		//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+		g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+	}
 	return S_OK;
 }
 

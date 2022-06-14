@@ -150,6 +150,22 @@ _int CEyepotChainGranade::Update(_double fDeltaTime)
 				tDesc2.fSize = 1;
 				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerCircleTornado), &tDesc2);
 
+				{
+
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+					tSoundDesc.vMinMax = _float2(0, 35);
+					tSoundDesc.fTargetSound = 1.f;
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"bomb_explode0" + to_wstring(rand() % 4 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+				}
+
 
 				m_bGonnabeDie = true;
 				m_DyingTime = 0;
@@ -223,7 +239,21 @@ _int CEyepotChainGranade::Update(_double fDeltaTime)
 				tDesc2.fSize = 1;
 				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerCircleTornado), &tDesc2);
 
+				{
 
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+					tSoundDesc.vMinMax = _float2(0, 35);
+					tSoundDesc.fTargetSound = 1.f;
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"bomb_explode0" + to_wstring(rand() % 4 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+				}
 
 				m_bGonnabeDie = true;
 				m_DyingTime = 0;
@@ -492,7 +522,21 @@ HRESULT CEyepotChainGranade::Set_Bullet_On_Terrain()
 		tDesc2.fSize = 1;
 		g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerCircleTornado), &tDesc2);
 
+		{
 
+			SOUNDDESC tSoundDesc;
+
+			tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+			tSoundDesc.vMinMax = _float2(0, 35);
+			tSoundDesc.fTargetSound = 1.f;
+
+			wstring SoundTrack = L"";
+			SoundTrack = L"bomb_explode0" + to_wstring(rand() % 4 + 1) + L".ogg";
+
+			//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+			g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+		}
 
 		m_bGonnabeDie = true;
 		m_DyingTime = 0;

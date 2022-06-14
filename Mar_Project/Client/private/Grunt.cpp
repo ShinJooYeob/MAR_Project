@@ -54,6 +54,21 @@ HRESULT CGrunt::Initialize_Clone(void * pArg)
 
 	FAILED_CHECK(SetUp_ParticleDesc());
 
+
+
+	{
+		SOUNDDESC tSoundDesc;
+
+		tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+		tSoundDesc.vMinMax = _float2(5, 35);
+		tSoundDesc.fTargetSound = 0.25f;
+		wstring SoundTrack = L"";
+		SoundTrack = L"Grunt_spawn0" + to_wstring(rand() % 3 + 1) + L".ogg";
+
+		//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+		g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+	}
 	return S_OK;
 }
 
@@ -101,8 +116,9 @@ _int CGrunt::Update(_double fDeltaTime)
 
 	if (g_pGameInstance->Get_DIKeyState(DIK_F1)&DIS_Down)
 		m_pModel->Change_AnimIndex(0);
-	if (g_pGameInstance->Get_DIKeyState(DIK_F2)&DIS_Down)
-		m_pModel->Change_AnimIndex(8);
+	if (g_pGameInstance->Get_DIKeyState(DIK_F2)&DIS_Down)		
+		Add_Dmg_to_Monster(1);
+
 
 	if (g_pGameInstance->Get_DIKeyState(DIK_O)&DIS_Down)
 		Add_Dmg_to_Monster(1000);
@@ -161,11 +177,42 @@ _int CGrunt::Update(_double fDeltaTime)
 
 		FAILED_CHECK(m_pSubModel->Update_AnimationClip(fDeltaTime, m_bIsOnScreen));
 
+		if (!m_DeathChecker && PlayRate > 0.f)
+		{
+			m_DeathChecker++;
+			{
+				SOUNDDESC tSoundDesc;
 
+				tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+				tSoundDesc.vMinMax = _float2(5, 35);
+				tSoundDesc.fTargetSound = 0.25f;
+				wstring SoundTrack = L"";
+				SoundTrack = L"Grunt_death0" + to_wstring(rand() % 2 + 1) + L".ogg";
+
+				//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+			}
+		}
 		if (PlayRate > 0.4105263 && m_iSpwanMeshRend == 1)
 		{
 			m_pSubTransformCom->Set_IsOwnerDead(true);
 			m_iSpwanMeshRend = 0;
+			
+
+			{
+				SOUNDDESC tSoundDesc;
+
+			tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+			tSoundDesc.vMinMax = _float2(5, 35);
+			tSoundDesc.fTargetSound = 0.25f;
+			wstring SoundTrack = L"";
+			SoundTrack = L"Grunt_prespawn0" + to_wstring(rand() % 2 + 1) + L".ogg";
+
+			//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+			g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+			}
 		}
 		else if (PlayRate > 0.95)
 		{
@@ -217,6 +264,22 @@ _int CGrunt::Update(_double fDeltaTime)
 			}
 			else if (m_iSpwanMeshRend == 1 && PlayRate > 0.95)
 			{
+
+				
+
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+					tSoundDesc.vMinMax = _float2(5, 35);
+					tSoundDesc.fTargetSound = 0.25f;
+					wstring SoundTrack = L"";
+					SoundTrack = L"Grunt_angry_flamesvox0" + to_wstring(rand() % 2 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+				}
 
 				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[1]);
 				m_iSpwanMeshRend = 2; 
@@ -409,12 +472,18 @@ _int CGrunt::Update_DmgCalculate(_double fDeltaTime)
 			m_pSubModel->Change_AnimIndex(1, 0.15f, true);
 			m_pModel->Change_AnimIndex_ReturnTo_Must(27, 27, 0, true);
 			m_bDeathAnimStart = true;
+
+
 		}
 		return 0;
 	}
 
 	if (!m_bIsDmgAnimUpdated[0] && m_fMaxHP * 0.07 < m_fDmgAmount)
 	{
+
+		if (m_FireSoundDesc && m_FireSoundDesc->iIdentificationNumber == 10)
+			m_FireSoundDesc->bStopSoundNow = true;
+
 		m_pModel->Change_AnimIndex_ReturnTo_Must(23, 1, 0.15, true);
 		m_bIsPatternFinished = true;
 		m_PatternPassedTime = 0;
@@ -422,9 +491,27 @@ _int CGrunt::Update_DmgCalculate(_double fDeltaTime)
 		Add_Force(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK)* -1, 10);
 		m_pTransformCom->Set_MoveSpeed(0.5);
 		m_bIsDmgAnimUpdated[0] = true;
+
+		{
+			SOUNDDESC tSoundDesc;
+
+			tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+			tSoundDesc.vMinMax = _float2(5, 25);
+			tSoundDesc.fTargetSound = 0.25f;
+			wstring SoundTrack = L"";
+			SoundTrack = L"Grunt_dam_armoff.ogg";
+
+			//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+			g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+		}
 	}
 	else if (!m_bIsDmgAnimUpdated[1] && m_fMaxHP * 0.15 < m_fDmgAmount)
 	{
+
+		if (m_FireSoundDesc && m_FireSoundDesc->iIdentificationNumber == 10)
+			m_FireSoundDesc->bStopSoundNow = true;
+
 		m_pModel->Change_AnimIndex_ReturnTo_Must(24, 1, 0.15, true);
 		m_bIsPatternFinished = true;
 		m_pParticleTargetTransformCom->Set_IsOwnerDead(true);
@@ -432,6 +519,19 @@ _int CGrunt::Update_DmgCalculate(_double fDeltaTime)
 		m_pTransformCom->Set_MoveSpeed(0.5);
 		Add_Force(m_pTransformCom, m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK)* -1, 20);
 		m_bIsDmgAnimUpdated[1] = true;
+		{
+			SOUNDDESC tSoundDesc;
+
+			tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+			tSoundDesc.vMinMax = _float2(5, 25);
+			tSoundDesc.fTargetSound = 0.25f;
+			wstring SoundTrack = L"";
+			SoundTrack = L"Grunt_dam_armoff.ogg";
+
+			//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+			g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+		}
 	}
 
 
@@ -628,6 +728,66 @@ HRESULT CGrunt::Adjust_AnimMovedTransform(_double fDeltatime)
 	{
 		switch (iNowAnimIndex)
 		{
+		case 1:
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.2615384615384)
+			{
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+					tSoundDesc.vMinMax = _float2(5, 25);
+					tSoundDesc.fTargetSound = 0.25f;
+					wstring SoundTrack = L"";
+					SoundTrack = L"Grunt_melee_s2_warn.ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+				}
+				m_iAdjMovedIndex++;
+			}
+
+			break;
+		case 2:
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.266666666666666)
+			{
+				if (Distance_BetweenPlayer(m_pTransformCom) < 15)
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+					tSoundDesc.vMinMax = _float2(5, 15);
+					tSoundDesc.fTargetSound = 0.25f;
+					wstring SoundTrack = L"";
+
+					SoundTrack = L"MapObject_doowmcom_move0" + to_wstring(rand() % 10 + 1) + L".ogg";
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
+				}
+				m_iAdjMovedIndex++;
+			}
+
+			else if (m_iAdjMovedIndex == 1 && PlayRate > 0.7666666666666666)
+			{
+				if (Distance_BetweenPlayer(m_pTransformCom) < 15)
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+					tSoundDesc.vMinMax = _float2(5, 15);
+					tSoundDesc.fTargetSound = 0.25f;
+					wstring SoundTrack = L"";
+
+					SoundTrack = L"MapObject_doowmcom_move0" + to_wstring(rand() % 10 + 1) + L".ogg";
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
+				}
+				m_iAdjMovedIndex++;
+			}
+
+			break;
 		case 4:
 			if (m_iAdjMovedIndex == 0 && PlayRate > 0.01)
 			{
@@ -665,6 +825,32 @@ HRESULT CGrunt::Adjust_AnimMovedTransform(_double fDeltatime)
 
 			break;
 
+		case 6:
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.0)
+			{
+				if (Distance_BetweenPlayer(m_pTransformCom) < 25)
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = m_pParticleTargetTransformCom;
+					tSoundDesc.vMinMax = _float2(5, 25);
+					tSoundDesc.fTargetSound = 0.25f;
+					tSoundDesc.iIdentificationNumber = 10;
+					wstring SoundTrack = L"";
+					SoundTrack = L"Grunt_melee_run0" + to_wstring(rand() % 3 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+				}
+
+				m_iAdjMovedIndex++;
+
+			}
+
+			break;
+	
+
 		case 8:
 			if (m_iAdjMovedIndex == 0 && PlayRate > 0.01)
 			{
@@ -685,16 +871,78 @@ HRESULT CGrunt::Adjust_AnimMovedTransform(_double fDeltatime)
 			break;
 
 		case 11:
-		case 13:
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.49090909090909)
+			{
+				if (Distance_BetweenPlayer(m_pTransformCom) < 20)
+				{
+					SOUNDDESC tSoundDesc;
 
+					tSoundDesc.pTransform = m_pParticleTargetTransformCom;
+					tSoundDesc.vMinMax = _float2(0, 20);
+					tSoundDesc.fTargetSound = 0.25f;
+					tSoundDesc.iIdentificationNumber = 10;
+					wstring SoundTrack = L"";
+					SoundTrack = L"Grunt_whip0" + to_wstring(rand() % 3 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+				}
+				m_iAdjMovedIndex++;
+			}
 		{
-			m_pParticleTargetTransformCom->Scaled_All(_float3(_float(3 -((fabs(0.5f - PlayRate) * 4)))));
+			m_pParticleTargetTransformCom->Scaled_All(_float3(_float(3 - ((fabs(0.5f - PlayRate) * 4)))));
 		}
+		break;
+		case 13:
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.42424242424)
+			{
+				if (Distance_BetweenPlayer(m_pTransformCom) < 20)
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = m_pParticleTargetTransformCom;
+					tSoundDesc.vMinMax = _float2(0, 20);
+					tSoundDesc.fTargetSound = 0.25f;
+					tSoundDesc.iIdentificationNumber = 10;
+					wstring SoundTrack = L"";
+					SoundTrack = L"Grunt_whip0" + to_wstring(rand() % 3 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+				}
+				m_iAdjMovedIndex++;
+			}
+			{
+				m_pParticleTargetTransformCom->Scaled_All(_float3(_float(3 - ((fabs(0.5f - PlayRate) * 4)))));
+			}
 		break;
 
 		case 12:
 
 		{
+			if (m_iAdjMovedIndex == 0 && PlayRate >0.22)
+			{
+				if (Distance_BetweenPlayer(m_pTransformCom) < 20)
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = m_pParticleTargetTransformCom;
+					tSoundDesc.vMinMax = _float2(0, 20);
+					tSoundDesc.fTargetSound = 0.25f;
+					tSoundDesc.iIdentificationNumber = 10;
+					wstring SoundTrack = L"";
+					SoundTrack = L"Grunt_whip0" + to_wstring(rand() % 3 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+				}
+				m_iAdjMovedIndex++;
+
+			}
+
 			if (PlayRate > 0.5)
 			{
 				m_pParticleTargetTransformCom->Scaled_All(_float3(1));
@@ -713,6 +961,22 @@ HRESULT CGrunt::Adjust_AnimMovedTransform(_double fDeltatime)
 			{
 				m_pParticleTargetTransformCom->Set_IsOwnerDead(false);
 				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_vecParticleDesc[0]);
+
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = m_pParticleTargetTransformCom;
+					tSoundDesc.vMinMax = _float2(5, 25);
+					tSoundDesc.fTargetSound = 0.1f;
+					tSoundDesc.iIdentificationNumber = 10;
+					wstring SoundTrack = L"";
+					SoundTrack = L"Grunt_projectile_loop_a01.ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc,&m_FireSoundDesc);
+				}
+
 				m_iAdjMovedIndex++;
 			}
 
@@ -733,7 +997,19 @@ HRESULT CGrunt::Adjust_AnimMovedTransform(_double fDeltatime)
 				tDesc.MoveDir = m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK) * 0.8f + m_pTransformCom->Get_MatrixState(CTransform::STATE_RIGHT) * 0.2f;
 				tDesc.MeshKinds = 0;
 				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), L"Prototype_ThrowOilBullet", &tDesc);
+				{
+					SOUNDDESC tSoundDesc;
 
+					tSoundDesc.vPosition = tDesc.vPosition;
+					tSoundDesc.vMinMax = _float2(5, 25);
+					tSoundDesc.fTargetSound = 1.f;
+					wstring SoundTrack = L"";
+					SoundTrack = L"Grunt_groundexplosion01.ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
+				}
 				m_iAdjMovedIndex++;
 			}
 
@@ -745,7 +1021,20 @@ HRESULT CGrunt::Adjust_AnimMovedTransform(_double fDeltatime)
 				tDesc.MoveDir = m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK);
 				tDesc.MeshKinds = 0;
 				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), L"Prototype_ThrowOilBullet",&tDesc);
+				if (Distance_BetweenPlayer(m_pTransformCom) < 25)
+				{
+					SOUNDDESC tSoundDesc;
 
+					tSoundDesc.vPosition = tDesc.vPosition;
+					tSoundDesc.vMinMax = _float2(5, 25);
+					tSoundDesc.fTargetSound = 1.f;
+					wstring SoundTrack = L"";
+					SoundTrack = L"Grunt_groundexplosion01.ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
+				}
 				m_iAdjMovedIndex++;
 			}
 			if (m_iAdjMovedIndex == 2 && PlayRate > 0.92)
@@ -757,7 +1046,27 @@ HRESULT CGrunt::Adjust_AnimMovedTransform(_double fDeltatime)
 				tDesc.MeshKinds = 0;
 				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), L"Prototype_ThrowOilBullet", &tDesc);
 
+
+				if (Distance_BetweenPlayer(m_pTransformCom) < 25)
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = tDesc.vPosition;
+					tSoundDesc.vMinMax = _float2(5, 25);
+					tSoundDesc.fTargetSound = 1.f;
+					wstring SoundTrack = L"";
+					SoundTrack = L"Grunt_groundexplosion01.ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
+				}
+
 				m_pParticleTargetTransformCom->Set_IsOwnerDead(true);
+
+				if (m_FireSoundDesc && m_FireSoundDesc->iIdentificationNumber == 10)
+					m_FireSoundDesc->bStopSoundNow = true;
+
 				m_iAdjMovedIndex++;
 			}
 

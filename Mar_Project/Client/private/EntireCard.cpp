@@ -178,7 +178,20 @@ void CEntireCard::Spout_Piece()
 
 	}
 
+	for (_uint i = 0 ; i< 4; i++)
+	{
+		SOUNDDESC tSoundDesc;
 
+		tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+		tSoundDesc.vMinMax = _float2(5, 35);
+		tSoundDesc.fTargetSound = 0.15f;
+		wstring SoundTrack = L"";
+		SoundTrack = L"Executioner_spin_destrcut0" + to_wstring(rand() % 12 + 1) + L".ogg";
+
+		//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+		g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+	}
 
 
 	Set_IsDead();

@@ -89,6 +89,25 @@ _int CScrechedDust::Update(_double fDeltaTime)
 		}
 	}
 
+	if ((!m_pSounDesc || m_pSounDesc->iIdentificationNumber != 60))
+	{
+		{
+			SOUNDDESC tSoundDesc;
+			tSoundDesc.pTransform = m_pTransformCom;
+			tSoundDesc.vMinMax = _float2(0, 35);
+			tSoundDesc.fTargetSound = 0.25f;
+			tSoundDesc.iIdentificationNumber = 60;
+
+			wstring SoundTrack = L"";
+			SoundTrack = L"HandyGirl_vox_death_a0" + to_wstring(rand() % 2 + 1) + L".ogg";
+			//SoundTrack = L"DollMaker_hands_boy_fistwhoosh.ogg";
+
+			g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc,&m_pSounDesc);
+		}
+
+	}
+	
+
 	//m_pTransformCom->MovetoDir_bySpeed(m_tDesc.MoveDir.XMVector(), 15 , fDeltaTime);
 
 

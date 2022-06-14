@@ -93,6 +93,24 @@ HRESULT CWaspInk::Initialize_Clone(void * pArg)
 	*/
 
 
+	{
+		SOUNDDESC tSoundDesc;
+
+		tSoundDesc.pTransform = m_pTransformCom;
+		tSoundDesc.bFollowTransform = true;
+		tSoundDesc.vMinMax = _float2(0, 55.f);
+		tSoundDesc.fTargetSound = m_fTargetSound;
+		tSoundDesc.iIdentificationNumber = 20 + m_SpwanKinds;
+
+		wstring SoundTrack = L"";
+		SoundTrack = L"WaspInk_buzz0" + to_wstring(rand() % 3 + 1) + L".ogg";
+
+		//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+		g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc, &m_pBuzzSoundDesc);
+	}
+
+
 	return S_OK;
 }
 
@@ -106,6 +124,9 @@ _int CWaspInk::Update(_double fDeltaTime)
 
 	if (g_pGameInstance->Get_DIKeyState(DIK_O)&DIS_Down)
 		Add_Dmg_to_Monster(1000);
+
+
+
 
 
 	//m_pTransformCom->Set_MoveSpeed(4.8f);
@@ -137,6 +158,27 @@ _int CWaspInk::Update(_double fDeltaTime)
 	}
 	else
 	{
+
+
+		if (!m_pBuzzSoundDesc || m_pBuzzSoundDesc->iIdentificationNumber != (20 + m_SpwanKinds))
+		{
+			SOUNDDESC tSoundDesc;
+
+			tSoundDesc.pTransform = m_pTransformCom;
+			tSoundDesc.bFollowTransform = true;
+
+			tSoundDesc.vMinMax = _float2(0, 55.f);
+			tSoundDesc.fTargetSound = m_fTargetSound;
+			tSoundDesc.iIdentificationNumber = 20 + m_SpwanKinds;
+
+			wstring SoundTrack = L"";
+			SoundTrack = L"WaspInk_buzz0" + to_wstring(rand() % 3 + 1) + L".ogg";
+
+			//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+			g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc, &m_pBuzzSoundDesc);
+		}
+
 		if (m_bSpwanAnimFinished)
 		{
 
@@ -164,9 +206,14 @@ _int CWaspInk::Update(_double fDeltaTime)
 				_float3 EasedPos = g_pGameInstance->Easing_Vector(TYPE_ExpoInOut, m_SpwanMovingPos[0], m_SpwanMovingPos[1], (_float)m_SpwanAnimPassedTime, 2);
 				m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, EasedPos);
 
+
+
+
 				_Vector NewLook = XMVectorLerp(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK),
 					XMVector3Normalize(m_SpwanMovingPos[1].XMVector() - m_SpwanMovingPos[0].XMVector()), 0.1f);
 
+				m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, EasedPos);
+		
 				m_pTransformCom->LookDir(NewLook);
 			}
 			else if (m_SpwanAnimPassedTime < 4)
@@ -179,7 +226,6 @@ _int CWaspInk::Update(_double fDeltaTime)
 					XMVector3Normalize(m_SpwanMovingPos[2].XMVector() - m_SpwanMovingPos[1].XMVector()), 0.1f);
 
 				m_pTransformCom->LookDir(NewLook);
-
 			}
 			else if (m_SpwanAnimPassedTime < 6)
 			{
@@ -200,6 +246,8 @@ _int CWaspInk::Update(_double fDeltaTime)
 				_Vector NewLook = XMVectorLerp(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK),
 					XMVector3Normalize(m_SpwanMovingPos[4].XMVector() - m_SpwanMovingPos[3].XMVector()), 0.1f);
 
+
+
 				m_pTransformCom->LookDir(NewLook);
 			}
 			else if (m_SpwanAnimPassedTime < 13)
@@ -212,6 +260,28 @@ _int CWaspInk::Update(_double fDeltaTime)
 					m_pTransformCom->LookDir(NewLook.XMVector());
 					__super::SetUp_WanderLook(m_pTransformCom->Get_MatrixState(CTransform::STATE_LOOK));
 					m_pModel->Change_AnimIndex(10);
+
+
+					m_pBuzzSoundDesc->vMinMax = _float2(0, 55.f);
+					m_pBuzzSoundDesc->fTargetSound = 0.55f;
+
+					{
+						SOUNDDESC tSoundDesc;
+
+						tSoundDesc.pTransform = m_pTransformCom;
+						tSoundDesc.bFollowTransform = true;
+						tSoundDesc.vMinMax = _float2(0, 55.f);
+						tSoundDesc.fTargetSound = 0.5f;
+						tSoundDesc.iIdentificationNumber = 20 + m_SpwanKinds;
+
+						wstring SoundTrack = L"";
+						SoundTrack = L"vox_warn0" + to_wstring(rand() % 4 + 1) + L".ogg";
+
+						//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+						g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc, &m_pBuzzSoundDesc);
+					}
+
 					m_SpwanAnimCount++;
 				}
 			}
@@ -228,7 +298,7 @@ _int CWaspInk::Update(_double fDeltaTime)
 		m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));
 
 		FAILED_CHECK(m_pModel->Update_AnimationClip(fDeltaTime, m_bIsOnScreen));
-
+		FAILED_CHECK(Adjust_AnimMovedTransform(fDeltaTime));
 		if (m_bIsOnScreen)
 		{
 			for (_uint i = 0; i < m_pColliderCom->Get_NumColliderBuffer(); i++)
@@ -360,6 +430,7 @@ _int CWaspInk::LightRender()
 
 _int CWaspInk::Update_DmgCalculate(_double fDeltaTime)
 {
+	if (m_bDeadAnimStart) return 0;
 	//if (m_DmgPassedTime <= 0)
 	//{
 	//	if (m_fDmgAmount > 0)
@@ -378,6 +449,46 @@ _int CWaspInk::Update_DmgCalculate(_double fDeltaTime)
 		{
 			m_bDeadAnimStart = true;
 			m_pModel->Change_AnimIndex_ReturnTo_Must(11, 11, 0.15, true);
+
+			m_fTargetSound = 0;
+			m_pBuzzSoundDesc->fTargetSound = m_fTargetSound;
+			m_pBuzzSoundDesc->bStopSoundNow = true;
+			{
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.pTransform = m_pTransformCom;
+				tSoundDesc.bFollowTransform = true;
+				tSoundDesc.vMinMax = _float2(0, 30.f);
+				tSoundDesc.fTargetSound = 0.5f;
+				tSoundDesc.iIdentificationNumber = 20 + m_SpwanKinds;
+
+				wstring SoundTrack = L"";
+				SoundTrack = L"vox_death_a0" + to_wstring(rand() % 4 + 1) + L".ogg";
+
+				//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc, &m_pBuzzSoundDesc);
+			}
+
+			{
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.pTransform = m_pTransformCom;
+				tSoundDesc.bFollowTransform = true;
+				tSoundDesc.vMinMax = _float2(0, 30.f);
+				tSoundDesc.fTargetSound = 0.5f;
+				tSoundDesc.iIdentificationNumber = 20 + m_SpwanKinds;
+
+				wstring SoundTrack = L"";
+				SoundTrack = L"wings_death_b0" + to_wstring(rand() % 3 + 1) + L".ogg";
+
+				//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc, &m_pBuzzSoundDesc);
+			}
+
+
+
 		}
 		return 0;
 	}
@@ -392,6 +503,23 @@ _int CWaspInk::Update_DmgCalculate(_double fDeltaTime)
 
 		m_PatternPassedTime = 0;
 		m_bIsDmgAnimUpdated[2] = false;
+
+		{
+			SOUNDDESC tSoundDesc;
+
+			tSoundDesc.pTransform = m_pTransformCom;
+			tSoundDesc.bFollowTransform = true;
+			tSoundDesc.vMinMax = _float2(0, 30.f);
+			tSoundDesc.fTargetSound = 0.5f;
+			tSoundDesc.iIdentificationNumber = 20 + m_SpwanKinds;
+
+			wstring SoundTrack = L"";
+			SoundTrack = L"vox_attack0" + to_wstring(rand() % 4 + 1) + L".ogg";
+
+			//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+			g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc, &m_pBuzzSoundDesc);
+		}
 	}
 
 	return _int();
@@ -574,6 +702,89 @@ HRESULT CWaspInk::NearPatternWander(_double fDeltaTime)
 
 
 
+	return S_OK;
+}
+
+HRESULT CWaspInk::Adjust_AnimMovedTransform(_double fDeltatime)
+{
+
+
+	_uint iNowAnimIndex = m_pModel->Get_NowAnimIndex();
+	_double PlayRate = m_pModel->Get_PlayRate();
+
+
+	if (iNowAnimIndex != m_iOldAnimIndex || PlayRate > 0.95)
+		m_iAdjMovedIndex = 0;
+
+	if (PlayRate <= 0.95)
+	{
+		switch (iNowAnimIndex)
+		{
+		case 7:
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.34782608695652173)
+			{
+				m_fTargetSound = 0.f;
+				m_pBuzzSoundDesc->fTargetSound = m_fTargetSound;
+
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = m_pTransformCom;
+					tSoundDesc.bFollowTransform = true;
+					tSoundDesc.vMinMax = _float2(0, 30.f);
+					tSoundDesc.fTargetSound = 0.5f;
+					tSoundDesc.iIdentificationNumber = 20 + m_SpwanKinds;
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"vox_damage_0" + to_wstring(rand() % 5 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc, &m_pBuzzSoundDesc);
+				}
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = m_pTransformCom;
+					tSoundDesc.bFollowTransform = true;
+					tSoundDesc.vMinMax = _float2(0, 30.f);
+					tSoundDesc.fTargetSound = 0.5f;
+					tSoundDesc.iIdentificationNumber = 20 + m_SpwanKinds;
+
+					wstring SoundTrack = L"";
+					SoundTrack = L"wings_rush0" + to_wstring(rand() % 2 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc, &m_pBuzzSoundDesc);
+				}
+
+				
+				m_iAdjMovedIndex++;
+			}
+			break;
+
+		}
+	}
+	else
+	{
+		switch (iNowAnimIndex)
+		{
+		case 7:
+			{
+				m_fTargetSound = 0.55f;
+				m_pBuzzSoundDesc->fTargetSound = m_fTargetSound;
+				m_iAdjMovedIndex++;
+			}
+			break;
+
+		}
+
+	}
+
+
+
+	m_iOldAnimIndex = iNowAnimIndex;
 	return S_OK;
 }
 
