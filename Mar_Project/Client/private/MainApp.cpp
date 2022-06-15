@@ -135,7 +135,7 @@ HRESULT CMainApp::Render()
 	FAILED_CHECK(m_pGameInstance->Clear_BackBuffer_View(_float4(0.5f, 0.5f, 0.5f, 1.f)));
 	FAILED_CHECK(m_pGameInstance->Clear_DepthStencil_View());
 
-	FAILED_CHECK(m_pComRenderer->Render_RenderGroup());
+	FAILED_CHECK(m_pComRenderer->Render_RenderGroup(g_fDeltaTime));
 	FAILED_CHECK(m_pGameInstance->Render_Scene());
 
 

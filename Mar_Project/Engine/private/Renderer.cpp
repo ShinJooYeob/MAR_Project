@@ -6,6 +6,7 @@
 #include "LightMgr.h"
 #include "VIBuffer_Rect.h"
 #include "Shader.h"
+#include "Texture.h"
 #include "SwordTrail.h"
 
 #include "GameInstance.h"
@@ -148,7 +149,9 @@ HRESULT CRenderer::Initialize_Prototype(void * pArg)
 	m_pShader = CShader::Create(m_pDevice, m_pDeviceContext, TEXT("Shader_Deferred.hlsl"), VTXTEX_DECLARATION::Elements, VTXTEX_DECLARATION::iNumElements);
 	NULL_CHECK_RETURN(m_pShader, E_FAIL);
 
-
+	m_pTexture = CTexture::Create(m_pDevice, m_pDeviceContext, L"NoiseTexture.txt");
+	NULL_CHECK_RETURN(m_pTexture, E_FAIL);
+	FAILED_CHECK(m_pTexture->Change_TextureLayer(L"Noise"));
 
 #ifdef _DEBUG
 
@@ -277,7 +280,7 @@ HRESULT CRenderer::Add_DebugGroup(CComponent * pComponent)
 	return S_OK;
 }
 
-HRESULT CRenderer::Render_RenderGroup()
+HRESULT CRenderer::Render_RenderGroup(_double fDeltaTime)
 {
 	FAILED_CHECK(m_pRenderTargetMgr->Clear_All_RenderTargetColor());
 
@@ -292,7 +295,7 @@ HRESULT CRenderer::Render_RenderGroup()
 	FAILED_CHECK(m_pRenderTargetMgr->End(TEXT("MRT_Deferred")));
 
 	FAILED_CHECK(Render_BlurShadow());
-	FAILED_CHECK(Render_Lights());
+	FAILED_CHECK(Render_Lights(fDeltaTime));
 
 
 
@@ -343,6 +346,8 @@ HRESULT CRenderer::Render_RenderGroup()
 
 HRESULT CRenderer::Clear_RenderGroup_forSceneChaging()
 {
+	NULL_CHECK_RETURN(m_pLightMgr, E_FAIL);
+
 	for (_uint i = 0; i < RENDER_END; ++i)
 	{
 		for (auto& RenderObject : m_RenderObjectList[i])
@@ -364,6 +369,8 @@ HRESULT CRenderer::Clear_RenderGroup_forSceneChaging()
 	}
 	m_TrailObjectList.clear();
 
+
+	m_pLightMgr->Clear_PointLightLisht();
 
 	return S_OK;
 }
@@ -633,11 +640,12 @@ HRESULT CRenderer::Render_BlurShadow()
 	return S_OK;
 }
 
-HRESULT CRenderer::Render_Lights()
+HRESULT CRenderer::Render_Lights(_double fDeltaTime)
 {
 	FAILED_CHECK(m_pRenderTargetMgr->Begin(TEXT("MRT_LightAcc")));
 
-	FAILED_CHECK(m_pLightMgr->Render(m_pShader, m_pVIBuffer, &m_WVPmat));
+	FAILED_CHECK(m_pTexture->Bind_OnShader(m_pShader, "g_NoiseTexture"));
+	FAILED_CHECK(m_pLightMgr->Render(m_pShader, m_pVIBuffer, &m_WVPmat, fDeltaTime));
 
 	FAILED_CHECK(m_pRenderTargetMgr->End(TEXT("MRT_LightAcc")));
 
@@ -1124,7 +1132,8 @@ void CRenderer::Free()
 
 	Safe_Release(m_pVIBuffer);
 	Safe_Release(m_pShader);
-
+	Safe_Release(m_pTexture);
+	
 
 	Safe_Release(m_pRenderTargetMgr);
 	Safe_Release(m_pLightMgr);

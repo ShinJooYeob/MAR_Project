@@ -603,11 +603,11 @@ LIGHTDESC * CGameInstance::Get_LightDesc(LIGHTDESC::TYPE eLightType, _uint iInde
 	return m_pLightMgr->Get_LightDesc(eLightType,iIndex);
 }
 
-HRESULT CGameInstance::Add_Light(const LIGHTDESC & LightDesc)
+HRESULT CGameInstance::Add_Light(const LIGHTDESC & LightDesc, LIGHTDESC** pOutDesc)
 {
 	NULL_CHECK_BREAK(m_pLightMgr);
 
-	return m_pLightMgr->Add_Light(LightDesc);
+	return m_pLightMgr->Add_Light(LightDesc, pOutDesc);
 }
 
 HRESULT CGameInstance::EasingDiffuseLightDesc(LIGHTDESC::TYPE eLightType, _uint iIndex, _fVector vTargetDiffuse, _float MixRate)

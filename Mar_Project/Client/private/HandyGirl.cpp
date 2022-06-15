@@ -1688,7 +1688,7 @@ HRESULT CHandyGirl::Adjust_MovedTransform_byAnim(_double fDeltatime)
 				tSoundDesc.fTargetSound = 0.35f;
 
 				wstring SoundTrack = L"";
-				SoundTrack = L"HandyGirl_intro_smash0" + to_wstring(rand() % 4 + 1) + L".ogg";
+				SoundTrack = L"HandyGirl_intro_smash0" + to_wstring(rand() % 3 + 1) + L".ogg";
 
 
 				//SoundTrack = L"MapObject_shrinkflower_open.ogg";

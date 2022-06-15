@@ -20,7 +20,7 @@ HRESULT CLightMgr::Initialize_LightMgr(ID3D11Device * pDevice, ID3D11DeviceConte
 	return S_OK;
 }
 
-HRESULT CLightMgr::Render(CShader * pShader, CVIBuffer_Rect * pViBuffer, MATRIXWVP* pWVPMat)
+HRESULT CLightMgr::Render(CShader * pShader, CVIBuffer_Rect * pViBuffer, MATRIXWVP* pWVPMat, _double fDeltaTime)
 {
 	NULL_CHECK_RETURN(pShader, E_FAIL);
 	NULL_CHECK_RETURN(pViBuffer, E_FAIL);
@@ -52,13 +52,25 @@ HRESULT CLightMgr::Render(CShader * pShader, CVIBuffer_Rect * pViBuffer, MATRIXW
 
 	for (_uint i = 0; i < LIGHTDESC::TYPE_END; i++)
 	{
-		for (auto& pLight : m_ArrLightList[i])
+
+		auto& iter = m_ArrLightList[i].begin();
+
+		for (;iter != m_ArrLightList[i].end();)
 		{
-			if (nullptr != pLight)
-				pLight->Render(pShader, pViBuffer);
+
+				if ((*iter)->Get_LightDesc()->bIsDead)
+				{
+					Safe_Release(*iter);
+					iter = m_ArrLightList[i].erase(iter);
+				}
+				else
+				{
+					(*iter)->Render(pShader, pViBuffer, fDeltaTime);
+					iter++;
+				}
+			
 
 		}
-
 	}
 
 
@@ -130,13 +142,28 @@ HRESULT CLightMgr::Relocate_LightDesc(LIGHTDESC::TYPE eLightType, _uint iIndex, 
 
 
 
-HRESULT CLightMgr::Add_Light(const LIGHTDESC & LightDesc)
+HRESULT CLightMgr::Add_Light(const LIGHTDESC & LightDesc, LIGHTDESC** pOutDesc)
 {
 	CLight*		pLight = CLight::Create(m_pDevice, m_pDeviceContext, LightDesc);
 
 	NULL_CHECK_RETURN(pLight, E_FAIL);
 
 	m_ArrLightList[LightDesc.eLightType].push_back(pLight);
+
+	if (pOutDesc != nullptr)
+		*pOutDesc = pLight->Get_LightDesc();
+	
+	return S_OK;
+}
+
+HRESULT CLightMgr::Clear_PointLightLisht()
+{
+
+	for (auto& pLight : m_ArrLightList[LIGHTDESC::TYPE_POINT])
+		Safe_Release(pLight);
+
+	m_ArrLightList[LIGHTDESC::TYPE_POINT].clear();
+	
 
 	return S_OK;
 }

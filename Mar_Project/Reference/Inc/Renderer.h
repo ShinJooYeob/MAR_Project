@@ -28,7 +28,7 @@ public:
 	HRESULT Add_RenderGroup(RENDERGROUP eRenderID ,CGameObject* pGameObject);
 	HRESULT Add_TrailGroup(class CSwordTrail* pComponent);
 	HRESULT Add_DebugGroup(class CComponent* pComponent);
-	HRESULT Render_RenderGroup();
+	HRESULT Render_RenderGroup(_double fDeltaTime);
 	HRESULT Clear_RenderGroup_forSceneChaging();
 
 public:
@@ -53,6 +53,7 @@ private:
 
 	class CVIBuffer_Rect*					m_pVIBuffer = nullptr;
 	class CShader*							m_pShader = nullptr;
+	class CTexture*							m_pTexture = nullptr;
 
 
 private:
@@ -75,7 +76,7 @@ private:
 	HRESULT Render_SwordTrail_NoLight();
 
 	HRESULT Render_BlurShadow();
-	HRESULT Render_Lights();
+	HRESULT Render_Lights(_double fDeltaTime);
 	HRESULT Render_DeferredTexture();
 
 	HRESULT Render_PostProcessing();

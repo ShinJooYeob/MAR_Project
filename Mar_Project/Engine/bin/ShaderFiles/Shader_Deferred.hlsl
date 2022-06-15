@@ -20,6 +20,7 @@ cbuffer	ForLightShaft
 {
 	float4 g_vLightShaftValue  = 0;
 	float2 g_vScreenLightUVPos = 0;
+	float g_fTimer = 0;
 };
 
 
@@ -55,6 +56,7 @@ texture2D			g_DepthTexture;
 texture2D			g_ShadeTexture;
 texture2D			g_SpecularTexture;
 texture2D			g_LinerTexture;
+texture2D			g_NoiseTexture;
 
 texture2D			g_UpScaledTexture1;
 texture2D			g_UpScaledTexture2;
@@ -309,6 +311,8 @@ PS_OUT_LIGHT PS_MAIN_POINT(PS_IN In)
 	vector		vNormalDesc = g_NormalTexture.Sample(DefaultSampler, In.vTexUV);
 	vector		vDepthDesc = g_DepthTexture.Sample(DefaultSampler, In.vTexUV);
 	vector		vMtrlSpecularMap = g_SpecularTexture.Sample(DefaultSampler, In.vTexUV);
+	vector		vNoiseDesc = g_NoiseTexture.Sample(WrapSampler, In.vTexUV + float2(0, g_fTimer));
+
 	float		fViewZ = vDepthDesc.x * 300.f;
 
 	vector		vNormal = vector(vNormalDesc.xyz * 2.f - 1.f, 0.f);
@@ -331,11 +335,13 @@ PS_OUT_LIGHT PS_MAIN_POINT(PS_IN In)
 
 	//Out.vEmissive = max((g_fLightRange * 0.25f) - fDistance, 0);
 		
-	
+	float NoisedRange = ((vNoiseDesc.r * 0.5f - 0.25f) + 1) * g_fLightRange;
 
-	float		fAtt = max(g_fLightRange - fDistance, 0.f) / g_fLightRange;
-	Out.vEmissive = pow(fAtt,2.2f);
+	float		fAtt = max(NoisedRange - fDistance, 0.f) / NoisedRange;
 
+	float Emsv = pow(fAtt, 1.5f);
+	Out.vEmissive = vector(Emsv, Emsv,0,1);
+		
 	Out.vShade = (g_vLightDiffuse * saturate(dot(normalize(vLightDir) * -1.f, vNormal)) + (g_vLightAmbient *  saturate(vMtrlSpecularMap.b + 0.2f))) * fAtt;
 	//Out.vShade = 0.5f;
 	 
@@ -346,6 +352,7 @@ PS_OUT_LIGHT PS_MAIN_POINT(PS_IN In)
 
 	vector		vLook = vWorldPos - g_vCamPosition;
 
+	//Out.vSpecular = (g_vLightSpecular * 1) * pow(saturate(dot(normalize(vReflect) * -1.f, normalize(vLook))), pow(1 / vMtrlSpecularMap.g, 2)) * fAtt;
 	Out.vSpecular = (g_vLightSpecular * pow(vMtrlSpecularMap.r, 1 / 1.2f)) * pow(saturate(dot(normalize(vReflect) * -1.f, normalize(vLook))), pow(1 / vMtrlSpecularMap.g, 2)) * fAtt;
 	Out.vSpecular.a = 0.f;
 
@@ -374,9 +381,7 @@ PS_OUT_AfterDeferred PS_MAIN_BLEND(PS_IN In)
 
 	if (vDepthDesc.g > 0)
 	{
-			Out.vColor *= (1 - vShadowMapDesc);
-
-
+		Out.vColor *= (1 - vShadowMapDesc);
 	}
 
 	Out.vColor2 = Out.vColor;
@@ -484,7 +489,7 @@ PS_OUT_AfterDeferred PS_DOWNSCALING_Luminence(PS_IN In)
 	vector EmissiveDesc = g_TargetTexture.Sample(DefaultSampler, In.vTexUV);
 	
 	float Lumi	= dot(LinerDesc.xyz, float3(0.2125f, 0.7154f, 0.0721f));
-	if (EmissiveDesc.r == 0 && Lumi < g_fBlurLuminence) discard;
+	if (EmissiveDesc.z == 0 && Lumi < g_fBlurLuminence) discard;
 	//Out.vColor = Lumi;
 	
 	Out.vColor = LinerDesc;

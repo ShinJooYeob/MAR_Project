@@ -65,6 +65,14 @@ HRESULT CNormalBullet::Initialize_Clone(void * pArg)
 
 	}
 
+	LIGHTDESC LightDesc;
+
+	LightDesc.eLightType = tagLightDesc::TYPE_POINT;
+	LightDesc.vSpecular = LightDesc.vAmbient = LightDesc.vDiffuse = _float4(0.90588235f, 0.745098039f, 0.f, 1.f);
+	LightDesc.vVector = XMVectorSetW(m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 1);
+	LightDesc.fRange = 2.f;
+	g_pGameInstance->Add_Light(LightDesc, &m_pLightDesc);
+
 	return S_OK;
 }
 
@@ -72,6 +80,7 @@ void CNormalBullet::Set_IsDead()
 {
 	m_pTransformCom->Set_IsOwnerDead();
 	m_bIsDead = true;
+	m_pLightDesc->bIsDead = true;
 }
 
 _int CNormalBullet::Update(_double fDeltaTime)
@@ -80,6 +89,7 @@ _int CNormalBullet::Update(_double fDeltaTime)
 		return -1;
 	if (m_bIsDead) return 0;
 	
+
 	m_pColliderCom->Update_ConflictPassedTime(fDeltaTime);
 
 	//_float EasedValue = g_pGameInstance->Easing(TYPE_Linear, 20, -100, m_fLifeTime, m_fTotalLifeTime);
@@ -118,6 +128,7 @@ _int CNormalBullet::LateUpdate(_double fDeltaTime)
 		FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this));
 
 	m_vOldPos = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+	m_pLightDesc->vVector = XMVectorSetW(m_vOldPos.XMVector(), 1);
 	return _int();
 }
 

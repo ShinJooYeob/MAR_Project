@@ -1,4 +1,5 @@
 #include "..\public\Light.h"
+#include "EasingMgr.h"
 
 
 
@@ -18,7 +19,7 @@ HRESULT CLight::Initilize_Protoype(const LIGHTDESC & LightDesc)
 	return S_OK;
 }
 
-HRESULT CLight::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer)
+HRESULT CLight::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer,_double fDeltaTime)
 {
 	_uint		iPassIndex = 0;
 
@@ -31,8 +32,18 @@ HRESULT CLight::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer)
 	}
 	else
 	{
+		m_PassedTime += (_float)fDeltaTime;
+		m_TargetTime += (_float)fDeltaTime;
+		
+		_float Range = GetSingle(CEasingMgr)->Easing_Return(TYPE_QuadInOut, TYPE_QuadInOut,  m_LightDesc.fRange * 1.1f, m_LightDesc.fRange * 0.9f, (_float)m_PassedTime, 1.f);
+		if (m_PassedTime > 1.f) m_PassedTime = 0;
+		if (m_TargetTime > m_LightDesc.fTargetDeadTime)m_LightDesc.bIsDead = true;
+
+
+		pShader->Set_RawValue("g_fTimer", &m_PassedTime, sizeof(_float));
+
 		pShader->Set_RawValue("g_vLightPos", &m_LightDesc.vVector, sizeof(_float4));
-		pShader->Set_RawValue("g_fLightRange", &m_LightDesc.fRange, sizeof(_float));
+		pShader->Set_RawValue("g_fLightRange", &Range, sizeof(_float));
 		iPassIndex = 2;
 	}
 

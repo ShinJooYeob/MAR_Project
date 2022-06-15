@@ -81,6 +81,9 @@ namespace Engine
 		//Directional : 방향 / Point : 위치
 		_float4		vVector;
 		_float		fRange;
+
+		_bool		bIsDead = false;
+		_float		fTargetDeadTime = FLT_MAX;
 	}LIGHTDESC;
 
 	typedef struct tagVertex_Model

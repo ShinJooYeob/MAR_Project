@@ -131,7 +131,7 @@ public:
 
 public:// LightMgr
 	LIGHTDESC* Get_LightDesc(LIGHTDESC::TYPE eLightType, _uint iIndex);
-	HRESULT Add_Light(const LIGHTDESC& LightDesc);
+	HRESULT Add_Light(const LIGHTDESC& LightDesc, LIGHTDESC** pOutDesc = nullptr);
 	HRESULT EasingDiffuseLightDesc(LIGHTDESC::TYPE eLightType, _uint iIndex, _fVector vTargetDiffuse, _float MixRate = 1.f);
 	HRESULT Relocate_LightDesc(LIGHTDESC::TYPE eLightType, _uint iIndex, _fVector vRelocatePosition, _float fRange = 8.f);
 

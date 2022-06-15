@@ -170,9 +170,6 @@ HRESULT CScene_Stage1::Ready_Light()
 	}
 
 
-
-
-
 	return S_OK;
 }
 

@@ -19,7 +19,7 @@ public:
 
 
 public:
-	HRESULT Render(CShader* pShader, CVIBuffer_Rect* pVIBuffer);
+	HRESULT Render(CShader* pShader, CVIBuffer_Rect* pVIBuffer, _double fDeltaTime);
 
 
 private:
@@ -27,6 +27,8 @@ private:
 	ID3D11DeviceContext*		m_pDeviceContext = nullptr;
 	LIGHTDESC					m_LightDesc;
 
+	_float						m_PassedTime = 0;
+	_float						m_TargetTime = 0;
 
 public:
 	static CLight* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, const LIGHTDESC& LightDesc);

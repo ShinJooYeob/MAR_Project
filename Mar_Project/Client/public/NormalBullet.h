@@ -26,6 +26,8 @@ public:
 private:
 	PARTICLEDESC		m_tParticleDesc;
 
+	LIGHTDESC*			m_pLightDesc = nullptr;
+
 private:
 	HRESULT Ready_ParticleDesc();
 

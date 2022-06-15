@@ -33,6 +33,9 @@ private:
 	_uint				m_iChecker = 0;
 	SOUNDDESC*			m_pSoundDesc = nullptr;
 	vector<PARTICLEDESC>		m_vecParticleDesc;
+
+
+	LIGHTDESC*			m_pLightDesc = nullptr;
 private:
 	HRESULT Set_Player_On_Terrain();
 	HRESULT Ready_ParticleDesc();

@@ -67,7 +67,10 @@ HRESULT CTexture::NullCheckTexture(_uint iIndex)
 HRESULT CTexture::Bind_OnShader(CShader * pShader, const char * pValueName, _uint iTextureIndex)
 {
 	if (pShader == nullptr || m_pBindedTextureLayer == nullptr)
+	{
+		__debugbreak();
 		return E_FAIL;
+	}
 
 	return m_pBindedTextureLayer->Bind_OnShader(pShader, pValueName, iTextureIndex);
 }
