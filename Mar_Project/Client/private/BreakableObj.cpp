@@ -207,6 +207,139 @@ _int CBreakableObj::LightRender()
 	return _int();
 }
 
+void CBreakableObj::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedObj, CCollider * pConflictedCollider, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType)
+{
+	switch (eConflictedObjCollisionType)
+	{
+	case Engine::CollisionType_PlayerWeapon:
+	{
+
+		if (!lstrcmp(pConflictedObj->Get_NameTag(), L"VopalBlade"))
+		{
+			switch (m_iKindsOfMesh)
+			{
+			case Prototype_Mesh_GiftBasket:
+			{
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+				tSoundDesc.vMinMax = _float2(0, 35);
+				tSoundDesc.fTargetSound = 0.5f;
+				wstring SoundTrack = L"";
+				SoundTrack = L"Weapon_vorpal_imp_wood0" + to_wstring(rand() % 4 + 1) + L".ogg";
+
+				//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+			}
+				break;
+			case Prototype_Mesh_BreakableBarrel:
+			{
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+				tSoundDesc.vMinMax = _float2(0, 35);
+				tSoundDesc.fTargetSound = 1.0f;
+				wstring SoundTrack = L"";
+				SoundTrack = L"Weapon_vorpal_imp_default0" + to_wstring(rand() % 4 + 1) + L".ogg";
+
+				//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+			}
+				break;
+			case Prototype_Mesh_BreakableBox:
+			{
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+				tSoundDesc.vMinMax = _float2(0, 35);
+				tSoundDesc.fTargetSound = 0.5f;
+				wstring SoundTrack = L"";
+				SoundTrack = L"Weapon_vorpal_imp_metal0" + to_wstring(rand() % 8 + 1) + L".ogg";
+
+				//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+			}
+				break;
+			default:
+				break;
+			}
+
+
+		}
+		else if (!lstrcmp(pConflictedObj->Get_NameTag(), L"Horse"))
+		{
+
+			switch (m_iKindsOfMesh)
+			{
+			case Prototype_Mesh_GiftBasket:
+			{
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = pConflictedCollider->Get_ColliderPosition(iConflictedObjColliderIndex);
+				tSoundDesc.vMinMax = _float2(0, 35);
+				tSoundDesc.fTargetSound = 0.5f;
+				wstring SoundTrack = L"";
+				SoundTrack = L"Weapon_hobby_imp_crabshell0" + to_wstring(rand() % 6 + 1) + L".ogg";
+
+				//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+			}
+				break;
+			case Prototype_Mesh_BreakableBarrel:
+			{
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = pConflictedCollider->Get_ColliderPosition(iConflictedObjColliderIndex);
+				tSoundDesc.vMinMax = _float2(0, 35);
+				tSoundDesc.fTargetSound = 0.5f;
+				wstring SoundTrack = L"";
+				SoundTrack = L"Weapon_hobby_imp_flesh0" + to_wstring(rand() % 7 + 1) + L".ogg";
+
+				//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+			}
+				break;
+			case Prototype_Mesh_BreakableBox:
+			{
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = pConflictedCollider->Get_ColliderPosition(iConflictedObjColliderIndex);
+				tSoundDesc.vMinMax = _float2(0, 35);
+				tSoundDesc.fTargetSound = 0.5f;
+				wstring SoundTrack = L"";
+				SoundTrack = L"Weapon_hobby_imp_metal0" + to_wstring(rand() % 9 + 1) + L".ogg";
+
+				//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+			}
+				break;
+			default:
+				break;
+			}
+
+
+		}
+
+	}
+	break;
+
+	case Engine::CollisionType_Terrain:
+		break;
+
+	default:
+		break;
+	}
+
+
+
+}
+
 HRESULT CBreakableObj::Add_Dmg_To_BreakableObj(_uint iDmg)
 {
 	m_fHP -= iDmg;
@@ -228,8 +361,21 @@ HRESULT CBreakableObj::Add_Dmg_To_BreakableObj(_uint iDmg)
 				FAILED_CHECK(pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_RoseObj),
 					TAG_OP(Prototype_RoseObj), &_float3(vPos)));
 			}
+			{
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+				tSoundDesc.vMinMax = _float2(0, 35);
+				tSoundDesc.fTargetSound = 0.5f;
+				wstring SoundTrack = L"";
+				SoundTrack = L"MapObject_br_shell0" + to_wstring(rand() % 3 + 1) + L".ogg";
+
+				//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+			}
 		}
-		else
+		else if(m_iKindsOfMesh == Prototype_Mesh_BreakableBarrel)
 		{
 
 			for (_uint i = 0; i < iNumTeethCount; i++)
@@ -240,7 +386,44 @@ HRESULT CBreakableObj::Add_Dmg_To_BreakableObj(_uint iDmg)
 				FAILED_CHECK(pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_TeethObj),
 					TAG_OP(Prototype_TeethObj), &_float4(vPos, _float(IsGold))));
 			}
+			{
+				SOUNDDESC tSoundDesc;
 
+				tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+				tSoundDesc.vMinMax = _float2(0, 35);
+				tSoundDesc.fTargetSound = 0.35f;
+				wstring SoundTrack = L"";
+				SoundTrack = L"MapObject_br_snailshell0" + to_wstring(rand() % 3 + 1) + L".ogg";
+
+				//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+			}
+		}
+		else if (m_iKindsOfMesh == Prototype_Mesh_BreakableBox)
+		{
+			for (_uint i = 0; i < iNumTeethCount; i++)
+			{
+				_uint IsGold = rand() % 5;
+				IsGold = (IsGold) ? 0 : 1;
+
+				FAILED_CHECK(pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_TeethObj),
+					TAG_OP(Prototype_TeethObj), &_float4(vPos, _float(IsGold))));
+			}
+			//MapObject_br_metal_crate01
+			{
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+				tSoundDesc.vMinMax = _float2(0, 35);
+				tSoundDesc.fTargetSound = 0.6f;
+				wstring SoundTrack = L"";
+				SoundTrack = L"MapObject_br_metal_crate0" + to_wstring(rand() % 6 + 1) + L".ogg";
+
+				//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
+			}
 		}
 
 		//////////////////////피스 생성

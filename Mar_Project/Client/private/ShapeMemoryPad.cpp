@@ -177,6 +177,21 @@ HRESULT CShapeMemoryPad::Let_ReturntoShape(_bool bBool)
 
 	m_bReturnToShape = bBool;
 
+	{
+		SOUNDDESC tSoundDesc;
+
+		tSoundDesc.pTransform = m_pPlayerTransform;
+		tSoundDesc.vMinMax = _float2(0, 55);
+		tSoundDesc.fTargetSound = 0.35f;
+		wstring SoundTrack = L"";
+		SoundTrack = L"c1w2_s_plat_risers_spin.ogg";
+
+		//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+		g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
+	}
+
+
 	for (auto& Piece : m_vecPiece)
 	{
 
@@ -276,7 +291,7 @@ HRESULT CShapeMemoryPad::Ready_Piece()
 	tDesc.fEasedAngle = tDesc.fAngle = ((rand() % 2 + 1) * 360) + ((rand() % 2) ? pUtil->RandomFloat(45,135) : pUtil->RandomFloat(225, 315));
 	tDesc.iKindsOfMesh = 2;
 	tDesc.PassedTime = 0;
-	tDesc.TotoalTime = pUtil->RandomFloat(0.8f, 1.8f);
+	tDesc.TotoalTime = pUtil->RandomFloat(0.8f, 1.2f);
 	tDesc.ReturnToMem = false;
 	m_vecPiece.push_back(tDesc);
 
@@ -289,7 +304,7 @@ HRESULT CShapeMemoryPad::Ready_Piece()
 	tDesc.fEasedAngle = tDesc.fAngle = ((rand() % 2 + 1) * 360) + ((rand() % 2) ? pUtil->RandomFloat(45, 135) : pUtil->RandomFloat(225, 315));
 	tDesc.iKindsOfMesh = 4;
 	tDesc.PassedTime = 0;
-	tDesc.TotoalTime = pUtil->RandomFloat(0.8f, 1.8f);
+	tDesc.TotoalTime = pUtil->RandomFloat(0.8f, 1.2f);
 	tDesc.ReturnToMem = false;
 	m_vecPiece.push_back(tDesc);
 
@@ -302,7 +317,7 @@ HRESULT CShapeMemoryPad::Ready_Piece()
 	tDesc.fEasedAngle = tDesc.fAngle = ((rand() % 2 + 1) * 360) + ((rand() % 2) ? pUtil->RandomFloat(45, 135) : pUtil->RandomFloat(225, 315));
 	tDesc.iKindsOfMesh = 1;
 	tDesc.PassedTime = 0;
-	tDesc.TotoalTime = pUtil->RandomFloat(0.8f, 1.8f);
+	tDesc.TotoalTime = pUtil->RandomFloat(0.8f, 1.2f);
 	tDesc.ReturnToMem = false;
 	m_vecPiece.push_back(tDesc);
 
@@ -315,7 +330,7 @@ HRESULT CShapeMemoryPad::Ready_Piece()
 	tDesc.fEasedAngle = tDesc.fAngle = ((rand() %2 + 1) * 360) + ((rand() % 2) ? pUtil->RandomFloat(45, 135) : pUtil->RandomFloat(225, 315));
 	tDesc.iKindsOfMesh = 3;
 	tDesc.PassedTime = 0;
-	tDesc.TotoalTime = pUtil->RandomFloat(0.8f, 1.8f);
+	tDesc.TotoalTime = pUtil->RandomFloat(0.8f, 1.2f);
 	tDesc.ReturnToMem = false;
 	m_vecPiece.push_back(tDesc);
 
@@ -328,7 +343,7 @@ HRESULT CShapeMemoryPad::Ready_Piece()
 	tDesc.fEasedAngle = tDesc.fAngle = ((rand() % 2 + 1) * 360) + ((rand() % 2) ? pUtil->RandomFloat(45, 135) : pUtil->RandomFloat(225, 315));
 	tDesc.iKindsOfMesh = 1;
 	tDesc.PassedTime = 0;
-	tDesc.TotoalTime = pUtil->RandomFloat(0.8f, 1.8f);
+	tDesc.TotoalTime = pUtil->RandomFloat(0.8f, 1.2f);
 	tDesc.ReturnToMem = false;
 	m_vecPiece.push_back(tDesc);
 
@@ -341,7 +356,7 @@ HRESULT CShapeMemoryPad::Ready_Piece()
 	tDesc.fEasedAngle = tDesc.fAngle = ((rand() % 2 + 1) * 360) + ((rand() % 2) ? pUtil->RandomFloat(45, 135) : pUtil->RandomFloat(225, 315));
 	tDesc.iKindsOfMesh = 4;
 	tDesc.PassedTime = 0;
-	tDesc.TotoalTime = pUtil->RandomFloat(0.8f, 1.8f);
+	tDesc.TotoalTime = pUtil->RandomFloat(0.8f, 1.2f);
 	tDesc.ReturnToMem = false;
 	m_vecPiece.push_back(tDesc);
 
@@ -354,7 +369,7 @@ HRESULT CShapeMemoryPad::Ready_Piece()
 	tDesc.fEasedAngle = tDesc.fAngle = ((rand() % 2 + 1) * 360) + ((rand() % 2) ? pUtil->RandomFloat(45, 135) : pUtil->RandomFloat(225, 315));
 	tDesc.iKindsOfMesh = 0;
 	tDesc.PassedTime = 0;
-	tDesc.TotoalTime = pUtil->RandomFloat(0.8f, 1.8f);
+	tDesc.TotoalTime = pUtil->RandomFloat(0.8f, 1.2f);
 	tDesc.ReturnToMem = false;
 	m_vecPiece.push_back(tDesc);
 

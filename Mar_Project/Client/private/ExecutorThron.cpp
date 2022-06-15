@@ -53,7 +53,7 @@ HRESULT CExecutorThron::Initialize_Clone(void * pArg)
 
 	tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
 	tSoundDesc.vMinMax = _float2(5, 35);
-	tSoundDesc.fTargetSound = 0.08f;
+	tSoundDesc.fTargetSound = 0.24f;
 	wstring SoundTrack = L"";
 	SoundTrack = L"Executioner_spin_destrcut0" + to_wstring(rand() % 12 + 1) + L".ogg";
 

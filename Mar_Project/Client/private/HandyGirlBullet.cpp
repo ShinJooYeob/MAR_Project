@@ -66,9 +66,9 @@ HRESULT CHandyGirlBullet::Initialize_Clone(void * pArg)
 
 	{
 		SOUNDDESC tSoundDesc;
-		tSoundDesc.pTransform = m_pTransformCom;
+		tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
 		tSoundDesc.vMinMax = _float2(0, 35);
-		tSoundDesc.fTargetSound = 0.25f;
+		tSoundDesc.fTargetSound = 0.15f;
 
 
 		wstring SoundTrack = L"";

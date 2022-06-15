@@ -10,7 +10,7 @@ IMPLEMENT_SINGLETON(CSoundMgr)
 #define SoundEasingType TYPE_Linear
 
 CSoundMgr::CSoundMgr()
-	:m_iNumOfEachChannel(_uint(31 / (CHANNEL_MAXCHANNEL - 1)))
+	:m_iNumOfEachChannel(_uint((MaxChannelCount - BGMChannelCount) / (CHANNEL_MAXCHANNEL - 1)))
 {
 }
 HRESULT CSoundMgr::Initialize_FMOD()
@@ -18,7 +18,7 @@ HRESULT CSoundMgr::Initialize_FMOD()
 	FMOD_System_Create(&m_pSystem);
 
 	// 1. 시스템 포인터, 2. 사용할 가상채널 수 , 초기화 방식) 
-	FMOD_System_Init(m_pSystem, 32, FMOD_INIT_NORMAL, NULL);
+	FMOD_System_Init(m_pSystem, MaxChannelCount, FMOD_INIT_NORMAL, NULL);
 
 	for (_uint i = 0; i<CHANNEL_MAXCHANNEL;i++)
 	{
@@ -33,7 +33,7 @@ HRESULT CSoundMgr::Initialize_FMOD()
 
 
 	ZeroMemory(m_PauseArr, sizeof(_bool)*CHANNEL_MAXCHANNEL);
-	ZeroMemory(m_fPassedTimeArr, sizeof(_double) * 32);
+	ZeroMemory(m_fPassedTimeArr, sizeof(_double) * MaxChannelCount);
 
 	m_pPipeLineMgr = GetSingle(CPipeLineMgr);
 	NULL_CHECK_RETURN(m_pPipeLineMgr, E_FAIL);
@@ -66,10 +66,9 @@ HRESULT CSoundMgr::Update_FMOD(_double fTimeDelta)
 
 	FMOD_BOOL bPlay = FALSE;
 
-	for (_uint i = 0; i< 32; i++)
+	for (_uint i = 0; i< MaxChannelCount - BGMChannelCount; i++)
 	{
 		_uint iChannel = i / m_iNumOfEachChannel;
-		if (i == 31) iChannel = CHANNEL_BGM;
 
 		if (m_fPassedTimeArr[i] != 0)
 		{
@@ -102,6 +101,44 @@ HRESULT CSoundMgr::Update_FMOD(_double fTimeDelta)
 			}
 		}
 	}
+	if (m_bChangingBGM)
+	{
+		m_ChangingBGMTime += fTimeDelta;
+
+		if (m_ChangingBGMTime < 1.f)
+		{
+			for (_uint i = (MaxChannelCount - BGMChannelCount); i < MaxChannelCount; i++)
+			{
+				if (i != (MaxChannelCount - BGMChannelCount) + m_iBGMIndex)
+				{
+					FMOD_Channel_SetVolume(m_pChannelArr[i], (1 - (_float)m_ChangingBGMTime)* m_tSoundDesc[i].fTargetSound * m_VolumeArr[CHANNEL_BGM]);
+
+				}
+			}
+		}
+		else if(m_ChangingBGMTime < 2.f)
+		{
+			for (_uint i = (MaxChannelCount - BGMChannelCount); i < MaxChannelCount; i++)
+			{
+				if (i == (MaxChannelCount - BGMChannelCount) + m_iBGMIndex)
+				{
+					FMOD_Channel_SetVolume(m_pChannelArr[i], ((_float)m_ChangingBGMTime - 1.f) * m_tSoundDesc[i].fTargetSound * m_VolumeArr[CHANNEL_BGM]);
+
+				}
+				else
+				{
+					FMOD_Channel_Stop(m_pChannelArr[i]);
+				}
+			}
+
+		}
+		else
+		{
+
+			m_bChangingBGM = false;
+		}
+
+	}
 
 	FMOD_System_Update(m_pSystem);
 
@@ -117,7 +154,7 @@ int CSoundMgr::Channel_VolumeUp(CHANNELID eID, _float _vol)
 		m_VolumeArr[eID] = SOUND_MIN;
 
 	if(eID == CHANNEL_BGM)
-		FMOD_Channel_SetVolume(m_pChannelArr[31], m_VolumeArr[eID]);
+		FMOD_Channel_SetVolume(m_pChannelArr[(MaxChannelCount - BGMChannelCount)], m_VolumeArr[eID]);
 	else 
 	{
 		for (_uint i = eID * m_iNumOfEachChannel; i < (eID + 1)* m_iNumOfEachChannel; i++)
@@ -142,7 +179,7 @@ int CSoundMgr::Channel_VolumeDown(CHANNELID eID, _float _vol)
 		m_VolumeArr[eID] = SOUND_MIN;
 
 	if (eID == CHANNEL_BGM)
-		FMOD_Channel_SetVolume(m_pChannelArr[31], m_VolumeArr[eID]);
+		FMOD_Channel_SetVolume(m_pChannelArr[(MaxChannelCount - BGMChannelCount)], m_VolumeArr[eID]);
 	else 
 	{
 		for (_uint i = eID * m_iNumOfEachChannel; i < (eID + 1)* m_iNumOfEachChannel; i++)
@@ -166,7 +203,7 @@ int CSoundMgr::Channel_Pause(CHANNELID eID)
 	m_PauseArr[eID] = !m_PauseArr[eID];
 
 	if (eID == CHANNEL_BGM)
-		FMOD_Channel_SetVolume(m_pChannelArr[31], m_VolumeArr[eID]);
+		FMOD_Channel_SetVolume(m_pChannelArr[(MaxChannelCount - BGMChannelCount)], m_VolumeArr[eID]);
 	else 
 	{
 		for (_uint i = eID * m_iNumOfEachChannel; i < (eID + 1)* m_iNumOfEachChannel; i++)
@@ -194,7 +231,10 @@ HRESULT CSoundMgr::PlaySound(const _tchar * pSoundKey, CHANNELID eID, SOUNDDESC*
 	});
 
 	if (iter == m_mapSound.end())
+	{
+		__debugbreak();
 		return E_FAIL;
+	}
 
 	FMOD_BOOL bPlay = FALSE;
 	_uint fOldSoundIndx = -1;
@@ -279,7 +319,6 @@ HRESULT CSoundMgr::PlaySound(const _tchar * pSoundKey, CHANNELID eID, SOUNDDESC*
 HRESULT CSoundMgr::PlayBGM(const _tchar * pSoundKey, _float fLouderMultiple)
 {
 	map<TCHAR*, FMOD_SOUND*>::iterator iter;
-	FMOD_Channel_Stop(m_pChannelArr[31]);
 
 	iter = find_if(m_mapSound.begin(), m_mapSound.end(), [&](auto& iter)
 	{
@@ -287,14 +326,26 @@ HRESULT CSoundMgr::PlayBGM(const _tchar * pSoundKey, _float fLouderMultiple)
 	});
 
 	if (iter == m_mapSound.end())
+	{
+		__debugbreak();
 		return E_FAIL;
+	}
 
-	FMOD_System_PlaySound(m_pSystem, iter->second, nullptr, FALSE, &m_pChannelArr[31]);
+	m_iBGMIndex = (m_iBGMIndex) ? 0:1;
 
+	_uint iChannelIndex = (MaxChannelCount - BGMChannelCount + m_iBGMIndex);
 
-	FMOD_Channel_SetVolume(m_pChannelArr[31], m_VolumeArr[CHANNEL_BGM] * fLouderMultiple);
+	m_tSoundDesc[iChannelIndex].fTargetSound = fLouderMultiple;
+	m_bChangingBGM = true;
+	m_ChangingBGMTime = 0;
 
-	FMOD_Channel_SetMode(m_pChannelArr[31], FMOD_LOOP_NORMAL);
+	FMOD_Channel_Stop(m_pChannelArr[iChannelIndex]);
+	FMOD_System_PlaySound(m_pSystem, iter->second, nullptr, FALSE, &m_pChannelArr[iChannelIndex]);
+
+	FMOD_Channel_SetVolume(m_pChannelArr[iChannelIndex], 0);
+
+	FMOD_Channel_SetMode(m_pChannelArr[iChannelIndex], FMOD_LOOP_NORMAL);
+
 	FMOD_System_Update(m_pSystem);
 	return S_OK;
 }
@@ -302,7 +353,11 @@ HRESULT CSoundMgr::PlayBGM(const _tchar * pSoundKey, _float fLouderMultiple)
 void CSoundMgr::Stop_ChannelSound(CHANNELID eID)
 {
 	if (eID == CHANNEL_BGM)
-		FMOD_Channel_Stop(m_pChannelArr[31]);
+	{
+		m_bChangingBGM = true;
+		m_ChangingBGMTime = 0;
+		m_iBGMIndex = (m_iBGMIndex) ? 0 : 1;
+	}
 	else
 	{
 		for (_uint i = eID * m_iNumOfEachChannel; i < (eID + 1)* m_iNumOfEachChannel; i++)
@@ -317,11 +372,14 @@ void CSoundMgr::Stop_ChannelSound(CHANNELID eID)
 
 void CSoundMgr::Stop_AllChannel()
 {
-	for (_uint i = 0; i < 32; ++i) {
+	for (_uint i = 0; i < MaxChannelCount - BGMChannelCount; ++i) {
 
 		FMOD_Channel_Stop(m_pChannelArr[i]);
 		m_fPassedTimeArr[i] = 0;
 	}
+	m_bChangingBGM = true;
+	m_ChangingBGMTime = 0;
+	m_iBGMIndex = (m_iBGMIndex) ? 0 : 1;
 }
 
 _float CSoundMgr::Get_Channel_Volume(CHANNELID eID)

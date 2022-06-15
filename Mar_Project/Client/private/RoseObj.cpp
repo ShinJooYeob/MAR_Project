@@ -158,6 +158,34 @@ _int CRoseObj::Update(_double fDeltaTime)
 
 		if (abs(fBetweenLength) < 0.3f)
 		{
+			{
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+				tSoundDesc.vMinMax = _float2(0, 25);
+				tSoundDesc.fTargetSound = 0.30f;
+				wstring SoundTrack = L"";
+				SoundTrack = L"MapObject_pickups_rose01.ogg";
+
+				//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+			}
+
+			{
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+				tSoundDesc.vMinMax = _float2(0, 25);
+				tSoundDesc.fTargetSound = 0.20f;
+				wstring SoundTrack = L"";
+				SoundTrack = L"MapObject_pickups_rose_magic0" + to_wstring(rand() % 2 + 1) + L".ogg";
+
+				//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
+			}
+
 			Set_IsDead();
 
 		}

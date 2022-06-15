@@ -60,7 +60,7 @@ private:
 	_uint				m_iHP = 5;
 
 	_bool				m_bChecker = false;
-
+	_bool				m_bSoundChecker = false;
 
 private:
 	HRESULT SetUp_Components();

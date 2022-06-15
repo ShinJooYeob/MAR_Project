@@ -83,6 +83,8 @@ HRESULT CKnife::Initialize_Clone(void * pArg)
 	GetSingle(CUtilityMgr)->RandomFloat3(0.5f, 1);
 	m_pSwordTrailCom->Set_PassIndex(0);
 	m_pSwordTrailCom->Set_TextureIndex(1);
+
+	m_szNameTag = L"VopalBlade";
 	return S_OK;
 }
 

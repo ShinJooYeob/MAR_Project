@@ -265,22 +265,6 @@ _int CWaspInk::Update(_double fDeltaTime)
 					m_pBuzzSoundDesc->vMinMax = _float2(0, 55.f);
 					m_pBuzzSoundDesc->fTargetSound = 0.55f;
 
-					{
-						SOUNDDESC tSoundDesc;
-
-						tSoundDesc.pTransform = m_pTransformCom;
-						tSoundDesc.bFollowTransform = true;
-						tSoundDesc.vMinMax = _float2(0, 55.f);
-						tSoundDesc.fTargetSound = 0.5f;
-						tSoundDesc.iIdentificationNumber = 20 + m_SpwanKinds;
-
-						wstring SoundTrack = L"";
-						SoundTrack = L"vox_warn0" + to_wstring(rand() % 4 + 1) + L".ogg";
-
-						//SoundTrack = L"MapObject_shrinkflower_open.ogg";
-
-						g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc, &m_pBuzzSoundDesc);
-					}
 
 					m_SpwanAnimCount++;
 				}
@@ -594,6 +578,47 @@ void CWaspInk::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflicted
 		}
 	}
 	break;
+	case Engine::CollisionType_PlayerWeapon:
+	{
+		if (m_bIsPatternFinished)
+		{
+			if (!lstrcmp(pConflictedObj->Get_NameTag(), L"VopalBlade"))
+			{
+
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+				tSoundDesc.vMinMax = _float2(0, 35);
+				tSoundDesc.fTargetSound = 0.75f;
+				wstring SoundTrack = L"";
+				SoundTrack = L"Weapon_vorpal_imp_default0" + to_wstring(rand() % 4 + 1) + L".ogg";
+
+				//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+
+
+			}
+			else if (!lstrcmp(pConflictedObj->Get_NameTag(), L"Horse"))
+			{
+
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = pConflictedCollider->Get_ColliderPosition(iConflictedObjColliderIndex);
+				tSoundDesc.vMinMax = _float2(0, 35);
+				tSoundDesc.fTargetSound = 0.5f;
+				wstring SoundTrack = L"";
+				SoundTrack = L"Weapon_hobby_imp_default0" + to_wstring(rand() % 5 + 1) + L".ogg";
+
+				//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+
+			}
+		}
+	}
+	break;
+
 	case Engine::CollisionType_Terrain:
 		break;
 
@@ -763,7 +788,27 @@ HRESULT CWaspInk::Adjust_AnimMovedTransform(_double fDeltatime)
 				m_iAdjMovedIndex++;
 			}
 			break;
+		case 10:
+			if (m_iAdjMovedIndex == 0 && PlayRate > 0.236111111)
+			{
+				SOUNDDESC tSoundDesc;
 
+				tSoundDesc.pTransform = m_pTransformCom;
+				tSoundDesc.bFollowTransform = true;
+				tSoundDesc.vMinMax = _float2(0, 55.f);
+				tSoundDesc.fTargetSound = 0.5f;
+
+				wstring SoundTrack = L"";
+				SoundTrack = L"vox_warn0" + to_wstring(rand() % 4 + 1) + L".ogg";
+
+				//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+				m_iAdjMovedIndex++;
+			}
+
+
+			break;
 		}
 	}
 	else

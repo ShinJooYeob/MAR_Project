@@ -45,7 +45,8 @@ HRESULT CScene_Boss::Initialize()
 	FAILED_CHECK(Ready_Layer_TriggerCollider(TAG_LAY(Layer_TriggerCollider)));
 	
 
-	
+
+	FAILED_CHECK(g_pGameInstance->PlayBGM(L"BGM_STAGE_4.ogg", 0.1f));
 
 	return S_OK;
 }

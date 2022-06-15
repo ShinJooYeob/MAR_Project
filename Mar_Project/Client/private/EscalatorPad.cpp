@@ -193,6 +193,8 @@ void CEscalatorPad::LetEscalatingToDest(_bool bBool)
 	{
 		m_bMoveToDest = bBool;
 		m_PassedTime = 0;
+
+	
 	}
 }
 

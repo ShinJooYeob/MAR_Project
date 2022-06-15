@@ -69,6 +69,8 @@ private:
 
 	_bool				m_bReturnToShape = false;
 
+	_uint				m_iSoundCounter = 0;
+
 	_float4				m_NevRectPoint[4];
 private:
 	HRESULT SetUp_Components();

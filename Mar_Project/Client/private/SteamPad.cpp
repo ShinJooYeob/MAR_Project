@@ -49,8 +49,46 @@ _int CSteamPad::Update(_double fDeltaTime)
 
 	m_fAngle += 1080 * _float(fDeltaTime);
 
+
+
+
+
 	_Vector vPlayer = m_pPlayerTransform->Get_MatrixState(CTransform::STATE_POS);
 	_Vector vObjet = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+
+
+	if (XMVectorGetX(XMVector3Length(vPlayer - vObjet)) < m_fMaxHight*1.5f)
+	{
+		if (!m_pSteamSoundDesc || m_pSteamSoundDesc->iIdentificationNumber != 70)
+		{
+
+
+			{
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+				tSoundDesc.vMinMax = _float2(0, m_fMaxHight*1.5f);
+				tSoundDesc.fTargetSound = 0.15f;
+				tSoundDesc.iIdentificationNumber = 70;
+				wstring SoundTrack = L"";
+				SoundTrack = L"c1_steamloop0" + to_wstring(rand() % 4 + 1) + L".ogg";
+
+				//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc, &m_pSteamSoundDesc);
+			}
+
+		}
+
+
+
+	}
+
+
+
+
+
+
 	_float Height = XMVectorGetY(vPlayer) - XMVectorGetY(vObjet);
 	if (Height < 0 || Height > m_fMaxHight || 
 		XMVectorGetX(XMVector3Length(XMVectorSetY(vObjet,0) - XMVectorSetY(vPlayer, 0))) > m_fRangeRadius )

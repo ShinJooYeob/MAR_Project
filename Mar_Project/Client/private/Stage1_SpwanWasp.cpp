@@ -81,6 +81,7 @@ _int CStage1_SpwanWasp::Update(_double fDeltaTime)
 			if (MonsterLayer->size() == 0)
 			{
 				((CGamePlayUI*)(g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_UI_GamePlay))))->Set_DrawFightUI(false);
+				g_pGameInstance->PlayBGM(L"BGM_STAGE_1.ogg", 0.1f);
 
 				CCamera_Main* pCamera = (CCamera_Main*)g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Camera_Main));
 				NULL_CHECK_BREAK(pCamera);
@@ -232,6 +233,7 @@ void CStage1_SpwanWasp::CollisionTriger(_uint iMyColliderIndex, CGameObject * pC
 		Return.vPosition = Return.vPosition.XMVector() + (pCamera->Get_Camera_Transform()->Get_MatrixState(CTransform::STATE_LOOK));
 		tDesc.vecLookAt.push_back(Return);
 
+		g_pGameInstance->PlayBGM(L"BGM_FIGHT_1.ogg", 0.15f);
 		pCamera->CamActionStart(tDesc);
 
 	}

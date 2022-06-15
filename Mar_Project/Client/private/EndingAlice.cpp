@@ -248,7 +248,80 @@ HRESULT CEndingAlice::Adjust_AnimMovedTransform(_double fDeltatime)
 		switch (iNowAnimIndex)
 		{
 		case 1:
-		
+			if(m_iAdjMovedIndex == 0 && PlayRate > 0)
+		{
+			SOUNDDESC tSoundDesc;
+
+			tSoundDesc.vPosition = g_pGameInstance->Get_TargetPostion_float4(PLV_PLAYER);
+			tSoundDesc.vMinMax = _float2(0, 5);
+			tSoundDesc.fTargetSound = 0.35f;
+			wstring SoundTrack = L"";
+
+			SoundTrack = L"grass0" + to_wstring(rand() % 9 + 1) + L".ogg";
+
+			g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+			m_iAdjMovedIndex++;
+			}
+
+			else if (m_iAdjMovedIndex == 1 && PlayRate > 0.25f)
+			{
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = g_pGameInstance->Get_TargetPostion_float4(PLV_PLAYER);
+				tSoundDesc.vMinMax = _float2(0, 5);
+				tSoundDesc.fTargetSound = 0.35f;
+				wstring SoundTrack = L"";
+
+				SoundTrack = L"grass0" + to_wstring(rand() % 9 + 1) + L".ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+				m_iAdjMovedIndex++;
+			}
+
+			else if (m_iAdjMovedIndex == 2 && PlayRate > 0.5f)
+			{
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = g_pGameInstance->Get_TargetPostion_float4(PLV_PLAYER);
+				tSoundDesc.vMinMax = _float2(0, 5);
+				tSoundDesc.fTargetSound = 0.35f;
+				wstring SoundTrack = L"";
+
+				SoundTrack = L"grass0" + to_wstring(rand() % 9 + 1) + L".ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+				m_iAdjMovedIndex++;
+			}
+
+			else if (m_iAdjMovedIndex == 3 && PlayRate > 0.7666666666666)
+			{
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = g_pGameInstance->Get_TargetPostion_float4(PLV_PLAYER);
+				tSoundDesc.vMinMax = _float2(0, 5);
+				tSoundDesc.fTargetSound = 0.2f;
+				wstring SoundTrack = L"";
+
+				SoundTrack = L"grass0" + to_wstring(rand() % 9 + 1) + L".ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+				m_iAdjMovedIndex++;
+			}
+
+			else if (m_iAdjMovedIndex == 4 && PlayRate > 0.7666666666666)
+			{
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = g_pGameInstance->Get_TargetPostion_float4(PLV_PLAYER);
+				tSoundDesc.vMinMax = _float2(0, 5);
+				tSoundDesc.fTargetSound = 0.35f;
+				wstring SoundTrack = L"";
+
+				SoundTrack = L"grass0" + to_wstring(rand() % 9 + 1) + L".ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
+				m_iAdjMovedIndex++;
+			}
 			break;
 		default:
 			break;

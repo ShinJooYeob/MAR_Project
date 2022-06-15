@@ -34,6 +34,53 @@ HRESULT CPresserObj::Initialize_Clone(void * pArg)
 
 
 
+	m_tParticleDesc2.eParticleTypeID = Particle_Spread;
+
+	m_tParticleDesc2.FollowingTarget = nullptr;
+
+	m_tParticleDesc2.szTextureProtoTypeTag = TAG_CP(Prototype_Texture_PlayerEffect);
+	m_tParticleDesc2.szTextureLayerTag = L"Dust4";
+	m_tParticleDesc2.iSimilarLayerNum = 1;
+
+	m_tParticleDesc2.TextureChageFrequency = 1;
+	m_tParticleDesc2.vTextureXYNum = _float2(5, 4);
+
+	m_tParticleDesc2.TotalParticleTime = 0.1f;
+	m_tParticleDesc2.EachParticleLifeTime = 0.6f;
+	m_tParticleDesc2.MaxParticleCount = 50;
+
+	m_tParticleDesc2.SizeChageFrequency = 1;
+	m_tParticleDesc2.ParticleSize = _float3(5.0f);
+	m_tParticleDesc2.ParticleSize2 = _float3(2.5f);
+
+	m_tParticleDesc2.ColorChageFrequency = 1;
+	m_tParticleDesc2.TargetColor = _float4(0.8f, 0.8f, 0.8f, 1.f);
+	m_tParticleDesc2.TargetColor2 = _float4(0.3f, 0.3f, 0.3f, 0.5f);
+
+
+	m_tParticleDesc2.Particle_Power = 18;
+	m_tParticleDesc2.PowerRandomRange = _float2(0.8f, 1.f);
+	m_tParticleDesc2.SubPowerRandomRange = _float2(5.f, 6.f);
+
+	m_tParticleDesc2.vUp = _float3(0, 1, 0);
+
+	m_tParticleDesc2.MaxBoundaryRadius = 999999.f;
+
+	m_tParticleDesc2.m_bIsUI = false;
+	m_tParticleDesc2.m_bIsBlur = true;
+	m_tParticleDesc2.m_bUIDepth = 0;
+
+	m_tParticleDesc2.ParticleStartRandomPosMin = _float3(0);
+	m_tParticleDesc2.ParticleStartRandomPosMax = _float3(0);
+
+	m_tParticleDesc2.DepthTestON = true;
+	m_tParticleDesc2.AlphaBlendON = true;
+
+	m_tParticleDesc2.m_fAlphaTestValue = 0.1f;
+	m_tParticleDesc2.m_iPassIndex = 3;
+
+
+
 
 	return S_OK;
 }
@@ -50,7 +97,7 @@ _int CPresserObj::Update(_double fDeltaTime)
 
 
 
-	m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS),13);
+	m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS),23);
 
 	if (m_bIsOnScreen)
 	{
@@ -248,6 +295,9 @@ HRESULT CPresserObj::Update_Escalating(_double fDeltaTime)
 			EasedPos = m_tDesc.vDestPos;
 			m_PassedTime = 0;
 			m_bMoveToDest = false;
+
+
+
 		}
 	}
 	else
@@ -260,6 +310,28 @@ HRESULT CPresserObj::Update_Escalating(_double fDeltaTime)
 			m_PassedTime = 0;
 			m_bMoveToDest = true;
 			m_TargetTime = m_tDesc.MoveSpeed * GetSingle(CUtilityMgr)->RandomFloat(0.7f, 1.5f);
+
+			if (m_bIsOnScreen)
+			{
+				m_tParticleDesc2.FixedTarget = m_tDesc.vStartPos.XMVector() + XMVectorSet(0, -10.f, 0, 0);
+				GetSingle(CUtilityMgr)->Create_ParticleObject(m_eNowSceneNum, m_tParticleDesc2);
+			}
+
+			{
+
+				SOUNDDESC tSoundDesc;
+				tSoundDesc.vPosition = EasedPos;
+				tSoundDesc.vMinMax = _float2(0, 40);
+				tSoundDesc.fTargetSound = 0.75f;
+				wstring SoundTrack = L"";
+				SoundTrack = L"c5w1_lower_slam_metal.ogg";
+
+				//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+			}
+
+
 		}
 	}
 

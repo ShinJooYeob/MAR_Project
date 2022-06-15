@@ -56,7 +56,7 @@ private:
 	_double				m_PassedTime = 0;
 	_bool				m_bChecker = false;
 
-
+	_bool				m_bSoundChecker = false;
 	vector<CAMACTDESC>		 m_vecCamPositions;
 	vector<CAMACTDESC>		 m_vecLookPostions;
 private:

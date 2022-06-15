@@ -42,6 +42,8 @@ private:
 
 	PARTICLEDESC		m_tParticleDesc;
 
+	SOUNDDESC*			m_pSteamSoundDesc = nullptr;
+
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_SubConstTable();

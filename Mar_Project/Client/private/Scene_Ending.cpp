@@ -51,8 +51,9 @@ HRESULT CScene_Ending::Initialize()
 	FAILED_CHECK(Load_ActionCam(L"StageEnd_CameAction_0"));
 
 	m_bStartChecker = false;
-	
 
+	FAILED_CHECK(g_pGameInstance->PlayBGM(L"BGM_STAGE_5.ogg", 0.1f));
+	m_fTimer = 0;
 	return S_OK;
 }
 
@@ -63,21 +64,47 @@ _int CScene_Ending::Update(_double fDeltaTime)
 
 	if (!m_bStartChecker)
 	{
-		m_bStartChecker = true;
-		GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeFlickeringIn, 10.f, _float4(0, 0, 0, 1.f));
-		m_iChecker = 0;
+		if (m_fTimer == 0)
+		{
+			{
+
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = tSoundDesc.vPosition = g_pGameInstance->Get_TargetPostion_float4(PLV_PLAYER);
+
+				tSoundDesc.vMinMax = _float2(0.f, 100000.f);
+				tSoundDesc.fTargetSound = 0.09f;
+				wstring SoundTrack = L"";
+				SoundTrack = L"5_12_1_K_Bumby.ogg";
+
+				//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+			}
+		}
+
+		m_fTimer += fDeltaTime;
+		if (m_fTimer > 4.5f)
+		{
+			m_bStartChecker = true;
+			GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeFlickeringIn, 10.f, _float4(0, 0, 0, 1.f));
+			m_iChecker = 0;
 
 
-		CCamera_Main* pCamera = (CCamera_Main*)g_pGameInstance->Get_GameObject_By_LayerIndex(SCENE_ENDING, TAG_LAY(Layer_Camera_Main));
-		NULL_CHECK_BREAK(pCamera);
+			CCamera_Main* pCamera = (CCamera_Main*)g_pGameInstance->Get_GameObject_By_LayerIndex(SCENE_ENDING, TAG_LAY(Layer_Camera_Main));
+			NULL_CHECK_BREAK(pCamera);
 
-		CAMERAACTION tDesc;
+			CAMERAACTION tDesc;
 
-		tDesc.vecCamPos = m_vecCamPositions;
-		tDesc.vecLookAt = m_vecLookPostions;
+			tDesc.vecCamPos = m_vecCamPositions;
+			tDesc.vecLookAt = m_vecLookPostions;
 
 
-		pCamera->CamActionStart(tDesc);
+			m_fTimer = 0;
+			pCamera->CamActionStart(tDesc);
+			
+		}
+	
 
 	}
 	else
@@ -100,13 +127,38 @@ _int CScene_Ending::Update(_double fDeltaTime)
 			m_iChecker++;
 
 		}
-		else if (m_iChecker == 2 && m_fTimer > 45)
+		else if (m_iChecker == 2 && m_fTimer > 40.5)
+		{
+			g_pGameInstance->Stop_ChannelSound(CHANNEL_BGM);
+			m_iChecker++;
+
+		}
+		else if (m_iChecker == 3 && m_fTimer > 41)
+		{
+			{
+
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = g_pGameInstance->Get_TargetPostion_float4(PLV_PLAYER);
+				tSoundDesc.vMinMax = _float2(0.f, 100000.f);
+				tSoundDesc.fTargetSound = 0.30f;
+				wstring SoundTrack = L"";
+				SoundTrack = L"1_1_1_A_Bumby_cin_rb.ogg";
+
+				//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+			}
+
+			m_iChecker++;
+		}
+		else if (m_iChecker == 4 && m_fTimer > 45)
 		{
 			GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeOut, 2.f, _float4(0, 0, 0, 1.f));
 			m_iChecker++;
 
 		}
-		else if (m_iChecker == 3 && m_fTimer > 47)
+		else if (m_iChecker == 5 && m_fTimer > 47)
 		{
 			FAILED_CHECK(GetSingle(CUtilityMgr)->Clear_RenderGroup_forSceneChange());
 			FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Loading::Create(m_pDevice, m_pDeviceContext, SCENEID::SCENE_LOBY), SCENEID::SCENE_LOADING));

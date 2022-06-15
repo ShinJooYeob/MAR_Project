@@ -94,7 +94,7 @@ _int CDollMaker::Update(_double fDeltaTime)
 
 						SOUNDDESC tSoundDesc;
 						tSoundDesc.pTransform = m_pTransformCom;
-						tSoundDesc.vMinMax = _float2(100, 100);
+						tSoundDesc.vMinMax = _float2(0, 100);
 						tSoundDesc.fTargetSound = 0.35f;
 
 
@@ -109,8 +109,8 @@ _int CDollMaker::Update(_double fDeltaTime)
 
 						SOUNDDESC tSoundDesc;
 						tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
-						tSoundDesc.vMinMax = _float2(100, 100);
-						tSoundDesc.fTargetSound = 1.f;
+						tSoundDesc.vMinMax = _float2(0, 100);
+						tSoundDesc.fTargetSound = 0.4f;
 
 
 						wstring SoundTrack = L"";
@@ -177,8 +177,8 @@ _int CDollMaker::Update(_double fDeltaTime)
 
 							SOUNDDESC tSoundDesc;
 							tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
-							tSoundDesc.vMinMax = _float2(100, 100);
-							tSoundDesc.fTargetSound = 0.75f;
+							tSoundDesc.vMinMax = _float2(0, 100);
+							tSoundDesc.fTargetSound = 0.3f;
 
 
 							wstring SoundTrack = L"";
@@ -192,7 +192,7 @@ _int CDollMaker::Update(_double fDeltaTime)
 
 							SOUNDDESC tSoundDesc;
 							tSoundDesc.pTransform = m_pTransformCom;
-							tSoundDesc.vMinMax = _float2(100, 100);
+							tSoundDesc.vMinMax = _float2(0, 100);
 							tSoundDesc.fTargetSound = 0.35f;
 
 
@@ -230,7 +230,7 @@ _int CDollMaker::Update(_double fDeltaTime)
 
 							SOUNDDESC tSoundDesc;
 							tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
-							tSoundDesc.vMinMax = _float2(100, 100);
+							tSoundDesc.vMinMax = _float2(0, 100);
 							tSoundDesc.fTargetSound = 0.75f;
 
 
@@ -269,7 +269,7 @@ _int CDollMaker::Update(_double fDeltaTime)
 
 						SOUNDDESC tSoundDesc;
 						tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
-						tSoundDesc.vMinMax = _float2(100, 100);
+						tSoundDesc.vMinMax = _float2(0, 100);
 						tSoundDesc.fTargetSound = 0.5f;
 
 
@@ -300,7 +300,7 @@ _int CDollMaker::Update(_double fDeltaTime)
 			else
 			{
 				Set_IsDead();
-				g_pGameInstance->Get_NowScene()->Set_SceneChanging(SCENE_LOBY);
+				g_pGameInstance->Get_NowScene()->Set_SceneChanging(SCENE_ENDING);
 			}
 
 		}
@@ -584,6 +584,57 @@ _int CDollMaker::LightRender()
 	return _int();
 }
 
+void CDollMaker::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedObj, CCollider * pConflictedCollider, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType)
+{
+	switch (eConflictedObjCollisionType)
+	{
+
+	case Engine::CollisionType_PlayerWeapon:
+	{
+
+		if (!lstrcmp(pConflictedObj->Get_NameTag(), L"VopalBlade"))
+		{
+
+			SOUNDDESC tSoundDesc;
+
+			tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+			tSoundDesc.vMinMax = _float2(0, 35);
+			tSoundDesc.fTargetSound = 0.5f;
+			wstring SoundTrack = L"";
+			SoundTrack = L"Weapon_vorpal_imp_flesh0" + to_wstring(rand() % 6 + 1) + L".ogg";
+
+			//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+			g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+
+
+		}
+		else if (!lstrcmp(pConflictedObj->Get_NameTag(), L"Horse"))
+		{
+
+			SOUNDDESC tSoundDesc;
+
+			tSoundDesc.vPosition = pConflictedCollider->Get_ColliderPosition(iConflictedObjColliderIndex);
+			tSoundDesc.vMinMax = _float2(0, 35);
+			tSoundDesc.fTargetSound = 0.5f;
+			wstring SoundTrack = L"";
+			SoundTrack = L"Weapon_hobby_imp_flesh0" + to_wstring(rand() % 7 + 1) + L".ogg";
+
+			//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+			g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+
+		}
+	}
+	break;
+	case Engine::CollisionType_Terrain:
+		break;
+
+	default:
+		break;
+	}
+}
+
 _int CDollMaker::Update_DmgCalculate(_double fDeltaTime)
 {
 	if (m_bDeadAnimStart) return 0;
@@ -830,26 +881,26 @@ HRESULT CDollMaker::SetUp_Weapon()
 
 
 
-	//CMonsterWeapon* pWeapon = nullptr;
-	//FAILED_CHECK(pInstance->Add_GameObject_Out_of_Manager((CGameObject**)&pWeapon, m_eNowSceneNum, TAG_OP(Prototype_HandyBoy), &_float3(71, 10, 60)));
-	//NULL_CHECK_RETURN(pWeapon, E_FAIL);
-	//m_vecWeapon.push_back(pWeapon);
-
-	//pWeapon = nullptr;
-	//FAILED_CHECK(pInstance->Add_GameObject_Out_of_Manager((CGameObject**)&pWeapon, m_eNowSceneNum, TAG_OP(Prototype_HandyGirl), &_float3(63, 10, 75)));
-	//NULL_CHECK_RETURN(pWeapon, E_FAIL);
-	//m_vecWeapon.push_back(pWeapon);
-
-	//Gril 먼저
 	CMonsterWeapon* pWeapon = nullptr;
-	FAILED_CHECK(pInstance->Add_GameObject_Out_of_Manager((CGameObject**)&pWeapon, m_eNowSceneNum, TAG_OP(Prototype_HandyGirl), &_float3(63, 10, 75)));
+	FAILED_CHECK(pInstance->Add_GameObject_Out_of_Manager((CGameObject**)&pWeapon, m_eNowSceneNum, TAG_OP(Prototype_HandyBoy), &_float3(71, 10, 60)));
 	NULL_CHECK_RETURN(pWeapon, E_FAIL);
 	m_vecWeapon.push_back(pWeapon);
 
 	pWeapon = nullptr;
-	FAILED_CHECK(pInstance->Add_GameObject_Out_of_Manager((CGameObject**)&pWeapon, m_eNowSceneNum, TAG_OP(Prototype_HandyBoy), &_float3(71, 10, 60)));
+	FAILED_CHECK(pInstance->Add_GameObject_Out_of_Manager((CGameObject**)&pWeapon, m_eNowSceneNum, TAG_OP(Prototype_HandyGirl), &_float3(63, 10, 75)));
 	NULL_CHECK_RETURN(pWeapon, E_FAIL);
 	m_vecWeapon.push_back(pWeapon);
+
+	////Gril 먼저
+	//CMonsterWeapon* pWeapon = nullptr;
+	//FAILED_CHECK(pInstance->Add_GameObject_Out_of_Manager((CGameObject**)&pWeapon, m_eNowSceneNum, TAG_OP(Prototype_HandyGirl), &_float3(63, 10, 75)));
+	//NULL_CHECK_RETURN(pWeapon, E_FAIL);
+	//m_vecWeapon.push_back(pWeapon);
+	//
+	//pWeapon = nullptr;
+	//FAILED_CHECK(pInstance->Add_GameObject_Out_of_Manager((CGameObject**)&pWeapon, m_eNowSceneNum, TAG_OP(Prototype_HandyBoy), &_float3(71, 10, 60)));
+	//NULL_CHECK_RETURN(pWeapon, E_FAIL);
+	//m_vecWeapon.push_back(pWeapon);
 
 
 

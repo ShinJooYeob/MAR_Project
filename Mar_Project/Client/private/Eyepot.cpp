@@ -460,6 +460,45 @@ void CEyepot::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedO
 		}
 	}
 	break;
+
+	case Engine::CollisionType_PlayerWeapon:
+	{
+
+		if (!lstrcmp(pConflictedObj->Get_NameTag(), L"VopalBlade"))
+		{
+
+			SOUNDDESC tSoundDesc;
+
+			tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+			tSoundDesc.vMinMax = _float2(0, 35);
+			tSoundDesc.fTargetSound = 0.5f;
+			wstring SoundTrack = L"";
+			SoundTrack = L"Weapon_vorpal_imp_metalshield0" + to_wstring(rand() % 6 + 1) + L".ogg";
+
+			//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+			g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+
+
+		}
+		else if (!lstrcmp(pConflictedObj->Get_NameTag(), L"Horse"))
+		{
+
+			SOUNDDESC tSoundDesc;
+
+			tSoundDesc.vPosition = pConflictedCollider->Get_ColliderPosition(iConflictedObjColliderIndex);
+			tSoundDesc.vMinMax = _float2(0, 35);
+			tSoundDesc.fTargetSound = 0.5f;
+			wstring SoundTrack = L"";
+			SoundTrack = L"Weapon_hobby_imp_metalshield0" + to_wstring(rand() % 6 + 1) + L".ogg";
+
+			//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+			g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+
+		}
+	}
+	break;
 	case Engine::CollisionType_Terrain:
 		break;
 

@@ -88,6 +88,34 @@ _int CJumpPad::Update(_double fDeltaTime)
 
 		m_pPlayerTransform->MovetoDir(XMVectorSet(0, 1, 0, 0), fDeltaTime);
 		m_pPlayer->Add_JumpForce(m_tDesc.fPower,1);
+		{
+			SOUNDDESC tSoundDesc;
+
+			tSoundDesc.pTransform = m_pPlayerTransform;
+			tSoundDesc.vMinMax = _float2(0, 35);
+			tSoundDesc.fTargetSound = 0.35f;
+			wstring SoundTrack = L"";
+			SoundTrack = L"MapObject_mushroom_wind0" + to_wstring(rand() % 3 + 1) + L".ogg";
+
+			//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+			g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+		}
+		{
+			SOUNDDESC tSoundDesc;
+			tSoundDesc.pTransform = m_pTransformCom;
+
+			tSoundDesc.vMinMax = _float2(0, 55);
+			tSoundDesc.fTargetSound = 0.55f;
+			wstring SoundTrack = L"";
+			//SoundTrack = L"Roar_jump0" + to_wstring(rand() % 4 + 1) + L".ogg";
+
+			SoundTrack = L"MapObject_mushroom_jump01.ogg";
+
+			g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+		}
+
+
 		m_pModel->Change_AnimIndex_ReturnTo_Must(2,  0, 0.08, true);
 	}
 

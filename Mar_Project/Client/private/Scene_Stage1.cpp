@@ -75,6 +75,7 @@ HRESULT CScene_Stage1::Initialize()
 
 	//GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeIn, 0.5, { 0,0,0,1 });
 			
+	FAILED_CHECK(g_pGameInstance->PlayBGM(L"BGM_STAGE_1.ogg", 0.1f));
 
 	return S_OK;
 }
@@ -91,7 +92,7 @@ _int CScene_Stage1::Update(_double fDeltaTime)
 	if (GetKeyState(VK_RETURN) & 0x8000)
 	{
 		FAILED_CHECK(GetSingle(CUtilityMgr)->Clear_RenderGroup_forSceneChange());
-		FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Loading::Create(m_pDevice, m_pDeviceContext, SCENEID::SCENE_BOSS), SCENEID::SCENE_LOADING));
+		FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Loading::Create(m_pDevice, m_pDeviceContext, SCENEID::SCENE_STAGE2), SCENEID::SCENE_LOADING));
 	}
 
 

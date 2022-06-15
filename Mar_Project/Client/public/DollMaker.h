@@ -22,6 +22,7 @@ public:
 	virtual _int Render()override;
 	virtual _int LightRender()override;
 
+	virtual void CollisionTriger(_uint iMyColliderIndex, CGameObject* pConflictedObj, CCollider* pConflictedCollider, _uint iConflictedObjColliderIndex, CollisionTypeID eConflictedObjCollisionType) override;
 
 	_int		Update_DmgCalculate(_double fDeltaTime);
 	virtual _int Update_Pattern(_double fDeltaTime)override;

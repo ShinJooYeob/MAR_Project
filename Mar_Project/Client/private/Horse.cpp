@@ -83,6 +83,7 @@ HRESULT CHorse::Initialize_Clone(void * pArg)
 	//m_pSubSwordTrailCom->Set_PassIndex(2);
 	//m_pSubSwordTrailCom->Set_TextureIndex(2);
 
+	m_szNameTag = L"Horse";
 	return S_OK;
 }
 

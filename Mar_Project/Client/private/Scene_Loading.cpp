@@ -33,7 +33,6 @@ HRESULT CScene_Loading::Initialize(SCENEID eSceneID)
 	if (FAILED(__super::Initialize()))
 		return E_FAIL;
 
-	g_pGameInstance->Stop_AllChannel();
 
 	m_eNextSceneIndex = eSceneID;
 	m_pLoader = CLoader::Create(m_pDevice,m_pDeviceContext,eSceneID);
@@ -44,6 +43,7 @@ HRESULT CScene_Loading::Initialize(SCENEID eSceneID)
 	m_FadePassedTime = 0;
 
 	GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeIn, 0.5, { 0,0,0,1 });
+	g_pGameInstance->Stop_AllChannel();
 
 	return S_OK;
 }

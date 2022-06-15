@@ -88,33 +88,33 @@ _int CPlayer::Update(_double fDeltaTime)
 
 
 
-	if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
-	{	
-
-		Eat_Protain();
-
-
-
-		//SOUNDDESC tSoundDesc;
-
-		//tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
-		//tSoundDesc.vMinMax = _float2(3, 10);
-		//tSoundDesc.fTargetSound = 0.5f;
-
-
-		//g_pGameInstance->PlaySoundW(L"beat.wav", CHANNEL_OBJECT, &tSoundDesc);
-
-	}
 	//if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
-	//{
-	//
-	//	Eat_Protain();
-	//}
+	//{	
 
-	if (g_pGameInstance->Get_DIKeyState(DIK_2)&DIS_Down)
-	{
-		Set_GettingBigger(false);
-	}
+	//	Eat_Protain();
+
+
+
+	//	//SOUNDDESC tSoundDesc;
+
+	//	//tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
+	//	//tSoundDesc.vMinMax = _float2(3, 10);
+	//	//tSoundDesc.fTargetSound = 0.5f;
+
+
+	//	//g_pGameInstance->PlaySoundW(L"beat.wav", CHANNEL_OBJECT, &tSoundDesc);
+
+	//}
+	////if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
+	////{
+	////
+	////	Eat_Protain();
+	////}
+
+	//if (g_pGameInstance->Get_DIKeyState(DIK_2)&DIS_Down)
+	//{
+	//	Set_GettingBigger(false);
+	//}
 
 
 
@@ -310,6 +310,11 @@ _int CPlayer::LightRender()
 
 	}
 
+	if (m_iWeaponModelIndex != 10 && !m_LevitationTime)
+	{
+		m_vecWeapon[m_iWeaponModelIndex]->LightRender();
+	}
+
 
 	return _int();
 }
@@ -333,7 +338,7 @@ void CPlayer::Add_Dmg_to_Player(_uint iDmgAmount)
 	m_bIsAttackClicked = false;
 	m_iAttackCount = 0;
 
-	if (m_bIsAttached || m_bSlide )return;
+	if (m_bIsAttached  )return;
 
 	
 
@@ -350,6 +355,7 @@ void CPlayer::Add_Dmg_to_Player(_uint iDmgAmount)
 		g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_PLAYER, &tSoundDesc);
 	}
 
+	if (m_bSlide) return;
 	switch (m_eNowWeapon)
 	{
 	case Client::CPlayer::Weapon_None:
@@ -864,6 +870,7 @@ HRESULT CPlayer::Update_EattingProtein(_double fDeltatime)
 
 	if (!m_iProteinChecker)
 	{
+		g_pGameInstance->Stop_ChannelSound(CHANNEL_BGM);
 		GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeOutIn, 1, _float4(0, 0, 0, 1));
 		m_iProteinChecker++;
 	}
@@ -950,7 +957,7 @@ HRESULT CPlayer::Update_EattingProtein(_double fDeltatime)
 
 			tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
 			tSoundDesc.vMinMax = _float2(10000000.f, 10000000.f);
-			tSoundDesc.fTargetSound = 0.20f;
+			tSoundDesc.fTargetSound = 0.08f;
 			wstring SoundTrack = L"";
 
 			SoundTrack = L"MapObject_doowmcom_move0" + to_wstring(rand() % 2 + 7) + L".ogg";
@@ -969,7 +976,7 @@ HRESULT CPlayer::Update_EattingProtein(_double fDeltatime)
 
 			tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
 			tSoundDesc.vMinMax = _float2(10000000.f, 10000000.f);
-			tSoundDesc.fTargetSound = 0.20f;
+			tSoundDesc.fTargetSound = 0.08f;
 			wstring SoundTrack = L"";
 
 			SoundTrack = L"MapObject_doowmcom_move0" + to_wstring(rand() % 2 + 7) + L".ogg";
@@ -988,7 +995,7 @@ HRESULT CPlayer::Update_EattingProtein(_double fDeltatime)
 
 			tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
 			tSoundDesc.vMinMax = _float2(10000000.f, 10000000.f);
-			tSoundDesc.fTargetSound = 0.20f;
+			tSoundDesc.fTargetSound = 0.08f;
 			wstring SoundTrack = L"";
 
 			SoundTrack = L"MapObject_doowmcom_move0" + to_wstring(rand() % 2 + 7) + L".ogg";
@@ -1007,7 +1014,7 @@ HRESULT CPlayer::Update_EattingProtein(_double fDeltatime)
 
 			tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
 			tSoundDesc.vMinMax = _float2(10000000.f, 10000000.f);
-			tSoundDesc.fTargetSound = 0.20f;
+			tSoundDesc.fTargetSound = 0.08f;
 			wstring SoundTrack = L"";
 
 			SoundTrack = L"MapObject_doowmcom_move0" + to_wstring(rand() % 2 + 7) + L".ogg";
@@ -1026,7 +1033,7 @@ HRESULT CPlayer::Update_EattingProtein(_double fDeltatime)
 
 			tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
 			tSoundDesc.vMinMax = _float2(10000000.f, 10000000.f);
-			tSoundDesc.fTargetSound = 0.20f;
+			tSoundDesc.fTargetSound = 0.08f;
 			wstring SoundTrack = L"";
 
 			SoundTrack = L"MapObject_doowmcom_move0" + to_wstring(rand() % 2 + 7) + L".ogg";
@@ -1039,7 +1046,7 @@ HRESULT CPlayer::Update_EattingProtein(_double fDeltatime)
 
 			tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
 			tSoundDesc.vMinMax = _float2(10000000.f, 10000000.f);
-			tSoundDesc.fTargetSound = 0.20f;
+			tSoundDesc.fTargetSound = 0.08f;
 			wstring SoundTrack = L"";
 
 			SoundTrack = L"Burp_sound_effect.mp3";
@@ -1070,7 +1077,7 @@ HRESULT CPlayer::Update_EattingProtein(_double fDeltatime)
 
 			tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
 			tSoundDesc.vMinMax = _float2(10000000.f, 10000000.f);
-			tSoundDesc.fTargetSound = 1.f;
+			tSoundDesc.fTargetSound = 0.35f;
 			wstring SoundTrack = L"";
 
 			SoundTrack = L"MapObject_Rock_Big_Fall_02.ogg";
@@ -4259,6 +4266,9 @@ HRESULT CPlayer::Giantting_Update(_double fDeltaTime, CGameInstance * pInstance)
 
 			m_fSmallScale = PlayerGiantSize;
 			m_bGettingBigger = false;
+
+			g_pGameInstance->PlayBGM(L"BGM_STAGE_3.ogg",0.1f);
+
 		}
 
 		m_pTransformCom->Scaled_All(_float3(m_fSmallScale));
@@ -4402,8 +4412,8 @@ HRESULT CPlayer::Move_Update_Giant(_double fDeltaTime, CGameInstance * pInstance
 					SOUNDDESC tSoundDesc;
 
 					tSoundDesc.vPosition = tDesc.vPosition;
-					tSoundDesc.vMinMax = _float2(10000000.f, 10000000.f);
-					tSoundDesc.fTargetSound = 1.f;
+					tSoundDesc.vMinMax = _float2(0.f, 10000000.f);
+					tSoundDesc.fTargetSound = 0.5f;
 					wstring SoundTrack = L"";
 
 					SoundTrack = L"Player_giant_step0" + to_wstring(rand() % 3 + 1) + L".ogg";
@@ -4436,8 +4446,9 @@ HRESULT CPlayer::Move_Update_Giant(_double fDeltaTime, CGameInstance * pInstance
 					SOUNDDESC tSoundDesc;
 
 					tSoundDesc.vPosition = tDesc.vPosition;
-					tSoundDesc.vMinMax = _float2(10000000.f, 10000000.f);
-					tSoundDesc.fTargetSound = 1.f;
+					tSoundDesc.vMinMax = _float2(0.f, 10000000.f);
+					tSoundDesc.fTargetSound = 0.5f;
+
 					wstring SoundTrack = L"";
 
 					SoundTrack = L"Player_giant_step0" + to_wstring(rand() % 3 + 1) + L".ogg";
@@ -4495,8 +4506,9 @@ HRESULT CPlayer::Move_Update_Giant(_double fDeltaTime, CGameInstance * pInstance
 					SOUNDDESC tSoundDesc;
 
 					tSoundDesc.vPosition = tDesc.vPosition;
-					tSoundDesc.vMinMax = _float2(10000000.f, 10000000.f);
-					tSoundDesc.fTargetSound = 1.f;
+					tSoundDesc.vMinMax = _float2(0.f, 10000000.f);
+					tSoundDesc.fTargetSound = 0.5f;
+
 					wstring SoundTrack = L"";
 
 					//SoundTrack = L"Player_giant_step0" + to_wstring(rand() % 3 + 1) + L".ogg";

@@ -214,11 +214,14 @@ _bool CFadeEffect::Start_FadeEffect(FadeID eFadeType, _double Duration, _float4 
 	if (m_eKindsFade == CFadeEffect::FadeID_FlikeringIn)
 	{
 		m_PassIndex = 22;
+		m_fAlphaTestValue = 0.f;		
+		m_vColor.w = 1;
+
 	}
 	else
 	{
+		
 		m_fAlphaTestValue = 0.1f;
-
 		m_PassIndex = 7;
 	}
 

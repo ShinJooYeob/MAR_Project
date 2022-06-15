@@ -7,6 +7,9 @@ class CSoundMgr :public CBase
 {
 	DECLARE_SINGLETON(CSoundMgr);
 
+#define MaxChannelCount 102
+#define BGMChannelCount	2
+
 private:
 	explicit CSoundMgr();
 	virtual ~CSoundMgr() = default;
@@ -30,13 +33,15 @@ public:
 	_bool  Get_Channel_IsPaused(CHANNELID eID);
 
 private:
-	_double	m_fPassedTimeArr[32];
+	_double	m_fPassedTimeArr[MaxChannelCount];
 	_float	m_VolumeArr[CHANNEL_MAXCHANNEL];
 	_bool	m_PauseArr[CHANNEL_MAXCHANNEL];
-	SOUNDDESC m_tSoundDesc[32];
+	SOUNDDESC m_tSoundDesc[MaxChannelCount];
 	_float3 m_ListenerPosition;
 
-	//FMOD_BOOL m_bool;
+	_uint  m_iBGMIndex = 0;
+	_bool  m_bChangingBGM = false;
+	_double m_ChangingBGMTime = 0;
 
 private:
 	HRESULT LoadSoundFile();
@@ -45,7 +50,7 @@ private:
 	// 사운드 리소스 정보를 갖는 객체 
 	map<TCHAR*, FMOD_SOUND*> m_mapSound;
 	// FMOD_CHANNEL : 재생하고 있는 사운드를 관리할 객체 
-	FMOD_CHANNEL* m_pChannelArr[32];
+	FMOD_CHANNEL* m_pChannelArr[MaxChannelCount];
 	// 사운드 ,채널 객체 및 장치를 관리하는 객체 
 	FMOD_SYSTEM* m_pSystem;
 	const _uint		m_iNumOfEachChannel;

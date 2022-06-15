@@ -235,6 +235,7 @@ void CStageBoss_SpwanBoss::CollisionTriger(_uint iMyColliderIndex, CGameObject *
 
 		pCamera->CamActionStart(tDesc);
 
+		g_pGameInstance->PlayBGM(L"BGM_FIGHT_4.ogg", 0.15f);
 
 	}
 	break;

@@ -224,6 +224,8 @@ void CShpaeMemButton::Set_ButtonIsUp(_bool bBool)
 		m_bIsUp = bBool;
 		m_PassedTime = 0;
 		m_iHP = 5;
+
+
 	}
 
 }
@@ -299,6 +301,25 @@ HRESULT CShpaeMemButton::Update_ButtonAnim(_double fDeltaTime)
 	{
 		if (m_PassedTime < 1)
 		{
+
+			if (!m_bSoundChecker && m_PassedTime > 0.35f)
+			{
+				m_bSoundChecker = true;
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+				tSoundDesc.vMinMax = _float2(0, 25);
+				tSoundDesc.fTargetSound = 0.3f;
+				wstring SoundTrack = L"";
+				SoundTrack = L"MapObject_ppad_down.ogg";
+
+				//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+
+			}
+
+
 			m_PassedTime += fDeltaTime;
 			m_ButtonHight = g_pGameInstance->Easing(TYPE_ExpoInOut, 0, 0.6f, (_float)m_PassedTime, 1);
 			if (m_ButtonHight > 0.5)
@@ -310,6 +331,25 @@ HRESULT CShpaeMemButton::Update_ButtonAnim(_double fDeltaTime)
 			((CShapeMemoryPad*)m_tDesc.pTargetObject)->Let_ReturntoShape(true);
 		}
 		else if (m_PassedTime < 7) {
+
+			if (m_bSoundChecker && m_PassedTime > 6.35f)
+			{
+				m_bSoundChecker = false;
+
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+				tSoundDesc.vMinMax = _float2(0, 25);
+				tSoundDesc.fTargetSound = 0.3f;
+				wstring SoundTrack = L"";
+				SoundTrack = L"MapObject_ppad_up01.ogg";
+
+				//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+
+			}
+
 			m_PassedTime += fDeltaTime;
 			m_ButtonHight = g_pGameInstance->Easing(TYPE_ExpoInOut, 0.6f, 0, (_float)m_PassedTime - 6.f, 1);
 

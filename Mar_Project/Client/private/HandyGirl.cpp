@@ -276,8 +276,43 @@ void CHandyGirl::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflict
 
 		break;
 	case Engine::CollisionType_PlayerWeapon:
-		break;
+	{
 
+		if (!lstrcmp(pConflictedObj->Get_NameTag(), L"VopalBlade"))
+		{
+
+			SOUNDDESC tSoundDesc;
+
+			tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+			tSoundDesc.vMinMax = _float2(0, 35);
+			tSoundDesc.fTargetSound = 0.5f;
+			wstring SoundTrack = L"";
+			SoundTrack = L"Weapon_vorpal_imp_flesh0" + to_wstring(rand() % 6 + 1) + L".ogg";
+
+			//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+			g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+
+
+		}
+		else if (!lstrcmp(pConflictedObj->Get_NameTag(), L"Horse"))
+		{
+
+			SOUNDDESC tSoundDesc;
+
+			tSoundDesc.vPosition = pConflictedCollider->Get_ColliderPosition(iConflictedObjColliderIndex);
+			tSoundDesc.vMinMax = _float2(0, 35);
+			tSoundDesc.fTargetSound = 0.5f;
+			wstring SoundTrack = L"";
+			SoundTrack = L"Weapon_hobby_imp_flesh0" + to_wstring(rand() % 7 + 1) + L".ogg";
+
+			//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+			g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+
+		}
+	}
+	break;
 
 
 	case Engine::CollisionType_Terrain:
@@ -1523,7 +1558,7 @@ HRESULT CHandyGirl::Adjust_MovedTransform_byAnim(_double fDeltatime)
 
 			if (ShakeTimer < 0)
 			{
-				ShakeTimer = GetSingle(CUtilityMgr)->RandomFloat(0.25f, 0.5f);
+				ShakeTimer = GetSingle(CUtilityMgr)->RandomFloat(0.1f, 0.25f);
 
 				{
 					SOUNDDESC tSoundDesc;

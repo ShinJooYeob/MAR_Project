@@ -153,16 +153,17 @@ _int CStage2_SpwanEyePot::Update(_double fDeltaTime)
 				static _uint iChecker = 0;
 				if (iChecker == 0)
 				{
-					((CGamePlayUI*)(g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_UI_GamePlay))))->Set_DrawFightUI(false);
 
 					list<CGameObject*>* MonsterLayer = g_pGameInstance->Get_ObjectList_from_Layer(SCENE_STAGE2, TAG_LAY(Layer_Monster));
 					NULL_CHECK_RETURN(MonsterLayer, E_FAIL);
 
 					if (MonsterLayer->size() == 0)
 					{
+						((CGamePlayUI*)(g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_UI_GamePlay))))->Set_DrawFightUI(false);
 						CCamera_Main* pCamera = (CCamera_Main*)g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Camera_Main));
 						NULL_CHECK_BREAK(pCamera);
 
+						g_pGameInstance->PlayBGM(L"BGM_STAGE_2.ogg", 0.1f);
 						CAMERAACTION tDesc;
 
 						tDesc.vecCamPos = m_vecEndCamPositions;
@@ -306,6 +307,7 @@ void CStage2_SpwanEyePot::CollisionTriger(_uint iMyColliderIndex, CGameObject * 
 			m_pTransformCom->Scaled_All(_float3(0.4f));
 			m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, _float3(161.611f, 54.45f, 68.017f));
 
+			g_pGameInstance->PlayBGM(L"BGM_FIGHT_2.ogg", 0.1f);
 
 
 

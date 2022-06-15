@@ -33,6 +33,7 @@ HRESULT CScene_Loby::Initialize()
 		
 
 	GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeIn, 0.5, { 0,0,0,1 });
+	FAILED_CHECK(g_pGameInstance->PlayBGM(L"BGM_STAGE_0.ogg", 0.1f));
 
 	return S_OK;
 }
@@ -57,6 +58,32 @@ _int CScene_Loby::LateUpdate(_double fDeltaTime)
 	if (m_bIsNeedToSceneChange)	return Change_to_NextScene();
 
 
+	static _uint iTrackIndex = 0;
+
+	if (g_pGameInstance->Get_DIKeyState(DIK_1)&DIS_Down)
+	{
+		iTrackIndex++;
+		if (iTrackIndex > 8)iTrackIndex = 0;
+
+		//wstring TrackName = L"BGM_STAGE_3.mp3";
+		wstring TrackName = L"BGM_STAGE_" + to_wstring(iTrackIndex) + L".ogg";
+
+		g_pGameInstance->PlayBGM(TrackName.c_str(), 0.1f);
+
+
+
+	}
+	if (g_pGameInstance->Get_DIKeyState(DIK_2)&DIS_Down)
+	{
+		iTrackIndex++;
+		if (iTrackIndex > 4)iTrackIndex = 0;
+
+		//wstring TrackName = L"BGM_STAGE_3.mp3";
+		wstring TrackName = L"BGM_FIGHT_" + to_wstring(iTrackIndex) + L".ogg";
+
+		g_pGameInstance->PlayBGM(TrackName.c_str(), 0.1f);
+
+	}
 
 
 //#ifdef USE_IMGUI

@@ -61,7 +61,7 @@ HRESULT CGrunt::Initialize_Clone(void * pArg)
 
 		tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState(CTransform::STATE_POS);
 		tSoundDesc.vMinMax = _float2(5, 35);
-		tSoundDesc.fTargetSound = 0.25f;
+		tSoundDesc.fTargetSound = 0.65f;
 		wstring SoundTrack = L"";
 		SoundTrack = L"Grunt_spawn0" + to_wstring(rand() % 3 + 1) + L".ogg";
 
@@ -439,6 +439,46 @@ void CGrunt::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedOb
 		}
 	}
 	break;
+
+
+	case Engine::CollisionType_PlayerWeapon:
+	{
+
+		if (!lstrcmp(pConflictedObj->Get_NameTag(), L"VopalBlade"))
+		{
+
+			SOUNDDESC tSoundDesc;
+
+			tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+			tSoundDesc.vMinMax = _float2(0, 35);
+			tSoundDesc.fTargetSound = 0.5f;
+			wstring SoundTrack = L"";
+			SoundTrack = L"Weapon_vorpal_imp_npc_oil0" + to_wstring(rand() % 7 + 1) + L".ogg";
+
+			//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+			g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+
+
+		}
+		else if (!lstrcmp(pConflictedObj->Get_NameTag(), L"Horse"))
+		{
+
+			SOUNDDESC tSoundDesc;
+
+			tSoundDesc.vPosition = pConflictedCollider->Get_ColliderPosition(iConflictedObjColliderIndex);
+			tSoundDesc.vMinMax = _float2(0, 35);
+			tSoundDesc.fTargetSound = 0.5f;
+			wstring SoundTrack = L"";
+			SoundTrack = L"Weapon_hobby_imp_npc_oil0" + to_wstring(rand() % 5 + 1) + L".ogg";
+
+			//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+			g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+
+		}
+	}
+	break;
 	case Engine::CollisionType_Terrain:
 		break;
 
@@ -760,7 +800,7 @@ HRESULT CGrunt::Adjust_AnimMovedTransform(_double fDeltatime)
 					tSoundDesc.fTargetSound = 0.25f;
 					wstring SoundTrack = L"";
 
-					SoundTrack = L"MapObject_doowmcom_move0" + to_wstring(rand() % 10 + 1) + L".ogg";
+					SoundTrack = L"MapObject_doowmcom_move0" + to_wstring(rand() % 9 + 1) + L".ogg";
 					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
 
 					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
@@ -779,7 +819,7 @@ HRESULT CGrunt::Adjust_AnimMovedTransform(_double fDeltatime)
 					tSoundDesc.fTargetSound = 0.25f;
 					wstring SoundTrack = L"";
 
-					SoundTrack = L"MapObject_doowmcom_move0" + to_wstring(rand() % 10 + 1) + L".ogg";
+					SoundTrack = L"MapObject_doowmcom_move0" + to_wstring(rand() % 9 + 1) + L".ogg";
 					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
 
 					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);

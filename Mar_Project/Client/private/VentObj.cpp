@@ -70,6 +70,37 @@ _int CVentObj::Update(_double fDeltaTime)
 				m_tDesc.pTargetVent->m_bVentingStart = false;
 				m_pPlayer->Set_IsVenting(false, m_vTempTargetPosition);
 			}
+			else
+			{
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = m_pPlayerTransform;
+					tSoundDesc.vMinMax = _float2(0, 25);
+					tSoundDesc.fTargetSound = 0.35f;
+					wstring SoundTrack = L"";
+					SoundTrack = L"Roar_jump0" + to_wstring(rand() % 4 + 1) + L".ogg";
+
+					//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+				}
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.pTransform = m_pPlayerTransform;
+					tSoundDesc.vMinMax = _float2(0, 25);
+					tSoundDesc.fTargetSound = 0.55f;
+					wstring SoundTrack = L"";
+					//SoundTrack = L"Roar_jump0" + to_wstring(rand() % 4 + 1) + L".ogg";
+
+					SoundTrack = L"MapObject_pickups_bottle_small_magic.ogg";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+				}
+
+				
+			}
 			EasedPos = m_vTempTargetPosition;
 		}
 
@@ -163,6 +194,20 @@ void CVentObj::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflicted
 		
 			pCamera->CamActionStart(tDesc);
 
+
+			{
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = m_pColliderCom->Get_ColliderPosition(0);
+				tSoundDesc.vMinMax = _float2(0, 25);
+				tSoundDesc.fTargetSound = 0.35f;
+				wstring SoundTrack = L"";
+				SoundTrack = L"Roar_jump0"+to_wstring(rand()%4 + 1)+L".ogg";
+
+				//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+			}
 
 
 		}

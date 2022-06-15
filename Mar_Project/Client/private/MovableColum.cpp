@@ -131,6 +131,23 @@ _bool CMovableColum::Start_Turning_Colum(_uint iKinds)
 {
 	if (m_bIsTurning || m_iTuringKinds == iKinds) return false;
 	
+
+	//{
+	//	SOUNDDESC tSoundDesc;
+
+	//	tSoundDesc.vPosition = g_pGameInstance->Get_TargetPostion_float4(PLV_PLAYER);
+	//	tSoundDesc.vMinMax = _float2(0, 25);
+	//	tSoundDesc.fTargetSound = 0.3f;
+	//	wstring SoundTrack = L"";
+	//	SoundTrack = L"c1w2_amb_f_locked_close.ogg";
+
+	//	//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+	//	g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+	//}
+	//
+
+
 	m_PassedTime = 0;
 	m_fStartAngle = m_tDesc.vAngle.y;
 	(Set_TerrainTileKindsAToB(Tile_DynamicNoneTile, Tile_Movable));
@@ -235,12 +252,36 @@ HRESULT CMovableColum::SetUp_Components()
 HRESULT CMovableColum::Update_Turning(_double fDeltaTime)
 {
 
-	if (!m_bIsTurning) return S_FALSE;
-
+	if (!m_bIsTurning)
+	{
+		m_bSoundChekcer = false;
+		return S_FALSE;
+	}
 	m_PassedTime += fDeltaTime;
 
 
 	_float EasedAngle = g_pGameInstance->Easing(TYPE_SinInOut, m_fStartAngle, m_fTargetAngle, (_float)m_PassedTime, 5);
+
+
+
+
+	if(!m_bSoundChekcer  && m_PassedTime > 0.1f)
+	{
+		m_bSoundChekcer = true;
+
+		SOUNDDESC tSoundDesc;
+
+		tSoundDesc.vPosition = g_pGameInstance->Get_TargetPostion_float4(PLV_PLAYER);
+		tSoundDesc.vMinMax = _float2(0, 25);
+		tSoundDesc.fTargetSound = 0.8f;
+		wstring SoundTrack = L"";
+		SoundTrack = L"c3w1_stonedoor_slide01.ogg";
+
+		//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+		g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+	}
+
 
 	if (m_PassedTime > 5)
 	{

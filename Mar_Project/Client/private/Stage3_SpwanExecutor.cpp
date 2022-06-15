@@ -111,6 +111,7 @@ _int CStage3_SpwanExecutor::Update(_double fDeltaTime)
 			{
 
 				((CGamePlayUI*)(g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_UI_GamePlay))))->Set_DrawFightUI(false);
+				g_pGameInstance->PlayBGM(L"BGM_STAGE_3.ogg", 0.1f);
 
 				//CCamera_Main* pCamera = (CCamera_Main*)g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Camera_Main));
 				//NULL_CHECK_BREAK(pCamera);
@@ -232,6 +233,7 @@ void CStage3_SpwanExecutor::CollisionTriger(_uint iMyColliderIndex, CGameObject 
 		m_SpwanPassedTime = 0;
 
 		((CGamePlayUI*)(g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_UI_GamePlay))))->Set_DrawFightUI(true);
+		g_pGameInstance->PlayBGM(L"BGM_FIGHT_3.ogg", 0.15f);
 
 		CCamera_Main* pCamera = (CCamera_Main*)g_pGameInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Camera_Main));
 		NULL_CHECK_BREAK(pCamera);

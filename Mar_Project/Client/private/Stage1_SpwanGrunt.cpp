@@ -268,6 +268,7 @@ _int CStage1_SpwanGrunt::Update(_double fDeltaTime)
 					pCamera->CamActionStart(tDesc);
 
 
+					g_pGameInstance->PlayBGM(L"BGM_STAGE_1.ogg", 0.1f);
 
 
 					m_JumpPadSpwanCount++;
@@ -434,6 +435,8 @@ void CStage1_SpwanGrunt::CollisionTriger(_uint iMyColliderIndex, CGameObject * p
 
 		pCamera->CamActionStart(tDesc);
 
+
+		g_pGameInstance->PlayBGM(L"BGM_FIGHT_0.ogg", 0.15f);
 
 
 	}

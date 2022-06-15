@@ -52,7 +52,7 @@ private:
 	_bool				m_bMoveToDest = false;
 	_double				m_PassedTime = 0;
 	_double				m_TargetTime = 0;
-
+	PARTICLEDESC		m_tParticleDesc2;
 private:
 	HRESULT SetUp_Components();
 	HRESULT Update_Escalating(_double fDeltaTime);

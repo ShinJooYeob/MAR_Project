@@ -54,6 +54,7 @@ private:
 
 	_float4				m_NevRectPoint[4];
 
+	_bool				m_bSoundChekcer = false;
 
 	_bool				m_bIsTurning = false;
 	_double				m_PassedTime = 0;

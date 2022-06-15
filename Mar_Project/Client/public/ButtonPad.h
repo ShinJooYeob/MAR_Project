@@ -62,7 +62,7 @@ private:
 
 	_bool				m_bVisuable = false;
 
-
+	_bool				m_bSoundChecker = false;
 private:
 	HRESULT SetUp_Components();
 	HRESULT Update_ButtonAnim(_double fDeltaTime);

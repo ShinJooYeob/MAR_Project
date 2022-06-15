@@ -55,6 +55,7 @@ HRESULT CScene_Stage3::Initialize()
 
 	//GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeIn, 0.5, { 0,0,0,1 });
 
+	FAILED_CHECK(g_pGameInstance->PlayBGM(L"BGM_STAGE_3.ogg", 0.1f));
 	return S_OK;
 }
 
@@ -211,9 +212,9 @@ HRESULT CScene_Stage3::Ready_Layer_Player(const _tchar * pLayerTag)
 
 	pPlayer->Set_NowSceneNum(SCENE_STAGE3);
 	/*executor 앞*/
-	pPlayer->Renew_Player(_float3(128, 23.134f, 174.085f), _float3(128, 23.134f, 200.085f));
+	//pPlayer->Renew_Player(_float3(128, 23.134f, 174.085f), _float3(128, 23.134f, 200.085f));
 	/*원래 위치*/
-	//pPlayer->Renew_Player(_float3(128, 20.f, 88) , _float3(128, 20.f, 108));
+	pPlayer->Renew_Player(_float3(128, 20.f, 88) , _float3(128, 20.f, 108));
 	
 
 	return S_OK;

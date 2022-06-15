@@ -223,6 +223,21 @@ void CMovableColumBtn::LetWorkButton(_bool bBool)
 		if (!m_bIsUp)
 		{
 
+			{
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+				tSoundDesc.vMinMax = _float2(0, 25);
+				tSoundDesc.fTargetSound = 0.3f;
+				wstring SoundTrack = L"";
+				SoundTrack = L"MapObject_ppad_down.ogg";
+
+				//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+			}
+
+
 			_bool	TempBool =  true;
 			switch (m_tDesc.eKindsOfObject)
 			{
@@ -262,6 +277,24 @@ void CMovableColumBtn::LetWorkButton(_bool bBool)
 
 				pCamera->CamActionStart(tDesc);
 			}
+		}
+		else
+		{
+
+			{
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+				tSoundDesc.vMinMax = _float2(0, 25);
+				tSoundDesc.fTargetSound = 0.3f;
+				wstring SoundTrack = L"";
+				SoundTrack = L"MapObject_ppad_down.ogg";
+
+				//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+			}
+
 		}
 
 	}
@@ -334,13 +367,34 @@ HRESULT CMovableColumBtn::SetUp_Components()
 
 HRESULT CMovableColumBtn::Update_ButtonAnim(_double fDeltaTime)
 {
-	if (m_PassedTime > 1)		return S_FALSE;
-
+	if (m_PassedTime > 1)
+	{
+		m_bSoundChecker = false;
+		return S_FALSE;
+	}
 
 	m_PassedTime += fDeltaTime;
 
 	if (!m_bIsUp)
 	{
+		if (!m_bSoundChecker && m_PassedTime > 0.35f)
+		{
+			m_bSoundChecker = true;
+
+			SOUNDDESC tSoundDesc;
+
+			tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+			tSoundDesc.vMinMax = _float2(0, 25);
+			tSoundDesc.fTargetSound = 0.3f;
+			wstring SoundTrack = L"";
+			SoundTrack = L"MapObject_ppad_down.ogg";
+
+			//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+			g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+
+		}
+
 		m_ButtonHight = g_pGameInstance->Easing(TYPE_ExpoInOut, 0, 0.3f, (_float)m_PassedTime, 1);
 
 		if (m_ButtonHight > 0.2)
@@ -365,6 +419,23 @@ HRESULT CMovableColumBtn::Update_ButtonAnim(_double fDeltaTime)
 	}
 	else
 	{
+		if (!m_bSoundChecker && m_PassedTime > 0.35f)
+		{
+			m_bSoundChecker = true;
+
+			SOUNDDESC tSoundDesc;
+
+			tSoundDesc.vPosition = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
+			tSoundDesc.vMinMax = _float2(0, 25);
+			tSoundDesc.fTargetSound = 0.3f;
+			wstring SoundTrack = L"";
+			SoundTrack = L"MapObject_ppad_down.ogg";
+
+			//SoundTrack = L"MapObject_shrinkflower_open.ogg";
+
+			g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+
+		}
 		m_ButtonHight = g_pGameInstance->Easing(TYPE_ExpoInOut, 0.3f, 0, (_float)m_PassedTime, 1);
 	}
 
