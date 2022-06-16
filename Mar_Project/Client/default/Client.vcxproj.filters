@@ -172,23 +172,11 @@
     <Filter Include="01.GameObject\08.Weapon\99.Bullet\GrenadeBullet">
       <UniqueIdentifier>{3680e6bd-38bc-4566-8cbb-ead603f94126}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.GameObject\99.UI\UsedUI">
-      <UniqueIdentifier>{63ce8578-d558-42ac-b0e6-d8aa14b42798}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.GameObject\99.UI\UsedUI\LoadingUI">
-      <UniqueIdentifier>{9dbff93d-1319-4cc0-8aaa-b3d009109591}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.GameObject\99.UI\UsedUI\GamePlayUI">
-      <UniqueIdentifier>{dd5bb2f8-fc13-4571-9bb8-3255bccc9ae4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.GameObject\00.Player\EffectMesh">
       <UniqueIdentifier>{7cac079b-276d-468f-bf1a-06f2f901bfdb}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.Scene\00.Scene_Loby\LobyAlice">
       <UniqueIdentifier>{48a5d59c-ff13-4b56-a546-a919d68aade2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.GameObject\99.UI\UsedUI\LobyUI">
-      <UniqueIdentifier>{cb881261-62d6-49a3-93fc-21af958417ce}</UniqueIdentifier>
     </Filter>
     <Filter Include="01.GameObject\08.Weapon\05.Horse">
       <UniqueIdentifier>{694ccd0e-563a-44b5-9639-89a8b09e0e58}</UniqueIdentifier>
@@ -336,6 +324,21 @@
     </Filter>
     <Filter Include="01.GameObject\03.Monster\07.EndingAlice">
       <UniqueIdentifier>{403467a7-ed4b-4561-b8e5-1346a465c862}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\99.UI\00.Used_UI">
+      <UniqueIdentifier>{63ce8578-d558-42ac-b0e6-d8aa14b42798}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\99.UI\00.Used_UI\LoadingUI">
+      <UniqueIdentifier>{9dbff93d-1319-4cc0-8aaa-b3d009109591}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\99.UI\00.Used_UI\GamePlayUI">
+      <UniqueIdentifier>{dd5bb2f8-fc13-4571-9bb8-3255bccc9ae4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\99.UI\00.Used_UI\LobyUI">
+      <UniqueIdentifier>{cb881261-62d6-49a3-93fc-21af958417ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\99.UI\00.Used_UI\PauseUI">
+      <UniqueIdentifier>{3467ba22-dbcf-441c-93bd-d18b2077bb9a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -496,10 +499,10 @@
       <Filter>01.GameObject\96.EditorSceneObj</Filter>
     </ClInclude>
     <ClInclude Include="..\public\GamePlayUI.h">
-      <Filter>01.GameObject\99.UI\UsedUI\GamePlayUI</Filter>
+      <Filter>01.GameObject\99.UI\00.Used_UI\GamePlayUI</Filter>
     </ClInclude>
     <ClInclude Include="..\public\LoadingUI.h">
-      <Filter>01.GameObject\99.UI\UsedUI\LoadingUI</Filter>
+      <Filter>01.GameObject\99.UI\00.Used_UI\LoadingUI</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Scene_Stage1.h">
       <Filter>02.Scene\03.Scene_Gameplay\01.Scene_Stage1</Filter>
@@ -520,7 +523,7 @@
       <Filter>02.Scene\00.Scene_Loby\LobyAlice</Filter>
     </ClInclude>
     <ClInclude Include="..\public\LobyUI.h">
-      <Filter>01.GameObject\99.UI\UsedUI\LobyUI</Filter>
+      <Filter>01.GameObject\99.UI\00.Used_UI\LobyUI</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Knife.h">
       <Filter>01.GameObject\08.Weapon\01.Knife</Filter>
@@ -699,6 +702,9 @@
     <ClInclude Include="..\public\EndingAlice.h">
       <Filter>01.GameObject\03.Monster\07.EndingAlice</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\PauseUI.h">
+      <Filter>01.GameObject\99.UI\00.Used_UI\PauseUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -837,10 +843,10 @@
       <Filter>01.GameObject\96.EditorSceneObj</Filter>
     </ClCompile>
     <ClCompile Include="..\private\GamePlayUI.cpp">
-      <Filter>01.GameObject\99.UI\UsedUI\GamePlayUI</Filter>
+      <Filter>01.GameObject\99.UI\00.Used_UI\GamePlayUI</Filter>
     </ClCompile>
     <ClCompile Include="..\private\LoadingUI.cpp">
-      <Filter>01.GameObject\99.UI\UsedUI\LoadingUI</Filter>
+      <Filter>01.GameObject\99.UI\00.Used_UI\LoadingUI</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Scene_Stage1.cpp">
       <Filter>02.Scene\03.Scene_Gameplay\01.Scene_Stage1</Filter>
@@ -861,7 +867,7 @@
       <Filter>02.Scene\00.Scene_Loby\LobyAlice</Filter>
     </ClCompile>
     <ClCompile Include="..\private\LobyUI.cpp">
-      <Filter>01.GameObject\99.UI\UsedUI\LobyUI</Filter>
+      <Filter>01.GameObject\99.UI\00.Used_UI\LobyUI</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Knife.cpp">
       <Filter>01.GameObject\08.Weapon\01.Knife</Filter>
@@ -1036,6 +1042,9 @@
     </ClCompile>
     <ClCompile Include="..\private\EndingAlice.cpp">
       <Filter>01.GameObject\03.Monster\07.EndingAlice</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\PauseUI.cpp">
+      <Filter>01.GameObject\99.UI\00.Used_UI\PauseUI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

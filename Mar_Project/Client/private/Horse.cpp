@@ -226,6 +226,18 @@ void CHorse::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedOb
 			m_tParticleDesc.FixedTarget = (vMyColliderPos + vEnemyColliderPos)*0.5f;
 			m_tParticleDesc.vUp = XMVector3Normalize(XMVector3Cross(vMyColliderPos - vEnemyColliderPos, g_pGameInstance->Get_TargetPostion_Vector(PLV_CAMERA) - vEnemyColliderPos));
 			pUtil->Create_ParticleObject(m_eNowSceneNum, m_tParticleDesc);
+
+
+			LIGHTDESC LightDesc;
+
+			LightDesc.eLightType = tagLightDesc::TYPE_POINT;
+			LightDesc.vAmbient = LightDesc.vDiffuse = _float4(0.71764705882f, 0.86274509803f, 1.f, 1.f);
+			LightDesc.vSpecular = _float4(0, 0, 0, 0);
+			LightDesc.vVector = XMVectorSetW(m_tParticleDesc.FixedTarget.XMVector(), 1);
+			LightDesc.fRange = 2.5f;
+			LightDesc.fTargetDeadTime = 0.5f;
+			g_pGameInstance->Add_Light(LightDesc);
+
 		}
 		else
 		{
@@ -246,6 +258,16 @@ void CHorse::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflictedOb
 			m_tParticleDesc.FixedTarget = (vMyColliderPos + vEnemyColliderPos)*0.5f;
 			m_tParticleDesc.vUp = XMVector3Normalize(XMVector3Cross(vMyColliderPos - vEnemyColliderPos, g_pGameInstance->Get_TargetPostion_Vector(PLV_CAMERA) - vEnemyColliderPos));
 			pUtil->Create_ParticleObject(m_eNowSceneNum, m_tParticleDesc);
+
+			LIGHTDESC LightDesc;
+
+			LightDesc.eLightType = tagLightDesc::TYPE_POINT;
+			LightDesc.vAmbient = LightDesc.vDiffuse = _float4(0.71764705882f, 0.86274509803f, 1.f, 1.f);
+			LightDesc.vSpecular = _float4(0, 0, 0, 0);
+			LightDesc.vVector = XMVectorSetW(m_tParticleDesc.FixedTarget.XMVector(), 1);
+			LightDesc.fRange = 2.5f;
+			LightDesc.fTargetDeadTime = 0.5f;
+			g_pGameInstance->Add_Light(LightDesc);
 
 		}
 

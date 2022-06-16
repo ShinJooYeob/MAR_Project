@@ -1,6 +1,11 @@
 #pragma once
 
 
+enum UPGRADEID
+{
+	Upgrade_Vopal, Upgrade_PaperGrinder, Upgrade_Horse, Upgrade_Teapot, Upgrade_End
+};
+
 enum SCENEID
 {
 	SCENE_STATIC,
@@ -36,7 +41,7 @@ enum OBJECTPROTOTYPEID
 	Prototype_UIGamePlay,
 	Prototype_UILoading,
 	Prototype_UILoby,
-	Prototype_UISetting,
+	Prototype_UIPause,
 
 
 	Prototype_EatableProtein,
@@ -200,8 +205,8 @@ static const _tchar* Tag_Object_Prototype(OBJECTPROTOTYPEID eTag)
 	case Prototype_UILoby:
 		return TEXT("Prototype_UILoby");
 		break;
-	case Prototype_UISetting:
-		return TEXT("Prototype_UISetting");
+	case Prototype_UIPause:
+		return TEXT("Prototype_UIPause");
 		break;
 
 	case Prototype_WeaponKnife:
@@ -958,7 +963,8 @@ enum COMPONENTPROTOTYPEID
 	Prototype_Texture_LoadingScene,
 	Prototype_Texture_LobyScene,
 	Prototype_Texture_SettingScene,
-	Prototype_Texture_MskTex,
+			Prototype_Texture_MskTex,
+			Prototype_Texture_PauseUI,
 
 
 };
@@ -1788,6 +1794,9 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 			break;
 		case Prototype_Texture_InstanceParticleTex:
 			return TEXT("Prototype_Texture_InstanceParticleTex");
+			break;
+		case Prototype_Texture_PauseUI:
+			return TEXT("Prototype_Texture_PauseUI");
 			break;
 			
 				//¸Þ½¬////////////////////////////////////////////////////////////////////////

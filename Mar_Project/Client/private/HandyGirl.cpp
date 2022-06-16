@@ -1215,6 +1215,11 @@ HRESULT CHandyGirl::Adjust_MovedTransform_byAnim(_double fDeltatime)
 				}
 
 
+				GetSingle(CUtilityMgr)->Start_InstanceParticle(m_eNowSceneNum, tDesc.vPosition.XMVector() + XMVectorSet(0, 2.5f, 0, 0), 4);
+				GetSingle(CUtilityMgr)->Start_InstanceParticle(m_eNowSceneNum, tDesc.vPosition.XMVector() + XMVectorSet(0, 2.5f, 0, 0), 5);
+				GetSingle(CUtilityMgr)->Start_InstanceParticle(m_eNowSceneNum, tDesc.vPosition.XMVector(), 4);
+				GetSingle(CUtilityMgr)->Start_InstanceParticle(m_eNowSceneNum, tDesc.vPosition.XMVector(), 5);
+
 				CCircleTornado::CIRCLETORNADODESC tTornadoDesc;
 				tTornadoDesc.vLook = _float3(0.00000001f, 1.f, 0);
 				tTornadoDesc.vPosition = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS);
@@ -1766,6 +1771,12 @@ HRESULT CHandyGirl::Adjust_MovedTransform_byAnim(_double fDeltatime)
 
 			pUtil->Start_InstanceParticle(m_eNowSceneNum, m_vecParticleDesc[4].FixedTarget, 2);
 			pUtil->Start_InstanceParticle(m_eNowSceneNum, m_vecParticleDesc[4].FixedTarget, 2);
+
+
+			pUtil->Start_InstanceParticle(m_eNowSceneNum, m_vecParticleDesc[4].FixedTarget.XMVector() + XMVectorSet(0, 2.5f, 0, 0), 4);
+			pUtil->Start_InstanceParticle(m_eNowSceneNum, m_vecParticleDesc[4].FixedTarget.XMVector() + XMVectorSet(0, 2.5f, 0, 0), 5);
+			pUtil->Start_InstanceParticle(m_eNowSceneNum, m_vecParticleDesc[4].FixedTarget.XMVector(), 4);
+			pUtil->Start_InstanceParticle(m_eNowSceneNum, m_vecParticleDesc[4].FixedTarget.XMVector(), 5);
 
 			CCircleTornado::CIRCLETORNADODESC tTornadoDesc;
 			tTornadoDesc.vLook = _float3(0.00000001f, 1.f, 0);

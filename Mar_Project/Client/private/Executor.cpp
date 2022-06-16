@@ -112,6 +112,7 @@ _int CExecutor::Update(_double fDeltaTime)
 
 				g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_CardPiece), &tDesc);
 
+
 			}
 
 
@@ -168,8 +169,7 @@ _int CExecutor::Update(_double fDeltaTime)
 			pUtil->Create_ParticleObject(m_eNowSceneNum, m_tParticleDesc);
 
 
-			pUtil->Start_InstanceParticle(m_eNowSceneNum, m_tParticleDesc.FixedTarget, 5);
-			pUtil->Start_InstanceParticle(m_eNowSceneNum, m_tParticleDesc.FixedTarget, 5);
+
 
 
 
@@ -183,6 +183,10 @@ _int CExecutor::Update(_double fDeltaTime)
 			tDesc.fSize = 5.f;
 			g_pGameInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_Particle), TAG_OP(Prototype_PlayerCircleTornado), &tDesc);
 
+			pUtil->Start_InstanceParticle(m_eNowSceneNum, tDesc.vPosition, 6);
+			pUtil->Start_InstanceParticle(m_eNowSceneNum, tDesc.vPosition, 7);
+			pUtil->Start_InstanceParticle(m_eNowSceneNum, tDesc.vPosition.XMVector() + XMVectorSet(0, 2.5f, 0, 0), 6);
+			pUtil->Start_InstanceParticle(m_eNowSceneNum, tDesc.vPosition.XMVector() + XMVectorSet(0, 2.5f, 0, 0), 7);
 
 			{
 				SOUNDDESC tSoundDesc;
@@ -393,6 +397,12 @@ _int CExecutor::Update(_double fDeltaTime)
 						tDesc.MeshKinds = rand() % 2 + Prototype_QBattleTowerParticleA;
 						pInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_BreakedGazbo), &tDesc);
 					}
+
+
+					GetSingle(CUtilityMgr)->Start_InstanceParticle(m_eNowSceneNum, tDesc.vPosition.XMVector() + XMVectorSet(0, 2.5f, 0, 0), 6);
+					GetSingle(CUtilityMgr)->Start_InstanceParticle(m_eNowSceneNum, tDesc.vPosition.XMVector() + XMVectorSet(0, 2.5f, 0, 0), 7);
+					GetSingle(CUtilityMgr)->Start_InstanceParticle(m_eNowSceneNum, tDesc.vPosition.XMVector(), 6);
+					GetSingle(CUtilityMgr)->Start_InstanceParticle(m_eNowSceneNum, tDesc.vPosition.XMVector(), 7);
 
 
 				}
@@ -1372,7 +1382,15 @@ HRESULT CExecutor::Set_Monster_On_Terrain(CTransform * pTransform, _double fDelt
 				//SoundTrack = L"MapObject_shrinkflower_open.ogg";
 
 				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+
+
+				GetSingle(CUtilityMgr)->Start_InstanceParticle(m_eNowSceneNum, tSoundDesc.vPosition, 6);
+				GetSingle(CUtilityMgr)->Start_InstanceParticle(m_eNowSceneNum, tSoundDesc.vPosition, 7);
+				GetSingle(CUtilityMgr)->Start_InstanceParticle(m_eNowSceneNum, tSoundDesc.vPosition.XMVector() + XMVectorSet(0, 2.5f, 0, 0), 6);
+				GetSingle(CUtilityMgr)->Start_InstanceParticle(m_eNowSceneNum, tSoundDesc.vPosition.XMVector() + XMVectorSet(0, 2.5f, 0, 0), 7);
 			}
+
+
 
 			GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_CamShaking, 0.3, _float4(0.5));
 
@@ -1650,6 +1668,11 @@ HRESULT CExecutor::Adjust_AnimMovedTransform(_double fDeltatime)
 					pInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_BreakedGazbo), &tDesc);
 				}
 
+
+				GetSingle(CUtilityMgr)->Start_InstanceParticle(m_eNowSceneNum, tDesc.vPosition.XMVector() + XMVectorSet(0, 2.5f, 0, 0), 6);
+				GetSingle(CUtilityMgr)->Start_InstanceParticle(m_eNowSceneNum, tDesc.vPosition.XMVector() + XMVectorSet(0, 2.5f, 0, 0), 7);
+				GetSingle(CUtilityMgr)->Start_InstanceParticle(m_eNowSceneNum, tDesc.vPosition.XMVector(), 6);
+				GetSingle(CUtilityMgr)->Start_InstanceParticle(m_eNowSceneNum, tDesc.vPosition.XMVector(), 7);
 
 				m_iAdjMovedIndex++;
 			}

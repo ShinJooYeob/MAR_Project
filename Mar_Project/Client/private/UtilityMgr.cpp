@@ -416,6 +416,32 @@ HRESULT CUtilityMgr::Ready_InstanceParticleDesc()
 	m_vecInstanceParticleDesc.push_back(tDesc);
 
 
+
+
+	//6
+	tDesc.ColorChangeFrequency = 4;
+	tDesc.vStartColor = _float4(0.72156862f, 0.066666f, 0, 1);
+	//tDesc.vTargetColor = _float4(0.7333333f, 0.31372549f, 0.f, 0.2f);
+	tDesc.vTargetColor = _float4(1, 1, 1, 0.2f);
+
+	tDesc.SizeChangingEndRate = 0.7f;
+	tDesc.vStartSize = _float3(0.03f, 0.6f, 1);
+	tDesc.vTargetSize = _float3(0.02f);
+	m_vecInstanceParticleDesc.push_back(tDesc);
+
+
+
+	//7
+	tDesc.ColorChangeFrequency = 1;
+	tDesc.vStartColor = _float4(1, 0.64313725f, 0.141176470f, 1);
+	//tDesc.vTargetColor = _float4(0.7333333f, 0.31372549f, 0.f, 0.2f);
+	tDesc.vTargetColor = _float4(1, 1, 1, 0.2f);
+	
+	tDesc.SizeChangingEndRate = 0.7f;
+	tDesc.vStartSize = _float3(0.03f, 0.6f, 1);
+	tDesc.vTargetSize = _float3(0.02f);
+	m_vecInstanceParticleDesc.push_back(tDesc);
+
 	return S_OK;
 }
 

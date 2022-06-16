@@ -132,6 +132,13 @@ _int CUIImage::LightRender()
 	return _int();
 }
 
+HRESULT CUIImage::Bind_Texture_OnShader(const char * szConstName, ID3D11ShaderResourceView * pSRV)
+{
+	NULL_CHECK_RETURN(m_pShaderCom, E_FAIL);
+
+	return m_pShaderCom->Set_Texture(szConstName, pSRV);
+}
+
 
 HRESULT CUIImage::SetUp_Components()
 {
@@ -145,7 +152,7 @@ HRESULT CUIImage::SetUp_Components()
 
 	CTransform::TRANSFORMDESC tDesc = {};
 	tDesc.fMovePerSec = 5;
-	tDesc.fRotationPerSec = XMConvertToRadians(60);
+	tDesc.fRotationPerSec = 1;
 	tDesc.fScalingPerSec = 1;
 	tDesc.vPivot = _float3(0, 0, 0);
 

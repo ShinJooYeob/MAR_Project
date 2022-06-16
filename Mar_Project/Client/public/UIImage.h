@@ -21,6 +21,7 @@ public:
 	virtual _int Render()override;
 	virtual _int LightRender()override;
 
+	virtual HRESULT Bind_Texture_OnShader(const char* szConstName, ID3D11ShaderResourceView* pSRV) override;
 
 
 protected:

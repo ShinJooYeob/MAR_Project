@@ -84,6 +84,11 @@ HRESULT CRenderer::Initialize_Prototype(void * pArg)
 	FAILED_CHECK(m_pRenderTargetMgr->Add_RenderTarget(TEXT("Target_UpScaled_By16"), (_uint)Viewport.Width, (_uint)Viewport.Height, DXGI_FORMAT_R16G16B16A16_UNORM, _float4(0.f, 0.f, 0.f, 0.f)));
 	FAILED_CHECK(m_pRenderTargetMgr->Add_RenderTarget(TEXT("Target_UpScaled_By32"), (_uint)Viewport.Width, (_uint)Viewport.Height, DXGI_FORMAT_R16G16B16A16_UNORM, _float4(0.f, 0.f, 0.f, 0.f)));
 
+	/* For.Target_Specular */
+	FAILED_CHECK(m_pRenderTargetMgr->Add_RenderTarget(TEXT("Target_PaperCurl"), (_uint)Viewport.Width, (_uint)Viewport.Height, DXGI_FORMAT_B8G8R8A8_UNORM, _float4(0.f, 0.f, 0.f, 1.f)));
+
+
+
 
 	/* For.MRT_Deferred : 객체들을 그릴때 바인드. */
 	FAILED_CHECK(m_pRenderTargetMgr->Add_MRT(TEXT("MRT_Deferred"), TEXT("Target_Diffuse")));
@@ -141,6 +146,8 @@ HRESULT CRenderer::Initialize_Prototype(void * pArg)
 	FAILED_CHECK(m_pRenderTargetMgr->Add_MRT(TEXT("MRT_LumineceBluringVerticle"), TEXT("Target_ReferenceLuminece")));
 	FAILED_CHECK(m_pRenderTargetMgr->Add_MRT(TEXT("MRT_LumineceBluringHorizon"), TEXT("Target_DownScaledLuminece")));
 
+
+	FAILED_CHECK(m_pRenderTargetMgr->Add_MRT(TEXT("MRT_PaperCurl"), TEXT("Target_PaperCurl")));
 
 
 	m_pVIBuffer = CVIBuffer_Rect::Create(m_pDevice, m_pDeviceContext);

@@ -430,6 +430,18 @@ _int CClockBomb::Update(_double fDeltaTime)
 							g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_EFFECT, &tSoundDesc);
 						}
 
+
+
+						LIGHTDESC LightDesc;
+
+						LightDesc.eLightType = tagLightDesc::TYPE_POINT;
+						LightDesc.vAmbient = LightDesc.vDiffuse = _float4(1.f, 0.47843137254f, 0.47843137254f, 1.f);
+						LightDesc.vSpecular = _float4(0, 0, 0, 0);
+						LightDesc.vVector = XMVectorSetW(m_pColliderCom->Get_ColliderPosition().XMVector() + XMVectorSet(0, 1.5f, 0, 0), 1);
+						LightDesc.fRange = 5.5f;
+						LightDesc.fTargetDeadTime = 1.f;
+						g_pGameInstance->Add_Light(LightDesc);
+
 						m_DeadPassedTime = 0;
 					}
 
@@ -621,6 +633,18 @@ void CClockBomb::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflict
 					}
 
 
+					LIGHTDESC LightDesc;
+
+					LightDesc.eLightType = tagLightDesc::TYPE_POINT;
+					LightDesc.vAmbient = LightDesc.vDiffuse = _float4(1.f, 0.47843137254f, 0.47843137254f, 1.f);
+					LightDesc.vSpecular = _float4(0, 0, 0, 0);
+					LightDesc.vVector = XMVectorSetW(m_pColliderCom->Get_ColliderPosition().XMVector() + XMVectorSet(0, 1.5f, 0, 0), 1);
+					LightDesc.fRange = 5.5f;
+					LightDesc.fTargetDeadTime = 1.f;
+					g_pGameInstance->Add_Light(LightDesc);
+
+					m_DeadPassedTime = 0;
+
 				}
 				else
 				{
@@ -671,6 +695,18 @@ void CClockBomb::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflict
 					}
 
 
+
+					LIGHTDESC LightDesc;
+
+					LightDesc.eLightType = tagLightDesc::TYPE_POINT;
+					LightDesc.vAmbient = LightDesc.vDiffuse = _float4(1.f, 0.47843137254f, 0.47843137254f, 1.f);
+					LightDesc.vSpecular = _float4(0, 0, 0, 0);
+					LightDesc.vVector = XMVectorSetW(m_pColliderCom->Get_ColliderPosition().XMVector() + XMVectorSet(0, 1.5f, 0, 0), 1);
+					LightDesc.fRange = 5.5f;
+					LightDesc.fTargetDeadTime = 1.f;
+					g_pGameInstance->Add_Light(LightDesc);
+
+					m_DeadPassedTime = 0;
 				}
 
 			}
@@ -739,6 +775,18 @@ void CClockBomb::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflict
 					}
 
 
+					LIGHTDESC LightDesc;
+
+					LightDesc.eLightType = tagLightDesc::TYPE_POINT;
+					LightDesc.vAmbient = LightDesc.vDiffuse = _float4(1.f, 0.47843137254f, 0.47843137254f, 1.f);
+					LightDesc.vSpecular = _float4(0, 0, 0, 0);
+					LightDesc.vVector = XMVectorSetW(m_pColliderCom->Get_ColliderPosition().XMVector() + XMVectorSet(0, 1.5f, 0, 0), 1);
+					LightDesc.fRange = 5.5f;
+					LightDesc.fTargetDeadTime = 1.f;
+					g_pGameInstance->Add_Light(LightDesc);
+
+					m_DeadPassedTime = 0;
+
 				}
 				else
 				{
@@ -791,6 +839,18 @@ void CClockBomb::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflict
 						g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_EFFECT, &tSoundDesc);
 					}
 
+
+					LIGHTDESC LightDesc;
+
+					LightDesc.eLightType = tagLightDesc::TYPE_POINT;
+					LightDesc.vAmbient = LightDesc.vDiffuse = _float4(1.f, 0.47843137254f, 0.47843137254f, 1.f);
+					LightDesc.vSpecular = _float4(0, 0, 0, 0);
+					LightDesc.vVector = XMVectorSetW(m_pColliderCom->Get_ColliderPosition().XMVector() + XMVectorSet(0, 1.5f, 0, 0), 1);
+					LightDesc.fRange = 5.5f;
+					LightDesc.fTargetDeadTime = 1.f;
+					g_pGameInstance->Add_Light(LightDesc);
+
+					m_DeadPassedTime = 0;
 				}
 
 			}

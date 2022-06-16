@@ -169,7 +169,6 @@ _int CLobyUI::LateUpdate(_double fDeltaTime)
 	else
 	{
 		FAILED_CHECK(m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_PRIORITY, this));
-
 	}
 
 

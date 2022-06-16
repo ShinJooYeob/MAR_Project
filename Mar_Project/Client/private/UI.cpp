@@ -27,7 +27,7 @@ HRESULT CUI::Initialize_Clone(void * pArg)
 
 	FAILED_CHECK(Add_Component(SCENE_STATIC, TAG_CP(Prototype_Transform), TAG_COM(Com_Transform), (CComponent**)&m_pTransformCom));
 
-	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixTranspose(XMMatrixOrthographicLH(_int(g_iWinCX), _int(g_iWinCY), 0.f, 1.f)));
+	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixTranspose(XMMatrixOrthographicLH(_int(g_iWinCX), _int(g_iWinCY), -300.f, 300.f)));
 
 
 	return S_OK;
@@ -200,7 +200,10 @@ HRESULT CUI::Apply_UIDesc_To_Transform()
 	m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, _float3(m_UIDesc.fX - g_iWinCX * 0.5f, -m_UIDesc.fY + g_iWinCY * 0.5f, 0.f));
 
 	if (m_fAngle != 0)
-		m_pTransformCom->Rotation_CW(XMVectorSet(0, 1, 0, 0), XMConvertToRadians(m_fAngle));
+		m_pTransformCom->Rotation_CCW(XMVectorSet(0, 0, 1, 0), XMConvertToRadians(m_fAngle));
+
+	if (m_fYTurnAngle)
+		m_pTransformCom->Turn_CW(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_UP).Get_Nomalize(), XMConvertToRadians(m_fYTurnAngle));
 
 	return S_OK;
 }
@@ -223,6 +226,9 @@ HRESULT CUI::Apply_Rect_To_Transform()
 
 	if (m_fAngle != 0)
 		m_pTransformCom->Rotation_CCW(XMVectorSet(0, 0, 1, 0), XMConvertToRadians(m_fAngle));
+
+	if (m_fYTurnAngle)
+		m_pTransformCom->Turn_CW(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_UP).Get_Nomalize(), XMConvertToRadians(m_fYTurnAngle));
 	return S_OK;
 }
 

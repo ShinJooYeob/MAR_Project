@@ -756,6 +756,27 @@ PS_OUT_Emissive PS_MAIN_PARTICLE_Emissive_EDGE(PS_IN In)
 }
 
 
+
+PS_OUT PS_MAIN_PaperCurl(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	vector PaperCurl = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
+	Out.vColor = PaperCurl;
+
+
+	if (PaperCurl.b > PaperCurl.r + PaperCurl.g) discard;
+
+	if (PaperCurl.r > PaperCurl.b + PaperCurl.g)
+	{
+		Out.vColor = g_SourTexture.Sample(DefaultSampler, In.vTexUV);
+	}
+
+
+
+	return Out;
+}
+
 technique11		DefaultTechnique
 {
 	pass Rect			//0
@@ -993,4 +1014,26 @@ technique11		DefaultTechnique
 		PixelShader = compile ps_5_0 PS_FADE_Flicker();
 	}
 
+
+	pass PaperCurl			//23
+	{
+		SetBlendState(AlphaBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(NonZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_ccw);
+
+		VertexShader = compile vs_5_0 VS_MAIN_RECT();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_PaperCurl();
+	}
+
+	pass UIALMOSTDISCARD_CullNone			//24
+	{
+		SetBlendState(AlphaBlending, vector(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(NonZTestAndWriteState, 0);
+		SetRasterizerState(CullMode_None);
+
+		VertexShader = compile vs_5_0 VS_MAIN_RECT();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_ALLMOSTDISCARD();
+	}
 }

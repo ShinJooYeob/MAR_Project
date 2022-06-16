@@ -36,6 +36,7 @@ HRESULT CLight::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer,_double fDe
 		m_TargetTime += (_float)fDeltaTime;
 		
 		_float Range = GetSingle(CEasingMgr)->Easing_Return(TYPE_QuadInOut, TYPE_QuadInOut,  m_LightDesc.fRange * 1.1f, m_LightDesc.fRange * 0.9f, (_float)m_PassedTime, 1.f);
+		Range *= (m_LightDesc.fTargetDeadTime - m_TargetTime) / m_LightDesc.fTargetDeadTime;
 		if (m_PassedTime > 1.f) m_PassedTime = 0;
 		if (m_TargetTime > m_LightDesc.fTargetDeadTime)m_LightDesc.bIsDead = true;
 

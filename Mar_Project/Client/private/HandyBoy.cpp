@@ -1145,6 +1145,12 @@ HRESULT CHandyBoy::Adjust_MovedTransform_byAnim(_double fDeltatime)
 					pInstance->Add_GameObject_To_Layer(m_eNowSceneNum, TAG_LAY(Layer_MonsterBullet), TAG_OP(Prototype_BreakedGazbo), &tDesc);
 				}
 
+
+				GetSingle(CUtilityMgr)->Start_InstanceParticle(m_eNowSceneNum, tDesc.vPosition.XMVector() + XMVectorSet(0, 2.5f, 0, 0), 4);
+				GetSingle(CUtilityMgr)->Start_InstanceParticle(m_eNowSceneNum, tDesc.vPosition.XMVector() + XMVectorSet(0, 2.5f, 0, 0), 5);
+				GetSingle(CUtilityMgr)->Start_InstanceParticle(m_eNowSceneNum, tDesc.vPosition.XMVector(), 4);
+				GetSingle(CUtilityMgr)->Start_InstanceParticle(m_eNowSceneNum, tDesc.vPosition.XMVector(), 5);
+
 				{
 					SOUNDDESC tSoundDesc;
 					tSoundDesc.pTransform = m_pTransformCom;

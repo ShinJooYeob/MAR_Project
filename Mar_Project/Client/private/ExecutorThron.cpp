@@ -61,6 +61,10 @@ HRESULT CExecutorThron::Initialize_Clone(void * pArg)
 
 	g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
 
+
+	GetSingle(CUtilityMgr)->Start_InstanceParticle(m_eNowSceneNum, m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 6);
+	GetSingle(CUtilityMgr)->Start_InstanceParticle(m_eNowSceneNum, m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 7);
+
 	return S_OK;
 }
 

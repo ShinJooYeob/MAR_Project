@@ -18,6 +18,8 @@ public:
 public:
 	virtual _float	Get_RenderSortValue() override;
 	virtual _float	Compute_RenderSortValue() override;
+	virtual HRESULT Bind_Texture_OnShader(const char* szConstName, ID3D11ShaderResourceView* pSRV) { return E_FAIL; };
+
 
 	void Set_UIDepth(_float fDepth) { m_fDepth = fDepth; };
 	_float Get_UIDepth() { return m_fDepth; };
@@ -63,6 +65,9 @@ public:
 	void Set_Color(_float4 vColor) { m_vColor = vColor; };
 	void Set_UICutY(_float vCutY) { m_fUICutY = vCutY; };
 
+	void Set_YTurningOn(_bool bBool) { m_bYTurning = bBool; }
+	void Set_YAngle(_float fAngle) { m_fYTurnAngle = fAngle; }
+
 protected:
 	_uint			m_iTextureLayerIndex = 0;
 	_uint			m_iTargetTextureLayerIndex = 0;
@@ -76,6 +81,8 @@ protected:
 
 	_float			m_fDepth = 0;
 	_float			m_fAngle = 0;
+	_float			m_fYTurnAngle = 0;
+	_bool			m_bYTurning = false;
 	_uint			m_PassIndex = 1;
 	_float4			m_vColor = { 1,1,1,1 };
 	_float			m_fUICutY = 0;

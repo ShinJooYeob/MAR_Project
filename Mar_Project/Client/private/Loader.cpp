@@ -91,6 +91,7 @@
 
 //UI
 #include "GamePlayUI.h"
+#include "PauseUI.h"
 #include "EndingAlice.h"
 
 
@@ -240,7 +241,7 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 
 
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Player),
-		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Alice", "Alice.FBX", TransformMatrix, 8)));
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Alice", "Alice.FBX", TransformMatrix, 1)));
 
 	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Tornado1),
@@ -640,6 +641,8 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_UIGamePlay),
 		CGamePlayUI::Create(m_pDevice, m_pDeviceContext)));
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_UIPause),
+		CPauseUI::Create(m_pDevice, m_pDeviceContext)));
 
 	//동적 맵 오브젝트
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_Terrain),

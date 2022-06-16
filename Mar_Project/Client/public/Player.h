@@ -83,6 +83,10 @@ public:
 	_bool	Get_IsGiantAtteck();
 	_float Get_DashPower() { return m_fDashPower; }
 	_float Get_UmbrellaIntro() { return m_fUmbrellaIntro; }
+
+	_int Get_UpgradeCount(UPGRADEID eID) { return m_ArrUpgraeCount[eID]; }
+	void Plus_UpgradeCount(UPGRADEID eID) { m_ArrUpgraeCount[eID]++; }
+
 private:
 	CShader*			m_pShaderCom = nullptr;
 	CRenderer*			m_pRendererCom = nullptr;
@@ -197,6 +201,8 @@ private:
 	_double			m_ProteinPassedTime = 0;
 	_uint			m_iProteinChecker = 0;
 	
+
+	_int		m_ArrUpgraeCount[Upgrade_End] = { 0 };
 
 
 private:

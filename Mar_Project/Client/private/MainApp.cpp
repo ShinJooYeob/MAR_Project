@@ -327,6 +327,11 @@ HRESULT CMainApp::Ready_Static_Component_Prototype()
 	FAILED_CHECK(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Texture_LoadingScene),
 		CTexture::Create(m_pDevice, m_pDeviceContext, L"UI_Loading.txt")));
 
+
+	FAILED_CHECK(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Texture_PauseUI),
+		CTexture::Create(m_pDevice, m_pDeviceContext, L"PaperCurl.txt")));
+
+
 	//FAILED_CHECK(m_pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Texture_SkyBox),
 	//	CTexture::Create(m_pDevice, m_pDeviceContext, L"SkyBox.txt")));
 

@@ -67,9 +67,21 @@ _int CCardPiece::Update(_double fDeltaTime)
 
 	m_fTurningTime += fDeltaTime;
 
-	if (m_fTurningTime > 0.00)
+	if (m_fTurningTime > 0.1)
 	{
+		m_fTurningTime = 0;
+		if (rand() % 2)
+		{
+			GetSingle(CUtilityMgr)->Start_InstanceParticle(m_eNowSceneNum, m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 6);
 
+		}
+		else
+		{
+			GetSingle(CUtilityMgr)->Start_InstanceParticle(m_eNowSceneNum, m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 7);
+
+		}
+
+	}
 		m_fStartTimer += _float(fDeltaTime);
 
 		if (!m_bIsSpout)
@@ -111,7 +123,7 @@ _int CCardPiece::Update(_double fDeltaTime)
 			}
 
 		}
-	}
+
 
 
 	m_bIsOnScreen = g_pGameInstance->IsNeedToRender(m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS));

@@ -92,7 +92,7 @@ _int CScene_Stage1::Update(_double fDeltaTime)
 	if (GetKeyState(VK_RETURN) & 0x8000)
 	{
 		FAILED_CHECK(GetSingle(CUtilityMgr)->Clear_RenderGroup_forSceneChange());
-		FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Loading::Create(m_pDevice, m_pDeviceContext, SCENEID::SCENE_STAGE2), SCENEID::SCENE_LOADING));
+		FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Loading::Create(m_pDevice, m_pDeviceContext, SCENEID::SCENE_STAGE3), SCENEID::SCENE_LOADING));
 	}
 
 
@@ -255,6 +255,7 @@ HRESULT CScene_Stage1::Ready_Layer_Player(const _tchar * pLayerTag)
 HRESULT CScene_Stage1::Ready_Layer_UI(const _tchar * pLayerTag)
 {
 	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_UIGamePlay)));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE1, pLayerTag, TAG_OP(Prototype_UIPause)));
 	return S_OK;
 }
 

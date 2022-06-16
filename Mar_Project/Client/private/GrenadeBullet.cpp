@@ -430,9 +430,10 @@ HRESULT CGrenadeBullet::Ready_ParticleDesc()
 		tDesc.ParticleSize = _float3(0.3f);
 		tDesc.ParticleSize2 = _float3(0.7f);
 
-		tDesc.ColorChageFrequency = 0;
+		tDesc.ColorChageFrequency = 2;
 		tDesc.TargetColor = _float4(1.f, 0.843f, 0.341f, 1.f);
-		tDesc.TargetColor2 = _float4(-0.3f, -0.3f, -0.3f, 1.f);
+		//tDesc.TargetColor2 = _float4(-0.3f, -0.3f, -0.3f, 1.f);
+		tDesc.TargetColor2 = _float4(1.f, 1.f, 1.f, 1.f);
 
 
 		tDesc.Particle_Power = 0.7f;
@@ -443,6 +444,7 @@ HRESULT CGrenadeBullet::Ready_ParticleDesc()
 		tDesc.MaxBoundaryRadius = 5;
 
 		tDesc.m_bIsUI = false;
+		tDesc.m_bIsBlur= true;
 		tDesc.m_bUIDepth = 0;
 
 		tDesc.ParticleStartRandomPosMin = _float3(0.f);

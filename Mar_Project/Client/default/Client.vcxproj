@@ -181,6 +181,7 @@
     <ClInclude Include="..\public\DollMakerBullet.h" />
     <ClInclude Include="..\public\EndingAlice.h" />
     <ClInclude Include="..\public\EyepotChainGranade.h" />
+    <ClInclude Include="..\public\PauseUI.h" />
     <ClInclude Include="..\public\HyperVoice.h" />
     <ClInclude Include="..\public\RadialBlurMonster.h" />
     <ClInclude Include="..\public\Scene_Ending.h" />
@@ -294,6 +295,7 @@
     <ClCompile Include="..\private\DollMakerBullet.cpp" />
     <ClCompile Include="..\private\EndingAlice.cpp" />
     <ClCompile Include="..\private\EyepotChainGranade.cpp" />
+    <ClCompile Include="..\private\PauseUI.cpp" />
     <ClCompile Include="..\private\HyperVoice.cpp" />
     <ClCompile Include="..\private\RadialBlurMonster.cpp" />
     <ClCompile Include="..\private\Scene_Ending.cpp" />

@@ -180,6 +180,10 @@ _int CScene_Edit::LateUpdate(_double fDeltaTime)
 			m_pCreatedTerrain->LateUpdate(fDeltaTime);
 		break;
 	case 1:
+
+
+		sort(m_vecBatchedUI.begin(), m_vecBatchedUI.end(),
+			[&](EDITUI& Sour, EDITUI& Dest) {return Sour.fDepth > Dest.fDepth; });
 		
 			if (m_pRendererEditUI->LateUpdate(fDeltaTime) < 0)
 			{
@@ -1397,23 +1401,21 @@ HRESULT CScene_Edit::Input_KeyBoard(_double fDeltaTime)
 				ScreenToClient(g_hWnd, &ptMouse);
 				m_bModifyBatchedUI = false;
 
-				for (_uint i = 0 ; i < m_vecBatchedUI.size(); i++)
+
+				for (_uint i = _uint(m_vecBatchedUI.size() - 1); i >= 0 ; i--)
 				{
 					
 					if (ptMouse.x > m_vecBatchedUI[i].UIRect.left	&& ptMouse.x < m_vecBatchedUI[i].UIRect.right &&
 						ptMouse.y > m_vecBatchedUI[i].UIRect.top	&& ptMouse.y < m_vecBatchedUI[i].UIRect.bottom)
 					{
 						m_bModifyBatchedUI = true;
-						m_iModifyUIIndex = i;
 
 
+						m_fUIDesc = m_vecBatchedUI[i].UIDesc;
 
-
-						m_fUIDesc = m_vecBatchedUI[m_iModifyUIIndex].UIDesc;
-
-						m_bIsRect=	m_vecBatchedUI[m_iModifyUIIndex].bIsRect;
-						m_fUIAngle=	m_vecBatchedUI[m_iModifyUIIndex].fAngle ;
-						m_fUIRect=	m_vecBatchedUI[m_iModifyUIIndex].UIRect ;
+						m_bIsRect=	m_vecBatchedUI[i].bIsRect;
+						m_fUIAngle=	m_vecBatchedUI[i].fAngle ;
+						m_fUIRect=	m_vecBatchedUI[i].UIRect ;
 
 
 
@@ -1422,7 +1424,7 @@ HRESULT CScene_Edit::Input_KeyBoard(_double fDeltaTime)
 
 							Safe_Release(m_TargetSRV);
 
-							m_TargetSRV = m_vecBatchedUI[m_iModifyUIIndex].SRV;
+							m_TargetSRV = m_vecBatchedUI[i].SRV;
 
 							Safe_AddRef(m_TargetSRV);
 
@@ -1431,6 +1433,7 @@ HRESULT CScene_Edit::Input_KeyBoard(_double fDeltaTime)
 
 
 
+						m_iModifyUIIndex = i;
 
 
 
@@ -1439,6 +1442,8 @@ HRESULT CScene_Edit::Input_KeyBoard(_double fDeltaTime)
 					}
 					
 				}
+
+				
 
 			}
 	
