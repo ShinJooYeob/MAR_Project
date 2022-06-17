@@ -87,6 +87,9 @@ public:
 	_int Get_UpgradeCount(UPGRADEID eID) { return m_ArrUpgraeCount[eID]; }
 	void Plus_UpgradeCount(UPGRADEID eID) { m_ArrUpgraeCount[eID]++; }
 
+
+	_int Get_TeethCount() { return m_iTeethCount; }
+	void Plus_iTeethCount(_int iCount) { m_iTeethCount += iCount; }
 private:
 	CShader*			m_pShaderCom = nullptr;
 	CRenderer*			m_pRendererCom = nullptr;
@@ -203,7 +206,7 @@ private:
 	
 
 	_int		m_ArrUpgraeCount[Upgrade_End] = { 0 };
-
+	_int		m_iTeethCount = 25;
 
 private:
 	HRESULT SetUp_Components();

@@ -51,6 +51,12 @@ HRESULT CMainApp::Initialize()
 
 	FAILED_CHECK(Scene_Change(SCENEID::SCENE_LOBY));
 
+	FAILED_CHECK(Ready_MouseCursor());
+
+
+
+	FAILED_CHECK(g_pGameInstance->Add_Font(L"VinerFonts", L"../bin/Resources/Fonts/Reenie.spritefont"));
+
 	return S_OK;
 }
 
@@ -64,13 +70,13 @@ _int CMainApp::Update(_double fDeltaTime)
 
 
 	g_fDeltaTime = fDeltaTime * m_SlowTimes;
+	FAILED_CHECK(Update_Mouse());
 
 	if (FAILED(m_pGameInstance->Update_Engine(fDeltaTime * m_SlowTimes)))
 	{
 		MSGBOX("Failed to Update_Engine ");
 		return E_FAIL;
 	}
-
 	//콜리전 내부 탐색중
 	//m_pCollision->Collision_Obsever(fDeltaTime);
 
@@ -132,12 +138,13 @@ HRESULT CMainApp::Render()
 		return E_FAIL;
 	}
 
+
+
 	FAILED_CHECK(m_pGameInstance->Clear_BackBuffer_View(_float4(0.5f, 0.5f, 0.5f, 1.f)));
 	FAILED_CHECK(m_pGameInstance->Clear_DepthStencil_View());
 
 	FAILED_CHECK(m_pComRenderer->Render_RenderGroup(g_fDeltaTime));
 	FAILED_CHECK(m_pGameInstance->Render_Scene());
-
 
 	FAILED_CHECK(m_pGameInstance->Present());
 	//m_pGameInstance->Present();
@@ -403,6 +410,119 @@ HRESULT CMainApp::Ready_Static_GameObject_Prototype()
 	return S_OK;
 }
 
+HRESULT CMainApp::Ready_MouseCursor()
+{
+	CGameInstance*	pInstance = g_pGameInstance;
+	FAILED_CHECK(pInstance->Add_GameObject_Out_of_Manager((CGameObject**)(&m_pMouseCursor), SCENE_STATIC, TAG_OP(Prototype_UIImage)));
+
+	NULL_CHECK_RETURN(m_pMouseCursor, E_FAIL);
+
+	FAILED_CHECK(m_pMouseCursor->Change_Component_by_NewAssign(SCENE_STATIC, TAG_CP(Prototype_Texture_PauseUI), TAG_COM(Com_Texture)));
+
+	FAILED_CHECK(m_pMouseCursor->Change_TextureLayer(L"Mouse"));
+	m_pMouseCursor->Set_TextureLayerIndex(0);
+	m_pMouseCursor->Set_PassIndex(8);
+	m_pMouseCursor->Set_IsDraw(true);
+
+	POINT ptMouse;
+	GetCursorPos(&ptMouse);
+	ScreenToClient(g_hWnd, &ptMouse);
+
+
+	FLOATRECT tUIDesc;
+
+	tUIDesc.left = _float(ptMouse.x);
+	tUIDesc.top = _float(ptMouse.y);
+	tUIDesc.right = tUIDesc.left + 28;
+	tUIDesc.bottom = tUIDesc.top + 56;
+
+	m_pMouseCursor->Apply_Rect_To_MemberValue(tUIDesc);
+	m_pMouseCursor->Set_DrawingValueIsUIDesc(false);
+	FAILED_CHECK(m_pMouseCursor->Apply_Rect_To_Transform());
+
+	m_pMouseCursor->Set_UIDepth(_float(-(FLT_MAX)));
+
+	ShowCursor(false);
+
+	RECT rt;
+	GetClientRect(g_hWnd, &rt);
+	POINT p1, p2;
+	p1.x = rt.left;
+	p1.y = rt.top;
+	p2.x = rt.right;
+	p2.y = rt.bottom;
+
+	ClientToScreen(g_hWnd, &p1);
+	ClientToScreen(g_hWnd, &p2);
+
+	rt.left = p1.x;
+	rt.top = p1.y;
+	rt.right = p2.x;
+	rt.bottom = p2.y;
+
+	ClipCursor(&rt);
+
+
+	return S_OK;
+}
+
+HRESULT CMainApp::Update_Mouse()
+{
+	if (g_pGameInstance->Get_DIKeyState(DIK_TAB)&DIS_Down)
+	{	
+		g_bShowMouse = !g_bShowMouse;
+		m_pMouseCursor->Set_IsDraw(g_bShowMouse);
+
+		if (!g_bShowMouse)
+		{
+			ClipCursor(NULL);
+		}
+		else
+		{
+			RECT rt;
+			GetClientRect(g_hWnd, &rt);
+			POINT p1, p2;
+			p1.x = rt.left;
+			p1.y = rt.top;
+			p2.x = rt.right;
+			p2.y = rt.bottom;
+
+			ClientToScreen(g_hWnd, &p1);
+			ClientToScreen(g_hWnd, &p2);
+
+			rt.left = p1.x;
+			rt.top = p1.y;
+			rt.right = p2.x;
+			rt.bottom = p2.y;
+
+			ClipCursor(&rt);
+
+		}
+	}
+
+	if (g_bShowMouse)
+	{
+
+		POINT ptMouse;
+		GetCursorPos(&ptMouse);
+		ScreenToClient(g_hWnd, &ptMouse);
+
+
+		FLOATRECT tUIDesc;
+
+		tUIDesc.left = _float(ptMouse.x);
+		tUIDesc.top = _float(ptMouse.y);
+		tUIDesc.right = tUIDesc.left + 28;
+		tUIDesc.bottom = tUIDesc.top + 56;
+
+		m_pMouseCursor->Apply_Rect_To_MemberValue(tUIDesc);
+
+		FAILED_CHECK(m_pComRenderer->Add_RenderGroup(CRenderer::RENDER_UI, m_pMouseCursor));
+	}
+
+	return S_OK;
+}
+
 CMainApp * CMainApp::Create()
 {
 	CMainApp* pInstance = new CMainApp;
@@ -418,6 +538,7 @@ CMainApp * CMainApp::Create()
 
 void CMainApp::Free()
 {
+	Safe_Release(m_pMouseCursor);
 	m_pGameInstance->Get_NowScene()->Free();
 
 	if (FAILED(Free_SingletonMgr()))

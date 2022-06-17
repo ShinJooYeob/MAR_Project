@@ -342,7 +342,7 @@ PS_OUT_LIGHT PS_MAIN_POINT(PS_IN In)
 	float Emsv = pow(fAtt, 1.5f);
 	Out.vEmissive = vector(Emsv, Emsv,0,1);
 		
-	Out.vShade = (g_vLightDiffuse * saturate(dot(normalize(vLightDir) * -1.f, vNormal)) + (g_vLightAmbient *  saturate(vMtrlSpecularMap.b + 0.2f))) * fAtt;
+	Out.vShade = (g_vLightDiffuse * saturate(dot(normalize(vLightDir) * -1.f, vNormal)) + (g_vLightAmbient *  saturate(vMtrlSpecularMap.b + 0.2f))) * Emsv;
 	//Out.vShade = 0.5f;
 	 
 	Out.vShade.a = 1.f;
@@ -353,7 +353,7 @@ PS_OUT_LIGHT PS_MAIN_POINT(PS_IN In)
 	vector		vLook = vWorldPos - g_vCamPosition;
 
 	//Out.vSpecular = (g_vLightSpecular * 1) * pow(saturate(dot(normalize(vReflect) * -1.f, normalize(vLook))), pow(1 / vMtrlSpecularMap.g, 2)) * fAtt;
-	Out.vSpecular = (g_vLightSpecular * pow(vMtrlSpecularMap.r, 1 / 1.2f)) * pow(saturate(dot(normalize(vReflect) * -1.f, normalize(vLook))), pow(1 / vMtrlSpecularMap.g, 2)) * fAtt;
+	Out.vSpecular = (g_vLightSpecular * pow(vMtrlSpecularMap.r, 1 / 1.2f)) * pow(saturate(dot(normalize(vReflect) * -1.f, normalize(vLook))), pow(1 / vMtrlSpecularMap.g, 2)) * Emsv;
 	Out.vSpecular.a = 0.f;
 
 	return Out;

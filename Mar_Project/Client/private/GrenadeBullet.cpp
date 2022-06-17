@@ -80,8 +80,10 @@ HRESULT CGrenadeBullet::Initialize_Clone(void * pArg)
 	LightDesc.eLightType = tagLightDesc::TYPE_POINT;
 	LightDesc.vSpecular = LightDesc.vAmbient = LightDesc.vDiffuse = _float4(0.90588235f, 0.745098039f, 0.f, 1.f);
 	LightDesc.vVector = XMVectorSetW(m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 1);
-	LightDesc.fRange = 3.5f;
+	LightDesc.fRange = 4.5f;
 	g_pGameInstance->Add_Light(LightDesc, &m_pLightDesc);
+
+
 
 	return S_OK;
 }
@@ -185,6 +187,17 @@ _int CGrenadeBullet::Update(_double fDeltaTime)
 
 			m_bDeadAnimStart = true;
 			m_DeadAnimPassedTime = 0;
+
+			m_pLightDesc->bIsDead = true;
+			LIGHTDESC LightDesc;
+
+			LightDesc.eLightType = tagLightDesc::TYPE_POINT;
+			LightDesc.vSpecular = LightDesc.vAmbient = LightDesc.vDiffuse = _float4(0.90588235f, 0.745098039f, 0.f, 1.f);
+			LightDesc.vVector = XMVectorSetW(m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 1);
+			LightDesc.fTargetDeadTime = 1.5f;
+			LightDesc.fRange = 10.5f;
+			g_pGameInstance->Add_Light(LightDesc, &m_pLightDesc);
+
 		}
 		_float EasedValue = g_pGameInstance->Easing(TYPE_Linear, 20, -100, m_fLifeTime, m_fTotalLifeTime);
 		m_pTransformCom->MovetoDir_bySpeed(XMVectorSet(0, 1, 0, 0), EasedValue, fDeltaTime);
@@ -314,6 +327,18 @@ void CGrenadeBullet::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConf
 
 				m_bDeadAnimStart = true;
 				m_DeadAnimPassedTime = 0;
+
+				m_pLightDesc->bIsDead = true;
+				LIGHTDESC LightDesc;
+
+				LightDesc.eLightType = tagLightDesc::TYPE_POINT;
+				LightDesc.vSpecular = LightDesc.vAmbient = LightDesc.vDiffuse = _float4(0.90588235f, 0.745098039f, 0.f, 1.f);
+				LightDesc.vVector = XMVectorSetW(m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 1);
+				LightDesc.fTargetDeadTime = 1.5f;		
+				LightDesc.fRange = 10.5f;
+
+				g_pGameInstance->Add_Light(LightDesc, &m_pLightDesc);
+
 			}
 
 		}
@@ -345,6 +370,17 @@ void CGrenadeBullet::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConf
 
 				m_bDeadAnimStart = true;
 				m_DeadAnimPassedTime = 0;
+
+				m_pLightDesc->bIsDead = true;
+				LIGHTDESC LightDesc;
+
+				LightDesc.eLightType = tagLightDesc::TYPE_POINT;
+				LightDesc.vSpecular = LightDesc.vAmbient = LightDesc.vDiffuse = _float4(0.90588235f, 0.745098039f, 0.f, 1.f);
+				LightDesc.vVector = XMVectorSetW(m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 1);
+				LightDesc.fTargetDeadTime = 1.5f;
+				LightDesc.fRange = 10.5f;
+				g_pGameInstance->Add_Light(LightDesc, &m_pLightDesc);
+
 			}
 
 		}
@@ -395,6 +431,18 @@ HRESULT CGrenadeBullet::Set_Player_On_Terrain()
 
 		m_bDeadAnimStart = true;
 		m_DeadAnimPassedTime = 0;
+
+		m_pLightDesc->bIsDead = true;
+		LIGHTDESC LightDesc;
+
+		LightDesc.eLightType = tagLightDesc::TYPE_POINT;
+		LightDesc.vSpecular = LightDesc.vAmbient = LightDesc.vDiffuse = _float4(0.90588235f, 0.745098039f, 0.f, 1.f);
+		LightDesc.vVector = XMVectorSetW(m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), 1);
+		LightDesc.fRange = 10.5f;
+
+		LightDesc.fTargetDeadTime = 1.5f;
+		g_pGameInstance->Add_Light(LightDesc, &m_pLightDesc);
+
 	}
 	
 	return S_OK;

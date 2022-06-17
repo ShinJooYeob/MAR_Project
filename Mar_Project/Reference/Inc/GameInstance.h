@@ -20,6 +20,7 @@ class CPipeLineMgr;
 class CLightMgr;
 class CCollisionMgr;
 class CRenderTargetMgr;
+class CFontMgr;
 
 class ENGINE_DLL CGameInstance final :public CBase
 {
@@ -140,6 +141,10 @@ public: //CollisionMgr
 	void	Clear_CollisionGroup();
 
 
+public: /* For.FontMgr */
+	HRESULT Add_Font(const _tchar* pFontTag, const _tchar* pFontFilePath);
+	HRESULT Render_Font(const _tchar* pFontTag, const _tchar* pText, _float2 vPosition, _float4 vColor,_float fAngle = 0,_float2 vScale = _float2(1));
+
 public:
 	ID3D11ShaderResourceView* Get_SRV(const _tchar* pTargetTag) const;
 	HRESULT Begin_MTV(const _tchar* pMRTTag);
@@ -162,6 +167,7 @@ private:
 	CLightMgr*			m_pLightMgr = nullptr;
 	CCollisionMgr*		m_pCollisionMgr = nullptr;
 	CRenderTargetMgr*	m_pRenderTargetMgr = nullptr;
+	CFontMgr*			m_pFontMgr	= nullptr;
 
 public:
 	static void Release_Engine();

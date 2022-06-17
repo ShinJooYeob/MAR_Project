@@ -11,6 +11,7 @@
 #include "LightMgr.h"
 #include "CollisionMgr.h"
 #include "RenderTargetMgr.h"
+#include "FontMgr.h"
 
 IMPLEMENT_SINGLETON(CGameInstance);
 
@@ -29,7 +30,8 @@ CGameInstance::CGameInstance()
 	m_pPipeLineMgr(GetSingle(CPipeLineMgr)),
 	m_pLightMgr(GetSingle(CLightMgr)),
 	m_pCollisionMgr(GetSingle(CCollisionMgr)),
-	m_pRenderTargetMgr(GetSingle(CRenderTargetMgr))
+	m_pRenderTargetMgr(GetSingle(CRenderTargetMgr)),
+	m_pFontMgr(GetSingle(CFontMgr))
 
 {
 
@@ -47,6 +49,7 @@ CGameInstance::CGameInstance()
 	Safe_AddRef(m_pLightMgr);
 	Safe_AddRef(m_pCollisionMgr);
 	Safe_AddRef(m_pRenderTargetMgr);
+	Safe_AddRef(m_pFontMgr);
 	
 }
 
@@ -86,7 +89,7 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInst, const CGraphic_Device:
 
 	FAILED_CHECK(m_pRenderTargetMgr->Initialize_RenderTargetMgr(*ppDeviceOut, *ppDeviceContextOut));
 
-
+	FAILED_CHECK(m_pFontMgr->Initialize_FontMgr(*ppDeviceOut, *ppDeviceContextOut));
 
 	return S_OK;
 }
@@ -638,6 +641,20 @@ void CGameInstance::Clear_CollisionGroup()
 	m_pCollisionMgr->Clear_CollisionGroup();
 }
 
+HRESULT CGameInstance::Add_Font(const _tchar * pFontTag, const _tchar * pFontFilePath)
+{
+	NULL_CHECK_BREAK(m_pFontMgr);
+
+	return m_pFontMgr->Add_Font(pFontTag,pFontFilePath);
+}
+
+HRESULT CGameInstance::Render_Font(const _tchar * pFontTag, const _tchar * pText, _float2 vPosition, _float4 vColor,_float fAngle, _float2 vScale)
+{
+	NULL_CHECK_BREAK(m_pFontMgr);
+
+	return m_pFontMgr->Render_Font(pFontTag, pText, vPosition, vColor.XMVector(), fAngle, vScale);
+}
+
 ID3D11ShaderResourceView * CGameInstance::Get_SRV(const _tchar * pTargetTag) const
 {
 	NULL_CHECK_BREAK(m_pRenderTargetMgr);
@@ -719,6 +736,9 @@ void CGameInstance::Release_Engine()
 	if (0 != GetSingle(CCollisionMgr)->DestroyInstance())
 		MSGBOX("Failed to Release CCollisionMgr ");
 
+	if (0 != GetSingle(CFontMgr)->DestroyInstance())
+		MSGBOX("Failed to Release Com CFontMgr");
+
 	if (0 != GetSingle(CRenderTargetMgr)->DestroyInstance())
 		MSGBOX("Failed to Release Com CRenderTargetMgr ");
 
@@ -743,6 +763,7 @@ void CGameInstance::Free()
 	Safe_Release(m_pLightMgr);
 	Safe_Release(m_pCollisionMgr);
 	Safe_Release(m_pRenderTargetMgr);
+	Safe_Release(m_pFontMgr);
 	
 	
 }

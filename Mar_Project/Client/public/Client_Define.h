@@ -7,6 +7,8 @@ extern HWND g_hWnd;
 extern _double g_fDeltaTime;
 extern _bool	g_bIsShowFPS;
 extern CGameInstance* g_pGameInstance;
+extern _bool g_bShowMouse;
+
 
 #ifdef USE_IMGUI
 #define GETIMGUI GetSingle(CImguiMgr)

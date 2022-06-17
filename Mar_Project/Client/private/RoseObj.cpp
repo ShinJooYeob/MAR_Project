@@ -186,6 +186,9 @@ _int CRoseObj::Update(_double fDeltaTime)
 				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
 			}
 
+
+			m_pPlayer->Heal_to_Player(rand() % 4 + 4);
+
 			Set_IsDead();
 
 		}

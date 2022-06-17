@@ -61,10 +61,10 @@ HRESULT CPlayer::Initialize_Clone(void * pArg)
 	m_szNameTag = L"Alice";
 	ZeroMemory(m_ArrUpgraeCount, sizeof(_int) * Upgrade_End);
 
-	m_ArrUpgraeCount[0] = 0;
+	m_ArrUpgraeCount[0] = 1;
 	m_ArrUpgraeCount[1] = 1;
-	m_ArrUpgraeCount[2] = 2;
-	m_ArrUpgraeCount[3] = 3;
+	m_ArrUpgraeCount[2] = 1;
+	m_ArrUpgraeCount[3] = 1;
 
 	return S_OK;
 }

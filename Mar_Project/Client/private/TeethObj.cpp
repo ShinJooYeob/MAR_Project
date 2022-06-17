@@ -157,6 +157,10 @@ _int CTeethObj::Update(_double fDeltaTime)
 				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_UI, &tSoundDesc);
 			}
 
+			if(m_bIsGolden)
+				m_pPlayer->Plus_iTeethCount(_int(GetSingle(CUtilityMgr)->RandomFloat(30,50)));
+			else
+				m_pPlayer->Plus_iTeethCount(rand() % 5 + 3);
 
 
 

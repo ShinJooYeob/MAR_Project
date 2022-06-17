@@ -4,7 +4,14 @@
 
 
 BEGIN(Client)
-
+typedef struct tagFonts
+{
+	wstring szString;
+	_float2 vPosition;
+	_float4 vColor = _float4(1);
+	_float2 vFontScale = _float2(1);
+	_float fAngle = 0;
+}FONTSDESC;
 typedef struct tagInstanceParticleDesc
 {
 	_float3 vWorldPosition = _float3(0);

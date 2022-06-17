@@ -157,6 +157,9 @@
     <Filter Include="01.Utility\01.ComponentMgr\01.Component\07.SwordTrail">
       <UniqueIdentifier>{2fab23fb-50d8-4ad5-9683-bde9fb0bf535}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\11.FontMgr\00.Manager">
+      <UniqueIdentifier>{86ae4cbc-f398-4774-abf6-5fb3c9bd93a8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Base.h">
@@ -312,6 +315,12 @@
     <ClInclude Include="..\public\SwordTrail.h">
       <Filter>01.Utility\01.ComponentMgr\01.Component\07.SwordTrail</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\ExternFont.h">
+      <Filter>01.Utility\11.FontMgr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\FontMgr.h">
+      <Filter>01.Utility\11.FontMgr\00.Manager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">
@@ -448,6 +457,12 @@
     </ClCompile>
     <ClCompile Include="..\private\SwordTrail.cpp">
       <Filter>01.Utility\01.ComponentMgr\01.Component\07.SwordTrail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\ExternFont.cpp">
+      <Filter>01.Utility\11.FontMgr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\FontMgr.cpp">
+      <Filter>01.Utility\11.FontMgr\00.Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

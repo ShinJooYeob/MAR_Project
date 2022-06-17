@@ -435,7 +435,7 @@ _int CClockBomb::Update(_double fDeltaTime)
 						LIGHTDESC LightDesc;
 
 						LightDesc.eLightType = tagLightDesc::TYPE_POINT;
-						LightDesc.vAmbient = LightDesc.vDiffuse = _float4(1.f, 0.47843137254f, 0.47843137254f, 1.f);
+						LightDesc.vSpecular  = LightDesc.vAmbient = LightDesc.vDiffuse = _float4(1.f, 0.47843137254f, 0.47843137254f, 1.f);
 						LightDesc.vSpecular = _float4(0, 0, 0, 0);
 						LightDesc.vVector = XMVectorSetW(m_pColliderCom->Get_ColliderPosition().XMVector() + XMVectorSet(0, 1.5f, 0, 0), 1);
 						LightDesc.fRange = 5.5f;
@@ -636,7 +636,7 @@ void CClockBomb::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflict
 					LIGHTDESC LightDesc;
 
 					LightDesc.eLightType = tagLightDesc::TYPE_POINT;
-					LightDesc.vAmbient = LightDesc.vDiffuse = _float4(1.f, 0.47843137254f, 0.47843137254f, 1.f);
+					LightDesc.vSpecular  = LightDesc.vAmbient = LightDesc.vDiffuse = _float4(1.f, 0.47843137254f, 0.47843137254f, 1.f);
 					LightDesc.vSpecular = _float4(0, 0, 0, 0);
 					LightDesc.vVector = XMVectorSetW(m_pColliderCom->Get_ColliderPosition().XMVector() + XMVectorSet(0, 1.5f, 0, 0), 1);
 					LightDesc.fRange = 5.5f;
@@ -699,7 +699,7 @@ void CClockBomb::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflict
 					LIGHTDESC LightDesc;
 
 					LightDesc.eLightType = tagLightDesc::TYPE_POINT;
-					LightDesc.vAmbient = LightDesc.vDiffuse = _float4(1.f, 0.47843137254f, 0.47843137254f, 1.f);
+					LightDesc.vSpecular  = LightDesc.vAmbient = LightDesc.vDiffuse = _float4(1.f, 0.47843137254f, 0.47843137254f, 1.f);
 					LightDesc.vSpecular = _float4(0, 0, 0, 0);
 					LightDesc.vVector = XMVectorSetW(m_pColliderCom->Get_ColliderPosition().XMVector() + XMVectorSet(0, 1.5f, 0, 0), 1);
 					LightDesc.fRange = 5.5f;
@@ -778,7 +778,7 @@ void CClockBomb::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflict
 					LIGHTDESC LightDesc;
 
 					LightDesc.eLightType = tagLightDesc::TYPE_POINT;
-					LightDesc.vAmbient = LightDesc.vDiffuse = _float4(1.f, 0.47843137254f, 0.47843137254f, 1.f);
+					LightDesc.vSpecular  = LightDesc.vAmbient = LightDesc.vDiffuse = _float4(1.f, 0.47843137254f, 0.47843137254f, 1.f);
 					LightDesc.vSpecular = _float4(0, 0, 0, 0);
 					LightDesc.vVector = XMVectorSetW(m_pColliderCom->Get_ColliderPosition().XMVector() + XMVectorSet(0, 1.5f, 0, 0), 1);
 					LightDesc.fRange = 5.5f;
@@ -843,7 +843,7 @@ void CClockBomb::CollisionTriger(_uint iMyColliderIndex, CGameObject * pConflict
 					LIGHTDESC LightDesc;
 
 					LightDesc.eLightType = tagLightDesc::TYPE_POINT;
-					LightDesc.vAmbient = LightDesc.vDiffuse = _float4(1.f, 0.47843137254f, 0.47843137254f, 1.f);
+					LightDesc.vSpecular  = LightDesc.vAmbient = LightDesc.vDiffuse = _float4(1.f, 0.47843137254f, 0.47843137254f, 1.f);
 					LightDesc.vSpecular = _float4(0, 0, 0, 0);
 					LightDesc.vVector = XMVectorSetW(m_pColliderCom->Get_ColliderPosition().XMVector() + XMVectorSet(0, 1.5f, 0, 0), 1);
 					LightDesc.fRange = 5.5f;

@@ -31,6 +31,8 @@ private:
 	CRenderer*				m_pComRenderer = nullptr;
 	//CCollision*				m_pCollision = nullptr;
 
+	class CUI*				m_pMouseCursor = nullptr;
+
 
 private: //슬로우 모션용
 	_bool					m_bIsSlowed = false;
@@ -55,6 +57,9 @@ private:
 
 	HRESULT Ready_Static_Component_Prototype();
 	HRESULT Ready_Static_GameObject_Prototype();
+
+	HRESULT Ready_MouseCursor();
+	HRESULT Update_Mouse();
 
 
 public:
