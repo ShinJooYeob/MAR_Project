@@ -32,6 +32,7 @@ private:
 	HRESULT Ready_MovableColum(const _tchar* pLayerTag);
 	HRESULT Ready_MovableColumBtn(const _tchar* pLayerTag);
 	HRESULT Ready_BreakableWall(const _tchar* pLayerTag);
+	HRESULT Ready_Layer_BreakableObj(const _tchar* pLayerTag);
 
 
 	HRESULT Ready_Layer_TriggerCollider(const _tchar* pLayerTag);

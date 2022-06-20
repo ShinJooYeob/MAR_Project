@@ -68,6 +68,7 @@ using namespace std;
 /////////비디오 포함헤더
 #include <Vfw.h>
 #pragma comment(lib, "vfw32.lib")
+//#pragma comment(lib, "msvfw32.lib")
 
 ////////사운드 포함 헤더/////////////
 #include <io.h>

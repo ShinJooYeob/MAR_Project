@@ -42,7 +42,7 @@ HRESULT CPlayer::Initialize_Prototype(void * pArg)
 {
 	FAILED_CHECK(__super::Initialize_Prototype(pArg));
 
-
+			
 	return S_OK;
 }
 
@@ -65,6 +65,8 @@ HRESULT CPlayer::Initialize_Clone(void * pArg)
 	m_ArrUpgraeCount[1] = 1;
 	m_ArrUpgraeCount[2] = 1;
 	m_ArrUpgraeCount[3] = 1;
+
+	m_iTeethCount = 1214;
 
 	return S_OK;
 }

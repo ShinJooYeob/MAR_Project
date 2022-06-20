@@ -340,6 +340,15 @@
     <Filter Include="01.GameObject\99.UI\00.Used_UI\PauseUI">
       <UniqueIdentifier>{3467ba22-dbcf-441c-93bd-d18b2077bb9a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.GameObject\00.Player\StageSelectAlice">
+      <UniqueIdentifier>{3c4c14d4-feaf-43ad-b508-d0be967ccaf7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\09.TriggerCollider\07.StageSelect_CatNScene">
+      <UniqueIdentifier>{c4bd0ce0-19b4-46a7-a16a-002ed31ebc77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.GameObject\99.UI\00.Used_UI\SelectSceneUI">
+      <UniqueIdentifier>{7b9f3ed5-55ab-4268-add2-86f8a74dee20}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -663,9 +672,6 @@
     <ClInclude Include="..\public\CircleTornado.h">
       <Filter>01.GameObject\00.Player\EffectMesh</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\StageBoss_SpwanBoss.h">
-      <Filter>01.GameObject\09.TriggerCollider\06.StageBoss_SpwanBoss</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\ScrechedBlock.h">
       <Filter>01.GameObject\03.Monster\99.MonsterWeapon\07.DollMaker</Filter>
     </ClInclude>
@@ -704,6 +710,21 @@
     </ClInclude>
     <ClInclude Include="..\public\PauseUI.h">
       <Filter>01.GameObject\99.UI\00.Used_UI\PauseUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\StageSelectAlice.h">
+      <Filter>01.GameObject\00.Player\StageSelectAlice</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\CatNpc.h">
+      <Filter>01.GameObject\04.NPC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\StageBoss_SpwanBoss.h">
+      <Filter>01.GameObject\09.TriggerCollider\06.StageBoss_SpwanBoss</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\StageSelect_CatNScene.h">
+      <Filter>01.GameObject\09.TriggerCollider\07.StageSelect_CatNScene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\SelectSceneUI.h">
+      <Filter>01.GameObject\99.UI\00.Used_UI\SelectSceneUI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1045,6 +1066,18 @@
     </ClCompile>
     <ClCompile Include="..\private\PauseUI.cpp">
       <Filter>01.GameObject\99.UI\00.Used_UI\PauseUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\StageSelectAlice.cpp">
+      <Filter>01.GameObject\00.Player\StageSelectAlice</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\CatNpc.cpp">
+      <Filter>01.GameObject\04.NPC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\StageSelect_CatNScene.cpp">
+      <Filter>01.GameObject\09.TriggerCollider\07.StageSelect_CatNScene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\SelectSceneUI.cpp">
+      <Filter>01.GameObject\99.UI\00.Used_UI\SelectSceneUI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

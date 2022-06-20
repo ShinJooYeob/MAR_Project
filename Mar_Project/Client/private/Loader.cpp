@@ -3,6 +3,8 @@
 
 #include "LobyAlice.h"
 #include "LobyUI.h"
+#include "SelectSceneUI.h"
+#include "StageSelectAlice.h"
 
 #include "Player.h"
 #include "NormalBullet.h"
@@ -17,6 +19,8 @@
 #include "Protein.h"
 #include "CircleTornado.h"
 
+#include "Npc.h"
+#include "CatNpc.h"
 #include "Instance_Particle.h"
 
 //Editor
@@ -53,6 +57,7 @@
 #include "Stage3_SpwanExecutor.h"
 #include "Stage3_GientTrigger.h"
 #include "StageBoss_SpwanBoss.h"
+#include "StageSelect_CatNScene.h"
 
 #include "StaticMapObject.h"
 
@@ -206,7 +211,82 @@ HRESULT CLoader::Load_Scene_Loby(_bool * _IsClientQuit, CRITICAL_SECTION * _CriS
 
 HRESULT CLoader::Load_Scene_StageSelect(_bool * _IsClientQuit, CRITICAL_SECTION * _CriSec)
 {
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
+
+
+	_Matrix TransformMatrix = XMMatrixScaling(0.0001f, 0.0001f, 0.0001f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGESELECT, TAG_CP(Prototype_Mesh_PlayerStageSelect),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Alice_StageSelect", "Alice_StageSelect.FBX", TransformMatrix)));
+
+
+	 TransformMatrix = XMMatrixScaling(0.0001f, 0.0001f, 0.0001f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGESELECT, TAG_CP(Prototype_Mesh_StageSelectCat),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "StageSelect/Cat", "Cat.FBX", TransformMatrix, 1)));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGESELECT, TAG_CP(Prototype_Mesh_StageSelectCop),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "StageSelect/Cop", "Cop.FBX", TransformMatrix, 1)));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGESELECT, TAG_CP(Prototype_Mesh_StageSelectGirl),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "StageSelect/Girl", "Girl.FBX", TransformMatrix, 1)));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGESELECT, TAG_CP(Prototype_Mesh_StageSelectBoy),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "StageSelect/Boy", "Boy.FBX", TransformMatrix, 1)));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGESELECT, TAG_CP(Prototype_Mesh_StageSelectWoman),	
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "StageSelect/Woman", "Woman.FBX", TransformMatrix, 1)));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGESELECT, TAG_CP(Prototype_Mesh_StageSelectMan),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "StageSelect/Man", "Man.FBX", TransformMatrix, 1)));
+
+
+
+	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGESELECT, TAG_CP(Prototype_Mesh_FarBuildingsPoorBig),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "StageSelect", "FarBuildingsPoorBig.FBX", TransformMatrix)));
+	TransformMatrix = XMMatrixScaling(0.001f, 0.001f, 0.001f);
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGESELECT, TAG_CP(Prototype_Mesh_BricksWall),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "StageSelect", "BricksWall.FBX", TransformMatrix)));
+
+
+	TransformMatrix = XMMatrixScaling(0.0005f, 0.0005f, 0.0005f) * XMMatrixRotationY(XMConvertToRadians(90.0f));
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGESELECT, TAG_CP(Prototype_Mesh_SkyBox),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "SkyBox", "SkyBox_Night.FBX", TransformMatrix)));
+
+	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_AlgaeRock_Ledge),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "AlgaeRock", "AlgaeRock_Ledge.FBX", TransformMatrix)));
+
+
+	//////////Terrain
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_Terrain),
+		CTerrain::Create(m_pDevice, m_pDeviceContext)));
+
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_StaticMapObject),
+		CStaticMapObject::Create(m_pDevice, m_pDeviceContext)));
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(L"Prototype_StageSelectAlice",
+		CStageSelectAlice::Create(m_pDevice, m_pDeviceContext)));
+
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(L"Prototype_NPC",
+		CNpc::Create(m_pDevice, m_pDeviceContext)));
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(L"Prototype_CatNpc",
+		CCatNpc::Create(m_pDevice, m_pDeviceContext)));
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(L"Prototype_StageSelect_CatNScene",
+		CStageSelect_CatNScene::Create(m_pDevice, m_pDeviceContext)));
+
+	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(L"Prototype_SelectSceneUI",
+		CSelectSceneUI::Create(m_pDevice, m_pDeviceContext)));
+	
+	
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGESELECT, TAG_CP(Prototype_VIBuffer_Terrain),
+		CVIBuffer_Terrain::Create(m_pDevice, m_pDeviceContext, L"Height_StageSelect.bmp")));
+
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGESELECT, TAG_CP(Prototype_Texture_Terrain),
+		CTexture::Create(m_pDevice, m_pDeviceContext, L"Terrain.txt")));
+
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGESELECT, TAG_CP(Prototype_Texture_GamePlayScene),
+		CTexture::Create(m_pDevice, m_pDeviceContext, L"UI_GamePlay.txt")));
+
+	
+
+
+
+	RELEASE_INSTANCE(CGameInstance);
 	EnterCriticalSection(_CriSec);
 	m_iLoadingMaxCount = 1;
 	m_iLoadingProgressCount = 0;
@@ -241,7 +321,7 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 
 
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Player),
-		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Alice", "Alice.FBX", TransformMatrix, 1)));
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "Alice", "Alice.FBX", TransformMatrix, 8)));
 
 	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Tornado1),
@@ -413,12 +493,12 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_ANIM, "JumpPad", "JumpPad.FBX", TransformMatrix)));
 
 	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
-	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_HealthRose),
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_HealthRose),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "HealthRose", "Health.FBX", TransformMatrix)));
 
-	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_Tooth),
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_Tooth),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "Tooth", "Tooth.FBX", TransformMatrix)));
-	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_GoldenTooth),
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_GoldenTooth),
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "ToothGolden", "Tooth.FBX", TransformMatrix)));
 
 
@@ -483,9 +563,6 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
 
 	/* 테스트 알게락 */
-
-	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_AlgaeRock_Ledge),
-		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "AlgaeRock", "AlgaeRock_Ledge.FBX", TransformMatrix)));
 
 
 	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STAGE1, TAG_CP(Prototype_Mesh_AlgaeRock_Pillar),
@@ -645,8 +722,6 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 		CPauseUI::Create(m_pDevice, m_pDeviceContext)));
 
 	//동적 맵 오브젝트
-	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_Terrain),
-		CTerrain::Create(m_pDevice, m_pDeviceContext)));
 
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_JumpPad),
 		CJumpPad::Create(m_pDevice, m_pDeviceContext)));
@@ -674,11 +749,6 @@ HRESULT CLoader::Load_Scene_Stage1(_bool * _IsClientQuit, CRITICAL_SECTION * _Cr
 	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_BreakablePiece),
 		CBreakablePiece::Create(m_pDevice, m_pDeviceContext)));
 	
-
-	FAILED_CHECK(pGameInstance->Add_GameObject_Prototype(TAG_OP(Prototype_StaticMapObject),
-		CStaticMapObject::Create(m_pDevice, m_pDeviceContext)));
-
-
 
 	//몬스터
 
@@ -1781,8 +1851,13 @@ HRESULT CLoader::Load_Scene_Edit(_bool * _IsClientQuit, CRITICAL_SECTION * _CriS
 		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "BallMesh", "BallMesh.FBX", TransformMatrix)));
 	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
 
-	
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_FarBuildingsPoorBig),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "StageSelect", "FarBuildingsPoorBig.FBX", TransformMatrix)));
+	TransformMatrix = XMMatrixScaling(0.001f, 0.001f, 0.001f);
+	FAILED_CHECK(pGameInstance->Add_Component_Prototype(SCENEID::SCENE_STATIC, TAG_CP(Prototype_Mesh_BricksWall),
+		CModel::Create(m_pDevice, m_pDeviceContext, CModel::TYPE_NONANIM, "StageSelect", "BricksWall.FBX", TransformMatrix)));
 
+	 
 #pragma endregion
 
 

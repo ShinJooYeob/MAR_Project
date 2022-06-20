@@ -518,6 +518,7 @@ enum LAYERID
 
 
 	Layer_UI_GamePlay,
+	Layer_NPC,
 
 
 
@@ -532,6 +533,11 @@ static const _tchar* Tag_Layer(LAYERID eTag)
 {
 	switch (eTag)
 	{
+		
+	case Layer_NPC:
+		return TEXT("Layer_NPC");
+		break;
+
 	case Layer_Camera_Main:
 		return TEXT("Layer_Camera_Main");
 		break;
@@ -853,6 +859,8 @@ enum COMPONENTPROTOTYPEID
 		
 		Prototype_Mesh_BallMesh,
 
+		Prototype_Mesh_FarBuildingsPoorBig,
+		Prototype_Mesh_BricksWall,
 
 		//AsylumBed_Insane
 		//AsylumCabinetA_Normal
@@ -880,7 +888,16 @@ enum COMPONENTPROTOTYPEID
 
 	Prototype_Mesh_Player,
 		Prototype_Mesh_PlayerLoby,
+		Prototype_Mesh_PlayerStageSelect,
 		Prototype_Mesh_PlayerEnding,
+
+		Prototype_Mesh_StageSelectCat,
+		Prototype_Mesh_StageSelectCop,
+		Prototype_Mesh_StageSelectGirl,
+		Prototype_Mesh_StageSelectBoy,
+		Prototype_Mesh_StageSelectWoman,
+		Prototype_Mesh_StageSelectMan,
+
 	Prototype_Mesh_Executor,
 		Prototype_Mesh_Grunt,
 		Prototype_Mesh_GruntSwpanMesh,
@@ -1531,8 +1548,14 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 		break;
 
 
-
-
+	case Prototype_Mesh_FarBuildingsPoorBig:
+		return TEXT("Prototype_Mesh_FarBuildingsPoorBig");
+		break;
+	case Prototype_Mesh_BricksWall:
+		return TEXT("Prototype_Mesh_BricksWall");
+		break;
+		
+		
 		//////////////////////////////////////////////////////////////////////////
 		//////////////////////////////////////////////////////////////////////////
 		//////////////////////////////////////////////////////////////////////////
@@ -1574,6 +1597,32 @@ static const _tchar* Tag_Component_Prototype(COMPONENTPROTOTYPEID eTag)
 		break;
 	case Prototype_Mesh_ClockBomb:
 		return TEXT("Prototype_Mesh_ClockBomb");
+		break;
+		
+
+	case Prototype_Mesh_PlayerStageSelect:
+		return TEXT("Prototype_Mesh_PlayerStageSelect");
+		break;
+
+
+
+	case Prototype_Mesh_StageSelectCat:
+		return TEXT("Prototype_Mesh_StageSelectCat");
+		break;
+	case Prototype_Mesh_StageSelectCop:
+		return TEXT("Prototype_Mesh_StageSelectCop");
+		break;
+	case Prototype_Mesh_StageSelectGirl:
+		return TEXT("Prototype_Mesh_StageSelectGirl");
+		break;
+	case Prototype_Mesh_StageSelectBoy:
+		return TEXT("Prototype_Mesh_StageSelectBoy");
+		break;
+	case Prototype_Mesh_StageSelectWoman:
+		return TEXT("Prototype_Mesh_StageSelectWoman");
+		break;
+	case Prototype_Mesh_StageSelectMan:
+		return TEXT("Prototype_Mesh_StageSelectMan");
 		break;
 
 

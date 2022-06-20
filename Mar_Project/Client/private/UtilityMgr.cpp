@@ -145,6 +145,8 @@ void CUtilityMgr::DistFogRendOn(_bool bBool)
 	m_pMainApp->DistFogRendOn(bBool);
 }
 
+
+
 HRESULT CUtilityMgr::Create_ParticleObject(_uint eSceneID, PARTICLEDESC tParticleDesc)
 {
 

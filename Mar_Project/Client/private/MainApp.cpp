@@ -72,30 +72,22 @@ _int CMainApp::Update(_double fDeltaTime)
 	g_fDeltaTime = fDeltaTime * m_SlowTimes;
 	FAILED_CHECK(Update_Mouse());
 
-	if (FAILED(m_pGameInstance->Update_Engine(fDeltaTime * m_SlowTimes)))
-	{
-		MSGBOX("Failed to Update_Engine ");
-		return E_FAIL;
-	}
-	//콜리전 내부 탐색중
-	//m_pCollision->Collision_Obsever(fDeltaTime);
 
-	if (FAILED(m_pGameInstance->LateUpdate_Engine(fDeltaTime * m_SlowTimes)))
-	{
-		MSGBOX("Failed to LateUpdate_Engine ");
-		return E_FAIL;
 
-	}
+		if (FAILED(m_pGameInstance->Update_Engine(fDeltaTime * m_SlowTimes)))
+		{
+			MSGBOX("Failed to Update_Engine ");
+			return E_FAIL;
+		}
+		//콜리전 내부 탐색중
+		//m_pCollision->Collision_Obsever(fDeltaTime);
 
-	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_PERIOD)&DIS_Down)
-	{
-		GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeFlickeringIn, 10.f, _float4(0, 0, 0, 1.f));
-	}
-	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_SLASH)&DIS_Down)
-	{
-		GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeIn, 1.f, _float4(0, 0, 0, 1));
-	}
+		if (FAILED(m_pGameInstance->LateUpdate_Engine(fDeltaTime * m_SlowTimes)))
+		{
+			MSGBOX("Failed to LateUpdate_Engine ");
+			return E_FAIL;
 
+		}
 
 	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_COMMA)&DIS_Down)
 	{
@@ -190,6 +182,8 @@ void CMainApp::SlowMotionStart(_float fTargetTime , _float TargetSpeed )
 
 }
 
+
+
 HRESULT CMainApp::Scene_Change(SCENEID eSceneID)
 {
 	if (m_pGameInstance == nullptr)
@@ -204,7 +198,6 @@ HRESULT CMainApp::Scene_Change(SCENEID eSceneID)
 	case SCENEID::SCENE_STAGE1:
 	case SCENEID::SCENE_EDIT:
 
-		//Scene_Change에 디폴트로 false true 이걸 트루로 바꿔준다?
 		FAILED_CHECK(GetSingle(CUtilityMgr)->Clear_RenderGroup_forSceneChange());
 		m_pGameInstance->Scene_Change(CScene_Loading::Create(m_pDevice, m_pDeviceContext, eSceneID), SCENEID::SCENE_LOADING);
 
@@ -475,10 +468,6 @@ HRESULT CMainApp::Update_Mouse()
 
 		if (!g_bShowMouse)
 		{
-			ClipCursor(NULL);
-		}
-		else
-		{
 			RECT rt;
 			GetClientRect(g_hWnd, &rt);
 			POINT p1, p2;
@@ -496,6 +485,12 @@ HRESULT CMainApp::Update_Mouse()
 			rt.bottom = p2.y;
 
 			ClipCursor(&rt);
+
+		}
+		else
+		{
+
+			ClipCursor(NULL);
 
 		}
 	}

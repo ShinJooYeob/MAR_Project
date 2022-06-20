@@ -1013,7 +1013,7 @@ HRESULT CGamePlayUI::Ready_TeethUI(CGameInstance * pInstance)
 	tUIDesc.fY = 166;
 	tUIDesc.fCX = 36;
 	tUIDesc.fCY = 53;
-
+	pUI->Set_IsDraw(false);
 	pUI->Apply_UI_To_MemberValue(tUIDesc);
 	FAILED_CHECK(pUI->Apply_UIDesc_To_Transform());
 

@@ -24,7 +24,7 @@ CRenderer::CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	Safe_AddRef(m_pGraphicDevice);
 
 }
-#define ShadowMapQuality 8
+#define ShadowMapQuality 10
 
 HRESULT CRenderer::Initialize_Prototype(void * pArg)
 {
@@ -888,23 +888,23 @@ HRESULT CRenderer::Render_BlurLuminence()
 	FAILED_CHECK(m_pRenderTargetMgr->Begin(TEXT("MRT_LumineceBluringVerticle"), m_DownScaledDepthStencil[0]));
 
 
-	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_UP)&DIS_Press)
-	{
-		m_BlurLuminence += 0.003f;
-		if (m_BlurLuminence > 1)m_BlurLuminence = 1;
+	//if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_UP)&DIS_Press)
+	//{
+	//	m_BlurLuminence += 0.003f;
+	//	if (m_BlurLuminence > 1)m_BlurLuminence = 1;
 
-		wstring ttDebugLog = L"CutLuminece : " + to_wstring(m_BlurLuminence) + L"\n";
-		OutputDebugStringW(ttDebugLog.c_str());
-	}
+	//	wstring ttDebugLog = L"CutLuminece : " + to_wstring(m_BlurLuminence) + L"\n";
+	//	OutputDebugStringW(ttDebugLog.c_str());
+	//}
 
-	if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_DOWN)&DIS_Press)
-	{
-		m_BlurLuminence -= 0.003f;
-		if (m_BlurLuminence < 0)m_BlurLuminence = 0;
+	//if (GetSingle(CGameInstance)->Get_DIKeyState(DIK_DOWN)&DIS_Press)
+	//{
+	//	m_BlurLuminence -= 0.003f;
+	//	if (m_BlurLuminence < 0)m_BlurLuminence = 0;
 
-		wstring ttDebugLog = L"CutLuminece : " + to_wstring(m_BlurLuminence) + L"\n";
-		OutputDebugStringW(ttDebugLog.c_str());
-	}
+	//	wstring ttDebugLog = L"CutLuminece : " + to_wstring(m_BlurLuminence) + L"\n";
+	//	OutputDebugStringW(ttDebugLog.c_str());
+	//}
 
 	FAILED_CHECK(m_pShader->Set_Texture("g_LinerTexture", m_pRenderTargetMgr->Get_SRV(TEXT("Target_DownScaledLuminece"))));
 	FAILED_CHECK(m_pShader->Set_RawValue("fScreemWidth", &ViewPortDesc.Width, sizeof(_float)));

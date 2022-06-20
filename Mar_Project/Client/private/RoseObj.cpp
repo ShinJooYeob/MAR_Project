@@ -115,12 +115,28 @@ _int CRoseObj::Update(_double fDeltaTime)
 
 		_bool bIsOn = false;
 		_uint eNowTile = Tile_End;
-		pTerrain->PutOnTerrain(&bIsOn, m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), m_vOldPos.XMVector(),nullptr,&eNowTile);
+		_float3 CacultedPos = pTerrain->PutOnTerrain(&bIsOn, m_pTransformCom->Get_MatrixState(CTransform::STATE_POS), m_vOldPos.XMVector(),nullptr,&eNowTile);
+
+
+		m_pTransformCom->Turn_CW(XMVectorSet(0, 1, 0, 0), fDeltaTime * 7);
+		if (eNowTile == Tile_None || eNowTile == Tile_DynamicNoneTile)
+		{
+			_float3 New = m_vOldPos;
+			New.y = m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS).y;
+			m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, New);
+		}
+		if (m_pTransformCom->Get_MatrixState_Float3(CTransform::STATE_POS).y < 1)
+		{
+			Set_IsDead();
+		}
 
 
 		m_pTransformCom->Turn_CW(XMVectorSet(0, 1, 0, 0), fDeltaTime * 7);
 		if (bIsOn)
+		{
+			m_pTransformCom->Set_MatrixState(CTransform::STATE_POS, CacultedPos);
 			m_bIsSpout = true;
+		}
 
 	}
 

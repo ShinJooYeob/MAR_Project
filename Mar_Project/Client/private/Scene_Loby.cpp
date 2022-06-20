@@ -35,6 +35,7 @@ HRESULT CScene_Loby::Initialize()
 	GetSingle(CUtilityMgr)->Start_ScreenEffect(CUtilityMgr::ScreenEffect_FadeIn, 0.5, { 0,0,0,1 });
 	FAILED_CHECK(g_pGameInstance->PlayBGM(L"BGM_STAGE_0.ogg", 0.1f));
 
+
 	return S_OK;
 }
 
@@ -134,7 +135,7 @@ _int CScene_Loby::Change_to_NextScene()
 	{
 	case  SCENE_STAGE1:
 		FAILED_CHECK(GetSingle(CUtilityMgr)->Clear_RenderGroup_forSceneChange());
-		FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Loading::Create(m_pDevice, m_pDeviceContext, SCENEID::SCENE_STAGE1), SCENEID::SCENE_LOADING));
+		FAILED_CHECK(g_pGameInstance->Scene_Change(CScene_Loading::Create(m_pDevice, m_pDeviceContext, SCENEID::SCENE_STAGESELECT), SCENEID::SCENE_LOADING));
 		break;
 
 

@@ -36,6 +36,7 @@ private:
 	HRESULT Ready_Layer_ShapeMemPad(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_ShapeMemBtn(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_PresserObj(const _tchar* pLayerTag);
+	HRESULT Ready_Layer_BreakableObj(const _tchar* pLayerTag);
 
 	HRESULT Ready_Layer_TriggerCollider(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_Eyepot(const _tchar* pLayerTag);

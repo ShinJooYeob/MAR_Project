@@ -51,6 +51,8 @@ HRESULT CScene_Stage2::Initialize()
 	FAILED_CHECK(Ready_Layer_ShapeMemPad(TAG_LAY(Layer_ShapeMemoryPad)));
 	FAILED_CHECK(Ready_Layer_ShapeMemBtn(TAG_LAY(Layer_ButtonPad)));
 	FAILED_CHECK(Ready_Layer_PresserObj(TAG_LAY(Layer_Presser)));
+	FAILED_CHECK(Ready_Layer_BreakableObj(TAG_LAY(Layer_Breakable)));
+	
 
 	FAILED_CHECK(Ready_Layer_TriggerCollider(TAG_LAY(Layer_TriggerCollider)));
 	
@@ -249,10 +251,10 @@ HRESULT CScene_Stage2::Ready_Layer_Player(const _tchar * pLayerTag)
 	/*ÂþÀÜ ¾Õ¿¡*/
 	//pPlayer->Renew_Player(_float3(68.85f, 19.66f, 102.472f), _float3(69.106f, 19.66f, 97.17f));
 
-	//pPlayer->Renew_Player(_float3(187.1f, 25.16f, 175), _float3(200.1f, 25.16f, 175));
+	pPlayer->Renew_Player(_float3(187.1f, 25.16f, 175), _float3(200.1f, 25.16f, 175));
 	
 	/*¿ø·¡ À§Ä¡*/
-	pPlayer->Renew_Player(_float3(70, 25.16f, 168), _float3(80, 25.16f, 168));
+	//pPlayer->Renew_Player(_float3(70, 25.16f, 168), _float3(80, 25.16f, 168));
 
 	return S_OK;
 }
@@ -260,6 +262,8 @@ HRESULT CScene_Stage2::Ready_Layer_Player(const _tchar * pLayerTag)
 HRESULT CScene_Stage2::Ready_Layer_UI(const _tchar * pLayerTag)
 {
 	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_UIGamePlay)));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_UIPause)));
+
 	return S_OK;
 }
 
@@ -533,6 +537,60 @@ HRESULT CScene_Stage2::Ready_Layer_PresserObj(const _tchar * pLayerTag)
 	tDesc.vDestPos = _float3(69.187f, 40.5f, 97.403f);
 
 	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_Presser), &tDesc));
+	return S_OK;
+}
+
+HRESULT CScene_Stage2::Ready_Layer_BreakableObj(const _tchar * pLayerTag)
+{
+
+	_uint iMesh = Prototype_Mesh_BreakableBox;
+
+	for (_int i = 0; i< 4; i++)
+	{
+		iMesh = (rand() % 3)? Prototype_Mesh_BreakableBox : Prototype_Mesh_BreakableBarrel;
+
+		FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_BreakableObj), &_float4(124.472633f, 22.05f, 178.903f - _float(i * 1.2f) , _float(iMesh))));
+	}
+	for (_int i = 0; i < 3; i++)
+	{
+		iMesh = (rand() % 2) ? Prototype_Mesh_BreakableBox : Prototype_Mesh_BreakableBarrel;
+
+		FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_BreakableObj), &_float4(123.447235f, 22.05f, 178.134583f - _float(i * 1.2f),_float(iMesh))));
+	}
+
+
+
+	for (_int i = 0; i < 3; i++)
+	{
+		iMesh = (rand() % 3) ? Prototype_Mesh_BreakableBox : Prototype_Mesh_BreakableBarrel;
+
+		FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_BreakableObj), &_float4(106.891f - _float(i * 1.2f), 26.7f, 129.131f , _float(iMesh))));
+	}
+
+
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_BreakableObj), &_float4(123.647f, 31.990f, 100.912f, _float(Prototype_Mesh_GiftBasket))));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_BreakableObj), &_float4(123.647f, 31.990f, 99.412f, _float(Prototype_Mesh_GiftBasket))));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_BreakableObj), &_float4(122.347f, 31.990f, 99.412f, _float(Prototype_Mesh_GiftBasket))));
+
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_BreakableObj), &_float4(165.939f, 39.020f, 181.127f, _float(Prototype_Mesh_GiftBasket))));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_BreakableObj), &_float4(165.939f, 39.020f, 179.627f, _float(Prototype_Mesh_GiftBasket))));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_BreakableObj), &_float4(164.639f, 39.020f, 179.627f, _float(Prototype_Mesh_GiftBasket))));
+	FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_BreakableObj), &_float4(167.239f, 39.020f, 179.627f, _float(Prototype_Mesh_GiftBasket))));
+
+	for (_int i = 0; i < 2; i++)
+	{// -_float(i)x
+		iMesh = (rand() % 3) ? Prototype_Mesh_BreakableBox : Prototype_Mesh_BreakableBarrel;
+		FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_BreakableObj), &_float4(133.002f+ _float(i * 1.2f), 45.050f, 179.992f, _float(iMesh))));
+
+		iMesh = (rand() % 3) ? Prototype_Mesh_BreakableBox : Prototype_Mesh_BreakableBarrel;
+		FAILED_CHECK(g_pGameInstance->Add_GameObject_To_Layer(SCENE_STAGE2, pLayerTag, TAG_OP(Prototype_BreakableObj), &_float4(133.002f+ _float(i * 1.2f), 45.050f, 178.992f, _float(iMesh))));
+	}
+
+
+
+
+
+
 	return S_OK;
 }
 

@@ -199,6 +199,8 @@ HRESULT CCamera_Main::Progress_Shaking_Thread(_bool * _IsClientQuit, CRITICAL_SE
 
 HRESULT CCamera_Main::Set_Cam_Over_Terrain()
 {
+	if (m_eNowSceneNum == SCENE_STAGESELECT)return S_FALSE;
+
 	CGameInstance* pInstance = GetSingle(CGameInstance);
 
 	CTerrain* pTerrain = (CTerrain*)(pInstance->Get_GameObject_By_LayerIndex(m_eNowSceneNum, TAG_LAY(Layer_Terrain)));

@@ -163,6 +163,21 @@ HRESULT CPauseUI::Update_PaperCurl(_double fDeltaTime)
 		{
 			m_pPaperCurlUI->Set_TextureLayerIndex_UntilTo(0, 9, 0.5f);
 			m_PaperCurled = true;
+
+			{
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = g_pGameInstance->Get_TargetPostion_float4(PLV_PLAYER);
+				tSoundDesc.vMinMax = _float2(1000, 1001);
+				tSoundDesc.fTargetSound = 1.f;
+				wstring SoundTrack = L"";
+
+				SoundTrack = L"BookPageTurn.mp3";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+			}
+
+
 		}
 	}
 
@@ -484,6 +499,20 @@ HRESULT CPauseUI::Update_GuideLine(_double fDeltaTime)
 			{
 				m_iUpgradeIndex = i;
 				IndexChageTime = 0;
+
+				{
+					SOUNDDESC tSoundDesc;
+
+					tSoundDesc.vPosition = g_pGameInstance->Get_TargetPostion_float4(PLV_PLAYER);
+					tSoundDesc.vMinMax = _float2(1000, 1001);
+					tSoundDesc.fTargetSound = 1.f;
+					wstring SoundTrack = L"";
+
+					SoundTrack = L"beep.mp3";
+
+					g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+				}
+
 				break;
 			}
 		}
@@ -506,14 +535,44 @@ HRESULT CPauseUI::Update_GuideLine(_double fDeltaTime)
 			if (g_bShowMouse && (g_pGameInstance->Get_DIMouseButtonState(CInput_Device::MBS_LBUTTON) & DIS_Down))
 			{
 				if (m_pPlayer->Get_UpgradeCount((UPGRADEID)m_iUpgradeIndex) < WeaponUpgradeCount && !m_bUpgrading[m_iUpgradeIndex] && 
-					((m_pPlayer->Get_UpgradeCount((UPGRADEID)m_iUpgradeIndex) * 7) <=m_pPlayer->Get_TeethCount())	)
+					((m_pPlayer->Get_UpgradeCount((UPGRADEID)m_iUpgradeIndex) * 37) <=m_pPlayer->Get_TeethCount())	)
 				{
 					m_bUpgrading[m_iUpgradeIndex] = true;
 					m_fUpgradingPassedTime[m_iUpgradeIndex] = 0;
 
+					m_pPlayer->Plus_iTeethCount(-(m_pPlayer->Get_UpgradeCount((UPGRADEID)m_iUpgradeIndex) * 37));
 					m_pPlayer->Plus_UpgradeCount((UPGRADEID)m_iUpgradeIndex);
 
-					m_pPlayer->Plus_iTeethCount(-(m_pPlayer->Get_UpgradeCount((UPGRADEID)m_iUpgradeIndex) * 7));
+					{
+						SOUNDDESC tSoundDesc;
+
+						tSoundDesc.vPosition = g_pGameInstance->Get_TargetPostion_float4(PLV_PLAYER);
+						tSoundDesc.vMinMax = _float2(1000, 1001);
+						tSoundDesc.fTargetSound = 1.f;
+						wstring SoundTrack = L"";
+
+						SoundTrack = L"MapObject_pickups_teeth_magic0" + to_wstring(rand() % 3 + 1) + L".ogg";
+
+						g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+					}
+
+				}
+				else
+				{
+					{
+						SOUNDDESC tSoundDesc;
+
+						tSoundDesc.vPosition = g_pGameInstance->Get_TargetPostion_float4(PLV_PLAYER);
+						tSoundDesc.vMinMax = _float2(1000, 1001);
+						tSoundDesc.fTargetSound = 1.f;
+						wstring SoundTrack = L"";
+
+						SoundTrack = L"MapObject_pickups_teeth0"+to_wstring(rand()%2 + 1)+L".ogg";
+
+						g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+					}
+
+
 
 				}
 			}
@@ -539,6 +598,19 @@ HRESULT CPauseUI::Update_GuideLine(_double fDeltaTime)
 				m_vecUIContainer[26]->Set_TextureLayerIndex(0);
 					m_pPaperCurlUI->Set_TextureLayerIndex_UntilTo(9, 0, 0.5f);
 					m_PaperCurled = false;
+
+					{
+						SOUNDDESC tSoundDesc;
+
+						tSoundDesc.vPosition = g_pGameInstance->Get_TargetPostion_float4(PLV_PLAYER);
+						tSoundDesc.vMinMax = _float2(1000, 1001);
+						tSoundDesc.fTargetSound = 1.f;
+						wstring SoundTrack = L"";
+
+						SoundTrack = L"BookPageTurn.mp3";
+
+						g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+					}
 			}
 		}
 		else
@@ -620,21 +692,32 @@ HRESULT CPauseUI::Update_Button(_double fDeltaTime)
 	{
 
 		FONTSDESC tDesc;
+		if (m_pPlayer->Get_UpgradeCount(Upgrade_Vopal) < WeaponUpgradeCount)
+		{
 
-		tDesc.vPosition = _float2(447, 157);
-		tDesc.szString = to_wstring(m_pPlayer->Get_UpgradeCount(Upgrade_Vopal) * 7);
-		tDesc.fAngle = 6;
-		tDesc.vColor = ((m_pPlayer->Get_UpgradeCount(Upgrade_Vopal) * 7) <= m_pPlayer->Get_TeethCount())?_float4(1): _float4(0.99609375f, 0.10546875f, 0.08203125f , 1);
-		tDesc.vFontScale = _float2(FontsSize);
-		
-		m_vecFontDesc.push_back(tDesc);
+			tDesc.vPosition = _float2(447, 157);
+			tDesc.szString = to_wstring(m_pPlayer->Get_UpgradeCount(Upgrade_Vopal) * 37);
+			tDesc.fAngle = 6;
+			tDesc.vColor = ((m_pPlayer->Get_UpgradeCount(Upgrade_Vopal) * 37) <= m_pPlayer->Get_TeethCount()) ? _float4(1) : _float4(0.99609375f, 0.10546875f, 0.08203125f, 1);
+			tDesc.vFontScale = _float2(FontsSize);
 
+			m_vecFontDesc.push_back(tDesc);
+		}
 
 
 		tDesc.vPosition = _float2(395, 480);
-		tDesc.szString = L"LV: " + to_wstring(m_pPlayer->Get_UpgradeCount(Upgrade_Vopal));
+		if (m_pPlayer->Get_UpgradeCount(Upgrade_Vopal) == WeaponUpgradeCount)
+		{
+			tDesc.szString = L"LV: Max";
+			tDesc.vColor = _float4(0.12890625f, 0.1875f, 0.19140625f, 1);
+			tDesc.vFontScale = _float2(FontsSize * 0.8f);
+		}
+		else
+		{
+			tDesc.szString = L"LV: " + to_wstring(m_pPlayer->Get_UpgradeCount(Upgrade_Vopal));
+			tDesc.vColor = _float4(1);
+		}
 		tDesc.fAngle = 5;
-		tDesc.vColor = _float4(1);
 		tDesc.vFontScale = _float2(FontsSize);
 
 		m_vecFontDesc.push_back(tDesc);
@@ -643,21 +726,33 @@ HRESULT CPauseUI::Update_Button(_double fDeltaTime)
 
 		FONTSDESC tDesc;
 
-		tDesc.vPosition = _float2(599, 170);
-		tDesc.szString = to_wstring(m_pPlayer->Get_UpgradeCount(Upgrade_PaperGrinder) * 7);
-		tDesc.fAngle = 6;		
-		tDesc.vColor = ((m_pPlayer->Get_UpgradeCount(Upgrade_PaperGrinder) * 7) <= m_pPlayer->Get_TeethCount()) ? _float4(1) : _float4(0.99609375f, 0.10546875f, 0.08203125f, 1);
+		if (m_pPlayer->Get_UpgradeCount(Upgrade_PaperGrinder) < WeaponUpgradeCount)
+		{
+			tDesc.vPosition = _float2(599, 170);
+			tDesc.szString = to_wstring(m_pPlayer->Get_UpgradeCount(Upgrade_PaperGrinder) * 37);
+			tDesc.fAngle = 6;
+			tDesc.vColor = ((m_pPlayer->Get_UpgradeCount(Upgrade_PaperGrinder) * 37) <= m_pPlayer->Get_TeethCount()) ? _float4(1) : _float4(0.99609375f, 0.10546875f, 0.08203125f, 1);
 
-		tDesc.vFontScale = _float2(FontsSize);
+			tDesc.vFontScale = _float2(FontsSize);
 
-		m_vecFontDesc.push_back(tDesc);
-
+			m_vecFontDesc.push_back(tDesc);
+		}
 
 
 		tDesc.vPosition = _float2(543 ,493);
+		if (m_pPlayer->Get_UpgradeCount(Upgrade_PaperGrinder) == WeaponUpgradeCount)
+		{
+			tDesc.szString = L"LV: Max";
+			tDesc.vColor = _float4(0.12890625f, 0.1875f, 0.19140625f, 1);
+			tDesc.vFontScale = _float2(FontsSize * 0.8f);
+		}
+		else
+		{
 		tDesc.szString = L"LV: " + to_wstring(m_pPlayer->Get_UpgradeCount(Upgrade_PaperGrinder));
-		tDesc.fAngle = 5;
 		tDesc.vColor = _float4(1);
+
+		}
+		tDesc.fAngle = 5;
 		tDesc.vFontScale = _float2(FontsSize);
 
 		m_vecFontDesc.push_back(tDesc);
@@ -665,21 +760,31 @@ HRESULT CPauseUI::Update_Button(_double fDeltaTime)
 	{
 
 		FONTSDESC tDesc;
+		if (m_pPlayer->Get_UpgradeCount(Upgrade_Horse) < WeaponUpgradeCount)
+		{
+			tDesc.vPosition = _float2(752, 188);
+			tDesc.szString = to_wstring(m_pPlayer->Get_UpgradeCount(Upgrade_Horse) * 37);
+			tDesc.fAngle = 6;
+			tDesc.vColor = ((m_pPlayer->Get_UpgradeCount(Upgrade_Horse) * 37) <= m_pPlayer->Get_TeethCount()) ? _float4(1) : _float4(0.99609375f, 0.10546875f, 0.08203125f, 1);
 
-		tDesc.vPosition = _float2(752, 188);
-		tDesc.szString = to_wstring(m_pPlayer->Get_UpgradeCount(Upgrade_Horse) * 7);
-		tDesc.fAngle = 6;
-		tDesc.vColor = ((m_pPlayer->Get_UpgradeCount(Upgrade_Horse) * 7) <= m_pPlayer->Get_TeethCount()) ? _float4(1) : _float4(0.99609375f, 0.10546875f, 0.08203125f, 1);
+			tDesc.vFontScale = _float2(FontsSize);
 
-		tDesc.vFontScale = _float2(FontsSize);
-
-		m_vecFontDesc.push_back(tDesc);
-
+			m_vecFontDesc.push_back(tDesc);
+		}
 
 		tDesc.vPosition = _float2(691 ,506);
-		tDesc.szString = L"LV: " + to_wstring(m_pPlayer->Get_UpgradeCount(Upgrade_Horse));
+		if (m_pPlayer->Get_UpgradeCount(Upgrade_Horse) == WeaponUpgradeCount)
+		{
+			tDesc.szString = L"LV: Max";
+			tDesc.vColor = _float4(0.12890625f, 0.1875f, 0.19140625f, 1);
+			tDesc.vFontScale = _float2(FontsSize * 0.8f);
+		}
+		else
+		{
+			tDesc.szString = L"LV: " + to_wstring(m_pPlayer->Get_UpgradeCount(Upgrade_Horse));
+			tDesc.vColor = _float4(1);
+		}
 		tDesc.fAngle = 5;
-		tDesc.vColor = _float4(1);
 		tDesc.vFontScale = _float2(FontsSize);
 
 		m_vecFontDesc.push_back(tDesc);
@@ -688,20 +793,32 @@ HRESULT CPauseUI::Update_Button(_double fDeltaTime)
 	{
 
 		FONTSDESC tDesc;
+		if (m_pPlayer->Get_UpgradeCount(Upgrade_Teapot) < WeaponUpgradeCount)
+		{
+			tDesc.vPosition = _float2(907, 203);
+			tDesc.szString = to_wstring(m_pPlayer->Get_UpgradeCount(Upgrade_Teapot) * 37);
+			tDesc.fAngle = 6;
+			tDesc.vColor = ((m_pPlayer->Get_UpgradeCount(Upgrade_Teapot) * 37) <= m_pPlayer->Get_TeethCount()) ? _float4(1) : _float4(0.99609375f, 0.10546875f, 0.08203125f, 1);
 
-		tDesc.vPosition = _float2(907, 203);
-		tDesc.szString = to_wstring(m_pPlayer->Get_UpgradeCount(Upgrade_Teapot) * 7);
-		tDesc.fAngle = 6;
-		tDesc.vColor = ((m_pPlayer->Get_UpgradeCount(Upgrade_Teapot) * 7) <= m_pPlayer->Get_TeethCount()) ? _float4(1) : _float4(0.99609375f, 0.10546875f, 0.08203125f, 1);
+			tDesc.vFontScale = _float2(FontsSize);
 
-		tDesc.vFontScale = _float2(FontsSize);
+			m_vecFontDesc.push_back(tDesc);
+		}
 
-		m_vecFontDesc.push_back(tDesc);
 
 		tDesc.vPosition = _float2(847, 519);
-		tDesc.szString = L"LV: " + to_wstring(m_pPlayer->Get_UpgradeCount(Upgrade_Teapot));
+		if (m_pPlayer->Get_UpgradeCount(Upgrade_Teapot) == WeaponUpgradeCount)
+		{
+			tDesc.szString = L"LV: Max";
+			tDesc.vColor = _float4(0.12890625f, 0.1875f, 0.19140625f, 1);
+			tDesc.vFontScale = _float2(FontsSize * 0.8f);
+		}
+		else
+		{
+			tDesc.szString = L"LV: " + to_wstring(m_pPlayer->Get_UpgradeCount(Upgrade_Teapot));
+			tDesc.vColor = _float4(1);
+		}
 		tDesc.fAngle = 5;
-		tDesc.vColor = _float4(1);
 		tDesc.vFontScale = _float2(FontsSize);
 
 		m_vecFontDesc.push_back(tDesc);
@@ -739,7 +856,18 @@ HRESULT CPauseUI::Update_Button(_double fDeltaTime)
 			if (IndexChageTime > 5) IndexChageTime = 5;
 		}
 
-		if ((m_pPlayer->Get_UpgradeCount((UPGRADEID)m_iUpgradeIndex) * 7) > m_pPlayer->Get_TeethCount())
+		if (m_pPlayer->Get_UpgradeCount((UPGRADEID)m_iUpgradeIndex) == WeaponUpgradeCount)
+		{
+			tDesc.vPosition = _float2(395, 545);
+			tDesc.szString = L"No Way To Upgrade, \nAlready reached the maximum level of enhancement.";
+			tDesc.szString = tDesc.szString.substr(0, _uint(tDesc.szString.length() * IndexChageTime / 5.f));
+
+			tDesc.fAngle = 5;
+			tDesc.vColor = _float4(0.12890625f, 0.1875f, 0.19140625f, 1);
+			tDesc.vFontScale = _float2(0.65f);
+			m_vecFontDesc.push_back(tDesc);
+		}
+		else if ((m_pPlayer->Get_UpgradeCount((UPGRADEID)m_iUpgradeIndex) * 37) > m_pPlayer->Get_TeethCount())
 		{
 			tDesc.vPosition = _float2(395, 545);
 			tDesc.szString = L"Not Enough Teeth to Upgrade";

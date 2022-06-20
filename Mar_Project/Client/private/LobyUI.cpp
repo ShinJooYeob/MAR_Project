@@ -58,6 +58,18 @@ _int CLobyUI::Update(_double fDeltaTime)
 		{
 			m_vecUIContainer[0]->Set_TextureLayerIndex(1);
 
+			{
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = g_pGameInstance->Get_TargetPostion_float4(PLV_PLAYER);
+				tSoundDesc.vMinMax = _float2(1000, 1001);
+				tSoundDesc.fTargetSound = 1.f;
+				wstring SoundTrack = L"";
+
+				SoundTrack = L"BookPageTurn.mp3";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+			}
 		}
 	}
 	else
@@ -73,6 +85,18 @@ _int CLobyUI::Update(_double fDeltaTime)
 			//}
 			//m_vecUIContainer[3 + m_iIndex]->Set_TextureLayerIndex(m_iIndex * 2 + 1);
 
+			{
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = g_pGameInstance->Get_TargetPostion_float4(PLV_PLAYER);
+				tSoundDesc.vMinMax = _float2(1000, 1001);
+				tSoundDesc.fTargetSound = 1.f;
+				wstring SoundTrack = L"";
+
+				SoundTrack = L"beep.mp3";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+			}
 
 			UIDESC tDesc =  m_vecUIContainer[3 + m_iIndex]->Get_UIDesc();
 
@@ -96,6 +120,19 @@ _int CLobyUI::Update(_double fDeltaTime)
 			//	m_vecUIContainer[3 + i]->Set_TextureLayerIndex(i * 2);
 			//}
 			//m_vecUIContainer[3 + m_iIndex]->Set_TextureLayerIndex(m_iIndex * 2 + 1);
+
+			{
+				SOUNDDESC tSoundDesc;
+
+				tSoundDesc.vPosition = g_pGameInstance->Get_TargetPostion_float4(PLV_PLAYER);
+				tSoundDesc.vMinMax = _float2(1000, 1001);
+				tSoundDesc.fTargetSound = 1.f;
+				wstring SoundTrack = L"";
+
+				SoundTrack = L"beep.mp3";
+
+				g_pGameInstance->PlaySoundW(SoundTrack.c_str(), CHANNEL_OBJECT, &tSoundDesc);
+			}
 
 			UIDESC tDesc = m_vecUIContainer[3 + m_iIndex]->Get_UIDesc();
 
